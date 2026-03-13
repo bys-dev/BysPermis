@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ENUMS ───────────────────────────────────────────────
+
+enum Role {
+  ELEVE
+  CENTRE
+  ADMIN
+}
+
+enum ReservationStatus {
+  EN_ATTENTE
+  CONFIRMEE
+  ANNULEE
+  TERMINEE
+}
+
+enum TicketStatus {
+  OUVERT
+  EN_COURS
+  RESOLU
+}
+
+enum Modalite {
+  PRESENTIEL
+  DISTANCIEL
+  HYBRIDE
+}
+
+enum MonetisationModel {
+  ABONNEMENT
+  COMMISSION
+  HYBRIDE
+}
+
+// ─── USERS ───────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  auth0Id       String   @unique
+  email         String   @unique
+  nom           String
+  prenom        String
+  telephone     String?
+  adresse       String?
+  codePostal    String?
+  ville         String?
+  role          Role     @default(ELEVE)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  reservations  Reservation[]
+  centre        Centre?
+  tickets       Ticket[]
+  messages      TicketMessage[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// ─── CENTRES DE FORMATION ────────────────────────────────
+
+model Centre {
+  id              String   @id @default(cuid())
+  nom             String
+  description     String?
+  logo            String?
+  adresse         String
+  codePostal      String
+  ville           String
+  telephone       String?
+  email           String?
+  siteWeb         String?
+  stripeAccountId String?
+  isActive        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formations      Formation[]
+
+  @@map("centres")
+}
+
+// ─── FORMATIONS ──────────────────────────────────────────
+
+model Formation {
+  id            String    @id @default(cuid())
+  titre         String
+  description   String
+  objectifs     String?
+  programme     String?
+  prerequis     String?
+  publicCible   String?
+  duree         String
+  prix          Float
+  modalite      Modalite  @default(PRESENTIEL)
+  lieu          String?
+  isQualiopi    Boolean   @default(false)
+  isCPF         Boolean   @default(false)
+  image         String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  centreId      String
+  centre        Centre    @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  categorieId   String?
+  categorie     Categorie? @relation(fields: [categorieId], references: [id])
+  sessions      Session[]
+
+  @@map("formations")
+}
+
+// ─── CATEGORIES ──────────────────────────────────────────
+
+model Categorie {
+  id          String      @id @default(cuid())
+  nom         String      @unique
+  description String?
+  icon        String?
+  formations  Formation[]
+
+  @@map("categories")
+}
+
+// ─── SESSIONS (créneaux) ─────────────────────────────────
+
+model Session {
+  id            String    @id @default(cuid())
+  dateDebut     DateTime
+  dateFin       DateTime
+  placesTotal   Int
+  placesRestantes Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  formationId   String
+  formation     Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+  reservations  Reservation[]
+
+  @@map("sessions")
+}
+
+// ─── RESERVATIONS ────────────────────────────────────────
+
+model Reservation {
+  id                String            @id @default(cuid())
+  numero            String            @unique @default(cuid())
+  status            ReservationStatus @default(EN_ATTENTE)
+  montant           Float
+  commissionMontant Float?
+  stripePaymentId   String?
+  civilite          String?
+  nom               String
+  prenom            String
+  email             String
+  telephone         String
+  adresse           String?
+  codePostal        String?
+  ville             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  // Relations
+  userId            String
+  user              User              @relation(fields: [userId], references: [id])
+  sessionId         String
+  session           Session           @relation(fields: [sessionId], references: [id])
+
+  @@map("reservations")
+}
+
+// ─── SUPPORT / TICKETS ───────────────────────────────────
+
+model Ticket {
+  id        String       @id @default(cuid())
+  sujet     String
+  status    TicketStatus @default(OUVERT)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relations
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  messages  TicketMessage[]
+
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  contenu   String
+  fichier   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("ticket_messages")
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  titre     String
+  contenu   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// ─── PARAMETRES PLATEFORME ───────────────────────────────
+
+model PlatformSettings {
+  id                 String            @id @default("default")
+  commissionRate     Float             @default(10)
+  monetisationModel  MonetisationModel @default(COMMISSION)
+  updatedAt          DateTime          @updatedAt
+
+  @@map("platform_settings")
+}
