@@ -19,13 +19,35 @@ enum ReservationStatus {
   EN_ATTENTE
   CONFIRMEE
   ANNULEE
+  REMBOURSEE
   TERMINEE
+}
+
+enum SessionStatus {
+  ACTIVE
+  ANNULEE
+  COMPLETE
+  PASSEE
+}
+
+enum CentreStatus {
+  EN_ATTENTE
+  ACTIF
+  SUSPENDU
 }
 
 enum TicketStatus {
   OUVERT
   EN_COURS
   RESOLU
+  FERME
+}
+
+enum TicketPriorite {
+  BASSE
+  NORMALE
+  HAUTE
+  URGENTE
 }
 
 enum Modalite {
@@ -38,6 +60,13 @@ enum MonetisationModel {
   ABONNEMENT
   COMMISSION
   HYBRIDE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  ANNULEE
+  TRIALING
 }
 
 // ─── USERS ───────────────────────────────────────────────
@@ -53,6 +82,7 @@ model User {
   codePostal    String?
   ville         String?
   role          Role     @default(ELEVE)
+  isBlocked     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -69,25 +99,30 @@ model User {
 // ─── CENTRES DE FORMATION ────────────────────────────────
 
 model Centre {
-  id              String   @id @default(cuid())
-  nom             String
-  description     String?
-  logo            String?
-  adresse         String
-  codePostal      String
-  ville           String
-  telephone       String?
-  email           String?
-  siteWeb         String?
-  stripeAccountId String?
-  isActive        Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                    String             @id @default(cuid())
+  nom                   String
+  slug                  String             @unique
+  description           String?
+  logo                  String?
+  adresse               String
+  codePostal            String
+  ville                 String
+  telephone             String?
+  email                 String?
+  siteWeb               String?
+  stripeAccountId       String?
+  stripeOnboardingDone  Boolean            @default(false)
+  subscriptionStatus    SubscriptionStatus?
+  subscriptionStripeId  String?
+  statut                CentreStatus       @default(EN_ATTENTE)
+  isActive              Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
 
   // Relations
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  formations      Formation[]
+  userId                String             @unique
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formations            Formation[]
 
   @@map("centres")
 }
@@ -97,6 +132,7 @@ model Centre {
 model Formation {
   id            String    @id @default(cuid())
   titre         String
+  slug          String    @unique
   description   String
   objectifs     String?
   programme     String?
@@ -130,6 +166,8 @@ model Categorie {
   nom         String      @unique
   description String?
   icon        String?
+  couleur     String?
+  ordre       Int         @default(0)
   formations  Formation[]
 
   @@map("categories")
@@ -138,18 +176,19 @@ model Categorie {
 // ─── SESSIONS (créneaux) ─────────────────────────────────
 
 model Session {
-  id            String    @id @default(cuid())
-  dateDebut     DateTime
-  dateFin       DateTime
-  placesTotal   Int
+  id              String        @id @default(cuid())
+  dateDebut       DateTime
+  dateFin         DateTime
+  placesTotal     Int
   placesRestantes Int
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  status          SessionStatus @default(ACTIVE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   // Relations
-  formationId   String
-  formation     Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
-  reservations  Reservation[]
+  formationId     String
+  formation       Formation     @relation(fields: [formationId], references: [id], onDelete: Cascade)
+  reservations    Reservation[]
 
   @@map("sessions")
 }
@@ -171,6 +210,7 @@ model Reservation {
   adresse           String?
   codePostal        String?
   ville             String?
+  numeroPermis      String?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
@@ -186,15 +226,17 @@ model Reservation {
 // ─── SUPPORT / TICKETS ───────────────────────────────────
 
 model Ticket {
-  id        String       @id @default(cuid())
+  id        String         @id @default(cuid())
   sujet     String
-  status    TicketStatus @default(OUVERT)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  status    TicketStatus   @default(OUVERT)
+  priorite  TicketPriorite @default(NORMALE)
+  categorie String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   // Relations
   userId    String
-  user      User         @relation(fields: [userId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
   messages  TicketMessage[]
 
   @@map("tickets")
@@ -204,6 +246,7 @@ model TicketMessage {
   id        String   @id @default(cuid())
   contenu   String
   fichier   String?
+  isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
 
   // Relations
@@ -213,6 +256,21 @@ model TicketMessage {
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("ticket_messages")
+}
+
+// ─── FAQ ─────────────────────────────────────────────────
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  reponse   String
+  categorie String?
+  ordre     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faq_items")
 }
 
 // ─── NOTIFICATIONS ───────────────────────────────────────

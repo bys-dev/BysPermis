@@ -20,9 +20,20 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Formation Central – Trouvez et réservez votre formation professionnelle",
+  title: "BYS Formation — Récupérez vos points près de chez vous au meilleur prix",
   description:
-    "Plateforme marketplace de formations professionnelles certifiées Qualiopi et éligibles CPF. Recherchez, comparez et réservez en ligne.",
+    "Trouvez un stage de récupération de points permis agréé près de chez vous. Réservez en ligne, recevez votre convocation automatiquement. Centres agréés Ministère de l'Intérieur.",
+  keywords: [
+    "récupération de points",
+    "stage permis",
+    "points permis",
+    "stage agréé",
+    "BYS Formation",
+    "FIMO",
+    "FCO",
+    "permis B",
+    "sécurité routière",
+  ],
 };
 
 export default function RootLayout({
