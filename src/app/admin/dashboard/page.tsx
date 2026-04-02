@@ -7,6 +7,9 @@ import {
   faEuro, faBuilding, faUsers, faClipboardList,
   faArrowUp, faCheckCircle, faCircleXmark,
   faClock, faHeadset, faChartLine, faArrowRight, faSpinner,
+  faCrown, faShieldHalved, faUserShield, faCog,
+  faPercent, faScrewdriverWrench, faPlus,
+  faCalendarDay, faTicket, faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice, formatDate } from "@/lib/utils";
 
@@ -37,12 +40,26 @@ interface AdminStats {
   }[];
 }
 
+interface AdminUser {
+  prenom: string;
+  nom: string;
+  role: "ADMIN" | "OWNER";
+}
+
+interface ActivityItem {
+  id: string;
+  type: "reservation" | "centre" | "ticket" | "user";
+  label: string;
+  detail: string;
+  time: string;
+}
+
 const statusBadge = (s: string) => {
   const map: Record<string, { cls: string; label: string }> = {
-    CONFIRMEE:  { cls: "bg-green-400/10 text-green-400 border-green-500/20",   label: "Confirmée"  },
+    CONFIRMEE:  { cls: "bg-green-400/10 text-green-400 border-green-500/20",   label: "Confirmee"  },
     EN_ATTENTE: { cls: "bg-yellow-400/10 text-yellow-400 border-yellow-500/20", label: "En attente" },
-    ANNULEE:    { cls: "bg-red-400/10 text-red-400 border-red-500/20",           label: "Annulée"    },
-    TERMINEE:   { cls: "bg-gray-400/10 text-gray-400 border-gray-500/20",        label: "Terminée"   },
+    ANNULEE:    { cls: "bg-red-400/10 text-red-400 border-red-500/20",           label: "Annulee"    },
+    TERMINEE:   { cls: "bg-gray-400/10 text-gray-400 border-gray-500/20",        label: "Terminee"   },
   };
   return map[s] ?? { cls: "bg-gray-400/10 text-gray-400 border-gray-500/20", label: s };
 };
@@ -53,29 +70,60 @@ const MOCK_STATS: AdminStats = {
   reservationsCeMois: 1284, reservationsEvolution: 8,
   utilisateurs: 12847, ticketsOuverts: 3,
   reservationsRecentes: [
-    { id: "RES-2847", eleve: "Jean Dupont", centre: "BYS Formation Osny", stage: "Récupération de points", montant: 199, status: "CONFIRMEE", createdAt: new Date().toISOString() },
-    { id: "RES-2846", eleve: "Marie Martin", centre: "Auto-École Montmartre", stage: "Stage 48N", montant: 249, status: "EN_ATTENTE", createdAt: new Date().toISOString() },
-    { id: "RES-2845", eleve: "Lucas Bernard", centre: "BYS Formation Cergy", stage: "Récupération de points", montant: 209, status: "CONFIRMEE", createdAt: new Date().toISOString() },
+    { id: "RES-2847", eleve: "Jean Dupont", centre: "BYS Formation Osny", stage: "Recuperation de points", montant: 199, status: "CONFIRMEE", createdAt: new Date().toISOString() },
+    { id: "RES-2846", eleve: "Marie Martin", centre: "Auto-Ecole Montmartre", stage: "Stage 48N", montant: 249, status: "EN_ATTENTE", createdAt: new Date().toISOString() },
+    { id: "RES-2845", eleve: "Lucas Bernard", centre: "BYS Formation Cergy", stage: "Recuperation de points", montant: 209, status: "CONFIRMEE", createdAt: new Date().toISOString() },
   ],
   centresEnAttenteList: [
-    { id: "C001", nom: "Auto-École Bordelaise", ville: "Bordeaux", email: "ae-bordelaise@gmail.com", createdAt: new Date("2026-03-22").toISOString() },
+    { id: "C001", nom: "Auto-Ecole Bordelaise", ville: "Bordeaux", email: "ae-bordelaise@gmail.com", createdAt: new Date("2026-03-22").toISOString() },
     { id: "C002", nom: "Centre Conduite Nantes", ville: "Nantes", email: "conduite.nantes@gmail.com", createdAt: new Date("2026-03-21").toISOString() },
   ],
 };
 
+const MOCK_ACTIVITY: ActivityItem[] = [
+  { id: "a1", type: "reservation", label: "Nouvelle reservation", detail: "Jean Dupont — BYS Formation Osny", time: "Il y a 12 min" },
+  { id: "a2", type: "centre", label: "Nouveau centre inscrit", detail: "Auto-Ecole Bordelaise — Bordeaux", time: "Il y a 1h" },
+  { id: "a3", type: "ticket", label: "Ticket support ouvert", detail: "Probleme de paiement — Jean Dupont", time: "Il y a 2h" },
+  { id: "a4", type: "user", label: "Nouvel utilisateur", detail: "Sophie Petit — sophie.petit@outlook.fr", time: "Il y a 3h" },
+  { id: "a5", type: "reservation", label: "Reservation confirmee", detail: "Marie Martin — Auto-Ecole Montmartre", time: "Il y a 4h" },
+];
+
+const activityIcon = (type: ActivityItem["type"]) => {
+  const map = {
+    reservation: { icon: faCalendarDay, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/20" },
+    centre:      { icon: faBuilding,    color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/20" },
+    ticket:      { icon: faTicket,      color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-500/20" },
+    user:        { icon: faUserPlus,    color: "text-green-400", bg: "bg-green-400/10", border: "border-green-500/20" },
+  };
+  return map[type];
+};
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/stats")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && typeof data.centresActifs === "number") setStats(data);
-        else setStats(MOCK_STATS);
-      })
-      .catch(() => setStats(MOCK_STATS))
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/admin/stats")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && typeof data.centresActifs === "number") return data;
+          return MOCK_STATS;
+        })
+        .catch(() => MOCK_STATS),
+      fetch("/api/admin/me")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && data.role) return data;
+          return { prenom: "Admin", nom: "", role: "ADMIN" };
+        })
+        .catch(() => ({ prenom: "Admin", nom: "", role: "ADMIN" })),
+    ]).then(([statsData, userData]) => {
+      setStats(statsData);
+      setUser(userData);
+      setLoading(false);
+    });
   }, []);
 
   async function validateCentre(id: string) {
@@ -110,37 +158,68 @@ export default function AdminDashboardPage() {
   }
 
   const s = stats ?? MOCK_STATS;
+  const isOwner = user?.role === "OWNER";
 
   const kpis = [
     {
-      label: "Revenus plateforme", value: loading ? "…" : formatPrice(s.revenusPlateforme),
-      sub: "Commission perçue ce mois", icon: faEuro, trend: `+${s.revenusEvolution}%`,
+      label: "Revenus plateforme", value: loading ? "..." : formatPrice(s.revenusPlateforme),
+      sub: "Commission percue ce mois", icon: faEuro, trend: `+${s.revenusEvolution}%`,
       color: "text-green-400", bg: "bg-green-400/10", border: "border-green-500/20",
     },
     {
-      label: "Centres actifs", value: loading ? "…" : String(s.centresActifs),
+      label: "Centres actifs", value: loading ? "..." : String(s.centresActifs),
       sub: `${s.centresEnAttente} en attente de validation`, icon: faBuilding, trend: `${s.centresEnAttente} att.`,
       color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/20",
     },
     {
-      label: "Réservations", value: loading ? "…" : s.reservationsCeMois.toLocaleString("fr-FR"),
+      label: "Reservations", value: loading ? "..." : s.reservationsCeMois.toLocaleString("fr-FR"),
       sub: "Ce mois", icon: faClipboardList, trend: `+${s.reservationsEvolution}%`,
       color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/20",
     },
     {
-      label: "Utilisateurs", value: loading ? "…" : s.utilisateurs.toLocaleString("fr-FR"),
+      label: "Utilisateurs", value: loading ? "..." : s.utilisateurs.toLocaleString("fr-FR"),
       sub: `${s.ticketsOuverts} tickets ouverts`, icon: faUsers, trend: "+5%",
       color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20",
     },
   ];
 
+  // Quick actions based on role
+  const quickActions = [
+    { label: "Gerer les centres", href: "/admin/centres", icon: faBuilding, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/20" },
+    { label: "Voir les utilisateurs", href: "/admin/utilisateurs", icon: faUsers, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/20" },
+    { label: "Support", href: "/admin/support", icon: faHeadset, color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-500/20" },
+    { label: "Statistiques", href: "/admin/statistiques", icon: faChartLine, color: "text-green-400", bg: "bg-green-400/10", border: "border-green-500/20" },
+    ...(isOwner ? [
+      { label: "Roles & Permissions", href: "/admin/roles", icon: faUserShield, color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
+      { label: "Taux de commission", href: "/admin/parametres", icon: faPercent, color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
+      { label: "Configuration avancee", href: "/admin/configuration", icon: faScrewdriverWrench, color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
+    ] : [
+      { label: "Parametres", href: "/admin/parametres", icon: faCog, color: "text-gray-400", bg: "bg-white/5", border: "border-white/10" },
+    ]),
+  ];
+
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Vue d&apos;ensemble de la plateforme BYS Permis</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+            {user && (
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border
+                ${isOwner
+                  ? "bg-yellow-400/10 text-yellow-400 border-yellow-500/20"
+                  : "bg-red-400/10 text-red-400 border-red-500/20"
+                }`}
+              >
+                <FontAwesomeIcon icon={isOwner ? faCrown : faShieldHalved} className="text-[9px]" />
+                {isOwner ? "Owner" : "Admin"}
+              </span>
+            )}
+          </div>
+          <p className="text-gray-400 text-sm mt-0.5">
+            Bienvenue{user ? `, ${user.prenom}` : ""}. Vue d&apos;ensemble de la plateforme BYS Permis
+          </p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-400/10 border border-green-500/20">
           <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -168,8 +247,54 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Centres en attente + Tickets ouverts */}
+      {/* Quick actions */}
+      <div>
+        <h2 className="text-white font-semibold text-sm mb-3">Actions rapides</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+          {quickActions.map((action) => (
+            <Link
+              key={action.href + action.label}
+              href={action.href}
+              className={`flex flex-col items-center gap-2 p-3 rounded-xl bg-[#0A1628] border ${action.border} hover:bg-white/5 transition-all group`}
+            >
+              <div className={`w-9 h-9 rounded-lg ${action.bg} border ${action.border} flex items-center justify-center`}>
+                <FontAwesomeIcon icon={action.icon} className={`${action.color} text-sm`} />
+              </div>
+              <span className="text-gray-400 text-[11px] font-medium text-center group-hover:text-white transition-colors leading-tight">
+                {action.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Activity feed + Centres en attente */}
       <div className="grid lg:grid-cols-2 gap-6">
+        {/* Recent activity feed */}
+        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-white font-semibold text-sm">Activite recente</h2>
+            <span className="text-gray-600 text-[10px] uppercase tracking-wider font-medium">Temps reel</span>
+          </div>
+          <div className="space-y-3">
+            {MOCK_ACTIVITY.map((item) => {
+              const ai = activityIcon(item.type);
+              return (
+                <div key={item.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-white/3 transition-colors">
+                  <div className={`w-8 h-8 rounded-lg ${ai.bg} border ${ai.border} flex items-center justify-center shrink-0 mt-0.5`}>
+                    <FontAwesomeIcon icon={ai.icon} className={`${ai.color} text-xs`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-white text-sm font-medium">{item.label}</p>
+                    <p className="text-gray-500 text-xs truncate">{item.detail}</p>
+                  </div>
+                  <span className="text-gray-600 text-[10px] whitespace-nowrap shrink-0 mt-1">{item.time}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Centres en attente */}
         <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-4">
@@ -181,7 +306,7 @@ export default function AdminDashboardPage() {
           {loading ? (
             <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
               <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-              <span>Chargement…</span>
+              <span>Chargement...</span>
             </div>
           ) : s.centresEnAttenteList.length === 0 ? (
             <p className="text-gray-600 text-sm py-4">Aucun centre en attente.</p>
@@ -207,35 +332,35 @@ export default function AdminDashboardPage() {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Tickets ouverts */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-white font-semibold text-sm">Tickets support ouverts</h2>
-            <Link href="/admin/support" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
-              Voir tout <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
+      {/* Tickets ouverts */}
+      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-white font-semibold text-sm">Tickets support ouverts</h2>
+          <Link href="/admin/support" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+            Voir tout <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
+          </Link>
+        </div>
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-white/3 border border-white/5">
+          <FontAwesomeIcon icon={faHeadset} className="text-blue-400 text-2xl" />
+          <div>
+            <p className="text-white font-semibold">{loading ? "..." : s.ticketsOuverts} tickets ouverts</p>
+            <Link href="/admin/support" className="text-xs text-blue-400 hover:underline">
+              Gerer le support
             </Link>
-          </div>
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-white/3 border border-white/5">
-            <FontAwesomeIcon icon={faHeadset} className="text-blue-400 text-2xl" />
-            <div>
-              <p className="text-white font-semibold">{loading ? "…" : s.ticketsOuverts} tickets ouverts</p>
-              <Link href="/admin/support" className="text-xs text-blue-400 hover:underline">
-                Gérer le support →
-              </Link>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Dernières réservations */}
+      {/* Dernieres reservations */}
       <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-white font-semibold text-sm">Dernières réservations</h2>
+          <h2 className="text-white font-semibold text-sm">Dernieres reservations</h2>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <FontAwesomeIcon icon={faChartLine} className="text-blue-400" />
-              Commission ce mois : <span className="text-blue-400 font-semibold">{loading ? "…" : formatPrice(s.revenusPlateforme)}</span>
+              Commission ce mois : <span className="text-blue-400 font-semibold">{loading ? "..." : formatPrice(s.revenusPlateforme)}</span>
             </div>
             <Link href="/admin/centres" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
               Voir tout <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
@@ -246,15 +371,15 @@ export default function AdminDashboardPage() {
         {loading ? (
           <div className="flex items-center gap-3 text-gray-500 py-4">
             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span className="text-sm">Chargement…</span>
+            <span className="text-sm">Chargement...</span>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Référence</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Élève</th>
+                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reference</th>
+                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Eleve</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Stage</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Montant</th>

@@ -103,6 +103,7 @@ export default function InscriptionPage() {
   }
 
   if (success) {
+    const returnTo = accountType === 'centre' ? '/espace-centre' : '/espace-eleve';
     return (
       <div className="w-full max-w-md text-center">
         <div className="rounded-2xl p-10 backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -112,14 +113,14 @@ export default function InscriptionPage() {
           <h2 className="text-2xl font-bold text-white mb-3">Compte créé !</h2>
           <p className="text-gray-400 text-sm leading-relaxed mb-8">
             Bienvenue, <span className="text-white font-semibold">{form.firstName}</span> !<br />
-            Votre compte a bien été créé. Vous pouvez maintenant vous connecter.
+            Votre compte a bien été créé. Connectez-vous maintenant via Auth0.
           </p>
-          <Link
-            href="/connexion"
+          <a
+            href={`/auth/login?returnTo=${returnTo}`}
             className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-all"
           >
             Se connecter
-          </Link>
+          </a>
         </div>
       </div>
     );

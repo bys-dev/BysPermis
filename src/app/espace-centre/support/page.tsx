@@ -102,7 +102,7 @@ export default function CentreSupportPage() {
         const newMsg = await res.json();
         const updatedTicket = {
           ...selected,
-          messages: [...selected.messages, { ...newMsg, user: { prenom: "Moi", nom: "", role: "CENTRE" } }],
+          messages: [...selected.messages, { ...newMsg, user: { prenom: "Moi", nom: "", role: "CENTRE_OWNER" } }],
         };
         setSelected(updatedTicket);
         setTickets((prev) => prev.map((t) => t.id === selected.id ? updatedTicket : t));

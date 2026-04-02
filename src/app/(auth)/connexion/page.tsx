@@ -1,17 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faShieldHalved, faUserGraduate, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
-type AuthTab = 'email' | 'google';
-
 export default function ConnexionPage() {
-  const [activeTab, setActiveTab] = useState<AuthTab>('email');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo') ?? '/espace-eleve';
 
   return (
     <div className="w-full max-w-md">
@@ -29,116 +26,59 @@ export default function ConnexionPage() {
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2 text-white">
-            Bienvenue
-          </h2>
+          <h2 className="text-2xl font-bold mb-2 text-white">Connexion</h2>
           <p className="text-sm text-gray-400">
             Connectez-vous pour accéder à votre espace
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex mb-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab('email')}
-            className="flex-1 pb-3 text-sm font-semibold transition-colors"
-            style={{
-              color: activeTab === 'email' ? '#3B82F6' : 'rgba(255,255,255,0.4)',
-              borderBottom: activeTab === 'email' ? '2px solid #3B82F6' : '2px solid transparent',
-            }}
+        {/* Auth buttons */}
+        <div className="space-y-4">
+          {/* Auth0 login (email/password via Universal Login) */}
+          <a
+            href={`/auth/login?returnTo=${encodeURIComponent(returnTo)}`}
+            className="flex items-center justify-center gap-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-lg font-semibold transition-all shadow-lg shadow-blue-600/25"
           >
-            <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-            Email
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('google')}
-            className="flex-1 pb-3 text-sm font-semibold transition-colors"
-            style={{
-              color: activeTab === 'google' ? '#3B82F6' : 'rgba(255,255,255,0.4)',
-              borderBottom: activeTab === 'google' ? '2px solid #3B82F6' : '2px solid transparent',
-            }}
+            <FontAwesomeIcon icon={faArrowRight} />
+            Se connecter avec Email
+          </a>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            <span className="text-xs text-gray-500 uppercase tracking-wider">ou</span>
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          </div>
+
+          {/* Google login */}
+          <a
+            href={`/auth/login?connection=google-oauth2&returnTo=${encodeURIComponent(returnTo)}`}
+            className="flex items-center justify-center gap-3 w-full py-3.5 rounded-lg font-semibold transition-all hover:opacity-90"
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'white' }}
           >
-            <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-            Google
-          </button>
+            <FontAwesomeIcon icon={faGoogle} />
+            Continuer avec Google
+          </a>
         </div>
 
-        {/* Email Tab */}
-        {activeTab === 'email' && (
-          <div className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Adresse email</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                  <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4" />
-                </span>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="vous@exemple.fr"
-                  className="w-full pl-10 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Mot de passe</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                  <FontAwesomeIcon icon={faLock} className="w-4 h-4" />
-                </span>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Votre mot de passe"
-                  className="w-full pl-10 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            <div className="text-right">
-              <Link href="/api/auth/login" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
-                Mot de passe oublié ?
-              </Link>
-            </div>
-
-            <Link
-              href="/api/auth/login?returnTo=/espace-eleve"
-              className="block w-full text-center bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-all shadow-lg shadow-red-600/25"
-            >
-              Se connecter
-            </Link>
+        {/* Roles info */}
+        <div className="mt-8 pt-6 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-3">Accès par profil</p>
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <FontAwesomeIcon icon={faUserGraduate} className="w-4 text-blue-400" />
+            <span><strong className="text-gray-300">Élève</strong> — Réservez et suivez vos formations</span>
           </div>
-        )}
-
-        {/* Google Tab */}
-        {activeTab === 'google' && (
-          <div className="space-y-5">
-            <p className="text-sm text-center text-gray-400">
-              Utilisez votre compte Google pour vous connecter rapidement.
-            </p>
-            <Link
-              href="/api/auth/login?connection=google-oauth2&returnTo=/espace-eleve"
-              className="block w-full text-center py-3 rounded-lg font-semibold transition-all hover:opacity-90"
-              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', color: 'white' }}
-            >
-              <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-              Continuer avec Google
-            </Link>
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <FontAwesomeIcon icon={faBuilding} className="w-4 text-green-400" />
+            <span><strong className="text-gray-300">Centre</strong> — Gérez vos formations et sessions</span>
           </div>
-        )}
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <FontAwesomeIcon icon={faShieldHalved} className="w-4 text-purple-400" />
+            <span><strong className="text-gray-300">Admin</strong> — Pilotez la plateforme</span>
+          </div>
+        </div>
 
-        {/* Divider */}
+        {/* Register link */}
         <div className="mt-8 pt-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <p className="text-sm text-gray-400">
             Pas de compte ?{' '}

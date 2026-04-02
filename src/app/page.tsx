@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -61,7 +62,7 @@ const stageTypes: StageType[] = [
     badge: "+4 points",
     badgeStyle: "bg-red-50 text-red-600 font-bold",
     price: "À partir de 200 €",
-    slug: "stage-volontaire",
+    slug: "recuperation-de-points",
   },
   {
     name: "Stage 48N",
@@ -71,7 +72,7 @@ const stageTypes: StageType[] = [
     badge: "Obligatoire",
     badgeStyle: "bg-red-50 text-red-600 font-bold",
     price: "À partir de 200 €",
-    slug: "stage-48n",
+    slug: "sensibilisation-securite-routiere",
   },
   {
     name: "Composition pénale",
@@ -81,7 +82,7 @@ const stageTypes: StageType[] = [
     badge: "0 point récupéré",
     badgeStyle: "bg-gray-100 text-gray-500",
     price: "À partir de 250 €",
-    slug: "composition-penale",
+    slug: "recuperation-de-points",
   },
   {
     name: "Peine complémentaire",
@@ -91,7 +92,7 @@ const stageTypes: StageType[] = [
     badge: "0 point récupéré",
     badgeStyle: "bg-gray-100 text-gray-500",
     price: "À partir de 250 €",
-    slug: "peine-complementaire",
+    slug: "recuperation-de-points",
   },
 ];
 
@@ -309,8 +310,11 @@ function iconForCategorie(nom: string): IconDefinition {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [liveCourses, setLiveCourses] = useState<LiveFormation[]>([]);
+  const [heroSearch, setHeroSearch] = useState("");
+  const [heroVille, setHeroVille] = useState("");
 
   useEffect(() => {
     fetch("/api/formations?perPage=3")
@@ -357,38 +361,62 @@ export default function Home() {
               </p>
 
               {/* Search Card — glass effect */}
-              <div className="bg-white/[0.06] backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 max-w-4xl mx-auto">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const params = new URLSearchParams();
+                  if (heroSearch.trim()) params.set("q", heroSearch.trim());
+                  if (heroVille.trim()) params.set("ville", heroVille.trim());
+                  router.push(`/recherche?${params.toString()}`);
+                }}
+                className="bg-white/[0.06] backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 max-w-4xl mx-auto"
+              >
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
                   <div className="sm:col-span-5">
                     <label className="block text-sm font-medium text-gray-300 mb-2 text-left">Quel stage ?</label>
                     <div className="relative">
                       <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                      <input type="text" placeholder="Récupération de points, FIMO..." className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200" />
+                      <input
+                        type="text"
+                        placeholder="Récupération de points, FIMO..."
+                        value={heroSearch}
+                        onChange={(e) => setHeroSearch(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+                      />
                     </div>
                   </div>
                   <div className="sm:col-span-5">
                     <label className="block text-sm font-medium text-gray-300 mb-2 text-left">Où ? (ville ou code postal)</label>
                     <div className="relative">
                       <FontAwesomeIcon icon={faLocationDot} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                      <input type="text" placeholder="Paris, 95000, Lyon..." className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200" />
+                      <input
+                        type="text"
+                        placeholder="Paris, 95000, Lyon..."
+                        value={heroVille}
+                        onChange={(e) => setHeroVille(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+                      />
                     </div>
                   </div>
                   <div className="sm:col-span-2 flex items-end">
-                    <Link href="/recherche" className="w-full bg-red-600 text-white py-3.5 rounded-lg font-semibold hover:bg-red-700 transition-all duration-200 text-center block shadow-lg shadow-red-600/25">
+                    <button
+                      type="submit"
+                      className="w-full bg-red-600 text-white py-3.5 rounded-lg font-semibold hover:bg-red-700 transition-all duration-200 text-center shadow-lg shadow-red-600/25"
+                    >
                       Rechercher
-                    </Link>
+                    </button>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 mt-6 pt-6 border-t border-white/10">
                   <span className="text-sm text-gray-500 mr-1">Populaires :</span>
                   {popularTags.map((tag) => (
-                    <Link key={tag} href="/recherche" className="px-3 py-1.5 bg-white/5 hover:bg-blue-600/20 hover:text-blue-300 text-gray-400 text-sm rounded-full transition-all duration-200 border border-white/10">
+                    <Link key={tag} href={`/recherche?q=${encodeURIComponent(tag)}`} className="px-3 py-1.5 bg-white/5 hover:bg-blue-600/20 hover:text-blue-300 text-gray-400 text-sm rounded-full transition-all duration-200 border border-white/10">
                       {tag}
                     </Link>
                   ))}
                 </div>
-              </div>
+              </form>
 
               {/* Trusted by strip */}
               <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-sm text-gray-300">
@@ -660,7 +688,7 @@ export default function Home() {
                 price: `${f.prix} €`,
                 places: f.sessions[0]?.placesRestantes ?? 0,
                 icon: iconForCategorie(f.categorie?.nom ?? ""),
-              })) : featuredCourses.map((c) => ({ ...c, id: c.title, slug: "recherche", ville: "Île-de-France" }))).map((course) => (
+              })) : featuredCourses.map((c) => ({ ...c, id: c.title, slug: "", ville: "Île-de-France" }))).map((course) => (
                 <div key={course.id} className="bg-white rounded-2xl border border-brand-border overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer flex flex-col">
                   {/* Gradient top border */}
                   <div className="h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
@@ -716,7 +744,7 @@ export default function Home() {
                     {/* Price + CTA — pushed to bottom */}
                     <div className="flex items-center justify-between pt-4 border-t border-brand-border mt-auto">
                       <div className="text-2xl font-display font-bold text-brand-text">{course.price}</div>
-                      <Link href={`/formations/${course.slug}`} className="bg-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-red-600/20">
+                      <Link href={course.slug ? `/formations/${course.slug}` : "/recherche"} className="bg-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-red-600/20">
                         Réserver
                         <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
                       </Link>

@@ -57,9 +57,9 @@ const MOCK: Ticket[] = [
   {
     id: "TKT-411", sujet: "Demande d'agrément préfectoral manquant",
     status: "EN_COURS", createdAt: new Date(Date.now() - 5 * 3600000).toISOString(),
-    user: { prenom: "Auto-École", nom: "Bordelaise", email: "ae-bordelaise@gmail.com", role: "CENTRE" },
+    user: { prenom: "Auto-École", nom: "Bordelaise", email: "ae-bordelaise@gmail.com", role: "CENTRE_OWNER" },
     messages: [
-      { id: "m3", contenu: "Notre dossier a été soumis il y a 3 jours mais l'agrément n'a pas été validé.", isAdmin: false, createdAt: new Date(Date.now() - 5 * 3600000).toISOString(), user: { prenom: "Auto-École", nom: "Bordelaise", role: "CENTRE" } },
+      { id: "m3", contenu: "Notre dossier a été soumis il y a 3 jours mais l'agrément n'a pas été validé.", isAdmin: false, createdAt: new Date(Date.now() - 5 * 3600000).toISOString(), user: { prenom: "Auto-École", nom: "Bordelaise", role: "CENTRE_OWNER" } },
     ],
   },
 ];
@@ -69,7 +69,8 @@ export default function AdminSupportPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterStatut, setFilterStatut] = useState<"tous" | TicketStatut>("tous");
-  const [filterRole, setFilterRole] = useState<"tous" | "ELEVE" | "CENTRE">("tous");
+  const CENTRE_ROLE_VALUES = ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"];
+  const [filterRole, setFilterRole] = useState<"tous" | "eleves" | "centres">("tous");
   const [selected, setSelected] = useState<Ticket | null>(null);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
@@ -126,7 +127,7 @@ export default function AdminSupportPage() {
   const filtered = tickets.filter((t) => {
     const matchSearch = !search || t.sujet.toLowerCase().includes(search.toLowerCase()) || `${t.user.prenom} ${t.user.nom}`.toLowerCase().includes(search.toLowerCase());
     const matchStatut = filterStatut === "tous" || t.status === filterStatut;
-    const matchRole = filterRole === "tous" || t.user.role === filterRole;
+    const matchRole = filterRole === "tous" || (filterRole === "eleves" && t.user.role === "ELEVE") || (filterRole === "centres" && CENTRE_ROLE_VALUES.includes(t.user.role));
     return matchSearch && matchStatut && matchRole;
   });
 
@@ -168,7 +169,7 @@ export default function AdminSupportPage() {
                   </span>
                   <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border ${selected.user.role === "ELEVE" ? "bg-blue-400/10 text-blue-400 border-blue-500/20" : "bg-purple-400/10 text-purple-400 border-purple-500/20"}`}>
                     <FontAwesomeIcon icon={selected.user.role === "ELEVE" ? faUserGraduate : faBuilding} className="text-[9px]" />
-                    {selected.user.role === "ELEVE" ? "Élève" : "Centre"}
+                    {selected.user.role === "ELEVE" ? "Élève" : CENTRE_ROLE_VALUES.includes(selected.user.role) ? "Centre" : "Plateforme"}
                   </span>
                 </div>
                 <h2 className="text-white font-semibold">{selected.sujet}</h2>
@@ -277,14 +278,18 @@ export default function AdminSupportPage() {
               />
             </div>
             <div className="flex gap-2">
-              {(["tous", "ELEVE", "CENTRE"] as const).map((r) => (
+              {([
+                { key: "tous", label: "Tous", icon: faFilter },
+                { key: "eleves", label: "Élèves", icon: faUserGraduate },
+                { key: "centres", label: "Centres", icon: faBuilding },
+              ] as const).map((r) => (
                 <button
-                  key={r}
-                  onClick={() => setFilterRole(r)}
+                  key={r.key}
+                  onClick={() => setFilterRole(r.key)}
                   className={`px-3 py-2.5 rounded-lg text-xs font-medium border transition-colors
-                    ${filterRole === r ? "bg-white/10 text-white border-white/20" : "text-gray-400 border-white/8 hover:text-white"}`}
+                    ${filterRole === r.key ? "bg-white/10 text-white border-white/20" : "text-gray-400 border-white/8 hover:text-white"}`}
                 >
-                  {r === "tous" ? <><FontAwesomeIcon icon={faFilter} className="mr-1" />Tous</> : r === "ELEVE" ? <><FontAwesomeIcon icon={faUserGraduate} className="mr-1" />Élèves</> : <><FontAwesomeIcon icon={faBuilding} className="mr-1" />Centres</>}
+                  <FontAwesomeIcon icon={r.icon} className="mr-1" />{r.label}
                 </button>
               ))}
             </div>
@@ -314,9 +319,9 @@ export default function AdminSupportPage() {
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${st.cls}`}>
                               {st.label}
                             </span>
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${t.user.role === "ELEVE" ? "bg-blue-400/10 text-blue-400 border-blue-500/20" : "bg-purple-400/10 text-purple-400 border-purple-500/20"}`}>
-                              <FontAwesomeIcon icon={t.user.role === "ELEVE" ? faUserGraduate : faBuilding} className="text-[9px]" />
-                              {t.user.role === "ELEVE" ? "Élève" : "Centre"}
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${t.user.role === "ELEVE" ? "bg-blue-400/10 text-blue-400 border-blue-500/20" : CENTRE_ROLE_VALUES.includes(t.user.role) ? "bg-purple-400/10 text-purple-400 border-purple-500/20" : "bg-orange-400/10 text-orange-400 border-orange-500/20"}`}>
+                              <FontAwesomeIcon icon={t.user.role === "ELEVE" ? faUserGraduate : CENTRE_ROLE_VALUES.includes(t.user.role) ? faBuilding : faHeadset} className="text-[9px]" />
+                              {t.user.role === "ELEVE" ? "Élève" : CENTRE_ROLE_VALUES.includes(t.user.role) ? "Centre" : "Plateforme"}
                             </span>
                           </div>
                           <p className="text-white font-medium truncate">{t.sujet}</p>

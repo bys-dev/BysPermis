@@ -9,7 +9,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
 
-type Role = "ELEVE" | "CENTRE" | "ADMIN";
+type Role = "ELEVE" | "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE" | "SUPPORT" | "COMPTABLE" | "COMMERCIAL" | "ADMIN" | "OWNER";
+
+const CENTRE_ROLES: Role[] = ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"];
+const PLATFORM_ROLES: Role[] = ["SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER"];
 
 interface User {
   id: string;
@@ -23,9 +26,16 @@ interface User {
 }
 
 const roleMap: Record<Role, { label: string; cls: string; icon: typeof faUsers }> = {
-  ELEVE:  { label: "Élève",  cls: "bg-blue-400/10 text-blue-400 border-blue-500/20",     icon: faUserGraduate },
-  CENTRE: { label: "Centre", cls: "bg-purple-400/10 text-purple-400 border-purple-500/20", icon: faBuilding    },
-  ADMIN:  { label: "Admin",  cls: "bg-red-400/10 text-red-400 border-red-500/20",           icon: faShieldHalved },
+  ELEVE:              { label: "Élève",        cls: "bg-blue-400/10 text-blue-400 border-blue-500/20",       icon: faUserGraduate },
+  CENTRE_OWNER:       { label: "Propriétaire", cls: "bg-purple-400/10 text-purple-400 border-purple-500/20", icon: faBuilding     },
+  CENTRE_ADMIN:       { label: "Admin centre", cls: "bg-purple-400/10 text-purple-400 border-purple-500/20", icon: faBuilding     },
+  CENTRE_FORMATEUR:   { label: "Formateur",    cls: "bg-purple-400/10 text-purple-400 border-purple-500/20", icon: faBuilding     },
+  CENTRE_SECRETAIRE:  { label: "Secrétaire",   cls: "bg-purple-400/10 text-purple-400 border-purple-500/20", icon: faBuilding     },
+  SUPPORT:            { label: "Support",      cls: "bg-orange-400/10 text-orange-400 border-orange-500/20", icon: faShieldHalved },
+  COMPTABLE:          { label: "Comptable",    cls: "bg-orange-400/10 text-orange-400 border-orange-500/20", icon: faShieldHalved },
+  COMMERCIAL:         { label: "Commercial",   cls: "bg-orange-400/10 text-orange-400 border-orange-500/20", icon: faShieldHalved },
+  ADMIN:              { label: "Admin",        cls: "bg-red-400/10 text-red-400 border-red-500/20",           icon: faShieldHalved },
+  OWNER:              { label: "Owner",        cls: "bg-red-400/10 text-red-400 border-red-500/20",           icon: faShieldHalved },
 };
 
 const MOCK: User[] = [
@@ -39,12 +49,19 @@ export default function AdminUtilisateursPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterRole, setFilterRole] = useState<"tous" | Role>("tous");
+  const [filterRole, setFilterRole] = useState<"tous" | "eleves" | "centres" | "plateforme">("tous");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+  const filteredUsers = users.filter((u) => {
+    if (filterRole === "tous") return true;
+    if (filterRole === "eleves") return u.role === "ELEVE";
+    if (filterRole === "centres") return CENTRE_ROLES.includes(u.role);
+    if (filterRole === "plateforme") return PLATFORM_ROLES.includes(u.role);
+    return true;
+  });
 
   const fetchUsers = useCallback(async () => {
     const params = new URLSearchParams();
-    if (filterRole !== "tous") params.set("role", filterRole);
     if (search) params.set("search", search);
 
     const res = await fetch(`/api/admin/users?${params}`).catch(() => null);
@@ -76,9 +93,9 @@ export default function AdminUtilisateursPage() {
 
   const counts = {
     tous: users.length,
-    ELEVE:  users.filter((u) => u.role === "ELEVE").length,
-    CENTRE: users.filter((u) => u.role === "CENTRE").length,
-    ADMIN:  users.filter((u) => u.role === "ADMIN").length,
+    eleves:     users.filter((u) => u.role === "ELEVE").length,
+    centres:    users.filter((u) => CENTRE_ROLES.includes(u.role)).length,
+    plateforme: users.filter((u) => PLATFORM_ROLES.includes(u.role)).length,
   };
 
   return (
@@ -87,24 +104,29 @@ export default function AdminUtilisateursPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Utilisateurs</h1>
         <p className="text-gray-400 text-sm mt-0.5">
-          {counts.tous} comptes · {counts.ELEVE} élèves · {counts.CENTRE} centres · {counts.ADMIN} admins
+          {counts.tous} comptes · {counts.eleves} élèves · {counts.centres} centres · {counts.plateforme} plateforme
         </p>
       </div>
 
       {/* Tabs rôle */}
       <div className="flex flex-wrap gap-2">
-        {(["tous", "ELEVE", "CENTRE", "ADMIN"] as const).map((r) => (
+        {([
+          { key: "tous", label: "Tous" },
+          { key: "eleves", label: "Élèves" },
+          { key: "centres", label: "Centres" },
+          { key: "plateforme", label: "Plateforme" },
+        ] as const).map((r) => (
           <button
-            key={r}
-            onClick={() => setFilterRole(r)}
+            key={r.key}
+            onClick={() => setFilterRole(r.key)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border
-              ${filterRole === r
+              ${filterRole === r.key
                 ? "bg-white/10 text-white border-white/20"
                 : "text-gray-400 border-white/8 hover:text-white hover:border-white/20"
               }`}
           >
-            {r === "tous" ? "Tous" : roleMap[r].label}
-            <span className="ml-2 text-xs opacity-60">{counts[r]}</span>
+            {r.label}
+            <span className="ml-2 text-xs opacity-60">{counts[r.key]}</span>
           </button>
         ))}
       </div>
@@ -148,7 +170,7 @@ export default function AdminUtilisateursPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {users.map((u) => {
+                {filteredUsers.map((u) => {
                   const rm = roleMap[u.role];
                   const fullName = `${u.prenom} ${u.nom}`;
                   const initials = `${u.prenom[0]}${u.nom[0]}`.toUpperCase();
@@ -231,7 +253,7 @@ export default function AdminUtilisateursPage() {
             </table>
           </div>
         )}
-        {!loading && users.length === 0 && (
+        {!loading && filteredUsers.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             <FontAwesomeIcon icon={faUsers} className="text-2xl mb-2" />
             <p className="text-sm">Aucun utilisateur trouvé</p>

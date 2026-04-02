@@ -64,6 +64,81 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      // ── Abonnement: checkout complété ─────────────────────
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (session.mode === "subscription" && session.subscription) {
+          const centreId = session.metadata?.centreId;
+          const planId = session.metadata?.planId;
+          if (centreId) {
+            const updateData: Record<string, unknown> = {
+              subscriptionStripeId: session.subscription as string,
+              subscriptionStatus: "ACTIVE",
+              stripeCustomerId: session.customer as string,
+            };
+            if (planId) {
+              updateData.subscriptionPlanId = planId;
+            }
+            await prisma.centre.update({
+              where: { id: centreId },
+              data: updateData,
+            });
+          }
+        }
+        break;
+      }
+
+      // ── Abonnement: mise à jour ───────────────────────────
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const centreId = subscription.metadata?.centreId;
+        if (centreId) {
+          let status: "ACTIVE" | "PAST_DUE" | "ANNULEE" | "TRIALING" = "ACTIVE";
+          if (subscription.status === "past_due") status = "PAST_DUE";
+          else if (subscription.status === "canceled" || subscription.status === "unpaid") status = "ANNULEE";
+          else if (subscription.status === "trialing") status = "TRIALING";
+
+          await prisma.centre.update({
+            where: { id: centreId },
+            data: { subscriptionStatus: status },
+          });
+        }
+        break;
+      }
+
+      // ── Abonnement: supprimé ──────────────────────────────
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const centreId = subscription.metadata?.centreId;
+        if (centreId) {
+          await prisma.centre.update({
+            where: { id: centreId },
+            data: {
+              subscriptionStatus: "ANNULEE",
+              subscriptionStripeId: null,
+              subscriptionPlanId: null,
+            },
+          });
+        }
+        break;
+      }
+
+      // ── Facture: paiement échoué ──────────────────────────
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const invoiceSub = (invoice as unknown as { subscription: string | { id: string } | null }).subscription;
+        if (invoiceSub) {
+          const subscriptionId = typeof invoiceSub === "string"
+            ? invoiceSub
+            : invoiceSub.id;
+          await prisma.centre.updateMany({
+            where: { subscriptionStripeId: subscriptionId },
+            data: { subscriptionStatus: "PAST_DUE" },
+          });
+        }
+        break;
+      }
+
       default:
         // Ignorer les autres events
         break;

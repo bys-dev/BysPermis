@@ -33,7 +33,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(tickets);
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Erreur serveur";
+    if (message === "Non authentifié" || message === "Non autorisé") {
+      return NextResponse.json({ error: message }, { status: 401 });
+    }
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

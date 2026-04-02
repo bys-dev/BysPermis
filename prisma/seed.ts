@@ -1,6 +1,9 @@
+import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new (PrismaClient as any)() as InstanceType<typeof PrismaClient>;
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new (PrismaClient as any)({ adapter }) as InstanceType<typeof PrismaClient>;
 
 async function main() {
   console.log("🌱 Début du seeding...\n");
@@ -11,12 +14,14 @@ async function main() {
   await (prisma as any).reservation.deleteMany();
   await (prisma as any).session.deleteMany();
   await (prisma as any).formation.deleteMany();
+  await (prisma as any).centreMembre.deleteMany();
   await (prisma as any).centre.deleteMany();
   await (prisma as any).ticketMessage.deleteMany();
   await (prisma as any).ticket.deleteMany();
   await (prisma as any).user.deleteMany();
   await (prisma as any).categorie.deleteMany();
   await (prisma as any).faqItem.deleteMany();
+  await (prisma as any).subscriptionPlan.deleteMany();
   await (prisma as any).platformSettings.deleteMany();
   console.log("✅ Données supprimées.\n");
 
@@ -100,21 +105,150 @@ async function main() {
   const [catRecup, catPermisB, catFIMO, catFCO, catTransport, catSensibilisation, catMoto, catEco] = categories;
   console.log(`✅ ${categories.length} catégories créées.\n`);
 
+  // ─── 1b. PLANS D'ABONNEMENT ──────────────────────────────
+  console.log("💎 Création des plans d'abonnement...");
+  const subscriptionPlans = await Promise.all([
+    (prisma as any).subscriptionPlan.create({
+      data: {
+        nom: "Essentiel",
+        stripePriceId: "price_essentiel_placeholder",
+        prix: 49,
+        features: [
+          "Listing sur la marketplace",
+          "Gestion des sessions",
+          "Convocations automatiques",
+          "Support par email",
+          "Paiements automatiques",
+        ],
+        maxFormations: 5,
+        isFeatured: false,
+        commissionRate: 10,
+        isActive: true,
+        ordre: 1,
+      },
+    }),
+    (prisma as any).subscriptionPlan.create({
+      data: {
+        nom: "Premium",
+        stripePriceId: "price_premium_placeholder",
+        prix: 99,
+        features: [
+          "Listing sur la marketplace",
+          "Gestion des sessions",
+          "Convocations automatiques",
+          "Support prioritaire",
+          "Paiements automatiques",
+          "Mise en avant dans les résultats",
+          "Dashboard analytics",
+        ],
+        maxFormations: 20,
+        isFeatured: true,
+        commissionRate: 7,
+        isActive: true,
+        ordre: 2,
+      },
+    }),
+    (prisma as any).subscriptionPlan.create({
+      data: {
+        nom: "Entreprise",
+        stripePriceId: "price_entreprise_placeholder",
+        prix: 199,
+        features: [
+          "Listing sur la marketplace",
+          "Gestion des sessions",
+          "Convocations automatiques",
+          "Support prioritaire",
+          "Paiements automatiques",
+          "Mise en avant dans les résultats",
+          "Dashboard analytics",
+          "Account manager dédié",
+          "Accès API",
+        ],
+        maxFormations: 99999,
+        isFeatured: true,
+        commissionRate: 5,
+        isActive: true,
+        ordre: 3,
+      },
+    }),
+  ]);
+  console.log(`✅ ${subscriptionPlans.length} plans d'abonnement créés.\n`);
+
   // ─── 2. UTILISATEURS ─────────────────────────────────────
   console.log("👤 Création des utilisateurs...");
 
-  // Admin
-  const admin = await (prisma as any).user.create({
+  // Owner (super-propriétaire plateforme)
+  const owner = await (prisma as any).user.create({
     data: {
-      auth0Id: "auth0|admin001",
-      email: "admin@bys-formation.fr",
-      nom: "Magar",
-      prenom: "Andrys",
+      auth0Id: "auth0|owner001",
+      email: "sebastien@bys-formation.fr",
+      nom: "Moreau",
+      prenom: "Sébastien",
       telephone: "06 12 34 56 78",
       adresse: "15 Rue de la Paix",
       codePostal: "95520",
       ville: "Osny",
+      role: "OWNER",
+    },
+  });
+
+  // Admin plateforme
+  const admin = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|admin001",
+      email: "admin@bys-formation.fr",
+      nom: "Renault",
+      prenom: "Julien",
+      telephone: "06 10 20 30 40",
+      adresse: "5 Rue Victor Hugo",
+      codePostal: "75015",
+      ville: "Paris",
       role: "ADMIN",
+    },
+  });
+
+  // Support plateforme
+  const support = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|support001",
+      email: "support@bys-formation.fr",
+      nom: "Leroy",
+      prenom: "Camille",
+      telephone: "06 10 20 30 41",
+      adresse: "18 Rue de Rivoli",
+      codePostal: "75004",
+      ville: "Paris",
+      role: "SUPPORT",
+    },
+  });
+
+  // Comptable plateforme
+  const comptable = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|comptable001",
+      email: "comptabilite@bys-formation.fr",
+      nom: "Mercier",
+      prenom: "Isabelle",
+      telephone: "06 10 20 30 42",
+      adresse: "32 Avenue Foch",
+      codePostal: "75016",
+      ville: "Paris",
+      role: "COMPTABLE",
+    },
+  });
+
+  // Commercial plateforme
+  const commercial = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|commercial001",
+      email: "commercial@bys-formation.fr",
+      nom: "Dubois",
+      prenom: "Antoine",
+      telephone: "06 10 20 30 43",
+      adresse: "11 Boulevard Haussmann",
+      codePostal: "75009",
+      ville: "Paris",
+      role: "COMMERCIAL",
     },
   });
 
@@ -123,14 +257,14 @@ async function main() {
     (prisma as any).user.create({
       data: {
         auth0Id: "auth0|centre001",
-        email: "sebastien@bys-formation.fr",
-        nom: "Moreau",
-        prenom: "Sébastien",
+        email: "contact@bys-formation.fr",
+        nom: "Lambert",
+        prenom: "Philippe",
         telephone: "01 34 25 67 89",
         adresse: "Bât. 7, 9 Chaussée Jules César",
         codePostal: "95520",
         ville: "Osny",
-        role: "CENTRE",
+        role: "CENTRE_OWNER",
       },
     }),
     (prisma as any).user.create({
@@ -143,7 +277,7 @@ async function main() {
         adresse: "45 Avenue de la République",
         codePostal: "75011",
         ville: "Paris",
-        role: "CENTRE",
+        role: "CENTRE_OWNER",
       },
     }),
     (prisma as any).user.create({
@@ -156,7 +290,7 @@ async function main() {
         adresse: "12 Rue de la Part-Dieu",
         codePostal: "69003",
         ville: "Lyon",
-        role: "CENTRE",
+        role: "CENTRE_OWNER",
       },
     }),
     (prisma as any).user.create({
@@ -169,7 +303,7 @@ async function main() {
         adresse: "78 Boulevard Michelet",
         codePostal: "13008",
         ville: "Marseille",
-        role: "CENTRE",
+        role: "CENTRE_OWNER",
       },
     }),
     (prisma as any).user.create({
@@ -182,7 +316,7 @@ async function main() {
         adresse: "22 Rue de Strasbourg",
         codePostal: "44000",
         ville: "Nantes",
-        role: "CENTRE",
+        role: "CENTRE_OWNER",
       },
     }),
   ]);
@@ -308,7 +442,7 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ ${1 + centreUsers.length + eleves.length} utilisateurs créés.\n`);
+  console.log(`✅ ${5 + centreUsers.length + eleves.length} utilisateurs créés (owner, admin, support, comptable, commercial + centres + élèves).\n`);
 
   // ─── 3. CENTRES ──────────────────────────────────────────
   console.log("🏢 Création des centres...");
@@ -325,6 +459,8 @@ async function main() {
         telephone: "01 34 25 67 89",
         email: "contact@bys-formation.fr",
         siteWeb: "https://www.bys-formation.fr",
+        latitude: 49.0665,
+        longitude: 2.0633,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[0].id,
@@ -342,6 +478,8 @@ async function main() {
         telephone: "01 43 55 78 90",
         email: "contact@autoecole-conduite-plus.fr",
         siteWeb: "https://www.conduite-plus-paris.fr",
+        latitude: 48.8566,
+        longitude: 2.3522,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[1].id,
@@ -359,6 +497,8 @@ async function main() {
         telephone: "04 72 33 45 67",
         email: "contact@cfsr-lyon.fr",
         siteWeb: "https://www.cfsr-lyon.fr",
+        latitude: 45.7640,
+        longitude: 4.8357,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[2].id,
@@ -376,6 +516,8 @@ async function main() {
         telephone: "04 91 22 33 44",
         email: "contact@permis-express-marseille.fr",
         siteWeb: "https://www.permis-express-marseille.fr",
+        latitude: 43.2965,
+        longitude: 5.3698,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[3].id,
@@ -392,6 +534,8 @@ async function main() {
         ville: "Nantes",
         telephone: "02 40 55 66 77",
         email: "contact@securite-routiere-nantes.fr",
+        latitude: 47.2184,
+        longitude: -1.5536,
         statut: "EN_ATTENTE",
         isActive: false,
         userId: centreUsers[4].id,
@@ -400,6 +544,81 @@ async function main() {
   ]);
 
   console.log(`✅ ${centres.length} centres créés.\n`);
+
+  // ─── 3b. MEMBRES DE CENTRES ──────────────────────────────
+  console.log("👥 Création des membres de centres...");
+
+  // CENTRE_ADMIN — gestionnaire du centre BYS Osny
+  const centreAdmin = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|centreadmin001",
+      email: "gestion@bys-formation.fr",
+      nom: "Nguyen",
+      prenom: "Linh",
+      telephone: "06 20 30 40 50",
+      adresse: "10 Rue de la Gare",
+      codePostal: "95520",
+      ville: "Osny",
+      role: "CENTRE_ADMIN",
+    },
+  });
+
+  // CENTRE_FORMATEUR — moniteur du centre BYS Osny
+  const centreFormateur = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|centreformateur001",
+      email: "formateur@bys-formation.fr",
+      nom: "Garcia",
+      prenom: "Miguel",
+      telephone: "06 20 30 40 51",
+      adresse: "25 Avenue du Général Leclerc",
+      codePostal: "95520",
+      ville: "Osny",
+      role: "CENTRE_FORMATEUR",
+    },
+  });
+
+  // CENTRE_SECRETAIRE — secrétaire du centre Conduite Plus Paris
+  const centreSecretaire = await (prisma as any).user.create({
+    data: {
+      auth0Id: "auth0|centresecretaire001",
+      email: "secretariat@autoecole-conduite-plus.fr",
+      nom: "Petit",
+      prenom: "Nathalie",
+      telephone: "06 20 30 40 52",
+      adresse: "50 Rue Oberkampf",
+      codePostal: "75011",
+      ville: "Paris",
+      role: "CENTRE_SECRETAIRE",
+    },
+  });
+
+  // Créer les CentreMembre pour les lier aux centres
+  await Promise.all([
+    (prisma as any).centreMembre.create({
+      data: {
+        userId: centreAdmin.id,
+        centreId: centres[0].id,
+        role: "CENTRE_ADMIN",
+      },
+    }),
+    (prisma as any).centreMembre.create({
+      data: {
+        userId: centreFormateur.id,
+        centreId: centres[0].id,
+        role: "CENTRE_FORMATEUR",
+      },
+    }),
+    (prisma as any).centreMembre.create({
+      data: {
+        userId: centreSecretaire.id,
+        centreId: centres[1].id,
+        role: "CENTRE_SECRETAIRE",
+      },
+    }),
+  ]);
+
+  console.log("✅ 3 membres de centres créés.\n");
 
   // ─── 4. FORMATIONS ───────────────────────────────────────
   console.log("📚 Création des formations...");
@@ -1171,7 +1390,7 @@ async function main() {
         codePostal: "67000",
         ville: "Strasbourg",
         userId: eleves[7].id,
-        sessionId: sessions[25].id, // Marseille Moto
+        sessionId: sessions[24].id, // Marseille Moto
       },
     }),
     // Alexandre → BYS Osny Récup session 2
@@ -1349,8 +1568,10 @@ async function main() {
   console.log("🌱 Seeding terminé avec succès !");
   console.log("═══════════════════════════════════════════");
   console.log(`  📂 ${categories.length} catégories`);
-  console.log(`  👤 ${1 + centreUsers.length + eleves.length} utilisateurs (1 admin, 5 centres, 9 élèves)`);
+  console.log(`  💎 ${subscriptionPlans.length} plans d'abonnement`);
+  console.log(`  👤 ${1 + 1 + 1 + 1 + 1 + centreUsers.length + 3 + eleves.length} utilisateurs (1 owner, 1 admin, 1 support, 1 comptable, 1 commercial, 5 centre owners, 3 membres centre, 9 élèves)`);
   console.log(`  🏢 ${centres.length} centres`);
+  console.log(`  👥 3 membres de centres`);
   console.log(`  📚 ${allFormations.length} formations`);
   console.log(`  📅 ${sessions.length} sessions`);
   console.log(`  🎫 ${reservations.length} réservations`);

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,17 +12,103 @@ import {
   faChevronRight,
   faBuilding,
   faHeadset,
+  faUsers,
+  faClipboardCheck,
+  faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
-const sidebarLinks = [
-  { href: "/espace-centre/dashboard", label: "Dashboard", icon: faChartBar },
-  { href: "/espace-centre/formations", label: "Mes formations", icon: faGraduationCap },
-  { href: "/espace-centre/sessions", label: "Mes sessions", icon: faCalendarDays },
-  { href: "/espace-centre/support", label: "Support", icon: faHeadset },
-  { href: "/espace-centre/parametres", label: "Paramètres", icon: faGear },
+type CentreRole = "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE";
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: IconDefinition;
+  roles: CentreRole[];
+}
+
+const allNavItems: NavItem[] = [
+  {
+    href: "/espace-centre/dashboard",
+    label: "Dashboard",
+    icon: faChartBar,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"],
+  },
+  {
+    href: "/espace-centre/formations",
+    label: "Mes formations",
+    icon: faGraduationCap,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/sessions",
+    label: "Sessions",
+    icon: faCalendarDays,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE"],
+  },
+  {
+    href: "/espace-centre/mes-sessions",
+    label: "Mes sessions",
+    icon: faBookOpen,
+    roles: ["CENTRE_FORMATEUR"],
+  },
+  {
+    href: "/espace-centre/equipe",
+    label: "Équipe",
+    icon: faUsers,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/emargement",
+    label: "Émargement",
+    icon: faClipboardCheck,
+    roles: ["CENTRE_FORMATEUR"],
+  },
+  {
+    href: "/espace-centre/support",
+    label: "Support",
+    icon: faHeadset,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE"],
+  },
+  {
+    href: "/espace-centre/parametres",
+    label: "Paramètres",
+    icon: faGear,
+    roles: ["CENTRE_OWNER"],
+  },
 ];
 
+function getNavItems(role: CentreRole | null): NavItem[] {
+  if (!role) return allNavItems; // fallback: show all while loading
+  return allNavItems.filter((item) => item.roles.includes(role));
+}
+
+const roleBadgeLabels: Record<CentreRole, string> = {
+  CENTRE_OWNER: "Propriétaire",
+  CENTRE_ADMIN: "Administrateur",
+  CENTRE_FORMATEUR: "Formateur",
+  CENTRE_SECRETAIRE: "Secrétariat",
+};
+
 export default function EspaceCentreLayout({ children }: { children: React.ReactNode }) {
+  const [role, setRole] = useState<CentreRole | null>(null);
+
+  useEffect(() => {
+    fetch("/api/users/me")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.role && data.role.startsWith("CENTRE_")) {
+          setRole(data.role as CentreRole);
+        } else {
+          // Platform admins viewing centre space — show everything
+          setRole("CENTRE_OWNER");
+        }
+      })
+      .catch(() => setRole("CENTRE_OWNER"));
+  }, []);
+
+  const navItems = getNavItems(role);
+
   return (
     <div className="min-h-screen flex" style={{ background: "#0A1628" }}>
       {/* Sidebar */}
@@ -42,14 +131,16 @@ export default function EspaceCentreLayout({ children }: { children: React.React
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Espace Centre</p>
-              <p className="text-xs text-gray-500">Gestion partenaire</p>
+              <p className="text-xs text-gray-500">
+                {role ? roleBadgeLabels[role] : "Chargement…"}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 px-4 py-6 space-y-1">
-          {sidebarLinks.map((link) => (
+          {navItems.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -71,7 +162,7 @@ export default function EspaceCentreLayout({ children }: { children: React.React
             ← Voir le site
           </Link>
           <Link
-            href="/api/auth/logout"
+            href="/auth/logout"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-400 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-4 h-4" />
@@ -90,14 +181,14 @@ export default function EspaceCentreLayout({ children }: { children: React.React
             </div>
             <span className="font-semibold text-white text-sm">Espace Centre</span>
           </Link>
-          <Link href="/api/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
+          <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
             <FontAwesomeIcon icon={faArrowRightFromBracket} />
           </Link>
         </div>
 
         {/* Mobile nav */}
         <div className="lg:hidden flex gap-1 px-4 py-3 border-b overflow-x-auto" style={{ borderColor: "rgba(255,255,255,0.07)", background: "#0D1D3A" }}>
-          {sidebarLinks.map((link) => (
+          {navItems.map((link) => (
             <Link
               key={link.href}
               href={link.href}

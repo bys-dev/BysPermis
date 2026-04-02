@@ -80,7 +80,13 @@ describe("GET /api/formations", () => {
     expect(prisma.formation.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          lieu: expect.objectContaining({ contains: "Osny" }),
+          AND: expect.arrayContaining([
+            expect.objectContaining({
+              OR: expect.arrayContaining([
+                expect.objectContaining({ lieu: expect.objectContaining({ contains: "Osny" }) }),
+              ]),
+            }),
+          ]),
         }),
       })
     );

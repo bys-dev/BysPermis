@@ -61,7 +61,7 @@ export default function EspaceEleveLayout({ children }: { children: React.ReactN
         {/* Bottom */}
         <div className="px-4 pb-6 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <Link
-            href="/api/auth/logout"
+            href="/auth/logout"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-400 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-4 h-4" />
@@ -80,7 +80,7 @@ export default function EspaceEleveLayout({ children }: { children: React.ReactN
             </div>
             <span className="font-semibold text-white text-sm">Espace Élève</span>
           </Link>
-          <Link href="/api/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
+          <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
             <FontAwesomeIcon icon={faArrowRightFromBracket} />
           </Link>
         </div>

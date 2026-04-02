@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const users = await prisma.user.findMany({
       where: {
-        ...(role && role !== "tous" ? { role: role as "ELEVE" | "CENTRE" | "ADMIN" } : {}),
+        ...(role && role !== "tous" ? { role: role as "ELEVE" | "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE" | "SUPPORT" | "COMPTABLE" | "COMMERCIAL" | "ADMIN" | "OWNER" } : {}),
         ...(search ? {
           OR: [
             { prenom: { contains: search, mode: "insensitive" } },
@@ -32,7 +32,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(users);
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Erreur serveur";
+    if (message === "Non authentifié" || message === "Non autorisé") {
+      return NextResponse.json({ error: message }, { status: 401 });
+    }
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -41,7 +45,7 @@ export async function GET(req: NextRequest) {
 const patchSchema = z.object({
   id: z.string(),
   isBlocked: z.boolean().optional(),
-  role: z.enum(["ELEVE", "CENTRE", "ADMIN"]).optional(),
+  role: z.enum(["ELEVE", "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE", "SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER"]).optional(),
 });
 
 export async function PATCH(req: NextRequest) {

@@ -4,29 +4,20 @@ import { Auth0Client } from "@auth0/nextjs-auth0/server"
 // ─── Auth0 client for proxy layer (no Prisma import) ─────────
 const auth0 = new Auth0Client()
 
-// ─── Role-based route protection rules ────────────────────────────
+// ─── Routes that require authentication ──────────────────────
 
-type RoleRule = {
-  pattern: RegExp
-  allowedRoles?: string[]
-}
-
-const PROTECTED_ROUTES: RoleRule[] = [
-  { pattern: /^\/espace-centre(\/|$)/, allowedRoles: ["CENTRE", "ADMIN"] },
-  { pattern: /^\/admin(\/|$)/, allowedRoles: ["ADMIN"] },
-  { pattern: /^\/espace-eleve(\/|$)/, allowedRoles: ["ELEVE", "CENTRE", "ADMIN"] },
-  { pattern: /^\/support(\/|$)/ },
-  { pattern: /^\/reserver\/[^/]+\/donnees(\/|$)/ },
-  { pattern: /^\/reserver\/[^/]+\/paiement(\/|$)/ },
+const PROTECTED_PATTERNS = [
+  /^\/espace-centre(\/|$)/,
+  /^\/espace-eleve(\/|$)/,
+  /^\/admin(\/|$)/,
+  /^\/plateforme(\/|$)/,
+  /^\/support(\/|$)/,
+  /^\/reserver\/[^/]+\/donnees(\/|$)/,
+  /^\/reserver\/[^/]+\/paiement(\/|$)/,
 ]
 
-function findRouteRule(pathname: string): RoleRule | null {
-  for (const rule of PROTECTED_ROUTES) {
-    if (rule.pattern.test(pathname)) {
-      return rule
-    }
-  }
-  return null
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_PATTERNS.some((p) => p.test(pathname))
 }
 
 export async function proxy(request: NextRequest) {
@@ -34,15 +25,12 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Check if this route needs protection
-  const rule = findRouteRule(pathname)
-
   // Public route — pass through
-  if (!rule) {
+  if (!isProtectedRoute(pathname)) {
     return authResponse
   }
 
-  // Protected route — check session
+  // Protected route — check session exists
   const session = await auth0.getSession(request)
 
   if (!session) {
@@ -51,18 +39,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // If the rule requires specific roles, verify from token claims
-  if (rule.allowedRoles) {
-    const userRole =
-      (session.user.role as string | undefined) ??
-      (session.user["https://byspermis.fr/role"] as string | undefined)
-
-    if (!userRole || !rule.allowedRoles.includes(userRole)) {
-      const unauthorizedUrl = new URL("/unauthorized", request.url)
-      return NextResponse.redirect(unauthorizedUrl)
-    }
-  }
-
+  // Role-based access control is handled by the pages/API routes themselves
+  // (requireAuth, requireCentre, requireAdmin helpers in lib/auth0.ts)
   return authResponse
 }
 

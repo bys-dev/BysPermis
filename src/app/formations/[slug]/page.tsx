@@ -31,6 +31,7 @@ import {
   faClipboardList,
   faChevronDown,
   faChevronUp,
+  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
@@ -554,20 +555,47 @@ export default function FormationDetailPage() {
   const slug = params.slug as string;
   const [openProgramme, setOpenProgramme] = useState<number | null>(0);
   const [liveSessions, setLiveSessions] = useState<LiveSession[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [apiNotFound, setApiNotFound] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
+    setApiNotFound(false);
     fetch(`/api/formations/slug/${slug}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (r.status === 404) {
+          setApiNotFound(true);
+          return null;
+        }
+        return r.json();
+      })
       .then((data) => {
         if (data?.sessions?.length > 0) setLiveSessions(data.sessions);
       })
-      .catch(() => null);
+      .catch(() => null)
+      .finally(() => setLoading(false));
   }, [slug]);
 
   const formation = formationsData[slug];
 
-  // 404-like state
-  if (!formation) {
+  // Show loading state while API is being fetched (only when no mock data either)
+  if (loading && !formation) {
+    return (
+      <>
+        <Header />
+        <main className="bg-[#F9FAFB] min-h-screen">
+          <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6" />
+            <p className="text-gray-500 text-lg">Chargement de la formation...</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  // 404-like state: no mock data AND (API returned 404 or finished loading)
+  if (!formation && (apiNotFound || !loading)) {
     return (
       <>
         <Header />
@@ -578,14 +606,23 @@ export default function FormationDetailPage() {
             </div>
             <h1 className="font-display text-3xl font-bold text-brand-text mb-4">Formation introuvable</h1>
             <p className="text-gray-500 mb-8 text-lg">
-              La formation recherchee n&apos;existe pas ou n&apos;est plus disponible.
+              La formation recherch&eacute;e n&apos;existe pas ou n&apos;est plus disponible.
             </p>
-            <Link
-              href="/"
-              className="btn-primary px-8 py-3 rounded-lg text-base"
-            >
-              Retour a l&apos;accueil
-            </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/recherche"
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-8 py-3 rounded-lg text-base font-semibold hover:bg-red-700 transition-colors"
+              >
+                <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
+                Rechercher une formation
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 border-2 border-brand-border text-gray-600 px-8 py-3 rounded-lg text-base font-medium hover:border-brand-accent hover:text-brand-accent transition-colors"
+              >
+                Retour &agrave; l&apos;accueil
+              </Link>
+            </div>
           </div>
         </main>
         <Footer />
@@ -963,7 +1000,7 @@ export default function FormationDetailPage() {
                   </div>
 
                   <Link
-                    href={`/reserver/sess_001/donnees`}
+                    href={liveSessions?.[0] ? `/reserver/${liveSessions[0].id}/donnees` : `/recherche?q=${encodeURIComponent(formation.title)}`}
                     className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3.5 rounded-lg font-semibold text-base hover:bg-red-700 transition-colors mb-3"
                   >
                     Réserver ce stage

@@ -26,6 +26,7 @@ async function createAuth0User(params: {
   password: string;
   firstName: string;
   lastName: string;
+  role: string;
   token: string;
 }): Promise<string> {
   const domain = process.env.AUTH0_ISSUER_BASE_URL?.replace("https://", "") ?? process.env.AUTH0_DOMAIN;
@@ -43,6 +44,9 @@ async function createAuth0User(params: {
       name: `${params.firstName} ${params.lastName}`,
       connection: "Username-Password-Authentication",
       email_verified: false,
+      app_metadata: {
+        role: params.role,
+      },
     }),
   });
 
@@ -81,13 +85,13 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return NextResponse.json({ error: "Un compte existe déjà avec cet email." }, { status: 409 });
 
-    const role = accountType === "centre" ? "CENTRE" : "ELEVE";
+    const role = accountType === "centre" ? "CENTRE_OWNER" : "ELEVE";
 
     // ── Créer dans Auth0 (Management API) ─────────────────
     let auth0Id: string | null = null;
     try {
       const token = await getManagementToken();
-      auth0Id = await createAuth0User({ email, password, firstName, lastName, token });
+      auth0Id = await createAuth0User({ email, password, firstName, lastName, role, token });
     } catch (err) {
       if (err instanceof Error && err.message === "EMAIL_EXISTS") {
         return NextResponse.json({ error: "Un compte existe déjà avec cet email." }, { status: 409 });
@@ -111,7 +115,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      if (role === "CENTRE" && centreName) {
+      if (role === "CENTRE_OWNER" && centreName) {
         const slug = slugify(centreName) + "-" + Date.now().toString(36);
         await tx.centre.create({
           data: {

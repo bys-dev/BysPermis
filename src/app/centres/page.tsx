@@ -21,6 +21,8 @@ import {
   faHandshake,
   faGlobe,
   faSpinner,
+  faCrosshairs,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 // ─── TYPES ────────────────────────────────────────────────
@@ -34,6 +36,7 @@ interface Centre {
   isBYS: boolean;
   nombreFormations: number;
   specialites: string[];
+  distance?: number | null;
 }
 
 // ─── EMPTY FALLBACK ────────────────────────────────────────
@@ -55,6 +58,39 @@ function CentresInner() {
   const [centres, setCentres] = useState<Centre[]>(MOCK_CENTRES);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
+  const [userLat, setUserLat] = useState<number | null>(null);
+  const [userLng, setUserLng] = useState<number | null>(null);
+  const [geoRayon, setGeoRayon] = useState(50);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) {
+      setGeoError("La géolocalisation n'est pas supportée par votre navigateur.");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLat(position.coords.latitude);
+        setUserLng(position.coords.longitude);
+        setSearchVille("");
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError("Impossible d'obtenir votre position. Vérifiez les permissions.");
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const clearGeolocation = () => {
+    setUserLat(null);
+    setUserLng(null);
+    setGeoError(null);
+  };
 
   useEffect(() => {
     if (villeParam) setSearchVille(villeParam);
@@ -65,9 +101,16 @@ function CentresInner() {
       setLoading(true);
       try {
         const url = new URL("/api/centres", window.location.origin);
-        if (searchVille) url.searchParams.set("ville", searchVille);
+        if (userLat !== null && userLng !== null) {
+          url.searchParams.set("lat", String(userLat));
+          url.searchParams.set("lng", String(userLng));
+          url.searchParams.set("rayon", String(geoRayon));
+        } else if (searchVille) {
+          url.searchParams.set("ville", searchVille);
+        }
         const res = await fetch(url.toString());
         const data = await res.json();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mapped: Centre[] = data.map((c: any) => ({
           id: c.id,
           nom: c.nom,
@@ -77,9 +120,12 @@ function CentresInner() {
           isBYS: c.nom.toLowerCase().includes("bys"),
           nombreFormations: c._count?.formations ?? 0,
           specialites: [...new Set(c.formations?.map((f: any) => f.titre.split(" ").slice(0, 3).join(" ")) ?? [])].slice(0, 4) as string[],
+          distance: c.distance ?? null,
         }));
-        // BYS toujours en premier
-        mapped.sort((a, b) => (a.isBYS && !b.isBYS ? -1 : !a.isBYS && b.isBYS ? 1 : 0));
+        // When not using geo, BYS toujours en premier
+        if (userLat === null) {
+          mapped.sort((a, b) => (a.isBYS && !b.isBYS ? -1 : !a.isBYS && b.isBYS ? 1 : 0));
+        }
         setCentres(mapped);
         setTotal(mapped.length);
       } catch {
@@ -89,7 +135,7 @@ function CentresInner() {
       }
     }, 250);
     return () => clearTimeout(timer);
-  }, [searchVille]);
+  }, [searchVille, userLat, userLng, geoRayon]);
 
   return (
     <div className="min-h-screen bg-brand-bg">
@@ -112,13 +158,60 @@ function CentresInner() {
               type="text"
               placeholder="Rechercher par ville ou département..."
               value={searchVille}
-              onChange={(e) => setSearchVille(e.target.value)}
+              onChange={(e) => { setSearchVille(e.target.value); clearGeolocation(); }}
               className="w-full px-4 py-3.5 pl-11 rounded-lg bg-white text-brand-text"
             />
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
             />
+          </div>
+
+          {/* Geolocation button + radius */}
+          <div className="max-w-xl mx-auto mt-4 flex flex-col sm:flex-row items-center gap-3">
+            <button
+              onClick={handleGeolocate}
+              disabled={geoLoading}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-semibold transition-all disabled:opacity-50"
+            >
+              <FontAwesomeIcon
+                icon={geoLoading ? faSpinner : faCrosshairs}
+                className={geoLoading ? "animate-spin" : ""}
+              />
+              Me localiser
+            </button>
+
+            {userLat !== null && userLng !== null && (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-blue-300">Rayon :</span>
+                  {[10, 25, 50, 100].map((km) => (
+                    <button
+                      key={km}
+                      onClick={() => setGeoRayon(km)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        geoRayon === km
+                          ? "bg-blue-600 text-white"
+                          : "bg-white/10 text-blue-200 hover:bg-white/20"
+                      }`}
+                    >
+                      {km} km
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={clearGeolocation}
+                  className="text-xs text-blue-400/60 hover:text-blue-300 transition-colors"
+                >
+                  <FontAwesomeIcon icon={faXmark} className="mr-1" />
+                  Annuler
+                </button>
+              </>
+            )}
+
+            {geoError && (
+              <span className="text-xs text-red-400">{geoError}</span>
+            )}
           </div>
         </div>
       </section>
@@ -166,7 +259,7 @@ function CentresInner() {
             {centres.map((centre) => (
               <Link
                 key={centre.id}
-                href={`/recherche?centre=${centre.slug}`}
+                href={`/centres/${centre.slug}`}
                 className={`card p-0 overflow-hidden flex flex-col group ${centre.isBYS ? "ring-2 ring-brand-accent shadow-lg" : ""}`}
               >
                 {/* Logo placeholder */}
@@ -215,6 +308,11 @@ function CentresInner() {
                   <p className="text-sm text-gray-500 flex items-center gap-1.5 mb-3">
                     <FontAwesomeIcon icon={faLocationDot} className="text-gray-400" />
                     {centre.ville}
+                    {centre.distance != null && (
+                      <span className="ml-1 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                        à {centre.distance} km
+                      </span>
+                    )}
                   </p>
 
                   {/* Info */}
