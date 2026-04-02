@@ -10,6 +10,7 @@ async function main() {
 
   // ─── NETTOYAGE (ordre inverse des dépendances) ───────────
   console.log("🗑️  Suppression des données existantes...");
+  await (prisma as any).emailTemplate.deleteMany();
   await (prisma as any).notification.deleteMany();
   await (prisma as any).reservation.deleteMany();
   await (prisma as any).session.deleteMany();
@@ -464,6 +465,19 @@ async function main() {
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[0].id,
+        // Personnalisation
+        couleurPrimaire: "#2563EB",
+        couleurSecondaire: "#1E40AF",
+        presentationHtml: "<p>Bienvenue chez <strong>BYS Formation</strong>, votre centre de formation agréé par la préfecture du Val-d'Oise.</p><p>Nous sommes spécialisés dans les <strong>stages de récupération de points</strong> et la <strong>formation professionnelle transport</strong> (FIMO, FCO). Notre équipe de formateurs expérimentés vous accompagne dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de réussite supérieur à 95%</li><li>Formateurs certifiés et passionnés</li></ul>",
+        horaires: "Lundi - Vendredi : 8h30 - 18h30\nSamedi : 9h00 - 13h00\nDimanche : Fermé",
+        equipements: ["Salle climatisée", "Parking gratuit", "Wifi", "Simulateur", "Accès PMR", "Véhicules récents"],
+        certifications: ["Qualiopi", "Agréé Préfecture", "Datadock", "CPF"],
+        reseauxSociaux: {
+          facebook: "https://www.facebook.com/bysformation",
+          instagram: "https://www.instagram.com/bysformation",
+          linkedin: "",
+          youtube: "",
+        },
       },
     }),
     (prisma as any).centre.create({
@@ -483,6 +497,19 @@ async function main() {
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[1].id,
+        // Personnalisation
+        couleurPrimaire: "#10B981",
+        couleurSecondaire: "#059669",
+        presentationHtml: "<p><strong>Conduite Plus</strong> est votre auto-école de référence dans le 11ème arrondissement de Paris.</p><p>Que vous souhaitiez passer votre permis B, récupérer vos points ou suivre une formation complémentaire, notre équipe dynamique est là pour vous guider vers la réussite.</p>",
+        horaires: "Lundi - Vendredi : 9h00 - 19h00\nSamedi : 10h00 - 17h00\nDimanche : Fermé",
+        equipements: ["Salle climatisée", "Wifi", "Salle de code", "Véhicules récents"],
+        certifications: ["Agréé Préfecture", "Label qualité"],
+        reseauxSociaux: {
+          facebook: "https://www.facebook.com/conduiteplus",
+          instagram: "https://www.instagram.com/conduiteplus",
+          linkedin: "https://www.linkedin.com/company/conduite-plus",
+          youtube: "https://www.youtube.com/@conduiteplus",
+        },
       },
     }),
     (prisma as any).centre.create({
@@ -1563,6 +1590,180 @@ async function main() {
   });
   console.log("✅ 5 notifications créées.\n");
 
+  // ─── EMAIL TEMPLATES PAR DÉFAUT ──────────────────────────
+  console.log("📧 Création des templates d'emails par défaut...");
+  const emailTemplates = await Promise.all([
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "convocation",
+        nom: "Convocation de stage",
+        sujet: "Convocation — {{formation}}",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
+    <h1 style="color:#fff;margin:0;font-size:22px">Convocation</h1>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour <strong>{{prenom}} {{nom}}</strong>,</p>
+    <p>Vous êtes convoqué(e) à la formation suivante :</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280;width:140px">Formation</td><td style="padding:8px 12px">{{formation}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Du</td><td style="padding:8px 12px">{{dateDebut}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Au</td><td style="padding:8px 12px">{{dateFin}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Lieu</td><td style="padding:8px 12px">{{lieu}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Centre</td><td style="padding:8px 12px">{{centre}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">N° réservation</td><td style="padding:8px 12px">{{numero}}</td></tr>
+    </table>
+    <div style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:6px;padding:12px 16px;margin:16px 0">
+      <p style="margin:0 0 8px;font-weight:bold;color:#92400E;font-size:13px">Documents obligatoires à apporter :</p>
+      <ul style="margin:0;padding-left:18px;color:#78350F;font-size:13px">
+        <li>Pièce d'identité en cours de validité (CNI ou passeport)</li>
+        <li>Permis de conduire original</li>
+        <li>Cette convocation imprimée ou sur votre smartphone</li>
+      </ul>
+    </div>
+    <p style="margin:20px 0 12px">
+      <a href="{{lienConvocation}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-weight:bold;font-size:14px">Télécharger ma convocation PDF</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero", "lienConvocation"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "confirmation_reservation",
+        nom: "Confirmation de réservation",
+        sujet: "Confirmation de réservation #{{numero}}",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
+    <h1 style="color:#fff;margin:0;font-size:22px">Réservation confirmée</h1>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour <strong>{{prenom}}</strong>,</p>
+    <p>Votre réservation <strong>#{{numero}}</strong> a bien été enregistrée et confirmée.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280;width:140px">Formation</td><td style="padding:8px 12px">{{formation}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Date</td><td style="padding:8px 12px">{{dateDebut}} - {{dateFin}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Centre</td><td style="padding:8px 12px">{{centre}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Lieu</td><td style="padding:8px 12px">{{lieu}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Montant</td><td style="padding:8px 12px">{{prix}}</td></tr>
+    </table>
+    <p>Vous recevrez votre convocation par email avant la date de la session.</p>
+    <p style="margin:20px 0 12px">
+      <a href="{{lienConvocation}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-weight:bold;font-size:14px">Télécharger ma convocation PDF</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero", "lienConvocation"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "rappel_session",
+        nom: "Rappel de session",
+        sujet: "Rappel : {{formation}} dans 48h",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
+    <h1 style="color:#fff;margin:0;font-size:22px">Rappel — Votre formation approche</h1>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour <strong>{{prenom}}</strong>,</p>
+    <p>Votre formation <strong>{{formation}}</strong> commence bientôt. Voici un rappel des informations pratiques :</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280;width:140px">Formation</td><td style="padding:8px 12px">{{formation}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Date</td><td style="padding:8px 12px">{{dateDebut}} - {{dateFin}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Lieu</td><td style="padding:8px 12px">{{lieu}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Centre</td><td style="padding:8px 12px">{{centre}}</td></tr>
+    </table>
+    <div style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:6px;padding:12px 16px;margin:16px 0">
+      <p style="margin:0 0 8px;font-weight:bold;color:#92400E;font-size:13px">N'oubliez pas d'apporter :</p>
+      <ul style="margin:0;padding-left:18px;color:#78350F;font-size:13px">
+        <li>Pièce d'identité en cours de validité</li>
+        <li>Permis de conduire original</li>
+        <li>Votre convocation</li>
+      </ul>
+    </div>
+    <p style="margin:20px 0 12px">
+      <a href="{{lienConvocation}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-weight:bold;font-size:14px">Télécharger ma convocation PDF</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero", "lienConvocation"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "bienvenue",
+        nom: "Bienvenue",
+        sujet: "Bienvenue sur BYS Formation, {{prenom}} !",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
+    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue !</h1>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour <strong>{{prenom}} {{nom}}</strong>,</p>
+    <p>Bienvenue sur <strong>BYS Formation</strong>, votre plateforme de stages agréés et de formations professionnelles.</p>
+    <p>Avec BYS Formation, vous pouvez :</p>
+    <ul style="color:#4B5563;line-height:1.8">
+      <li>Trouver un stage de récupération de points près de chez vous</li>
+      <li>Réserver en ligne en quelques clics</li>
+      <li>Recevoir votre convocation automatiquement</li>
+      <li>Accéder à toutes vos formations depuis votre espace personnel</li>
+    </ul>
+    <p>N'hésitez pas à parcourir nos formations disponibles et à réserver votre prochaine session.</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["prenom", "nom", "email"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "centre_notification",
+        nom: "Notification centre",
+        sujet: "Nouvelle réservation — {{formation}}",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
+    <h1 style="color:#fff;margin:0;font-size:22px">Nouvelle réservation</h1>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour,</p>
+    <p>Un nouvel élève a réservé une place dans votre formation.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280;width:140px">Élève</td><td style="padding:8px 12px">{{prenom}} {{nom}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Formation</td><td style="padding:8px 12px">{{formation}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Date</td><td style="padding:8px 12px">{{dateDebut}} - {{dateFin}}</td></tr>
+      <tr style="background:#f9fafb"><td style="padding:8px 12px;font-weight:bold;color:#6B7280">N° réservation</td><td style="padding:8px 12px">{{numero}}</td></tr>
+      <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Montant</td><td style="padding:8px 12px">{{prix}}</td></tr>
+    </table>
+    <p>Connectez-vous à votre espace centre pour gérer cette réservation.</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+  ]);
+  console.log(`✅ ${emailTemplates.length} templates d'emails par défaut créés.\n`);
+
   // ─── RÉSUMÉ ──────────────────────────────────────────────
   console.log("═══════════════════════════════════════════");
   console.log("🌱 Seeding terminé avec succès !");
@@ -1577,6 +1778,7 @@ async function main() {
   console.log(`  🎫 ${reservations.length} réservations`);
   console.log(`  ❓ 8 FAQ`);
   console.log(`  🔔 5 notifications`);
+  console.log(`  📧 ${emailTemplates.length} templates d'emails`);
   console.log(`  ⚙️  1 paramètre plateforme`);
   console.log("═══════════════════════════════════════════\n");
 }

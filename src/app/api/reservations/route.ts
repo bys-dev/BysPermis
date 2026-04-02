@@ -4,7 +4,9 @@ import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
 import { generateReservationNumber, calculateCommission } from "@/lib/utils";
-import { sendConfirmationEmail, sendCentreNotificationEmail } from "@/lib/email";
+import { sendConfirmationEmail, sendCentreNotificationEmail, resend } from "@/lib/email";
+import { renderEmailTemplate } from "@/lib/email-templates";
+import { formatDate } from "@/lib/utils";
 
 // ─── GET /api/reservations — mes réservations ─────────────
 export async function GET() {
@@ -114,25 +116,61 @@ export async function POST(req: NextRequest) {
     });
 
     // 7. Envoyer les emails (hors transaction)
+    const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
+    const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
+    const centre = result.session.formation.centre;
+
     try {
-      await Promise.all([
+      const emailPromises: Promise<unknown>[] = [
         sendConfirmationEmail({
           to: data.email,
           reservationNumber: result.reservation.numero,
           formationTitle: result.session.formation.titre,
           sessionDate: result.session.dateDebut.toLocaleDateString("fr-FR"),
-          centreName: result.session.formation.centre.nom,
+          centreName: centre.nom,
         }),
-        result.session.formation.centre.email
-          ? sendCentreNotificationEmail({
-              to: result.session.formation.centre.email,
-              eleveName: `${data.prenom} ${data.nom}`,
-              formationTitle: result.session.formation.titre,
-              sessionDate: result.session.dateDebut.toLocaleDateString("fr-FR"),
-              amount: result.reservation.montant * (1 - Number(process.env.COMMISSION_RATE ?? 0.1)),
-            })
-          : Promise.resolve(),
-      ]);
+      ];
+
+      // Centre notification
+      if (centre.email) {
+        emailPromises.push(
+          sendCentreNotificationEmail({
+            to: centre.email,
+            eleveName: `${data.prenom} ${data.nom}`,
+            formationTitle: result.session.formation.titre,
+            sessionDate: result.session.dateDebut.toLocaleDateString("fr-FR"),
+            amount: result.reservation.montant * (1 - Number(process.env.COMMISSION_RATE ?? 0.1)),
+          })
+        );
+      }
+
+      // Convocation email via template system
+      const lienConvocation = `${APP_URL}/api/convocation/${result.reservation.id}`;
+      const convocationVars: Record<string, string> = {
+        prenom: data.prenom,
+        nom: data.nom,
+        email: data.email,
+        formation: result.session.formation.titre,
+        centre: centre.nom,
+        dateDebut: formatDate(result.session.dateDebut),
+        dateFin: formatDate(result.session.dateFin),
+        lieu: result.session.formation.lieu ?? `${centre.adresse}, ${centre.codePostal} ${centre.ville}`,
+        prix: `${result.reservation.montant} €`,
+        numero: result.reservation.numero,
+        lienConvocation,
+      };
+
+      emailPromises.push(
+        renderEmailTemplate("convocation", centre.id, convocationVars)
+          .then(({ subject, html }) =>
+            resend.emails.send({ from: FROM, to: data.email, subject, html })
+          )
+          .catch((err) => {
+            console.error("[POST /api/reservations] Convocation email error:", err);
+          })
+      );
+
+      await Promise.all(emailPromises);
     } catch (emailErr) {
       console.error("[POST /api/reservations] Email error:", emailErr);
       // Ne pas faire échouer la réservation pour un email

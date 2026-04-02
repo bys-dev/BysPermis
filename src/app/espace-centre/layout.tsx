@@ -15,6 +15,8 @@ import {
   faUsers,
   faClipboardCheck,
   faBookOpen,
+  faPaintBrush,
+  faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
@@ -63,6 +65,18 @@ const allNavItems: NavItem[] = [
     label: "Émargement",
     icon: faClipboardCheck,
     roles: ["CENTRE_FORMATEUR"],
+  },
+  {
+    href: "/espace-centre/profil-centre",
+    label: "Profil centre",
+    icon: faPaintBrush,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/emails",
+    label: "Emails",
+    icon: faEnvelope,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
   },
   {
     href: "/espace-centre/support",

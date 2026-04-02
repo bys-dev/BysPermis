@@ -135,11 +135,22 @@ model Centre {
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
 
+  // Personnalisation
+  bannerImage           String?
+  couleurPrimaire       String?
+  couleurSecondaire     String?
+  presentationHtml      String?
+  horaires              String?
+  equipements           String[]
+  certifications        String[]
+  reseauxSociaux        Json?
+
   // Relations
   userId                String             @unique
   user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   formations            Formation[]
   membres               CentreMembre[]
+  emailTemplates        EmailTemplate[]
   subscriptionPlanId    String?
   subscriptionPlan      SubscriptionPlan?  @relation(fields: [subscriptionPlanId], references: [id])
 
@@ -271,6 +282,8 @@ model Reservation {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
+  rappelEnvoye      Boolean           @default(false)
+
   // Relations
   userId            String
   user              User              @relation(fields: [userId], references: [id])
@@ -344,6 +357,25 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+// ─── EMAIL TEMPLATES ─────────────────────────────────────
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  slug        String   // "convocation", "confirmation_reservation", "rappel_session", "bienvenue", "centre_notification"
+  nom         String   // "Convocation de stage", etc.
+  sujet       String   // Email subject with variables like {{prenom}}, {{formation}}
+  contenu     String   // HTML body with variables
+  variables   String[] // List of available variables
+  isActive    Boolean  @default(true)
+  centreId    String?  // null = default template, centreId = centre-specific override
+  centre      Centre?  @relation(fields: [centreId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([slug, centreId])
+  @@map("email_templates")
 }
 
 // ─── PARAMETRES PLATEFORME ───────────────────────────────

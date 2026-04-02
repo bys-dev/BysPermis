@@ -24,7 +24,15 @@ import {
   faArrowRight,
   faUsers,
   faCircleExclamation,
+  faToolbox,
+  faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFacebook,
+  faInstagram,
+  faLinkedin,
+  faYoutube,
+} from "@fortawesome/free-brands-svg-icons";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -57,6 +65,13 @@ interface Formation {
   categorie: Categorie | null;
 }
 
+interface ReseauxSociaux {
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  youtube?: string;
+}
+
 interface Centre {
   id: string;
   nom: string;
@@ -71,6 +86,14 @@ interface Centre {
   latitude: number | null;
   longitude: number | null;
   isActive: boolean;
+  bannerImage: string | null;
+  couleurPrimaire: string | null;
+  couleurSecondaire: string | null;
+  presentationHtml: string | null;
+  horaires: string | null;
+  equipements: string[];
+  certifications: string[];
+  reseauxSociaux: ReseauxSociaux | null;
   formations: Formation[];
   _count: {
     formations: number;
@@ -191,13 +214,23 @@ export default function CentreDetailPage() {
   }
 
   const hasQualiopi = centre.formations.some((f) => f.isQualiopi);
+  const accentColor = centre.couleurPrimaire || "#3B82F6";
+  const socials = centre.reseauxSociaux;
+  const hasSocials = socials && Object.values(socials).some((v) => v);
 
   return (
     <div className="min-h-screen bg-brand-bg">
       <Header />
 
       {/* ─── HERO ──────────────────────────────────────────── */}
-      <section className="bg-[#0A1628] text-white py-14 px-4">
+      <section
+        className="text-white py-14 px-4 bg-cover bg-center"
+        style={{
+          background: centre.bannerImage
+            ? `linear-gradient(rgba(10,22,40,0.85), rgba(10,22,40,0.95)), url(${centre.bannerImage}) center/cover`
+            : "#0A1628",
+        }}
+      >
         <div className="max-w-5xl mx-auto">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
@@ -212,15 +245,19 @@ export default function CentreDetailPage() {
               Centres
             </Link>
             <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
-            <span className="text-blue-300">{centre.nom}</span>
+            <span style={{ color: accentColor }}>{centre.nom}</span>
           </nav>
 
           <div className="flex flex-col md:flex-row items-start gap-6">
             {/* Logo */}
-            <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0"
+              style={{ background: `${accentColor}20` }}
+            >
               <FontAwesomeIcon
                 icon={faBuilding}
-                className="text-blue-400 text-3xl"
+                className="text-3xl"
+                style={{ color: accentColor }}
               />
             </div>
 
@@ -235,14 +272,27 @@ export default function CentreDetailPage() {
                     Qualiopi
                   </span>
                 )}
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30">
-                  <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5" />
-                  Agréé Préfecture
-                </span>
+                {/* Display certifications as badges */}
+                {centre.certifications && centre.certifications.length > 0 ? (
+                  centre.certifications.map((cert, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30"
+                    >
+                      <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5" />
+                      {cert}
+                    </span>
+                  ))
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30">
+                    <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5" />
+                    Agree Prefecture
+                  </span>
+                )}
               </div>
 
               <p className="text-gray-300 flex items-center gap-2 mb-3">
-                <FontAwesomeIcon icon={faLocationDot} className="text-blue-400" />
+                <FontAwesomeIcon icon={faLocationDot} style={{ color: accentColor }} />
                 {centre.adresse}, {centre.codePostal} {centre.ville}
               </p>
 
@@ -257,7 +307,7 @@ export default function CentreDetailPage() {
                 <div className="flex items-center gap-2 text-sm">
                   <FontAwesomeIcon
                     icon={faBookOpen}
-                    className="text-blue-400"
+                    style={{ color: accentColor }}
                   />
                   <span className="text-white font-semibold">
                     {centre._count.formations}
@@ -269,16 +319,62 @@ export default function CentreDetailPage() {
                 <div className="flex items-center gap-2 text-sm">
                   <FontAwesomeIcon
                     icon={faCalendarDays}
-                    className="text-blue-400"
+                    style={{ color: accentColor }}
                   />
                   <span className="text-white font-semibold">
                     {centre._count.sessions}
                   </span>
                   <span className="text-gray-400">
-                    session{centre._count.sessions > 1 ? "s" : ""} à venir
+                    session{centre._count.sessions > 1 ? "s" : ""} a venir
                   </span>
                 </div>
               </div>
+
+              {/* Social media links */}
+              {hasSocials && (
+                <div className="flex gap-3 mt-5">
+                  {socials.facebook && (
+                    <a
+                      href={socials.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#1877F2]/30 flex items-center justify-center transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faFacebook} className="text-[#1877F2]" />
+                    </a>
+                  )}
+                  {socials.instagram && (
+                    <a
+                      href={socials.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#E4405F]/30 flex items-center justify-center transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faInstagram} className="text-[#E4405F]" />
+                    </a>
+                  )}
+                  {socials.linkedin && (
+                    <a
+                      href={socials.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#0A66C2]/30 flex items-center justify-center transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faLinkedin} className="text-[#0A66C2]" />
+                    </a>
+                  )}
+                  {socials.youtube && (
+                    <a
+                      href={socials.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#FF0000]/30 flex items-center justify-center transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faYoutube} className="text-[#FF0000]" />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -289,10 +385,13 @@ export default function CentreDetailPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Adresse */}
           <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: `${accentColor}15` }}
+            >
               <FontAwesomeIcon
                 icon={faLocationDot}
-                className="text-brand-accent"
+                style={{ color: accentColor }}
               />
             </div>
             <div>
@@ -306,22 +405,26 @@ export default function CentreDetailPage() {
             </div>
           </div>
 
-          {/* Téléphone */}
+          {/* Telephone */}
           {centre.telephone && (
             <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: `${accentColor}15` }}
+              >
                 <FontAwesomeIcon
                   icon={faPhone}
-                  className="text-brand-accent"
+                  style={{ color: accentColor }}
                 />
               </div>
               <div>
                 <p className="text-xs text-gray-400 font-medium mb-1">
-                  Téléphone
+                  Telephone
                 </p>
                 <a
                   href={`tel:${centre.telephone}`}
-                  className="text-sm text-brand-accent font-semibold hover:underline"
+                  className="text-sm font-semibold hover:underline"
+                  style={{ color: accentColor }}
                 >
                   {centre.telephone}
                 </a>
@@ -332,17 +435,21 @@ export default function CentreDetailPage() {
           {/* Email */}
           {centre.email && (
             <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: `${accentColor}15` }}
+              >
                 <FontAwesomeIcon
                   icon={faEnvelope}
-                  className="text-brand-accent"
+                  style={{ color: accentColor }}
                 />
               </div>
               <div>
                 <p className="text-xs text-gray-400 font-medium mb-1">Email</p>
                 <a
                   href={`mailto:${centre.email}`}
-                  className="text-sm text-brand-accent font-semibold hover:underline break-all"
+                  className="text-sm font-semibold hover:underline break-all"
+                  style={{ color: accentColor }}
                 >
                   {centre.email}
                 </a>
@@ -353,10 +460,13 @@ export default function CentreDetailPage() {
           {/* Site web */}
           {centre.siteWeb && (
             <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: `${accentColor}15` }}
+              >
                 <FontAwesomeIcon
                   icon={faGlobe}
-                  className="text-brand-accent"
+                  style={{ color: accentColor }}
                 />
               </div>
               <div>
@@ -371,7 +481,8 @@ export default function CentreDetailPage() {
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-brand-accent font-semibold hover:underline break-all"
+                  className="text-sm font-semibold hover:underline break-all"
+                  style={{ color: accentColor }}
                 >
                   {centre.siteWeb}
                 </a>
@@ -380,6 +491,67 @@ export default function CentreDetailPage() {
           )}
         </div>
       </section>
+
+      {/* ─── PRESENTATION / HORAIRES / EQUIPEMENTS ─────────── */}
+      {(centre.presentationHtml || centre.horaires || (centre.equipements && centre.equipements.length > 0)) && (
+        <section className="max-w-5xl mx-auto px-4 py-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Presentation */}
+            {centre.presentationHtml && (
+              <div className="lg:col-span-2 bg-white border border-brand-border rounded-xl p-6 shadow-sm">
+                <h2 className="font-display font-bold text-lg text-brand-text mb-4 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faBuilding} style={{ color: accentColor }} />
+                  A propos
+                </h2>
+                <div
+                  className="prose prose-sm max-w-none text-gray-600 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: centre.presentationHtml }}
+                />
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {/* Horaires */}
+              {centre.horaires && (
+                <div className="bg-white border border-brand-border rounded-xl p-6 shadow-sm">
+                  <h3 className="font-display font-bold text-sm text-brand-text mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faClock} style={{ color: accentColor }} />
+                    Horaires d&apos;ouverture
+                  </h3>
+                  <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
+                    {centre.horaires}
+                  </p>
+                </div>
+              )}
+
+              {/* Equipements */}
+              {centre.equipements && centre.equipements.length > 0 && (
+                <div className="bg-white border border-brand-border rounded-xl p-6 shadow-sm">
+                  <h3 className="font-display font-bold text-sm text-brand-text mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faToolbox} style={{ color: accentColor }} />
+                    Equipements
+                  </h3>
+                  <div className="space-y-2">
+                    {centre.equipements.map((eq, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2 text-sm text-gray-600"
+                      >
+                        <FontAwesomeIcon
+                          icon={faCircleCheck}
+                          className="w-3.5 h-3.5"
+                          style={{ color: accentColor }}
+                        />
+                        {eq}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ─── FORMATIONS ────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-4 py-12">
