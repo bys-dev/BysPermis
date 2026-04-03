@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileExport,
@@ -9,19 +9,21 @@ import {
   faCalendar,
   faEuro,
   faBuilding,
+  faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice } from "@/lib/utils";
 
 interface MonthlyRevenue {
-  mois: string;
+  month: string;
   label: string;
   reservations: number;
   revenuBrut: number;
   commission: number;
+  revenuCentres: number;
 }
 
 interface CentreCommission {
-  id: string;
+  centreId: string;
   nom: string;
   ville: string;
   reservations: number;
@@ -29,45 +31,10 @@ interface CentreCommission {
   commission: number;
 }
 
-const MOIS_LABELS = [
-  "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin",
-  "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre",
-];
-
-const MOCK_MONTHLY: MonthlyRevenue[] = [
-  { mois: "2026-01", label: "Janvier 2026", reservations: 980, revenuBrut: 124000, commission: 12400 },
-  { mois: "2026-02", label: "Fevrier 2026", reservations: 1120, revenuBrut: 142000, commission: 14200 },
-  { mois: "2026-03", label: "Mars 2026", reservations: 1284, revenuBrut: 184200, commission: 18420 },
-];
-
-const MOCK_CENTRES: CentreCommission[] = [
-  { id: "1", nom: "BYS Formation Osny", ville: "Osny", reservations: 312, revenuBrut: 62400, commission: 6240 },
-  { id: "2", nom: "Auto-Ecole Montmartre", ville: "Paris", reservations: 245, revenuBrut: 48600, commission: 4860 },
-  { id: "3", nom: "BYS Formation Cergy", ville: "Cergy", reservations: 189, revenuBrut: 37800, commission: 3780 },
-  { id: "4", nom: "Centre Conduite Nantes", ville: "Nantes", reservations: 156, revenuBrut: 31200, commission: 3120 },
-  { id: "5", nom: "Auto-Ecole Bordelaise", ville: "Bordeaux", reservations: 98, revenuBrut: 19600, commission: 1960 },
-];
-
-function generateCSV(monthly: MonthlyRevenue[], centres: CentreCommission[]): string {
-  const lines: string[] = [];
-
-  // Section: Revenus mensuels
-  lines.push("=== REVENUS MENSUELS ===");
-  lines.push("Mois,Reservations,Revenu brut (EUR),Commission (EUR)");
-  for (const m of monthly) {
-    lines.push(`${m.label},${m.reservations},${(m.revenuBrut / 100).toFixed(2)},${(m.commission / 100).toFixed(2)}`);
-  }
-
-  lines.push("");
-
-  // Section: Commissions par centre
-  lines.push("=== COMMISSIONS PAR CENTRE ===");
-  lines.push("Centre,Ville,Reservations,Revenu brut (EUR),Commission (EUR)");
-  for (const c of centres) {
-    lines.push(`"${c.nom}",${c.ville},${c.reservations},${(c.revenuBrut / 100).toFixed(2)},${(c.commission / 100).toFixed(2)}`);
-  }
-
-  return lines.join("\n");
+interface RevenuData {
+  monthly: MonthlyRevenue[];
+  parCentre: CentreCommission[];
+  totaux: { revenuBrut: number; commission: number; reservations: number };
 }
 
 function downloadCSV(content: string, filename: string) {
@@ -83,39 +50,65 @@ function downloadCSV(content: string, filename: string) {
 }
 
 export default function PlateformeExportsPage() {
-  const [monthly, setMonthly] = useState<MonthlyRevenue[]>([]);
-  const [centres, setCentres] = useState<CentreCommission[]>([]);
+  const [data, setData] = useState<RevenuData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [error, setError] = useState<string | null>(null);
+  const [months, setMonths] = useState<number>(6);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`/api/admin/revenus?months=${months}`);
+      if (!res.ok) throw new Error("Erreur lors du chargement des donnees");
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setData(json);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [months]);
 
   useEffect(() => {
-    fetch("/api/admin/stats")
-      .then((r) => r.json())
-      .then(() => {
-        // L'API ne retourne pas encore les donnees mensuelles detaillees, on utilise les mocks
-        setMonthly(MOCK_MONTHLY);
-        setCentres(MOCK_CENTRES);
-      })
-      .catch(() => {
-        setMonthly(MOCK_MONTHLY);
-        setCentres(MOCK_CENTRES);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
-  const totalRevenuBrut = monthly.reduce((sum, m) => sum + m.revenuBrut, 0);
-  const totalCommissions = monthly.reduce((sum, m) => sum + m.commission, 0);
-  const totalReservations = monthly.reduce((sum, m) => sum + m.reservations, 0);
+  const monthly = data?.monthly ?? [];
+  const centres = data?.parCentre ?? [];
+  const totaux = data?.totaux ?? { revenuBrut: 0, commission: 0, reservations: 0 };
 
   const handleExportCSV = () => {
-    const csv = generateCSV(monthly, centres);
-    const filename = `export-byspermis-${MOIS_LABELS[selectedMonth]?.toLowerCase() ?? "mois"}-${selectedYear}.csv`;
-    downloadCSV(csv, filename);
-  };
+    if (!data) return;
+    const lines: string[] = [];
 
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear - 1, currentYear, currentYear + 1];
+    // Section: Revenus mensuels
+    lines.push("=== REVENUS MENSUELS ===");
+    lines.push("Mois,Reservations,Revenu brut (EUR),Commission (EUR),Revenu Centres (EUR)");
+    for (const m of monthly) {
+      lines.push(`${m.label},${m.reservations},${m.revenuBrut.toFixed(2)},${m.commission.toFixed(2)},${m.revenuCentres.toFixed(2)}`);
+    }
+
+    lines.push("");
+
+    // Section: Commissions par centre
+    lines.push("=== COMMISSIONS PAR CENTRE ===");
+    lines.push("Centre,Ville,Reservations,Revenu brut (EUR),Commission (EUR)");
+    for (const c of centres) {
+      lines.push(`"${c.nom}",${c.ville},${c.reservations},${c.revenuBrut.toFixed(2)},${c.commission.toFixed(2)}`);
+    }
+
+    lines.push("");
+    lines.push("=== TOTAUX ===");
+    lines.push(`Reservations totales,${totaux.reservations}`);
+    lines.push(`Revenu brut total (EUR),${totaux.revenuBrut.toFixed(2)}`);
+    lines.push(`Commissions totales (EUR),${totaux.commission.toFixed(2)}`);
+
+    const filename = `export-byspermis-${months}mois-${new Date().toISOString().slice(0, 10)}.csv`;
+    downloadCSV(lines.join("\n"), filename);
+  };
 
   return (
     <div className="space-y-8">
@@ -129,7 +122,7 @@ export default function PlateformeExportsPage() {
         </div>
         <button
           onClick={handleExportCSV}
-          disabled={loading}
+          disabled={loading || !data}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
           <FontAwesomeIcon icon={faDownload} className="text-xs" />
@@ -141,27 +134,27 @@ export default function PlateformeExportsPage() {
       <div className="flex items-center gap-3 flex-wrap">
         <FontAwesomeIcon icon={faCalendar} className="text-gray-500 text-sm" />
         <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          value={months}
+          onChange={(e) => setMonths(Number(e.target.value))}
           className="bg-[#0A1628] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50"
         >
-          {MOIS_LABELS.map((label, i) => (
-            <option key={i} value={i}>{label}</option>
-          ))}
-        </select>
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="bg-[#0A1628] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50"
-        >
-          {years.map((y) => (
-            <option key={y} value={y}>{y}</option>
-          ))}
+          <option value={3}>3 derniers mois</option>
+          <option value={6}>6 derniers mois</option>
+          <option value={12}>12 derniers mois</option>
+          <option value={24}>24 derniers mois</option>
         </select>
         <span className="text-gray-500 text-xs ml-2">
-          Periode selectionnee : {MOIS_LABELS[selectedMonth]} {selectedYear}
+          Periode : {months} derniers mois
         </span>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <FontAwesomeIcon icon={faExclamationTriangle} className="text-xs" />
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* KPIs resume */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -171,7 +164,7 @@ export default function PlateformeExportsPage() {
               <FontAwesomeIcon icon={faEuro} className="text-green-400 text-sm" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(totalCommissions)}</p>
+          <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(totaux.commission)}</p>
           <p className="text-xs text-gray-500 mt-1">Total commissions</p>
         </div>
         <div className="rounded-xl p-5 border bg-[#0A1628] border-blue-500/20">
@@ -180,7 +173,7 @@ export default function PlateformeExportsPage() {
               <FontAwesomeIcon icon={faFileExport} className="text-blue-400 text-sm" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(totalRevenuBrut)}</p>
+          <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(totaux.revenuBrut)}</p>
           <p className="text-xs text-gray-500 mt-1">Revenu brut total</p>
         </div>
         <div className="rounded-xl p-5 border bg-[#0A1628] border-purple-500/20">
@@ -189,7 +182,7 @@ export default function PlateformeExportsPage() {
               <FontAwesomeIcon icon={faBuilding} className="text-purple-400 text-sm" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white">{loading ? "..." : totalReservations.toLocaleString("fr-FR")}</p>
+          <p className="text-2xl font-bold text-white">{loading ? "..." : totaux.reservations.toLocaleString("fr-FR")}</p>
           <p className="text-xs text-gray-500 mt-1">Total reservations</p>
         </div>
       </div>
@@ -202,6 +195,10 @@ export default function PlateformeExportsPage() {
             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
             <span>Chargement...</span>
           </div>
+        ) : monthly.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-sm">Aucune donnee pour cette periode</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -210,28 +207,28 @@ export default function PlateformeExportsPage() {
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Mois</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reservations</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Revenu brut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Commission (10%)</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Taux commission</th>
+                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Commission</th>
+                  <th className="text-gray-500 font-medium text-xs pb-3">Revenu centres</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {monthly.map((m) => (
-                  <tr key={m.mois} className="hover:bg-white/3 transition-colors">
+                  <tr key={m.month} className="hover:bg-white/3 transition-colors">
                     <td className="py-3 pr-4 text-white font-medium">{m.label}</td>
                     <td className="py-3 pr-4 text-gray-300">{m.reservations.toLocaleString("fr-FR")}</td>
                     <td className="py-3 pr-4 text-white font-semibold">{formatPrice(m.revenuBrut)}</td>
                     <td className="py-3 pr-4 text-green-400 font-semibold">{formatPrice(m.commission)}</td>
-                    <td className="py-3 text-gray-400">10%</td>
+                    <td className="py-3 text-gray-300">{formatPrice(m.revenuCentres)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="border-t border-white/10">
                   <td className="py-3 pr-4 text-white font-bold">Total</td>
-                  <td className="py-3 pr-4 text-white font-bold">{totalReservations.toLocaleString("fr-FR")}</td>
-                  <td className="py-3 pr-4 text-white font-bold">{formatPrice(totalRevenuBrut)}</td>
-                  <td className="py-3 pr-4 text-green-400 font-bold">{formatPrice(totalCommissions)}</td>
-                  <td className="py-3 text-gray-400">10%</td>
+                  <td className="py-3 pr-4 text-white font-bold">{totaux.reservations.toLocaleString("fr-FR")}</td>
+                  <td className="py-3 pr-4 text-white font-bold">{formatPrice(totaux.revenuBrut)}</td>
+                  <td className="py-3 pr-4 text-green-400 font-bold">{formatPrice(totaux.commission)}</td>
+                  <td className="py-3 text-gray-300 font-bold">{formatPrice(totaux.revenuBrut - totaux.commission)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -245,7 +242,7 @@ export default function PlateformeExportsPage() {
           <h2 className="text-white font-semibold text-sm">Commissions par centre</h2>
           <button
             onClick={handleExportCSV}
-            disabled={loading}
+            disabled={loading || !data}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600/15 text-blue-400 text-xs font-medium border border-blue-500/20 hover:bg-blue-600/25 transition-colors disabled:opacity-50"
           >
             <FontAwesomeIcon icon={faDownload} className="text-[10px]" />
@@ -256,6 +253,10 @@ export default function PlateformeExportsPage() {
           <div className="flex items-center gap-2 text-gray-500 text-sm py-8 justify-center">
             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
             <span>Chargement...</span>
+          </div>
+        ) : centres.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-sm">Aucune commission enregistree</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -271,7 +272,7 @@ export default function PlateformeExportsPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {centres.map((c) => (
-                  <tr key={c.id} className="hover:bg-white/3 transition-colors">
+                  <tr key={c.centreId} className="hover:bg-white/3 transition-colors">
                     <td className="py-3 pr-4 text-white font-medium">{c.nom}</td>
                     <td className="py-3 pr-4 text-gray-400">{c.ville}</td>
                     <td className="py-3 pr-4 text-gray-300">{c.reservations}</td>

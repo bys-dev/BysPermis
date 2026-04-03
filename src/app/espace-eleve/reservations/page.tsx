@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarCheck, faLocationDot, faClock, faFileLines,
   faCircleCheck, faCircleXmark, faCircleExclamation, faHourglassHalf,
-  faSpinner, faSearch,
+  faSpinner, faSearch, faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
@@ -20,8 +20,13 @@ interface Reservation {
   session: {
     dateDebut: string;
     dateFin: string;
+    placesRestantes?: number;
     formation: {
       titre: string;
+      slug?: string;
+      prix?: number;
+      lieu?: string | null;
+      duree?: string;
       centre: { nom: string; ville: string };
     };
   };
@@ -35,34 +40,30 @@ const statusConfig = {
   REMBOURSEE: { label: "Remboursée", icon: faCircleExclamation,color: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-500/20"  },
 } as const;
 
-// ─── Données mock (fallback si API non connectée) ─────────
-const MOCK: Reservation[] = [
-  {
-    id: "res_1", numero: "BYS-2026-A4F2", status: "CONFIRMEE", montant: 199, createdAt: new Date().toISOString(),
-    session: { dateDebut: "2026-04-21T09:00:00", dateFin: "2026-04-22T17:30:00", formation: { titre: "Stage de récupération de points", centre: { nom: "BYS Formation — Osny", ville: "Osny" } } },
-  },
-  {
-    id: "res_2", numero: "BYS-2026-B2C9", status: "TERMINEE", montant: 210, createdAt: "2026-03-22T09:00:00",
-    session: { dateDebut: "2026-03-22T09:00:00", dateFin: "2026-03-23T17:00:00", formation: { titre: "Sensibilisation sécurité routière", centre: { nom: "Auto-École Dupont", ville: "Cergy" } } },
-  },
-  {
-    id: "res_3", numero: "BYS-2026-D7E1", status: "ANNULEE", montant: 750, createdAt: "2026-02-05T08:00:00",
-    session: { dateDebut: "2026-02-05T08:00:00", dateFin: "2026-02-05T18:00:00", formation: { titre: "Stage permis B accéléré", centre: { nom: "BYS Formation — Paris", ville: "Paris" } } },
-  },
-];
-
 export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/reservations")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setReservations(data);
-        else setReservations(MOCK); // fallback mock en dev
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}));
+          throw new Error(body.error || "Erreur lors du chargement");
+        }
+        return r.json();
       })
-      .catch(() => setReservations(MOCK))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setReservations(data);
+        } else {
+          setReservations([]);
+        }
+      })
+      .catch((err) => {
+        setError(err.message || "Impossible de charger vos réservations.");
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -80,28 +81,44 @@ export default function ReservationsPage() {
         <p className="text-gray-500 text-sm">Retrouvez l&apos;historique de tous vos stages</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: "Total",       value: counts.total,      color: "text-white"      },
-          { label: "Confirmées",  value: counts.confirmees, color: "text-green-400"  },
-          { label: "Terminées",   value: counts.terminees,  color: "text-gray-400"   },
-          { label: "Annulées",    value: counts.annulees,   color: "text-red-400"    },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl p-4 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{s.label}</p>
-          </div>
-        ))}
-      </div>
+      {/* Stats — hidden during loading/error */}
+      {!loading && !error && reservations.length > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Total",       value: counts.total,      color: "text-white"      },
+            { label: "Confirmées",  value: counts.confirmees, color: "text-green-400"  },
+            { label: "Terminées",   value: counts.terminees,  color: "text-gray-400"   },
+            { label: "Annulées",    value: counts.annulees,   color: "text-red-400"    },
+          ].map((s) => (
+            <div key={s.label} className="rounded-xl p-4 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* List */}
+      {/* Loading */}
       {loading ? (
         <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
           <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement…</span>
+          <span className="text-sm">Chargement de vos réservations...</span>
+        </div>
+      ) : error ? (
+        /* Error */
+        <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
+          <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
+          <p className="text-white font-medium mb-1">Erreur de chargement</p>
+          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <button
+            onClick={() => { setError(null); setLoading(true); window.location.reload(); }}
+            className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
+          >
+            Réessayer
+          </button>
         </div>
       ) : reservations.length === 0 ? (
+        /* Empty */
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
           <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
           <p className="text-white font-medium mb-1">Aucune réservation</p>
@@ -111,6 +128,7 @@ export default function ReservationsPage() {
           </Link>
         </div>
       ) : (
+        /* List */
         <div className="space-y-4">
           {reservations.map((r) => {
             const s = statusConfig[r.status];
@@ -164,12 +182,14 @@ export default function ReservationsPage() {
       )}
 
       {/* CTA */}
-      <div className="mt-10 text-center rounded-xl p-8 border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-        <p className="text-gray-400 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
-        <Link href="/recherche" className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">
-          Rechercher un stage
-        </Link>
-      </div>
+      {!loading && !error && (
+        <div className="mt-10 text-center rounded-xl p-8 border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
+          <p className="text-gray-400 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
+          <Link href="/recherche" className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">
+            Rechercher un stage
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

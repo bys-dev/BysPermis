@@ -8,8 +8,8 @@ import {
   faArrowUp, faCheckCircle, faCircleXmark,
   faClock, faHeadset, faChartLine, faArrowRight, faSpinner,
   faCrown, faShieldHalved, faUserShield, faCog,
-  faPercent, faScrewdriverWrench, faPlus,
-  faCalendarDay, faTicket, faUserPlus,
+  faPercent, faScrewdriverWrench,
+  faCalendarDay, faTicket,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice, formatDate } from "@/lib/utils";
 
@@ -38,20 +38,19 @@ interface AdminStats {
     email?: string;
     createdAt: string;
   }[];
+  activityFeed?: {
+    id: string;
+    type: "reservation" | "centre" | "ticket";
+    label: string;
+    detail: string;
+    time: string;
+  }[];
 }
 
 interface AdminUser {
   prenom: string;
   nom: string;
   role: "ADMIN" | "OWNER";
-}
-
-interface ActivityItem {
-  id: string;
-  type: "reservation" | "centre" | "ticket" | "user";
-  label: string;
-  detail: string;
-  time: string;
 }
 
 const statusBadge = (s: string) => {
@@ -64,70 +63,57 @@ const statusBadge = (s: string) => {
   return map[s] ?? { cls: "bg-gray-400/10 text-gray-400 border-gray-500/20", label: s };
 };
 
-const MOCK_STATS: AdminStats = {
-  revenusPlateforme: 18420, revenusEvolution: 12,
-  centresActifs: 47, centresEnAttente: 8,
-  reservationsCeMois: 1284, reservationsEvolution: 8,
-  utilisateurs: 12847, ticketsOuverts: 3,
-  reservationsRecentes: [
-    { id: "RES-2847", eleve: "Jean Dupont", centre: "BYS Formation Osny", stage: "Recuperation de points", montant: 199, status: "CONFIRMEE", createdAt: new Date().toISOString() },
-    { id: "RES-2846", eleve: "Marie Martin", centre: "Auto-Ecole Montmartre", stage: "Stage 48N", montant: 249, status: "EN_ATTENTE", createdAt: new Date().toISOString() },
-    { id: "RES-2845", eleve: "Lucas Bernard", centre: "BYS Formation Cergy", stage: "Recuperation de points", montant: 209, status: "CONFIRMEE", createdAt: new Date().toISOString() },
-  ],
-  centresEnAttenteList: [
-    { id: "C001", nom: "Auto-Ecole Bordelaise", ville: "Bordeaux", email: "ae-bordelaise@gmail.com", createdAt: new Date("2026-03-22").toISOString() },
-    { id: "C002", nom: "Centre Conduite Nantes", ville: "Nantes", email: "conduite.nantes@gmail.com", createdAt: new Date("2026-03-21").toISOString() },
-  ],
-};
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "A l'instant";
+  if (mins < 60) return `Il y a ${mins}min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `Il y a ${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `Il y a ${days} jour(s)`;
+}
 
-const MOCK_ACTIVITY: ActivityItem[] = [
-  { id: "a1", type: "reservation", label: "Nouvelle reservation", detail: "Jean Dupont — BYS Formation Osny", time: "Il y a 12 min" },
-  { id: "a2", type: "centre", label: "Nouveau centre inscrit", detail: "Auto-Ecole Bordelaise — Bordeaux", time: "Il y a 1h" },
-  { id: "a3", type: "ticket", label: "Ticket support ouvert", detail: "Probleme de paiement — Jean Dupont", time: "Il y a 2h" },
-  { id: "a4", type: "user", label: "Nouvel utilisateur", detail: "Sophie Petit — sophie.petit@outlook.fr", time: "Il y a 3h" },
-  { id: "a5", type: "reservation", label: "Reservation confirmee", detail: "Marie Martin — Auto-Ecole Montmartre", time: "Il y a 4h" },
-];
-
-const activityIcon = (type: ActivityItem["type"]) => {
-  const map = {
+const activityIcon = (type: string) => {
+  const map: Record<string, { icon: typeof faCalendarDay; color: string; bg: string; border: string }> = {
     reservation: { icon: faCalendarDay, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/20" },
     centre:      { icon: faBuilding,    color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/20" },
     ticket:      { icon: faTicket,      color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-500/20" },
-    user:        { icon: faUserPlus,    color: "text-green-400", bg: "bg-green-400/10", border: "border-green-500/20" },
   };
-  return map[type];
+  return map[type] ?? map.reservation;
 };
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
       fetch("/api/admin/stats")
-        .then((r) => r.json())
-        .then((data) => {
-          if (data && typeof data.centresActifs === "number") return data;
-          return MOCK_STATS;
-        })
-        .catch(() => MOCK_STATS),
+        .then((r) => {
+          if (!r.ok) throw new Error("Erreur stats");
+          return r.json();
+        }),
       fetch("/api/admin/me")
-        .then((r) => r.json())
-        .then((data) => {
-          if (data && data.role) return data;
-          return { prenom: "Admin", nom: "", role: "ADMIN" };
-        })
-        .catch(() => ({ prenom: "Admin", nom: "", role: "ADMIN" })),
-    ]).then(([statsData, userData]) => {
-      setStats(statsData);
-      setUser(userData);
-      setLoading(false);
-    });
+        .then((r) => {
+          if (!r.ok) throw new Error("Erreur auth");
+          return r.json();
+        }),
+    ])
+      .then(([statsData, userData]) => {
+        setStats(statsData);
+        setUser(userData);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   async function validateCentre(id: string) {
-    const res = await fetch("/api/centres", {
+    const res = await fetch("/api/admin/centres", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, statut: "ACTIF" }),
@@ -143,7 +129,7 @@ export default function AdminDashboardPage() {
   }
 
   async function rejectCentre(id: string) {
-    const res = await fetch("/api/centres", {
+    const res = await fetch("/api/admin/centres", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, statut: "SUSPENDU" }),
@@ -157,28 +143,55 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const s = stats ?? MOCK_STATS;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
+        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-lg" />
+        <span className="text-sm">Chargement du dashboard...</span>
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <div className="bg-[#0A1628] rounded-xl border border-red-500/20 p-12 text-center">
+          <p className="text-red-400 font-medium">Impossible de charger le dashboard</p>
+          <p className="text-gray-600 text-sm mt-1">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white text-sm transition-colors"
+          >
+            Recharger
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const isOwner = user?.role === "OWNER";
 
   const kpis = [
     {
-      label: "Revenus plateforme", value: loading ? "..." : formatPrice(s.revenusPlateforme),
-      sub: "Commission percue ce mois", icon: faEuro, trend: `+${s.revenusEvolution}%`,
+      label: "Revenus plateforme", value: formatPrice(stats.revenusPlateforme),
+      sub: "Commission percue ce mois", icon: faEuro, trend: `+${stats.revenusEvolution}%`,
       color: "text-green-400", bg: "bg-green-400/10", border: "border-green-500/20",
     },
     {
-      label: "Centres actifs", value: loading ? "..." : String(s.centresActifs),
-      sub: `${s.centresEnAttente} en attente de validation`, icon: faBuilding, trend: `${s.centresEnAttente} att.`,
+      label: "Centres actifs", value: String(stats.centresActifs),
+      sub: `${stats.centresEnAttente} en attente de validation`, icon: faBuilding, trend: `${stats.centresEnAttente} att.`,
       color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/20",
     },
     {
-      label: "Reservations", value: loading ? "..." : s.reservationsCeMois.toLocaleString("fr-FR"),
-      sub: "Ce mois", icon: faClipboardList, trend: `+${s.reservationsEvolution}%`,
+      label: "Reservations", value: stats.reservationsCeMois.toLocaleString("fr-FR"),
+      sub: "Ce mois", icon: faClipboardList, trend: `+${stats.reservationsEvolution}%`,
       color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/20",
     },
     {
-      label: "Utilisateurs", value: loading ? "..." : s.utilisateurs.toLocaleString("fr-FR"),
-      sub: `${s.ticketsOuverts} tickets ouverts`, icon: faUsers, trend: "+5%",
+      label: "Utilisateurs", value: stats.utilisateurs.toLocaleString("fr-FR"),
+      sub: `${stats.ticketsOuverts} tickets ouverts`, icon: faUsers,
+      trend: `${stats.ticketsOuverts} tickets`,
       color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20",
     },
   ];
@@ -197,6 +210,8 @@ export default function AdminDashboardPage() {
       { label: "Parametres", href: "/admin/parametres", icon: faCog, color: "text-gray-400", bg: "bg-white/5", border: "border-white/10" },
     ]),
   ];
+
+  const activityFeed = stats.activityFeed ?? [];
 
   return (
     <div className="space-y-8">
@@ -270,29 +285,33 @@ export default function AdminDashboardPage() {
 
       {/* Activity feed + Centres en attente */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Recent activity feed */}
+        {/* Recent activity feed — real data */}
         <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-semibold text-sm">Activite recente</h2>
             <span className="text-gray-600 text-[10px] uppercase tracking-wider font-medium">Temps reel</span>
           </div>
-          <div className="space-y-3">
-            {MOCK_ACTIVITY.map((item) => {
-              const ai = activityIcon(item.type);
-              return (
-                <div key={item.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-white/3 transition-colors">
-                  <div className={`w-8 h-8 rounded-lg ${ai.bg} border ${ai.border} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <FontAwesomeIcon icon={ai.icon} className={`${ai.color} text-xs`} />
+          {activityFeed.length === 0 ? (
+            <p className="text-gray-600 text-sm text-center py-8">Aucune activite recente</p>
+          ) : (
+            <div className="space-y-3">
+              {activityFeed.map((item) => {
+                const ai = activityIcon(item.type);
+                return (
+                  <div key={item.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-white/3 transition-colors">
+                    <div className={`w-8 h-8 rounded-lg ${ai.bg} border ${ai.border} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <FontAwesomeIcon icon={ai.icon} className={`${ai.color} text-xs`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white text-sm font-medium">{item.label}</p>
+                      <p className="text-gray-500 text-xs truncate">{item.detail}</p>
+                    </div>
+                    <span className="text-gray-600 text-[10px] whitespace-nowrap shrink-0 mt-1">{timeAgo(item.time)}</span>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-white text-sm font-medium">{item.label}</p>
-                    <p className="text-gray-500 text-xs truncate">{item.detail}</p>
-                  </div>
-                  <span className="text-gray-600 text-[10px] whitespace-nowrap shrink-0 mt-1">{item.time}</span>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Centres en attente */}
@@ -303,16 +322,11 @@ export default function AdminDashboardPage() {
               Voir tout <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
             </Link>
           </div>
-          {loading ? (
-            <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-              <span>Chargement...</span>
-            </div>
-          ) : s.centresEnAttenteList.length === 0 ? (
+          {stats.centresEnAttenteList.length === 0 ? (
             <p className="text-gray-600 text-sm py-4">Aucun centre en attente.</p>
           ) : (
             <div className="space-y-3">
-              {s.centresEnAttenteList.map((c) => (
+              {stats.centresEnAttenteList.map((c) => (
                 <div key={c.id} className="flex items-center justify-between p-3 rounded-lg bg-white/3 border border-white/5">
                   <div>
                     <p className="text-white text-sm font-medium">{c.nom}</p>
@@ -345,7 +359,7 @@ export default function AdminDashboardPage() {
         <div className="flex items-center gap-3 p-4 rounded-lg bg-white/3 border border-white/5">
           <FontAwesomeIcon icon={faHeadset} className="text-blue-400 text-2xl" />
           <div>
-            <p className="text-white font-semibold">{loading ? "..." : s.ticketsOuverts} tickets ouverts</p>
+            <p className="text-white font-semibold">{stats.ticketsOuverts} tickets ouverts</p>
             <Link href="/admin/support" className="text-xs text-blue-400 hover:underline">
               Gerer le support
             </Link>
@@ -360,19 +374,13 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <FontAwesomeIcon icon={faChartLine} className="text-blue-400" />
-              Commission ce mois : <span className="text-blue-400 font-semibold">{loading ? "..." : formatPrice(s.revenusPlateforme)}</span>
+              Commission ce mois : <span className="text-blue-400 font-semibold">{formatPrice(stats.revenusPlateforme)}</span>
             </div>
-            <Link href="/admin/centres" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
-              Voir tout <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
-            </Link>
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex items-center gap-3 text-gray-500 py-4">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span className="text-sm">Chargement...</span>
-          </div>
+        {stats.reservationsRecentes.length === 0 ? (
+          <p className="text-gray-600 text-sm text-center py-8">Aucune reservation recente</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -388,11 +396,11 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {s.reservationsRecentes.map((r) => {
+                {stats.reservationsRecentes.map((r) => {
                   const badge = statusBadge(r.status);
                   return (
                     <tr key={r.id} className="hover:bg-white/3 transition-colors">
-                      <td className="py-3 pr-4 text-blue-400 font-mono text-xs">{r.id}</td>
+                      <td className="py-3 pr-4 text-blue-400 font-mono text-xs">{r.id.slice(0, 12)}</td>
                       <td className="py-3 pr-4 text-white">{r.eleve}</td>
                       <td className="py-3 pr-4 text-gray-400">{r.centre}</td>
                       <td className="py-3 pr-4 text-gray-400 max-w-[160px] truncate">{r.stage}</td>

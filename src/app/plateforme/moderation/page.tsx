@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShieldHalved,
@@ -19,6 +19,7 @@ interface CentreEnAttente {
   nom: string;
   ville: string;
   email: string;
+  telephone: string;
   createdAt: string;
 }
 
@@ -30,66 +31,64 @@ interface FormationSansSession {
   createdAt: string;
 }
 
-const MOCK_CENTRES_EN_ATTENTE: CentreEnAttente[] = [
-  { id: "4", nom: "Centre Conduite Nantes", ville: "Nantes", email: "conduite.nantes@gmail.com", createdAt: "2026-03-21T00:00:00Z" },
-  { id: "5", nom: "Auto-Ecole Bordelaise", ville: "Bordeaux", email: "ae-bordelaise@gmail.com", createdAt: "2026-03-22T00:00:00Z" },
-  { id: "7", nom: "Permis Plus Marseille", ville: "Marseille", email: "permisplus13@gmail.com", createdAt: "2026-03-28T00:00:00Z" },
-];
-
-const MOCK_FORMATIONS_SANS_SESSION: FormationSansSession[] = [
-  { id: "f1", titre: "Stage recuperation de points - 2 jours", centreNom: "BYS Formation Osny", centreId: "1", createdAt: "2026-03-15T00:00:00Z" },
-  { id: "f2", titre: "Stage sensibilisation securite routiere", centreNom: "Auto-Ecole Montmartre", centreId: "2", createdAt: "2026-03-20T00:00:00Z" },
-];
-
 export default function PlateformeModerationPage() {
   const [centresEnAttente, setCentresEnAttente] = useState<CentreEnAttente[]>([]);
   const [formationsSansSession, setFormationsSansSession] = useState<FormationSansSession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch("/api/admin/stats")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.centresEnAttenteList && Array.isArray(data.centresEnAttenteList)) {
-          setCentresEnAttente(data.centresEnAttenteList);
-        } else {
-          setCentresEnAttente(MOCK_CENTRES_EN_ATTENTE);
-        }
-        // Les formations sans session ne sont pas dans /api/admin/stats, on utilise les mocks
-        setFormationsSansSession(MOCK_FORMATIONS_SANS_SESSION);
-      })
-      .catch(() => {
-        setCentresEnAttente(MOCK_CENTRES_EN_ATTENTE);
-        setFormationsSansSession(MOCK_FORMATIONS_SANS_SESSION);
-      })
-      .finally(() => setLoading(false));
+  const fetchData = useCallback(async () => {
+    try {
+      setError(null);
+      const res = await fetch("/api/admin/moderation");
+      if (!res.ok) throw new Error("Erreur lors du chargement");
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCentresEnAttente(data.centresEnAttente ?? []);
+      setFormationsSansSession(data.formationsSansSession ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setCentresEnAttente([]);
+      setFormationsSansSession([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleActiverCentre = async (centreId: string) => {
-    setActionLoading(centreId);
+    setActionLoading(`activer-${centreId}`);
     try {
-      const res = await fetch(`/api/centres/${centreId}/activer`, { method: "POST" });
-      if (res.ok) {
-        setCentresEnAttente((prev) => prev.filter((c) => c.id !== centreId));
-      }
-    } catch {
-      // Fallback: retirer du state en mode mock
+      const res = await fetch("/api/admin/centres", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: centreId, statut: "ACTIF" }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de l'activation");
       setCentresEnAttente((prev) => prev.filter((c) => c.id !== centreId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'activation");
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleSuspendreCentre = async (centreId: string) => {
-    setActionLoading(`suspend-${centreId}`);
+    setActionLoading(`suspendre-${centreId}`);
     try {
-      const res = await fetch(`/api/centres/${centreId}/suspendre`, { method: "POST" });
-      if (res.ok) {
-        setCentresEnAttente((prev) => prev.filter((c) => c.id !== centreId));
-      }
-    } catch {
+      const res = await fetch("/api/admin/centres", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: centreId, statut: "SUSPENDU" }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de la suspension");
       setCentresEnAttente((prev) => prev.filter((c) => c.id !== centreId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la suspension");
     } finally {
       setActionLoading(null);
     }
@@ -110,10 +109,21 @@ export default function PlateformeModerationPage() {
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-400/10 border border-yellow-500/20">
           <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-400 text-xs" />
           <span className="text-yellow-400 text-xs font-medium">
-            {loading ? "..." : totalFlags} element{totalFlags > 1 ? "s" : ""} a traiter
+            {loading ? "..." : totalFlags} element{totalFlags !== 1 ? "s" : ""} a traiter
           </span>
         </div>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <FontAwesomeIcon icon={faExclamationTriangle} className="text-xs" />
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-300 text-xs">
+            Fermer
+          </button>
+        </div>
+      )}
 
       {/* KPIs rapides */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -171,6 +181,9 @@ export default function PlateformeModerationPage() {
                   <p className="text-gray-500 text-xs mt-0.5">
                     {c.ville} &mdash; {c.email}
                   </p>
+                  {c.telephone && (
+                    <p className="text-gray-600 text-[11px] mt-0.5">Tel : {c.telephone}</p>
+                  )}
                   <p className="text-gray-600 text-[11px] mt-0.5">
                     Inscrit le {new Date(c.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
@@ -178,10 +191,10 @@ export default function PlateformeModerationPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => handleActiverCentre(c.id)}
-                    disabled={actionLoading === c.id}
+                    disabled={actionLoading === `activer-${c.id}`}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-600/15 text-green-400 text-sm font-medium border border-green-500/20 hover:bg-green-600/25 transition-colors disabled:opacity-50"
                   >
-                    {actionLoading === c.id ? (
+                    {actionLoading === `activer-${c.id}` ? (
                       <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xs" />
                     ) : (
                       <FontAwesomeIcon icon={faCheckCircle} className="text-xs" />
@@ -190,10 +203,10 @@ export default function PlateformeModerationPage() {
                   </button>
                   <button
                     onClick={() => handleSuspendreCentre(c.id)}
-                    disabled={actionLoading === `suspend-${c.id}`}
+                    disabled={actionLoading === `suspendre-${c.id}`}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/15 text-red-400 text-sm font-medium border border-red-500/20 hover:bg-red-600/25 transition-colors disabled:opacity-50"
                   >
-                    {actionLoading === `suspend-${c.id}` ? (
+                    {actionLoading === `suspendre-${c.id}` ? (
                       <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xs" />
                     ) : (
                       <FontAwesomeIcon icon={faBan} className="text-xs" />

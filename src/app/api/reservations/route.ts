@@ -25,7 +25,33 @@ export async function GET() {
       },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(reservations);
+
+    // Flatten the response so the frontend gets all useful fields
+    const result = reservations.map((r) => ({
+      id: r.id,
+      numero: r.numero,
+      status: r.status,
+      montant: r.montant,
+      createdAt: r.createdAt,
+      session: {
+        dateDebut: r.session.dateDebut,
+        dateFin: r.session.dateFin,
+        placesRestantes: r.session.placesRestantes,
+        formation: {
+          titre: r.session.formation.titre,
+          slug: r.session.formation.slug,
+          prix: r.session.formation.prix,
+          lieu: r.session.formation.lieu,
+          duree: r.session.formation.duree,
+          centre: {
+            nom: r.session.formation.centre.nom,
+            ville: r.session.formation.centre.ville,
+          },
+        },
+      },
+    }));
+
+    return NextResponse.json(result);
   } catch {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }

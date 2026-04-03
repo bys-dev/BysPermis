@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCalendarDays, faEuroSign, faUsers, faGraduationCap,
-  faArrowTrendUp, faCircleCheck, faSpinner,
+  faCalendarDays, faEuroSign, faChartPie, faGraduationCap,
+  faArrowTrendUp, faCircleCheck, faSpinner, faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
@@ -12,15 +12,16 @@ import { formatDate, formatPrice } from "@/lib/utils";
 interface Stats {
   reservationsCeMois: number;
   revenusNets: number;
-  elevesFormes: number;
-  formationsActives: number;
-  formationsEnAttente: number;
+  sessionsActives: number;
+  formationsTotal: number;
+  tauxRemplissage: number;
   reservationsRecentes: {
     id: string;
     eleve: string;
     formation: string;
     date: string;
     status: string;
+    montant: number;
   }[];
 }
 
@@ -29,44 +30,85 @@ const statusBadge: Record<string, { label: string; color: string; bg: string }> 
   EN_ATTENTE: { label: "En attente", color: "text-yellow-400", bg: "bg-yellow-400/10" },
   TERMINEE:   { label: "Terminée",   color: "text-gray-400",   bg: "bg-gray-400/10"   },
   ANNULEE:    { label: "Annulée",    color: "text-red-400",    bg: "bg-red-400/10"    },
-};
-
-const MOCK_STATS: Stats = {
-  reservationsCeMois: 24,
-  revenusNets: 4320,
-  elevesFormes: 147,
-  formationsActives: 3,
-  formationsEnAttente: 1,
-  reservationsRecentes: [
-    { id: "BYS-2026-0042", eleve: "Jean Dupont",   formation: "Stage récupération de points", date: new Date("2026-04-12").toISOString(), status: "CONFIRMEE"  },
-    { id: "BYS-2026-0041", eleve: "Marie Martin",  formation: "Stage récupération de points", date: new Date("2026-04-12").toISOString(), status: "CONFIRMEE"  },
-    { id: "BYS-2026-0040", eleve: "Paul Bernard",  formation: "Sensibilisation sécurité",     date: new Date("2026-04-05").toISOString(), status: "EN_ATTENTE" },
-    { id: "BYS-2026-0039", eleve: "Sophie Leroy",  formation: "Stage récupération de points", date: new Date("2026-03-28").toISOString(), status: "TERMINEE"   },
-  ],
+  REMBOURSEE: { label: "Remboursée", color: "text-orange-400", bg: "bg-orange-400/10" },
 };
 
 export default function DashboardCentrePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/centre/stats")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && typeof data.reservationsCeMois === "number") setStats(data);
-        else setStats(MOCK_STATS);
+      .then((r) => {
+        if (!r.ok) throw new Error("Impossible de charger les statistiques");
+        return r.json();
       })
-      .catch(() => setStats(MOCK_STATS))
+      .then((data) => {
+        setStats(data);
+        setError(null);
+      })
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const s = stats ?? MOCK_STATS;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20 gap-3 text-gray-500">
+        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
+        <span className="text-sm">Chargement du tableau de bord...</span>
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-500">
+        <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
+        <p className="text-sm text-red-400">{error ?? "Erreur inconnue"}</p>
+        <button
+          onClick={() => { setLoading(true); setError(null); location.reload(); }}
+          className="text-xs text-blue-400 hover:text-blue-300 underline"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
 
   const kpis = [
-    { label: "Réservations ce mois",   value: loading ? "…" : String(s.reservationsCeMois), delta: "Confirmées + terminées", icon: faCalendarDays, color: "text-blue-400",   bg: "bg-blue-400/10"   },
-    { label: "Revenus nets",            value: loading ? "…" : formatPrice(s.revenusNets),    delta: "Après commission BYS (10%)",  icon: faEuroSign,      color: "text-green-400",  bg: "bg-green-400/10"  },
-    { label: "Élèves formés",           value: loading ? "…" : String(s.elevesFormes),        delta: "Depuis l'ouverture",          icon: faUsers,         color: "text-purple-400", bg: "bg-purple-400/10" },
-    { label: "Formations actives",      value: loading ? "…" : String(s.formationsActives),   delta: s.formationsEnAttente > 0 ? `${s.formationsEnAttente} en attente de validation` : "Toutes validées", icon: faGraduationCap, color: "text-yellow-400", bg: "bg-yellow-400/10" },
+    {
+      label: "Réservations ce mois",
+      value: String(stats.reservationsCeMois),
+      delta: "Confirmées + terminées",
+      icon: faCalendarDays,
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+    },
+    {
+      label: "Revenus nets",
+      value: formatPrice(stats.revenusNets),
+      delta: "Après commission BYS",
+      icon: faEuroSign,
+      color: "text-green-400",
+      bg: "bg-green-400/10",
+    },
+    {
+      label: "Sessions actives",
+      value: String(stats.sessionsActives),
+      delta: "À venir",
+      icon: faCalendarDays,
+      color: "text-purple-400",
+      bg: "bg-purple-400/10",
+    },
+    {
+      label: "Taux de remplissage",
+      value: `${stats.tauxRemplissage}%`,
+      delta: `${stats.formationsTotal} formation${stats.formationsTotal > 1 ? "s" : ""} au total`,
+      icon: faChartPie,
+      color: "text-yellow-400",
+      bg: "bg-yellow-400/10",
+    },
   ];
 
   return (
@@ -99,18 +141,17 @@ export default function DashboardCentrePage() {
         <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <h2 className="font-semibold text-white text-sm">Réservations récentes</h2>
           <Link href="/espace-centre/sessions" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-            Voir tout →
+            Voir tout
           </Link>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-10 gap-3 text-gray-500">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span className="text-sm">Chargement…</span>
+        {stats.reservationsRecentes.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">
+            <p className="text-sm">Aucune réservation pour le moment.</p>
           </div>
         ) : (
           <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-            {s.reservationsRecentes.map((r) => {
+            {stats.reservationsRecentes.map((r) => {
               const badge = statusBadge[r.status] ?? statusBadge["EN_ATTENTE"];
               const initials = r.eleve.split(" ").map((n) => n[0]).join("");
               return (
@@ -136,9 +177,9 @@ export default function DashboardCentrePage() {
       {/* Actions rapides */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Ajouter une session",    href: "/espace-centre/sessions",   icon: faCalendarDays,  color: "text-blue-400"   },
-          { label: "Créer une formation",    href: "/espace-centre/formations", icon: faGraduationCap, color: "text-purple-400" },
-          { label: "Voir les réservations",  href: "/espace-centre/sessions",   icon: faCircleCheck,   color: "text-green-400"  },
+          { label: "Ajouter une session",   href: "/espace-centre/sessions",   icon: faCalendarDays,  color: "text-blue-400"   },
+          { label: "Créer une formation",   href: "/espace-centre/formations", icon: faGraduationCap, color: "text-purple-400" },
+          { label: "Voir les réservations", href: "/espace-centre/sessions",   icon: faCircleCheck,   color: "text-green-400"  },
         ].map((a) => (
           <Link key={a.label} href={a.href} className="flex items-center gap-3 p-4 rounded-xl transition-all hover:bg-white/[0.07]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
             <FontAwesomeIcon icon={a.icon} className={`w-5 h-5 ${a.color}`} />

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth0";
+import { requireSupport } from "@/lib/auth0";
 
-// GET /api/admin/tickets — tous les tickets (admin seulement)
+// GET /api/admin/tickets — tous les tickets (support + admin)
 export async function GET(req: NextRequest) {
   try {
-    await requireAdmin();
+    await requireSupport();
     const { searchParams } = req.nextUrl;
     const status = searchParams.get("status");
     const search = searchParams.get("search");

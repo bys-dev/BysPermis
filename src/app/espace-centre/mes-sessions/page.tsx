@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpen,
@@ -11,6 +11,7 @@ import {
   faClipboardCheck,
   faCircleCheck,
   faArrowLeft,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
 
@@ -32,47 +33,6 @@ interface SessionFormateur {
   stagiaires: Stagiaire[];
 }
 
-const MOCK_SESSIONS: SessionFormateur[] = [
-  {
-    id: "s1",
-    formation: "Stage de récupération de points",
-    dateDebut: "2026-04-12T08:30:00",
-    dateFin: "2026-04-13T17:30:00",
-    nbStagiaires: 7,
-    placesTotal: 10,
-    status: "ACTIVE",
-    stagiaires: [
-      { id: "u1", nom: "Dupont", prenom: "Jean", present: false },
-      { id: "u2", nom: "Martin", prenom: "Marie", present: false },
-      { id: "u3", nom: "Bernard", prenom: "Paul", present: false },
-      { id: "u4", nom: "Leroy", prenom: "Sophie", present: false },
-      { id: "u5", nom: "Moreau", prenom: "Lucas", present: false },
-      { id: "u6", nom: "Thomas", prenom: "Emma", present: false },
-      { id: "u7", nom: "Robert", prenom: "Hugo", present: false },
-    ],
-  },
-  {
-    id: "s2",
-    formation: "Stage de récupération de points",
-    dateDebut: "2026-04-19T08:30:00",
-    dateFin: "2026-04-20T17:30:00",
-    nbStagiaires: 0,
-    placesTotal: 10,
-    status: "ACTIVE",
-    stagiaires: [],
-  },
-  {
-    id: "s3",
-    formation: "Sensibilisation sécurité routière",
-    dateDebut: "2026-03-28T08:30:00",
-    dateFin: "2026-03-29T17:30:00",
-    nbStagiaires: 8,
-    placesTotal: 8,
-    status: "PASSEE",
-    stagiaires: [],
-  },
-];
-
 const statusMap: Record<string, { label: string; color: string; bg: string }> = {
   ACTIVE:   { label: "À venir",   color: "text-green-400",  bg: "bg-green-400/10" },
   PASSEE:   { label: "Terminée",  color: "text-gray-400",   bg: "bg-gray-400/10"  },
@@ -83,23 +43,35 @@ const statusMap: Record<string, { label: string; color: string; bg: string }> = 
 export default function MesSessionsPage() {
   const [sessions, setSessions] = useState<SessionFormateur[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<SessionFormateur | null>(null);
   const [attendance, setAttendance] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  useEffect(() => {
+  const loadSessions = useCallback(() => {
+    setLoading(true);
     fetch("/api/centre/formateur/sessions")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setSessions(data);
-        else setSessions(MOCK_SESSIONS);
+      .then((r) => {
+        if (!r.ok) throw new Error("Impossible de charger les sessions");
+        return r.json();
       })
-      .catch(() => setSessions(MOCK_SESSIONS))
+      .then((data) => {
+        if (Array.isArray(data)) setSessions(data);
+        else setSessions([]);
+        setError(null);
+      })
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
+
   function openEmargement(session: SessionFormateur) {
     setSelectedSession(session);
+    setSaveSuccess(false);
     const initial: Record<string, boolean> = {};
     session.stagiaires.forEach((s) => {
       initial[s.id] = s.present;
@@ -114,14 +86,20 @@ export default function MesSessionsPage() {
   async function saveEmargement() {
     if (!selectedSession) return;
     setSaving(true);
+    setSaveSuccess(false);
     try {
-      await fetch(`/api/centre/formateur/sessions/${selectedSession.id}/emargement`, {
+      const res = await fetch(`/api/centre/formateur/sessions/${selectedSession.id}/emargement`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ attendance }),
       });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Erreur lors de la sauvegarde");
+      }
+      setSaveSuccess(true);
     } catch {
-      // silently fail in dev
+      // Could display an error toast
     } finally {
       setSaving(false);
     }
@@ -168,7 +146,7 @@ export default function MesSessionsPage() {
               {selectedSession.stagiaires.map((s) => (
                 <label
                   key={s.id}
-                  className="flex items-center gap-4 px-6 py-4 cursor-pointer hover:bg-white/[0.03] transition-colors"
+                  className="flex items-center gap-4 px-6 py-4 cursor-pointer hover:bg-white/3 transition-colors"
                 >
                   <input
                     type="checkbox"
@@ -193,7 +171,14 @@ export default function MesSessionsPage() {
           )}
 
           {selectedSession.stagiaires.length > 0 && (
-            <div className="px-6 py-4 border-t flex justify-end" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+            <div className="px-6 py-4 border-t flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+              {saveSuccess && (
+                <span className="text-sm text-green-400 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faCircleCheck} className="w-3.5 h-3.5" />
+                  Émargement enregistré
+                </span>
+              )}
+              {!saveSuccess && <span />}
               <button
                 onClick={saveEmargement}
                 disabled={saving}
@@ -219,22 +204,38 @@ export default function MesSessionsPage() {
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes sessions</h1>
         <p className="text-gray-500 text-sm">
-          {loading ? "Chargement…" : `${sessions.filter((s) => s.status === "ACTIVE").length} session(s) à venir`}
+          {loading ? "Chargement..." : `${sessions.filter((s) => s.status === "ACTIVE").length} session(s) à venir`}
         </p>
       </div>
 
-      {loading ? (
+      {/* Error state */}
+      {error && (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+          <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
+          <p className="text-sm text-red-400">{error}</p>
+          <button onClick={loadSessions} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loading && !error && (
         <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
           <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement…</span>
+          <span className="text-sm">Chargement...</span>
         </div>
-      ) : sessions.length === 0 ? (
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && sessions.length === 0 && (
         <div className="text-center py-16 text-gray-500">
           <FontAwesomeIcon icon={faBookOpen} className="text-3xl mb-3" />
           <p className="font-medium text-white mb-1">Aucune session</p>
           <p className="text-sm">Aucune session ne vous est attribuée pour le moment.</p>
         </div>
-      ) : (
+      )}
+
+      {/* Sessions */}
+      {!loading && !error && sessions.length > 0 && (
         <div className="space-y-4">
           {sessions.map((s) => {
             const badge = statusMap[s.status] ?? statusMap["ACTIVE"];
@@ -262,7 +263,7 @@ export default function MesSessionsPage() {
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
                       <span className="flex items-center gap-1">
                         <FontAwesomeIcon icon={faClock} className="w-3 h-3" />
-                        {formatDate(new Date(s.dateDebut))} → {formatDate(new Date(s.dateFin))}
+                        {formatDate(new Date(s.dateDebut))} &rarr; {formatDate(new Date(s.dateFin))}
                       </span>
                       <span className="flex items-center gap-1">
                         <FontAwesomeIcon icon={faUsers} className="w-3 h-3" />

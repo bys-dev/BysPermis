@@ -12,6 +12,7 @@ import {
   faEnvelope,
   faPhone,
   faPercent,
+  faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface Centre {
@@ -21,10 +22,11 @@ interface Centre {
   email: string;
   telephone?: string;
   statut: "ACTIF" | "EN_ATTENTE" | "SUSPENDU";
-  plan: "GRATUIT" | "STARTER" | "PRO" | "ENTREPRISE";
-  reservations: number;
-  revenu: number;
   createdAt: string;
+  // Fields from /api/centres
+  slug?: string;
+  adresse?: string;
+  codePostal?: string;
 }
 
 const statusConfig: Record<string, { cls: string; label: string; dot: string }> = {
@@ -33,42 +35,34 @@ const statusConfig: Record<string, { cls: string; label: string; dot: string }> 
   SUSPENDU: { cls: "bg-red-400/10 text-red-400 border-red-500/20", label: "Suspendu", dot: "text-red-400" },
 };
 
-const planConfig: Record<string, { cls: string }> = {
-  GRATUIT: { cls: "text-gray-400" },
-  STARTER: { cls: "text-blue-400" },
-  PRO: { cls: "text-purple-400" },
-  ENTREPRISE: { cls: "text-yellow-400" },
-};
-
-const MOCK_CENTRES: Centre[] = [
-  { id: "1", nom: "BYS Formation Osny", ville: "Osny", email: "osny@bysformation.fr", telephone: "01 34 56 78 90", statut: "ACTIF", plan: "PRO", reservations: 312, revenu: 62400, createdAt: "2026-01-15T00:00:00Z" },
-  { id: "2", nom: "Auto-Ecole Montmartre", ville: "Paris", email: "contact@ae-montmartre.fr", telephone: "01 42 58 12 34", statut: "ACTIF", plan: "ENTREPRISE", reservations: 245, revenu: 48600, createdAt: "2026-02-01T00:00:00Z" },
-  { id: "3", nom: "BYS Formation Cergy", ville: "Cergy", email: "cergy@bysformation.fr", telephone: "01 30 75 42 10", statut: "ACTIF", plan: "STARTER", reservations: 189, revenu: 37800, createdAt: "2026-02-10T00:00:00Z" },
-  { id: "4", nom: "Centre Conduite Nantes", ville: "Nantes", email: "conduite.nantes@gmail.com", telephone: "02 40 35 67 89", statut: "EN_ATTENTE", plan: "GRATUIT", reservations: 0, revenu: 0, createdAt: "2026-03-21T00:00:00Z" },
-  { id: "5", nom: "Auto-Ecole Bordelaise", ville: "Bordeaux", email: "ae-bordelaise@gmail.com", telephone: "05 56 12 34 56", statut: "EN_ATTENTE", plan: "GRATUIT", reservations: 0, revenu: 0, createdAt: "2026-03-22T00:00:00Z" },
-  { id: "6", nom: "Permis Express Lyon", ville: "Lyon", email: "contact@permisexpress.fr", telephone: "04 72 10 20 30", statut: "SUSPENDU", plan: "STARTER", reservations: 45, revenu: 9000, createdAt: "2026-01-20T00:00:00Z" },
-];
-
 export default function PlateformeCommercialPage() {
   const [centres, setCentres] = useState<Centre[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/centres").then((r) => r.json()).catch(() => null),
-      fetch("/api/admin/stats").then((r) => r.json()).catch(() => null),
-    ]).then(([centresData]) => {
-      if (Array.isArray(centresData) && centresData.length > 0) {
-        setCentres(centresData);
-      } else {
-        setCentres(MOCK_CENTRES);
+    const fetchCentres = async () => {
+      try {
+        setError(null);
+        const res = await fetch("/api/centres?statut=all");
+        if (!res.ok) throw new Error("Erreur lors du chargement des centres");
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("Donnees invalides");
+        setCentres(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        setCentres([]);
+      } finally {
+        setLoading(false);
       }
-    }).finally(() => setLoading(false));
+    };
+    fetchCentres();
   }, []);
 
   const total = centres.length;
   const actifs = centres.filter((c) => c.statut === "ACTIF").length;
   const enAttente = centres.filter((c) => c.statut === "EN_ATTENTE").length;
+  const suspendus = centres.filter((c) => c.statut === "SUSPENDU").length;
   const tauxConversion = total > 0 ? Math.round((actifs / total) * 100) : 0;
   const prospects = centres.filter((c) => c.statut === "EN_ATTENTE");
 
@@ -85,7 +79,7 @@ export default function PlateformeCommercialPage() {
     {
       label: "Centres actifs",
       value: loading ? "..." : String(actifs),
-      sub: `${enAttente} en attente de validation`,
+      sub: `${suspendus} suspendu${suspendus !== 1 ? "s" : ""}`,
       icon: faCheckCircle,
       color: "text-green-400",
       bg: "bg-green-400/10",
@@ -129,6 +123,14 @@ export default function PlateformeCommercialPage() {
         </div>
       </div>
 
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <FontAwesomeIcon icon={faExclamationTriangle} className="text-xs" />
+          <span>{error}</span>
+        </div>
+      )}
+
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {kpis.map((k) => (
@@ -153,6 +155,11 @@ export default function PlateformeCommercialPage() {
             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
             <span>Chargement...</span>
           </div>
+        ) : centres.length === 0 ? (
+          <div className="text-center py-8">
+            <FontAwesomeIcon icon={faBuilding} className="text-gray-600 text-3xl mb-3" />
+            <p className="text-gray-500 text-sm">Aucun centre inscrit</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -161,19 +168,17 @@ export default function PlateformeCommercialPage() {
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Ville</th>
                   <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Statut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Plan</th>
+                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Contact</th>
                   <th className="text-gray-500 font-medium text-xs pb-3">Inscription</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {centres.map((c) => {
                   const sc = statusConfig[c.statut] ?? statusConfig.ACTIF;
-                  const pc = planConfig[c.plan] ?? planConfig.GRATUIT;
                   return (
                     <tr key={c.id} className="hover:bg-white/3 transition-colors">
                       <td className="py-3 pr-4">
                         <p className="text-white font-medium">{c.nom}</p>
-                        <p className="text-gray-600 text-xs">{c.email}</p>
                       </td>
                       <td className="py-3 pr-4 text-gray-400">{c.ville}</td>
                       <td className="py-3 pr-4">
@@ -185,7 +190,11 @@ export default function PlateformeCommercialPage() {
                         </span>
                       </td>
                       <td className="py-3 pr-4">
-                        <span className={`text-sm font-medium ${pc.cls}`}>{c.plan}</span>
+                        <div className="flex items-center gap-3">
+                          {c.email && (
+                            <span className="text-gray-400 text-xs">{c.email}</span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 text-gray-400 text-xs">
                         {new Date(c.createdAt).toLocaleDateString("fr-FR")}
@@ -229,10 +238,12 @@ export default function PlateformeCommercialPage() {
                   <p className="text-white font-medium text-sm">{p.nom}</p>
                   <p className="text-gray-500 text-xs mt-0.5">{p.ville}</p>
                   <div className="flex items-center gap-4 mt-2">
-                    <span className="flex items-center gap-1.5 text-gray-400 text-xs">
-                      <FontAwesomeIcon icon={faEnvelope} className="text-[10px]" />
-                      {p.email}
-                    </span>
+                    {p.email && (
+                      <span className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <FontAwesomeIcon icon={faEnvelope} className="text-[10px]" />
+                        {p.email}
+                      </span>
+                    )}
                     {p.telephone && (
                       <span className="flex items-center gap-1.5 text-gray-400 text-xs">
                         <FontAwesomeIcon icon={faPhone} className="text-[10px]" />
