@@ -83,6 +83,27 @@ export async function POST(req: NextRequest) {
               where: { id: centreId },
               data: updateData,
             });
+
+            // Créer l'enregistrement de paiement d'abonnement initial
+            const amountTotal = session.amount_total ?? 0;
+            if (amountTotal > 0) {
+              const plan = planId
+                ? await prisma.subscriptionPlan.findUnique({ where: { id: planId }, select: { nom: true } })
+                : null;
+              const planName = plan?.nom ?? "Abonnement";
+              const periode = new Date().toISOString().slice(0, 7);
+              await prisma.centrePayment.create({
+                data: {
+                  centreId,
+                  type: "ABONNEMENT",
+                  montant: amountTotal / 100,
+                  description: `Abonnement ${planName} — ${periode}`,
+                  stripeId: session.id,
+                  status: "PAYE",
+                  periode,
+                },
+              });
+            }
           }
         }
         break;
@@ -119,6 +140,56 @@ export async function POST(req: NextRequest) {
               subscriptionPlanId: null,
             },
           });
+        }
+        break;
+      }
+
+      // ── Facture: paiement réussi (renouvellement abonnement) ──
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const invoiceSubPaid = (invoice as unknown as { subscription: string | { id: string } | null }).subscription;
+        if (invoiceSubPaid) {
+          const subscriptionId = typeof invoiceSubPaid === "string"
+            ? invoiceSubPaid
+            : invoiceSubPaid.id;
+
+          // Trouver le centre lié à cet abonnement
+          const centre = await prisma.centre.findFirst({
+            where: { subscriptionStripeId: subscriptionId },
+            select: { id: true, subscriptionPlan: { select: { nom: true } } },
+          });
+
+          if (centre) {
+            const amountPaid = (invoice as unknown as { amount_paid: number }).amount_paid ?? 0;
+            if (amountPaid > 0) {
+              const planName = centre.subscriptionPlan?.nom ?? "Abonnement";
+              const invoiceId = invoice.id;
+              // Extraire la période depuis la facture
+              const periodEnd = (invoice as unknown as { period_end: number }).period_end;
+              const periode = periodEnd
+                ? new Date(periodEnd * 1000).toISOString().slice(0, 7)
+                : new Date().toISOString().slice(0, 7);
+
+              // Éviter les doublons (checkout.session.completed peut déjà l'avoir créé)
+              const existing = await prisma.centrePayment.findFirst({
+                where: { stripeId: invoiceId, centreId: centre.id },
+              });
+
+              if (!existing) {
+                await prisma.centrePayment.create({
+                  data: {
+                    centreId: centre.id,
+                    type: "ABONNEMENT",
+                    montant: amountPaid / 100,
+                    description: `Abonnement ${planName} — ${periode}`,
+                    stripeId: invoiceId,
+                    status: "PAYE",
+                    periode,
+                  },
+                });
+              }
+            }
+          }
         }
         break;
       }

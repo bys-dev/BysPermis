@@ -89,6 +89,7 @@ export async function GET(req: NextRequest) {
           siteWeb: centre.siteWeb,
           statut: centre.statut,
           isActive: centre.isActive,
+          profilCompletionPct: centre.profilCompletionPct,
           subscriptionStatus: centre.subscriptionStatus,
           createdAt: centre.createdAt,
           updatedAt: centre.updatedAt,
@@ -140,9 +141,18 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
     }
 
+    // When activating, only set isActive if profile is complete
+    const existing = await prisma.centre.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+    }
+
+    const newIsActive =
+      statut === "ACTIF" && existing.profilCompletionPct >= 100;
+
     const centre = await prisma.centre.update({
       where: { id },
-      data: { statut, isActive: statut === "ACTIF" },
+      data: { statut, isActive: statut === "ACTIF" ? newIsActive : false },
     });
 
     return NextResponse.json(centre);

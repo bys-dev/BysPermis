@@ -34,6 +34,7 @@ interface Centre {
   siteWeb?: string;
   statut: Statut;
   isActive: boolean;
+  profilCompletionPct: number;
   subscriptionStatus?: string;
   createdAt: string;
   updatedAt: string;
@@ -212,6 +213,7 @@ export default function AdminCentresPage() {
                 <tr className="border-b border-white/8">
                   <th className="text-left text-gray-500 font-medium text-xs py-3 px-5">Centre</th>
                   <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Statut</th>
+                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Profil</th>
                   <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Abonnement</th>
                   <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Formations</th>
                   <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">CA total</th>
@@ -225,7 +227,7 @@ export default function AdminCentresPage() {
                   const isExpanded = expandedId === c.id;
                   return (
                     <tr key={c.id} className="group">
-                      <td colSpan={7} className="p-0">
+                      <td colSpan={8} className="p-0">
                         <div>
                           {/* Main row */}
                           <div className="flex items-center hover:bg-white/3 transition-colors">
@@ -248,6 +250,32 @@ export default function AdminCentresPage() {
                                 <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
                                 {st.label}
                               </span>
+                            </div>
+                            <div className="py-3.5 px-4">
+                              <div className="flex items-center gap-2">
+                                <div className="w-16 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${c.profilCompletionPct}%`,
+                                      background: c.profilCompletionPct >= 100
+                                        ? "#22c55e"
+                                        : c.profilCompletionPct >= 50
+                                        ? "#3b82f6"
+                                        : "#f97316",
+                                    }}
+                                  />
+                                </div>
+                                <span className={`text-xs font-semibold ${
+                                  c.profilCompletionPct >= 100
+                                    ? "text-green-400"
+                                    : c.profilCompletionPct >= 50
+                                    ? "text-blue-400"
+                                    : "text-orange-400"
+                                }`}>
+                                  {c.profilCompletionPct}%
+                                </span>
+                              </div>
                             </div>
                             <div className="py-3.5 px-4">
                               {c.subscriptionPlan ? (

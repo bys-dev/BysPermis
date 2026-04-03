@@ -131,6 +131,7 @@ model Centre {
   subscriptionStripeId  String?
   latitude              Float?
   longitude             Float?
+  profilCompletionPct   Int                @default(0)
   statut                CentreStatus       @default(EN_ATTENTE)
   isActive              Boolean            @default(false)
   createdAt             DateTime           @default(now())
@@ -152,6 +153,7 @@ model Centre {
   formations            Formation[]
   membres               CentreMembre[]
   emailTemplates        EmailTemplate[]
+  payments              CentrePayment[]
   subscriptionPlanId    String?
   subscriptionPlan      SubscriptionPlan?  @relation(fields: [subscriptionPlanId], references: [id])
 
@@ -396,6 +398,25 @@ model EmailTemplate {
 
   @@unique([slug, centreId])
   @@map("email_templates")
+}
+
+// ─── PAIEMENTS CENTRES ──────────────────────────────────
+
+model CentrePayment {
+  id            String   @id @default(cuid())
+  type          String   // "COMMISSION" | "ABONNEMENT" | "REMBOURSEMENT"
+  montant       Float
+  description   String
+  stripeId      String?  // Stripe payment/invoice ID
+  status        String   @default("EN_ATTENTE") // "EN_ATTENTE" | "PAYE" | "ECHOUE"
+  periode       String?  // "2026-03" for monthly tracking
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  centreId      String
+  centre        Centre   @relation(fields: [centreId], references: [id])
+
+  @@map("centre_payments")
 }
 
 // ─── PARAMETRES PLATEFORME ───────────────────────────────

@@ -138,6 +138,20 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // 7. Créer l'enregistrement de commission (suivi paiement centre)
+      const stripeConnectUsed = !!session.formation.centre.stripeOnboardingDone && !!session.formation.centre.stripeAccountId;
+      await tx.centrePayment.create({
+        data: {
+          centreId: session.formation.centre.id,
+          type: "COMMISSION",
+          montant: commission,
+          description: `Commission réservation #${reservation.numero} — ${session.formation.titre}`,
+          stripeId: data.stripePaymentIntentId,
+          status: stripeConnectUsed ? "PAYE" : "EN_ATTENTE",
+          periode: new Date().toISOString().slice(0, 7),
+        },
+      });
+
       return { reservation, session };
     });
 

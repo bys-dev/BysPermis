@@ -17,6 +17,10 @@ import {
   faBookOpen,
   faPaintBrush,
   faEnvelope,
+  faFileInvoiceDollar,
+  faCircleExclamation,
+  faXmark,
+  faRocket,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
@@ -79,6 +83,12 @@ const allNavItems: NavItem[] = [
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
   },
   {
+    href: "/espace-centre/facturation",
+    label: "Facturation",
+    icon: faFileInvoiceDollar,
+    roles: ["CENTRE_OWNER"],
+  },
+  {
     href: "/espace-centre/support",
     label: "Support",
     icon: faHeadset,
@@ -106,6 +116,8 @@ const roleBadgeLabels: Record<CentreRole, string> = {
 
 export default function EspaceCentreLayout({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<CentreRole | null>(null);
+  const [completionPct, setCompletionPct] = useState<number | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   useEffect(() => {
     fetch("/api/users/me")
@@ -119,9 +131,20 @@ export default function EspaceCentreLayout({ children }: { children: React.React
         }
       })
       .catch(() => setRole("CENTRE_OWNER"));
+
+    // Fetch completion percentage
+    fetch("/api/centre/completion")
+      .then((r) => r.json())
+      .then((data) => {
+        if (typeof data.percentage === "number") {
+          setCompletionPct(data.percentage);
+        }
+      })
+      .catch(() => null);
   }, []);
 
   const navItems = getNavItems(role);
+  const showCompletionBanner = completionPct !== null && completionPct < 100 && !bannerDismissed;
 
   return (
     <div className="min-h-screen flex" style={{ background: "#0A1628" }}>
@@ -214,6 +237,43 @@ export default function EspaceCentreLayout({ children }: { children: React.React
             </Link>
           ))}
         </div>
+
+        {/* Completion banner */}
+        {showCompletionBanner && (
+          <div
+            className="flex items-center gap-3 px-6 py-3 text-sm border-b"
+            style={{
+              background: "linear-gradient(90deg, rgba(59,130,246,0.12), rgba(251,146,60,0.08))",
+              borderColor: "rgba(59,130,246,0.2)",
+            }}
+          >
+            <FontAwesomeIcon icon={faRocket} className="text-blue-400 w-4 h-4 shrink-0" />
+            <div className="flex-1 flex items-center gap-3">
+              <span className="text-gray-300">
+                Completez votre profil (<span className="text-blue-400 font-semibold">{completionPct}%</span>) pour etre visible sur la marketplace
+              </span>
+              <div className="hidden sm:block w-24 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-blue-500 transition-all duration-700"
+                  style={{ width: `${completionPct}%` }}
+                />
+              </div>
+            </div>
+            <Link
+              href="/espace-centre/onboarding"
+              className="shrink-0 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors px-3 py-1 rounded-lg bg-blue-600/15 border border-blue-500/20"
+            >
+              Completer
+            </Link>
+            <button
+              onClick={() => setBannerDismissed(true)}
+              className="shrink-0 text-gray-600 hover:text-gray-400 transition-colors"
+              title="Masquer"
+            >
+              <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           {children}

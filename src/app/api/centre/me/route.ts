@@ -3,13 +3,16 @@ import { prisma } from "@/lib/prisma";
 import * as Prisma from "@/generated/prisma/internal/prismaNamespace";
 import { z } from "zod";
 import { requireAuth, requireCentreManagement } from "@/lib/auth0";
+import { calculateCentreCompletion } from "@/lib/centre-completion";
 
 const centreSelect = {
   id: true, nom: true, slug: true, description: true,
   adresse: true, codePostal: true, ville: true,
   telephone: true, email: true, siteWeb: true,
   stripeAccountId: true, stripeOnboardingDone: true,
-  statut: true,
+  subscriptionStatus: true,
+  profilCompletionPct: true,
+  statut: true, isActive: true,
   bannerImage: true, couleurPrimaire: true, couleurSecondaire: true,
   presentationHtml: true, horaires: true,
   equipements: true, certifications: true, reseauxSociaux: true,
@@ -46,7 +49,18 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const data = updateSchema.parse(body);
 
-    const centre = await prisma.centre.findUnique({ where: { userId: user.id } });
+    const centre = await prisma.centre.findUnique({
+      where: { userId: user.id },
+      include: {
+        formations: {
+          where: { isActive: true },
+          select: {
+            id: true,
+            sessions: { where: { status: "ACTIVE" }, select: { id: true }, take: 1 },
+          },
+        },
+      },
+    });
     if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
 
     const updated = await prisma.centre.update({
@@ -54,7 +68,20 @@ export async function PATCH(req: NextRequest) {
       data,
       select: centreSelect,
     });
-    return NextResponse.json(updated);
+
+    // Recalculate completion
+    const activeFormationsWithSessions = centre.formations.filter((f) => f.sessions.length > 0).length;
+    const { percentage } = calculateCentreCompletion({
+      ...updated,
+      _activeFormationsWithSessions: activeFormationsWithSessions,
+    });
+    const newIsActive = percentage >= 100 && centre.statut === "ACTIF";
+    await prisma.centre.update({
+      where: { id: centre.id },
+      data: { profilCompletionPct: percentage, isActive: newIsActive },
+    });
+
+    return NextResponse.json({ ...updated, profilCompletionPct: percentage, isActive: newIsActive });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
@@ -94,7 +121,18 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const data = profileSchema.parse(body);
 
-    const centre = await prisma.centre.findUnique({ where: { userId: user.id } });
+    const centre = await prisma.centre.findUnique({
+      where: { userId: user.id },
+      include: {
+        formations: {
+          where: { isActive: true },
+          select: {
+            id: true,
+            sessions: { where: { status: "ACTIVE" }, select: { id: true }, take: 1 },
+          },
+        },
+      },
+    });
     if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
 
     // Handle Prisma JSON null properly
@@ -112,7 +150,20 @@ export async function PUT(req: NextRequest) {
       data: prismaData,
       select: centreSelect,
     });
-    return NextResponse.json(updated);
+
+    // Recalculate completion
+    const activeFormationsWithSessions = centre.formations.filter((f) => f.sessions.length > 0).length;
+    const { percentage } = calculateCentreCompletion({
+      ...updated,
+      _activeFormationsWithSessions: activeFormationsWithSessions,
+    });
+    const newIsActive = percentage >= 100 && centre.statut === "ACTIF";
+    await prisma.centre.update({
+      where: { id: centre.id },
+      data: { profilCompletionPct: percentage, isActive: newIsActive },
+    });
+
+    return NextResponse.json({ ...updated, profilCompletionPct: percentage, isActive: newIsActive });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });
     console.error("[PUT /api/centre/me]", err);

@@ -48,7 +48,10 @@ export async function GET(req: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
       isActive: true,
-      centre: { statut: "ACTIF" },
+      centre: {
+        statut: "ACTIF",
+        isActive: true,
+      },
     };
 
     // Full-text search across multiple fields
@@ -56,8 +59,8 @@ export async function GET(req: NextRequest) {
       where.OR = [
         { titre: { contains: q, mode: "insensitive" } },
         { description: { contains: q, mode: "insensitive" } },
-        { centre: { nom: { contains: q, mode: "insensitive" }, statut: "ACTIF" } },
-        { centre: { ville: { contains: q, mode: "insensitive" }, statut: "ACTIF" } },
+        { centre: { nom: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
+        { centre: { ville: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
         { categorie: { nom: { contains: q, mode: "insensitive" } } },
       ];
     }
@@ -69,7 +72,7 @@ export async function GET(req: NextRequest) {
         {
           OR: [
             { lieu: { contains: ville, mode: "insensitive" } },
-            { centre: { ville: { contains: ville, mode: "insensitive" }, statut: "ACTIF" } },
+            { centre: { ville: { contains: ville, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
           ],
         },
       ];
