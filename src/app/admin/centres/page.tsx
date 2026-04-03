@@ -6,7 +6,8 @@ import {
   faMagnifyingGlass, faBuilding, faCheckCircle, faCircleXmark,
   faClock, faEye, faFilter, faSpinner, faChevronDown, faChevronUp,
   faAward, faLocationDot, faEuro, faUsers, faCalendarDay,
-  faEnvelope, faPhone, faGlobe, faEllipsisVertical,
+  faEnvelope, faPhone, faGlobe, faEllipsisVertical, faPlus, faXmark,
+  faPaperPlane, faCircleCheck, faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate, formatPrice } from "@/lib/utils";
 
@@ -55,6 +56,278 @@ const statusMap: Record<Statut, { label: string; cls: string; dot: string }> = {
   SUSPENDU:   { label: "Suspendu",    cls: "bg-red-400/10 text-red-400 border-red-500/20",           dot: "bg-red-400"    },
 };
 
+// ─── INVITE MODAL ─────────────────────────────────────────
+
+function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [nom, setNom] = useState("");
+  const [email, setEmail] = useState("");
+  const [ville, setVille] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/admin/centres/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nom, email, ville: ville || undefined }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de l'invitation");
+      }
+
+      setSuccess(true);
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="relative w-full max-w-md mx-4 rounded-xl p-6 shadow-2xl"
+        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center">
+              <FontAwesomeIcon icon={faPaperPlane} className="text-blue-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold text-lg">Inviter un centre</h2>
+              <p className="text-gray-500 text-xs">Creer un acces pour un nouveau centre partenaire</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+            <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
+          </button>
+        </div>
+
+        {success ? (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+              <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
+            </div>
+            <p className="text-green-400 font-semibold text-lg">Invitation envoyee !</p>
+            <p className="text-gray-500 text-sm mt-1">Le centre a ete cree et l'email d'invitation envoye.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                Nom du centre *
+              </label>
+              <input
+                type="text"
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
+                placeholder="Ex: Centre de Formation ABC"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                Email du proprietaire *
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
+                placeholder="proprietaire@centre.fr"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                Ville <span className="text-gray-600">(optionnel)</span>
+              </label>
+              <input
+                type="text"
+                value={ville}
+                onChange={(e) => setVille(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
+                placeholder="Paris, Lyon, Marseille..."
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <FontAwesomeIcon icon={faCircleXmark} className="w-4 h-4 shrink-0" />
+                {error}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={loading || !nom.trim() || !email.trim()}
+                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {loading ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" />
+                    Envoi...
+                  </>
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faPaperPlane} className="w-3.5 h-3.5" />
+                    Envoyer l'invitation
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── REJECT MODAL ─────────────────────────────────────────
+
+function RejectModal({
+  centre,
+  onClose,
+  onSuccess,
+}: {
+  centre: Centre;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleReject(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/admin/centres/${centre.id}/validate`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur lors du rejet");
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="relative w-full max-w-md mx-4 rounded-xl p-6 shadow-2xl"
+        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+              <FontAwesomeIcon icon={faCircleXmark} className="text-red-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold text-lg">Rejeter le centre</h2>
+              <p className="text-gray-500 text-xs">{centre.nom}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+            <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleReject} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">
+              Raison du refus *
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              required
+              rows={4}
+              className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-red-600 transition-all resize-none"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
+              placeholder="Expliquez les elements a corriger..."
+            />
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              <FontAwesomeIcon icon={faCircleXmark} className="w-4 h-4 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !reason.trim()}
+              className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all"
+            >
+              {loading ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" />
+                  Envoi...
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faCircleXmark} className="w-3.5 h-3.5" />
+                  Rejeter avec motif
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN PAGE ────────────────────────────────────────────
+
 export default function AdminCentresPage() {
   const [centres, setCentres] = useState<Centre[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +337,8 @@ export default function AdminCentresPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [rejectCentre, setRejectCentre] = useState<Centre | null>(null);
 
   const fetchCentres = useCallback(() => {
     setLoading(true);
@@ -92,6 +367,26 @@ export default function AdminCentresPage() {
     const timeout = setTimeout(fetchCentres, 300);
     return () => clearTimeout(timeout);
   }, [fetchCentres]);
+
+  async function handleActivate(id: string) {
+    setUpdatingId(id);
+    try {
+      const res = await fetch(`/api/admin/centres/${id}/validate`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        setCentres((prev) =>
+          prev.map((c) =>
+            c.id === id ? { ...c, statut: "ACTIF" as Statut, isActive: true } : c
+          )
+        );
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setUpdatingId(null);
+    }
+  }
 
   async function changeStatut(id: string, statut: Statut) {
     setUpdatingId(id);
@@ -140,6 +435,11 @@ export default function AdminCentresPage() {
     SUSPENDU:   centres.filter((c) => c.statut === "SUSPENDU").length,
   };
 
+  // Centres ready to validate (EN_ATTENTE + 100% completion)
+  const readyToValidateCount = centres.filter(
+    (c) => c.statut === "EN_ATTENTE" && c.profilCompletionPct >= 100
+  ).length;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -147,9 +447,23 @@ export default function AdminCentresPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Centres partenaires</h1>
           <p className="text-gray-400 text-sm mt-0.5">
-            {loading ? "Chargement..." : `${counts.tous} centres · ${counts.EN_ATTENTE} en attente de validation`}
+            {loading
+              ? "Chargement..."
+              : `${counts.tous} centres · ${counts.EN_ATTENTE} en attente de validation`}
+            {!loading && readyToValidateCount > 0 && (
+              <span className="text-green-400 font-semibold ml-2">
+                · {readyToValidateCount} pret(s) a valider
+              </span>
+            )}
           </p>
         </div>
+        <button
+          onClick={() => setShowInviteModal(true)}
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shrink-0"
+        >
+          <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" />
+          Inviter un centre
+        </button>
       </div>
 
       {/* Tabs statut */}
@@ -225,6 +539,8 @@ export default function AdminCentresPage() {
                 {filtered.map((c) => {
                   const st = statusMap[c.statut];
                   const isExpanded = expandedId === c.id;
+                  const isReadyToValidate =
+                    c.statut === "EN_ATTENTE" && c.profilCompletionPct >= 100;
                   return (
                     <tr key={c.id} className="group">
                       <td colSpan={8} className="p-0">
@@ -237,10 +553,18 @@ export default function AdminCentresPage() {
                                   <FontAwesomeIcon icon={faBuilding} className="text-xs text-gray-500" />
                                 </div>
                                 <div>
-                                  <p className="text-white font-medium">{c.nom}</p>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-white font-medium">{c.nom}</p>
+                                    {isReadyToValidate && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-400/15 text-green-400 border border-green-500/25 animate-pulse">
+                                        <FontAwesomeIcon icon={faShieldHalved} className="w-2.5 h-2.5" />
+                                        Pret a valider
+                                      </span>
+                                    )}
+                                  </div>
                                   <p className="text-gray-500 text-xs flex items-center gap-1 mt-0.5">
                                     <FontAwesomeIcon icon={faLocationDot} className="text-[9px]" />
-                                    {c.ville}
+                                    {c.ville || "Ville non renseignee"}
                                   </p>
                                 </div>
                               </div>
@@ -290,7 +614,7 @@ export default function AdminCentresPage() {
                             </div>
                             <div className="py-3.5 px-4">
                               <span className="text-green-400 text-xs font-semibold">
-                                {c.revenue > 0 ? formatPrice(c.revenue) : "—"}
+                                {c.revenue > 0 ? formatPrice(c.revenue) : "\u2014"}
                               </span>
                             </div>
                             <div className="py-3.5 px-4 text-gray-500 text-xs">
@@ -301,7 +625,34 @@ export default function AdminCentresPage() {
                             </div>
                             <div className="py-3.5 px-4">
                               <div className="flex items-center gap-1 justify-end">
-                                {c.statut === "EN_ATTENTE" && (
+                                {/* Ready to validate: show prominent activate + reject buttons */}
+                                {isReadyToValidate && (
+                                  <>
+                                    <button
+                                      onClick={() => handleActivate(c.id)}
+                                      disabled={updatingId === c.id}
+                                      className="px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-[11px] font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                                      title="Activer ce centre"
+                                    >
+                                      {updatingId === c.id ? (
+                                        <FontAwesomeIcon icon={faSpinner} className="text-xs animate-spin" />
+                                      ) : (
+                                        <FontAwesomeIcon icon={faCheckCircle} className="text-xs" />
+                                      )}
+                                      Activer
+                                    </button>
+                                    <button
+                                      onClick={() => setRejectCentre(c)}
+                                      disabled={updatingId === c.id}
+                                      className="p-1.5 rounded-lg bg-red-400/10 border border-red-500/20 text-red-400 hover:bg-red-400/20 transition-colors disabled:opacity-50"
+                                      title="Rejeter avec motif"
+                                    >
+                                      <FontAwesomeIcon icon={faCircleXmark} className="text-xs" />
+                                    </button>
+                                  </>
+                                )}
+                                {/* EN_ATTENTE but not ready: standard actions */}
+                                {c.statut === "EN_ATTENTE" && !isReadyToValidate && (
                                   <>
                                     <button
                                       onClick={() => changeStatut(c.id, "ACTIF")}
@@ -316,10 +667,10 @@ export default function AdminCentresPage() {
                                       )}
                                     </button>
                                     <button
-                                      onClick={() => changeStatut(c.id, "SUSPENDU")}
+                                      onClick={() => setRejectCentre(c)}
                                       disabled={updatingId === c.id}
                                       className="p-1.5 rounded-lg bg-red-400/10 border border-red-500/20 text-red-400 hover:bg-red-400/20 transition-colors disabled:opacity-50"
-                                      title="Refuser"
+                                      title="Rejeter"
                                     >
                                       <FontAwesomeIcon icon={faCircleXmark} className="text-xs" />
                                     </button>
@@ -474,6 +825,21 @@ export default function AdminCentresPage() {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {showInviteModal && (
+        <InviteModal
+          onClose={() => setShowInviteModal(false)}
+          onSuccess={fetchCentres}
+        />
+      )}
+      {rejectCentre && (
+        <RejectModal
+          centre={rejectCentre}
+          onClose={() => setRejectCentre(null)}
+          onSuccess={fetchCentres}
+        />
+      )}
     </div>
   );
 }

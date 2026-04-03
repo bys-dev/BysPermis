@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartBar,
@@ -115,9 +116,12 @@ const roleBadgeLabels: Record<CentreRole, string> = {
 };
 
 export default function EspaceCentreLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const [role, setRole] = useState<CentreRole | null>(null);
   const [completionPct, setCompletionPct] = useState<number | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [redirectChecked, setRedirectChecked] = useState(false);
 
   useEffect(() => {
     fetch("/api/users/me")
@@ -143,8 +147,43 @@ export default function EspaceCentreLayout({ children }: { children: React.React
       .catch(() => null);
   }, []);
 
+  // ─── Force onboarding redirect for incomplete centres ────
+  useEffect(() => {
+    if (completionPct === null || role === null) return;
+
+    // Only force redirect for CENTRE_OWNER with incomplete profile
+    const isOnboardingPage = pathname.startsWith("/espace-centre/onboarding");
+    const isCentreOwner = role === "CENTRE_OWNER";
+
+    if (isCentreOwner && completionPct < 100 && !isOnboardingPage) {
+      router.push("/espace-centre/onboarding");
+    } else {
+      setRedirectChecked(true);
+    }
+  }, [completionPct, role, pathname, router]);
+
+  // Also mark redirect as checked when on onboarding page
+  useEffect(() => {
+    if (pathname.startsWith("/espace-centre/onboarding")) {
+      setRedirectChecked(true);
+    }
+  }, [pathname]);
+
   const navItems = getNavItems(role);
   const showCompletionBanner = completionPct !== null && completionPct < 100 && !bannerDismissed;
+
+  // Show a loading state while checking if redirect is needed
+  // to avoid page flashing before redirect
+  if (!redirectChecked && !pathname.startsWith("/espace-centre/onboarding")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0A1628" }}>
+        <div className="flex items-center gap-3 text-gray-500">
+          <FontAwesomeIcon icon={faRocket} className="animate-pulse text-blue-400" />
+          <span className="text-sm">Chargement de votre espace...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex" style={{ background: "#0A1628" }}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,6 +26,8 @@ import {
   faLocationDot,
   faRocket,
   faArrowUpRightFromSquare,
+  faCircleInfo,
+  faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 
 // ─── TYPES ────────────────────────────────────────────────
@@ -66,13 +68,113 @@ interface CompletionData {
 
 type StepId = "informations" | "contact" | "presentation" | "formations" | "paiement";
 
-const STEP_CONFIG: { id: StepId; label: string; icon: typeof faBuilding }[] = [
-  { id: "informations", label: "Informations de base", icon: faBuilding },
-  { id: "contact", label: "Contact", icon: faPhone },
-  { id: "presentation", label: "Presentation", icon: faFileLines },
-  { id: "formations", label: "Premiere formation", icon: faGraduationCap },
-  { id: "paiement", label: "Paiement", icon: faCreditCard },
+const STEP_CONFIG: { id: StepId; label: string; icon: typeof faBuilding; estimatedTime: string; tooltip: string }[] = [
+  { id: "informations", label: "Informations de base", icon: faBuilding, estimatedTime: "~2 min", tooltip: "Renseignez le nom, l'adresse et une description courte de votre centre." },
+  { id: "contact", label: "Contact", icon: faPhone, estimatedTime: "~1 min", tooltip: "Ajoutez les coordonnees pour que vos clients puissent vous joindre." },
+  { id: "presentation", label: "Presentation", icon: faFileLines, estimatedTime: "~5 min", tooltip: "Redigez un texte de presentation, ajoutez vos equipements et certifications." },
+  { id: "formations", label: "Premiere formation", icon: faGraduationCap, estimatedTime: "~5 min", tooltip: "Creez au moins une formation avec une session pour commencer." },
+  { id: "paiement", label: "Paiement", icon: faCreditCard, estimatedTime: "~3 min", tooltip: "Connectez Stripe ou souscrivez un abonnement pour recevoir les paiements." },
 ];
+
+// ─── TOOLTIP ────────────────────────────────────────────
+
+function Tooltip({ text }: { text: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="relative inline-block ml-1">
+      <button
+        type="button"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(!show)}
+        className="text-gray-600 hover:text-blue-400 transition-colors"
+        aria-label="Aide"
+      >
+        <FontAwesomeIcon icon={faCircleInfo} className="w-3 h-3" />
+      </button>
+      {show && (
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg text-xs text-white bg-gray-800 border border-white/10 shadow-lg w-56 text-center z-50 pointer-events-none">
+          {text}
+          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800" />
+        </span>
+      )}
+    </span>
+  );
+}
+
+// ─── CONFETTI ───────────────────────────────────────────
+
+function ConfettiCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ["#3B82F6", "#22C55E", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4"];
+    const particles: { x: number; y: number; w: number; h: number; color: string; vx: number; vy: number; rotation: number; rotationSpeed: number; opacity: number }[] = [];
+
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 8 + 4,
+        h: Math.random() * 4 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 3,
+        vy: Math.random() * 3 + 2,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.2,
+        opacity: 1,
+      });
+    }
+
+    let frame: number;
+    let elapsed = 0;
+
+    function animate() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      elapsed++;
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.vy += 0.05;
+        p.y += p.vy;
+        p.rotation += p.rotationSpeed;
+        if (elapsed > 100) p.opacity = Math.max(0, p.opacity - 0.01);
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+
+      if (elapsed < 250) {
+        frame = requestAnimationFrame(animate);
+      }
+    }
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-50"
+      style={{ mixBlendMode: "screen" }}
+    />
+  );
+}
 
 const EQUIPEMENT_SUGGESTIONS = [
   "Salle climatisee",
@@ -119,6 +221,11 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<StepId>("informations");
   const [connectingStripe, setConnectingStripe] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [validationRequested, setValidationRequested] = useState(false);
+  const [requestingValidation, setRequestingValidation] = useState(false);
+  const [stepErrors, setStepErrors] = useState<Record<string, string[]>>({});
+  const prevPercentage = useRef<number>(0);
 
   // Chip inputs
   const [newEquipement, setNewEquipement] = useState("");
@@ -279,6 +386,78 @@ export default function OnboardingPage() {
     setConnectingStripe(false);
   }
 
+  // ─── Trigger confetti when reaching 100% ─────────────────
+
+  useEffect(() => {
+    if (completion && prevPercentage.current < 100 && completion.percentage >= 100) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+    }
+    if (completion) {
+      prevPercentage.current = completion.percentage;
+    }
+  }, [completion]);
+
+  // ─── Step validation ───────────────────────────────────
+
+  function validateCurrentStep(): string[] {
+    if (!centre) return [];
+    const errors: string[] = [];
+
+    switch (currentStep) {
+      case "informations":
+        if (!centre.nom.trim()) errors.push("Le nom du centre est requis.");
+        if ((centre.description?.trim().length ?? 0) < 50) errors.push("La description doit contenir au moins 50 caracteres.");
+        if (!centre.adresse.trim()) errors.push("L'adresse est requise.");
+        if (!centre.codePostal.trim()) errors.push("Le code postal est requis.");
+        if (!centre.ville.trim()) errors.push("La ville est requise.");
+        break;
+      case "contact":
+        if (!centre.telephone?.trim()) errors.push("Le telephone est requis.");
+        if (!centre.email?.trim()) errors.push("L'email est requis.");
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(centre.email)) errors.push("L'email est invalide.");
+        break;
+      case "presentation":
+        if ((centre.presentationHtml?.replace(/<[^>]*>/g, "").trim().length ?? 0) < 100) {
+          errors.push("Le texte de presentation doit contenir au moins 100 caracteres.");
+        }
+        break;
+      // formations and paiement are validated by their completion status
+    }
+
+    return errors;
+  }
+
+  function handleSaveAndNextWithValidation() {
+    const errors = validateCurrentStep();
+    if (errors.length > 0) {
+      setStepErrors({ ...stepErrors, [currentStep]: errors });
+      return;
+    }
+    setStepErrors({ ...stepErrors, [currentStep]: [] });
+    handleSaveAndNext();
+  }
+
+  // ─── Request admin validation ──────────────────────────
+
+  async function handleRequestValidation() {
+    setRequestingValidation(true);
+    try {
+      const res = await fetch("/api/centre/request-validation", {
+        method: "POST",
+      });
+      if (res.ok) {
+        setValidationRequested(true);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Erreur lors de la demande de validation.");
+      }
+    } catch {
+      setError("Erreur lors de la demande de validation.");
+    }
+    setRequestingValidation(false);
+  }
+
   // ─── Loading ────────────────────────────────────────────
 
   if (loading) {
@@ -308,6 +487,9 @@ export default function OnboardingPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {/* Confetti animation when reaching 100% */}
+      {showConfetti && <ConfettiCanvas />}
+
       {/* Header */}
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/15 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-4">
@@ -356,14 +538,42 @@ export default function OnboardingPage() {
           />
         </div>
         {percentage >= 100 ? (
-          <p className="text-green-400 text-xs mt-3 flex items-center gap-2">
-            <FontAwesomeIcon icon={faCircleCheck} className="w-3.5 h-3.5" />
-            Votre centre est visible sur la marketplace !
-          </p>
+          <div className="mt-3 space-y-3">
+            <p className="text-green-400 text-xs flex items-center gap-2">
+              <FontAwesomeIcon icon={faCircleCheck} className="w-3.5 h-3.5" />
+              Votre profil est complet !
+            </p>
+            {!validationRequested ? (
+              <button
+                onClick={handleRequestValidation}
+                disabled={requestingValidation}
+                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {requestingValidation ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} className="animate-spin w-3.5 h-3.5" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faPaperPlane} className="w-3.5 h-3.5" />
+                    Demander la validation par l'equipe BYS
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <FontAwesomeIcon icon={faCircleCheck} className="text-blue-400 w-4 h-4" />
+                <p className="text-blue-400 text-xs font-semibold">
+                  Demande de validation envoyee ! Notre equipe examinera votre profil sous 24-48h.
+                </p>
+              </div>
+            )}
+          </div>
         ) : (
           <p className="text-gray-500 text-xs mt-3">
             Votre centre sera visible sur la marketplace quand votre profil
-            atteindra 100%
+            atteindra 100% et que notre equipe l'aura valide.
           </p>
         )}
       </div>
@@ -405,12 +615,17 @@ export default function OnboardingPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <span className="block truncate">{step.label}</span>
-                    {stepData && !isCompleted && (
-                      <span className="text-[10px] text-orange-400 block mt-0.5">
-                        {stepData.missingItems.length} element(s) manquant(s)
-                      </span>
-                    )}
+                    <span className="text-[10px] text-gray-600 flex items-center gap-1 mt-0.5">
+                      <FontAwesomeIcon icon={faClock} className="w-2.5 h-2.5" />
+                      {step.estimatedTime}
+                      {stepData && !isCompleted && (
+                        <span className="text-orange-400 ml-1">
+                          · {stepData.missingItems.length} element(s) manquant(s)
+                        </span>
+                      )}
+                    </span>
                   </div>
+                  <Tooltip text={step.tooltip} />
                 </button>
               );
             })}
@@ -439,6 +654,7 @@ export default function OnboardingPage() {
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-2">
                   Nom du centre *
+                  <Tooltip text="Le nom officiel de votre centre tel qu'il apparaitra sur la marketplace." />
                 </label>
                 <input
                   type="text"
@@ -453,6 +669,7 @@ export default function OnboardingPage() {
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-2">
                   Description courte * <span className="text-gray-600">(min. 50 caracteres)</span>
+                  <Tooltip text="Cette description courte sera affichee dans les resultats de recherche." />
                 </label>
                 <textarea
                   value={centre.description || ""}
@@ -550,6 +767,7 @@ export default function OnboardingPage() {
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-2">
                   Telephone *
+                  <Tooltip text="Le numero de telephone principal pour les stagiaires." />
                 </label>
                 <div className="relative">
                   <FontAwesomeIcon
@@ -632,6 +850,7 @@ export default function OnboardingPage() {
                   <label className="block text-xs font-medium text-gray-500 mb-2">
                     Texte de presentation *{" "}
                     <span className="text-gray-600">(min. 100 caracteres)</span>
+                    <Tooltip text="Redigez un texte complet qui decrit votre centre, vos atouts et votre pedagogie. Ce texte est affiche sur votre page centre." />
                   </label>
                   <textarea
                     value={centre.presentationHtml || ""}
@@ -1050,6 +1269,30 @@ export default function OnboardingPage() {
             </div>
           )}
 
+          {/* ─── Step validation errors ──────────────────────── */}
+          {(stepErrors[currentStep] ?? []).length > 0 && (
+            <div
+              className="flex items-start gap-3 p-4 rounded-lg text-sm mt-4"
+              style={{
+                background: "rgba(251,146,60,0.1)",
+                border: "1px solid rgba(251,146,60,0.2)",
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faCircleExclamation}
+                className="text-orange-400 w-4 h-4 mt-0.5"
+              />
+              <div>
+                <p className="text-orange-400 font-semibold text-sm mb-1">Veuillez corriger les erreurs suivantes :</p>
+                <ul className="list-disc list-inside space-y-0.5">
+                  {(stepErrors[currentStep] ?? []).map((err, i) => (
+                    <li key={i} className="text-orange-300 text-xs">{err}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+
           {/* ─── Error display ─────────────────────────────── */}
           {error && (
             <div
@@ -1117,7 +1360,7 @@ export default function OnboardingPage() {
                     ["informations", "contact", "presentation"].includes(
                       currentStep
                     )
-                      ? handleSaveAndNext
+                      ? handleSaveAndNextWithValidation
                       : goNext
                   }
                   disabled={saving}
@@ -1126,10 +1369,18 @@ export default function OnboardingPage() {
                   Suivant
                   <FontAwesomeIcon icon={faChevronRight} className="w-3 h-3" />
                 </button>
-              ) : (
+              ) : percentage >= 100 ? (
                 <button
                   onClick={() => router.push("/espace-centre/dashboard")}
                   className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                >
+                  <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
+                  Terminer et acceder au dashboard
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push("/espace-centre/dashboard")}
+                  className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
                 >
                   <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
                   Terminer

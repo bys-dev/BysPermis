@@ -462,6 +462,7 @@ async function main() {
         siteWeb: "https://www.bys-formation.fr",
         latitude: 49.0665,
         longitude: 2.0633,
+        profilCompletionPct: 100,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[0].id,
@@ -494,6 +495,7 @@ async function main() {
         siteWeb: "https://www.conduite-plus-paris.fr",
         latitude: 48.8566,
         longitude: 2.3522,
+        profilCompletionPct: 85,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[1].id,
@@ -526,6 +528,7 @@ async function main() {
         siteWeb: "https://www.cfsr-lyon.fr",
         latitude: 45.7640,
         longitude: 4.8357,
+        profilCompletionPct: 70,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[2].id,
@@ -545,6 +548,7 @@ async function main() {
         siteWeb: "https://www.permis-express-marseille.fr",
         latitude: 43.2965,
         longitude: 5.3698,
+        profilCompletionPct: 60,
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[3].id,
@@ -563,6 +567,7 @@ async function main() {
         email: "contact@securite-routiere-nantes.fr",
         latitude: 47.2184,
         longitude: -1.5536,
+        profilCompletionPct: 30,
         statut: "EN_ATTENTE",
         isActive: false,
         userId: centreUsers[4].id,
@@ -1728,6 +1733,87 @@ async function main() {
   </div>
 </div>`,
         variables: ["prenom", "nom", "email"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "invitation_centre",
+        nom: "Invitation centre",
+        sujet: "Bienvenue sur BYS Formation — Votre espace centre est prêt",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
+      <span style="color:#fff;font-weight:bold;font-size:18px">BYS</span>
+    </div>
+    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Formation</h1>
+    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Votre espace centre est prêt !</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour,</p>
+    <p>Nous avons le plaisir de vous informer que votre centre <strong>{{centreName}}</strong> a été créé sur la plateforme <strong>BYS Formation</strong>.</p>
+    <p>Votre espace est prêt — il ne reste plus qu'à compléter votre profil pour être visible sur notre marketplace et commencer à recevoir des réservations.</p>
+    <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">Vos identifiants de connexion :</p>
+      <table style="border-collapse:collapse">
+        <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Email</td><td style="font-size:13px;color:#1E3A5F">{{email}}</td></tr>
+        <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Mot de passe</td><td style="font-size:13px;color:#1E3A5F;font-family:monospace;background:#E0F2FE;padding:2px 8px;border-radius:4px">{{tempPassword}}</td></tr>
+      </table>
+    </div>
+    <h3 style="color:#1E293B;font-size:15px;margin:24px 0 12px">Les étapes pour démarrer :</h3>
+    <ol style="color:#4B5563;line-height:2;font-size:14px;padding-left:20px">
+      <li><strong>Informations de base</strong> — Nom, adresse et description (~2 min)</li>
+      <li><strong>Contact</strong> — Téléphone, email et site web (~1 min)</li>
+      <li><strong>Présentation</strong> — Texte, équipements, certifications (~5 min)</li>
+      <li><strong>Première formation</strong> — Créez votre première offre (~5 min)</li>
+      <li><strong>Paiement</strong> — Connectez Stripe (~3 min)</li>
+    </ol>
+    <p style="text-align:center;margin:24px 0">
+      <a href="{{loginUrl}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Accéder à mon espace centre</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["centreName", "email", "tempPassword", "loginUrl"],
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).emailTemplate.create({
+      data: {
+        slug: "activation_centre",
+        nom: "Activation centre",
+        sujet: "Votre centre est maintenant visible sur BYS Formation !",
+        contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
+      <span style="color:#fff;font-weight:bold;font-size:18px">BYS</span>
+    </div>
+    <h1 style="color:#fff;margin:0;font-size:22px">Félicitations !</h1>
+    <p style="color:#4ADE80;margin:8px 0 0;font-size:14px;font-weight:bold">Votre centre est maintenant actif</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour,</p>
+    <p>Excellente nouvelle ! Votre centre <strong>{{centreName}}</strong> a été validé par notre équipe et est désormais <strong>visible sur la marketplace BYS Formation</strong>.</p>
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:16px 20px;margin:20px 0;text-align:center">
+      <p style="margin:0;color:#166534;font-size:15px;font-weight:bold">Votre centre est en ligne !</p>
+      <p style="margin:8px 0 0;color:#15803D;font-size:13px">Les stagiaires peuvent désormais découvrir et réserver vos formations.</p>
+    </div>
+    <h3 style="color:#1E293B;font-size:15px;margin:24px 0 12px">Prochaines étapes recommandées :</h3>
+    <ul style="color:#4B5563;line-height:2;font-size:14px;padding-left:20px">
+      <li>Ajoutez d'autres formations pour attirer plus de stagiaires</li>
+      <li>Planifiez vos prochaines sessions</li>
+      <li>Partagez votre profil sur vos réseaux sociaux</li>
+      <li>Consultez votre dashboard pour suivre vos statistiques</li>
+    </ul>
+    <p style="text-align:center;margin:24px 0">
+      <a href="{{dashboardUrl}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Accéder à mon dashboard</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">Cordialement,<br/>L'équipe BYS Formation</p>
+  </div>
+</div>`,
+        variables: ["centreName", "dashboardUrl"],
         isActive: true,
         centreId: null,
       },
