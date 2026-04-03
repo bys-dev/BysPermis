@@ -1,21 +1,54 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faHouse,
   faCalendarCheck,
   faUser,
   faBell,
+  faHeadset,
   faArrowRightFromBracket,
   faChevronRight,
   faGraduationCap,
+  faCreditCard,
 } from "@fortawesome/free-solid-svg-icons";
 
 const sidebarLinks = [
+  { href: "/espace-eleve", label: "Accueil", icon: faHouse, exact: true },
   { href: "/espace-eleve/reservations", label: "Mes réservations", icon: faCalendarCheck },
+  { href: "/espace-eleve/mes-formations", label: "Mes formations", icon: faGraduationCap },
+  { href: "/espace-eleve/paiements", label: "Paiements", icon: faCreditCard },
   { href: "/espace-eleve/profil", label: "Mon profil", icon: faUser },
-  { href: "/espace-eleve/notifications", label: "Notifications", icon: faBell },
+  { href: "/espace-eleve/notifications", label: "Notifications", icon: faBell, showBadge: true },
+  { href: "/espace-eleve/support", label: "Support", icon: faHeadset },
 ];
 
 export default function EspaceEleveLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/notifications")
+      .then(async (r) => {
+        if (!r.ok) return;
+        const data = await r.json();
+        if (Array.isArray(data)) {
+          setUnreadCount(data.filter((n: { isRead: boolean }) => !n.isRead).length);
+        }
+      })
+      .catch(() => {
+        // Silently fail — badge just won't show
+      });
+  }, [pathname]); // Re-fetch on navigation
+
+  function isActive(href: string, exact?: boolean) {
+    if (exact) return pathname === href;
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
   return (
     <div className="min-h-screen flex" style={{ background: "#0A1628" }}>
       {/* Sidebar */}
@@ -45,17 +78,41 @@ export default function EspaceEleveLayout({ children }: { children: React.ReactN
 
         {/* Nav */}
         <nav className="flex-1 px-4 py-6 space-y-1">
-          {sidebarLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all group"
-            >
-              <FontAwesomeIcon icon={link.icon} className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
-              {link.label}
-              <FontAwesomeIcon icon={faChevronRight} className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-            </Link>
-          ))}
+          {sidebarLinks.map((link) => {
+            const active = isActive(link.href, link.exact);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
+                  active
+                    ? "text-white bg-white/5"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={link.icon}
+                    className={`w-4 h-4 transition-colors ${
+                      active ? "text-blue-400" : "group-hover:text-blue-400"
+                    }`}
+                  />
+                  {link.showBadge && unreadCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </div>
+                {link.label}
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  className={`w-3 h-3 ml-auto transition-opacity ${
+                    active ? "opacity-100 text-blue-400" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Bottom */}
@@ -80,24 +137,46 @@ export default function EspaceEleveLayout({ children }: { children: React.ReactN
             </div>
             <span className="font-semibold text-white text-sm">Espace Élève</span>
           </Link>
-          <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
-            <FontAwesomeIcon icon={faArrowRightFromBracket} />
-          </Link>
+          <div className="flex items-center gap-3">
+            {unreadCount > 0 && (
+              <Link href="/espace-eleve/notifications" className="relative text-gray-400 hover:text-white text-sm">
+                <FontAwesomeIcon icon={faBell} />
+                <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 flex items-center justify-center px-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              </Link>
+            )}
+            <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
+              <FontAwesomeIcon icon={faArrowRightFromBracket} />
+            </Link>
+          </div>
         </div>
 
         {/* Mobile nav */}
         <div className="lg:hidden flex gap-1 px-4 py-3 border-b overflow-x-auto" style={{ borderColor: "rgba(255,255,255,0.07)", background: "#0D1D3A" }}>
-          {sidebarLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white whitespace-nowrap transition-colors"
-              style={{ background: "rgba(255,255,255,0.05)" }}
-            >
-              <FontAwesomeIcon icon={link.icon} className="w-3 h-3" />
-              {link.label}
-            </Link>
-          ))}
+          {sidebarLinks.map((link) => {
+            const active = isActive(link.href, link.exact);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                  active
+                    ? "text-white bg-white/10"
+                    : "text-gray-400 hover:text-white"
+                }`}
+                style={active ? undefined : { background: "rgba(255,255,255,0.05)" }}
+              >
+                <div className="relative">
+                  <FontAwesomeIcon icon={link.icon} className="w-3 h-3" />
+                  {link.showBadge && unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
+                  )}
+                </div>
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <main className="flex-1 p-6 lg:p-8 overflow-auto">

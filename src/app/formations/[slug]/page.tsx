@@ -550,6 +550,20 @@ interface LiveSession {
   centre: string;
 }
 
+interface ReviewPublic {
+  id: string;
+  note: number;
+  commentaire: string | null;
+  createdAt: string;
+  user: { prenom: string; nom: string };
+}
+
+interface ReviewsData {
+  reviews: ReviewPublic[];
+  average: number;
+  count: number;
+}
+
 export default function FormationDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -557,6 +571,7 @@ export default function FormationDetailPage() {
   const [liveSessions, setLiveSessions] = useState<LiveSession[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [apiNotFound, setApiNotFound] = useState(false);
+  const [reviewsData, setReviewsData] = useState<ReviewsData | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -571,6 +586,13 @@ export default function FormationDetailPage() {
       })
       .then((data) => {
         if (data?.sessions?.length > 0) setLiveSessions(data.sessions);
+        if (data?.id) {
+          // Fetch reviews for this formation
+          fetch(`/api/formations/${data.id}/reviews`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((rd) => { if (rd) setReviewsData(rd); })
+            .catch(() => null);
+        }
       })
       .catch(() => null)
       .finally(() => setLoading(false));
@@ -953,6 +975,52 @@ export default function FormationDetailPage() {
                   ))}
                 </div>
               </section>
+
+              {/* Dynamic Reviews from DB */}
+              {reviewsData && reviewsData.count > 0 && (
+                <section className="bg-white rounded-xl border border-brand-border p-6 sm:p-8 mb-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="font-display text-2xl font-bold text-brand-text">
+                      Avis vérifiés
+                    </h2>
+                    <div className="flex items-center gap-3">
+                      <StarRating rating={reviewsData.average} />
+                      <span className="text-sm font-semibold text-brand-text">{reviewsData.average}/5</span>
+                      <span className="text-sm text-gray-400">({reviewsData.count} avis)</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {reviewsData.reviews.map((review) => (
+                      <div key={review.id} className="bg-gray-50 rounded-xl p-5 border border-brand-border">
+                        <div className="flex items-center justify-between mb-3">
+                          <StarRating rating={review.note} />
+                          <span className="text-xs text-gray-400">
+                            {new Date(review.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                          </span>
+                        </div>
+                        {review.commentaire && (
+                          <div className="relative mb-3">
+                            <FontAwesomeIcon icon={faQuoteLeft} className="text-gray-200 text-2xl absolute -top-1 -left-1" />
+                            <p className="text-gray-600 text-sm leading-relaxed pl-6">
+                              {review.commentaire}
+                            </p>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 pt-2 border-t border-brand-border">
+                          <div className="w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">
+                              {review.user.prenom.charAt(0)}
+                            </span>
+                          </div>
+                          <p className="text-sm font-semibold text-brand-text">
+                            {review.user.prenom} {review.user.nom}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Related Formations */}
               <section>
