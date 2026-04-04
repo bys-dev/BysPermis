@@ -19,6 +19,7 @@ import {
   faScrewdriverWrench,
   faRightFromBracket,
   faCrown,
+  faTag,
 } from "@fortawesome/free-solid-svg-icons";
 
 type UserRole = "ADMIN" | "OWNER";
@@ -35,6 +36,7 @@ const baseNavItems = [
   { href: "/admin/utilisateurs", icon: faUsers, label: "Utilisateurs" },
   { href: "/admin/support", icon: faHeadset, label: "Support" },
   { href: "/admin/statistiques", icon: faChartLine, label: "Statistiques" },
+  { href: "/admin/promo", icon: faTag, label: "Codes promo" },
   { href: "/admin/parametres", icon: faCog, label: "Paramètres" },
 ];
 

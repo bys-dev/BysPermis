@@ -152,6 +152,24 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // 8. Créer la facture automatiquement
+      const invoiceCount = await tx.invoice.count();
+      const invoiceNum = `FAC-${new Date().getFullYear()}-${String(invoiceCount + 1).padStart(4, "0")}`;
+      const montantHT = Math.round((reservation.montant / 1.2) * 100) / 100;
+      const tvaAmount = Math.round((reservation.montant - montantHT) * 100) / 100;
+      await tx.invoice.create({
+        data: {
+          numero: invoiceNum,
+          type: "ELEVE",
+          montantHT,
+          tva: tvaAmount,
+          montantTTC: reservation.montant,
+          status: "PAYEE",
+          userId: user.id,
+          reservationId: reservation.id,
+        },
+      });
+
       return { reservation, session };
     });
 

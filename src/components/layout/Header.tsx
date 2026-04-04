@@ -13,7 +13,9 @@ import {
   faLocationCrosshairs,
   faSpinner,
   faChevronDown,
+  faBell,
 } from "@fortawesome/free-solid-svg-icons";
+import { useNotifications } from "@/lib/useNotifications";
 
 const navLinks = [
   { label: "Stages", href: "/recherche" },
@@ -29,8 +31,13 @@ export default function Header() {
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
   const [city, setCity] = useState<string | null>(null);
   const [geoOpen, setGeoOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const geoRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const { unreadCount, notifications, markAsRead, markAllAsRead } = useNotifications();
 
   // Fermer dropdown si clic extérieur
   useEffect(() => {
@@ -38,15 +45,23 @@ export default function Header() {
       if (geoRef.current && !geoRef.current.contains(e.target as Node)) {
         setGeoOpen(false);
       }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // Charger la ville sauvegardée
+  // Charger la ville sauvegardée + vérifier l'authentification
   useEffect(() => {
     const saved = localStorage.getItem("bys_city");
     if (saved) setCity(saved);
+
+    // Quick auth check
+    fetch("/api/users/me")
+      .then((r) => { if (r.ok) setIsAuthenticated(true); })
+      .catch(() => {});
   }, []);
 
   async function detectLocation() {
@@ -210,10 +225,81 @@ export default function Header() {
                 )}
               </div>
 
-              <Link href="/connexion" className="text-gray-600 font-medium hover:text-brand-accent transition-colors inline-flex items-center gap-2">
-                <FontAwesomeIcon icon={faUser} className="text-sm" />
-                Connexion
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  {/* Notification bell */}
+                  <div className="relative" ref={notifRef}>
+                    <button
+                      onClick={() => setNotifOpen(!notifOpen)}
+                      className="relative text-gray-500 hover:text-brand-accent transition-colors p-2"
+                      title="Notifications"
+                    >
+                      <FontAwesomeIcon icon={faBell} className="text-lg" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {notifOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm font-semibold text-gray-800">Notifications</p>
+                          {unreadCount > 0 && (
+                            <button
+                              onClick={() => { markAllAsRead(); }}
+                              className="text-xs text-blue-600 hover:underline"
+                            >
+                              Tout marquer comme lu
+                            </button>
+                          )}
+                        </div>
+                        <div className="max-h-72 overflow-y-auto">
+                          {notifications.length === 0 ? (
+                            <p className="text-center text-sm text-gray-400 py-8">Aucune notification</p>
+                          ) : (
+                            notifications.slice(0, 5).map((n) => (
+                              <button
+                                key={n.id}
+                                onClick={() => { if (!n.isRead) markAsRead(n.id); setNotifOpen(false); }}
+                                className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${!n.isRead ? "bg-blue-50/50" : ""}`}
+                              >
+                                <p className={`text-sm ${!n.isRead ? "font-semibold text-gray-900" : "text-gray-700"}`}>
+                                  {n.titre}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{n.contenu}</p>
+                                <p className="text-[10px] text-gray-400 mt-1">
+                                  {new Date(n.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                </p>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-2.5">
+                          <Link
+                            href="/espace-eleve/notifications"
+                            onClick={() => setNotifOpen(false)}
+                            className="text-xs text-blue-600 hover:underline font-medium"
+                          >
+                            Voir toutes les notifications
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <Link href="/espace-eleve" className="text-gray-600 font-medium hover:text-brand-accent transition-colors inline-flex items-center gap-2">
+                    <FontAwesomeIcon icon={faUser} className="text-sm" />
+                    Mon espace
+                  </Link>
+                </>
+              ) : (
+                <Link href="/connexion" className="text-gray-600 font-medium hover:text-brand-accent transition-colors inline-flex items-center gap-2">
+                  <FontAwesomeIcon icon={faUser} className="text-sm" />
+                  Connexion
+                </Link>
+              )}
 
               <Link href="/recherche" className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-red-700 transition-colors inline-flex items-center gap-2">
                 <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
@@ -258,10 +344,22 @@ export default function Header() {
               ))}
             </nav>
             <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-brand-border">
-              <Link href="/connexion" className="text-center py-2.5 text-gray-600 font-medium hover:text-brand-accent inline-flex items-center justify-center gap-2" onClick={() => setMobileOpen(false)}>
-                <FontAwesomeIcon icon={faUser} className="text-sm" />
-                Connexion
-              </Link>
+              {isAuthenticated ? (
+                <Link href="/espace-eleve" className="text-center py-2.5 text-gray-600 font-medium hover:text-brand-accent inline-flex items-center justify-center gap-2" onClick={() => setMobileOpen(false)}>
+                  <FontAwesomeIcon icon={faUser} className="text-sm" />
+                  Mon espace
+                  {unreadCount > 0 && (
+                    <span className="min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Link>
+              ) : (
+                <Link href="/connexion" className="text-center py-2.5 text-gray-600 font-medium hover:text-brand-accent inline-flex items-center justify-center gap-2" onClick={() => setMobileOpen(false)}>
+                  <FontAwesomeIcon icon={faUser} className="text-sm" />
+                  Connexion
+                </Link>
+              )}
               <Link href="/recherche" className="text-center bg-red-600 text-white py-2.5 rounded-lg font-medium hover:bg-red-700 inline-flex items-center justify-center gap-2" onClick={() => setMobileOpen(false)}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
                 Réserver un stage

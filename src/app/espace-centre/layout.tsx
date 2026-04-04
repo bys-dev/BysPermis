@@ -8,6 +8,7 @@ import {
   faChartBar,
   faGraduationCap,
   faCalendarDays,
+  faCalendar,
   faGear,
   faArrowRightFromBracket,
   faChevronRight,
@@ -22,6 +23,7 @@ import {
   faCircleExclamation,
   faXmark,
   faRocket,
+  faTag,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
@@ -54,6 +56,12 @@ const allNavItems: NavItem[] = [
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE"],
   },
   {
+    href: "/espace-centre/calendrier",
+    label: "Calendrier",
+    icon: faCalendar,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"],
+  },
+  {
     href: "/espace-centre/mes-sessions",
     label: "Mes sessions",
     icon: faBookOpen,
@@ -82,6 +90,12 @@ const allNavItems: NavItem[] = [
     label: "Emails",
     icon: faEnvelope,
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/promo",
+    label: "Codes promo",
+    icon: faTag,
+    roles: ["CENTRE_OWNER"],
   },
   {
     href: "/espace-centre/facturation",

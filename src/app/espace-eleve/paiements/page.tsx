@@ -11,6 +11,7 @@ import {
   faCircleCheck,
   faCircleXmark,
   faReceipt,
+  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate, formatPrice } from "@/lib/utils";
 
@@ -36,6 +37,16 @@ interface Reservation {
   };
 }
 
+interface Invoice {
+  id: string;
+  numero: string;
+  montantTTC: number;
+  status: string;
+  createdAt: string;
+  reservationNumero: string | null;
+  formationTitre: string | null;
+}
+
 const paymentStatusConfig = {
   CONFIRMEE:  { label: "Payé",       icon: faCircleCheck, color: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-500/20" },
   TERMINEE:   { label: "Payé",       icon: faCircleCheck, color: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-500/20" },
@@ -46,23 +57,35 @@ const paymentStatusConfig = {
 
 export default function PaiementsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/reservations")
-      .then(async (r) => {
+    Promise.all([
+      fetch("/api/reservations").then(async (r) => {
         if (!r.ok) throw new Error("Erreur lors du chargement");
         return r.json();
-      })
-      .then((data) => {
-        setReservations(Array.isArray(data) ? data : []);
+      }),
+      fetch("/api/invoices").then(async (r) => {
+        if (!r.ok) return [];
+        return r.json();
+      }),
+    ])
+      .then(([resData, invData]) => {
+        setReservations(Array.isArray(resData) ? resData : []);
+        setInvoices(Array.isArray(invData) ? invData : []);
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : "Erreur inconnue");
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Helper: find invoice for a reservation
+  const getInvoiceForReservation = (reservationNumero: string): Invoice | undefined => {
+    return invoices.find((inv) => inv.reservationNumero === reservationNumero);
+  };
 
   // ─── Stats ─────────────────────────────────────────────
   const totalPaye = reservations
@@ -163,7 +186,7 @@ export default function PaiementsPage() {
                       <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Référence</th>
                       <th className="text-right text-xs font-medium text-gray-500 px-5 py-3">Montant</th>
                       <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Statut</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Document</th>
+                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Documents</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -202,15 +225,31 @@ export default function PaiementsPage() {
                           </td>
                           <td className="px-5 py-4 text-center">
                             {(r.status === "CONFIRMEE" || r.status === "TERMINEE") && (
-                              <a
-                                href={`/api/convocation/${r.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                              >
-                                <FontAwesomeIcon icon={faFileLines} className="w-3 h-3" />
-                                Télécharger
-                              </a>
+                              <div className="flex flex-col items-center gap-1">
+                                <a
+                                  href={`/api/convocation/${r.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                  <FontAwesomeIcon icon={faFileLines} className="w-3 h-3" />
+                                  Convocation
+                                </a>
+                                {(() => {
+                                  const inv = getInvoiceForReservation(r.numero);
+                                  return inv ? (
+                                    <a
+                                      href={`/api/invoices/${inv.id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 text-xs text-green-400 hover:text-green-300 transition-colors"
+                                    >
+                                      <FontAwesomeIcon icon={faFileInvoiceDollar} className="w-3 h-3" />
+                                      Facture
+                                    </a>
+                                  ) : null;
+                                })()}
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -249,15 +288,31 @@ export default function PaiementsPage() {
                         <span className="text-sm font-semibold text-white">{formatPrice(r.montant)}</span>
                       </div>
                       {(r.status === "CONFIRMEE" || r.status === "TERMINEE") && (
-                        <a
-                          href={`/api/convocation/${r.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                        >
-                          <FontAwesomeIcon icon={faFileLines} className="w-3 h-3" />
-                          Télécharger la convocation
-                        </a>
+                        <div className="flex items-center gap-4">
+                          <a
+                            href={`/api/convocation/${r.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                          >
+                            <FontAwesomeIcon icon={faFileLines} className="w-3 h-3" />
+                            Convocation
+                          </a>
+                          {(() => {
+                            const inv = getInvoiceForReservation(r.numero);
+                            return inv ? (
+                              <a
+                                href={`/api/invoices/${inv.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-xs text-green-400 hover:text-green-300 transition-colors"
+                              >
+                                <FontAwesomeIcon icon={faFileInvoiceDollar} className="w-3 h-3" />
+                                Facture
+                              </a>
+                            ) : null;
+                          })()}
+                        </div>
                       )}
                     </div>
                   );

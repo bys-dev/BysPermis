@@ -10,6 +10,8 @@ async function main() {
 
   // ─── NETTOYAGE (ordre inverse des dépendances) ───────────
   console.log("🗑️  Suppression des données existantes...");
+  await (prisma as any).promoCode.deleteMany();
+  await (prisma as any).invoice.deleteMany();
   await (prisma as any).emailTemplate.deleteMany();
   await (prisma as any).notification.deleteMany();
   await (prisma as any).reservation.deleteMany();
@@ -1850,6 +1852,57 @@ async function main() {
   ]);
   console.log(`✅ ${emailTemplates.length} templates d'emails par défaut créés.\n`);
 
+  // ─── CODES PROMO ─────────────────────────────────────────
+  console.log("🏷️  Création des codes promo...");
+  const promoCodes = await Promise.all([
+    (prisma as any).promoCode.create({
+      data: {
+        code: "BIENVENUE10",
+        description: "10% de réduction pour les nouveaux utilisateurs",
+        type: "POURCENTAGE",
+        valeur: 10,
+        minAchat: null,
+        maxUtilisations: null,
+        utilisations: 0,
+        dateDebut: new Date("2026-01-01"),
+        dateFin: new Date("2026-12-31"),
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).promoCode.create({
+      data: {
+        code: "STAGE20",
+        description: "20€ de réduction sur les stages de 200€ minimum",
+        type: "MONTANT_FIXE",
+        valeur: 20,
+        minAchat: 200,
+        maxUtilisations: 100,
+        utilisations: 0,
+        dateDebut: new Date("2026-01-01"),
+        dateFin: new Date("2026-12-31"),
+        isActive: true,
+        centreId: null,
+      },
+    }),
+    (prisma as any).promoCode.create({
+      data: {
+        code: "BYSOSNY",
+        description: "15% de réduction chez BYS Formation Osny",
+        type: "POURCENTAGE",
+        valeur: 15,
+        minAchat: null,
+        maxUtilisations: 50,
+        utilisations: 0,
+        dateDebut: new Date("2026-01-01"),
+        dateFin: new Date("2026-12-31"),
+        isActive: true,
+        centreId: centres[0].id,
+      },
+    }),
+  ]);
+  console.log(`✅ ${promoCodes.length} codes promo créés.\n`);
+
   // ─── RÉSUMÉ ──────────────────────────────────────────────
   console.log("═══════════════════════════════════════════");
   console.log("🌱 Seeding terminé avec succès !");
@@ -1865,6 +1918,7 @@ async function main() {
   console.log(`  ❓ 8 FAQ`);
   console.log(`  🔔 5 notifications`);
   console.log(`  📧 ${emailTemplates.length} templates d'emails`);
+  console.log(`  🏷️  ${promoCodes.length} codes promo`);
   console.log(`  ⚙️  1 paramètre plateforme`);
   console.log("═══════════════════════════════════════════\n");
 }

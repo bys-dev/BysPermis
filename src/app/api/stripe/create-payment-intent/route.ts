@@ -6,13 +6,14 @@ import { requireAuth } from "@/lib/auth0";
 
 const schema = z.object({
   sessionId: z.string().min(1),
+  promoCode: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
     const body = await req.json();
-    const { sessionId } = schema.parse(body);
+    const { sessionId, promoCode } = schema.parse(body);
 
     // Charger la session avec la formation et le centre
     const session = await prisma.session.findUnique({
@@ -29,7 +30,40 @@ export async function POST(req: NextRequest) {
     if (session.placesRestantes <= 0) return NextResponse.json({ error: "Plus de places disponibles" }, { status: 400 });
 
     const centre = session.formation.centre;
-    const amountCents = Math.round(session.formation.prix * 100);
+    let finalPrice = session.formation.prix;
+
+    // Appliquer le code promo s'il est fourni
+    if (promoCode) {
+      const promo = await prisma.promoCode.findUnique({
+        where: { code: promoCode.toUpperCase().trim() },
+      });
+
+      if (promo && promo.isActive) {
+        const now = new Date();
+        const isValid =
+          now >= promo.dateDebut &&
+          now <= promo.dateFin &&
+          (promo.maxUtilisations === null || promo.utilisations < promo.maxUtilisations) &&
+          (promo.minAchat === null || finalPrice >= promo.minAchat) &&
+          (promo.centreId === null || promo.centreId === centre.id);
+
+        if (isValid) {
+          const reduction =
+            promo.type === "POURCENTAGE"
+              ? Math.round((finalPrice * promo.valeur) / 100 * 100) / 100
+              : Math.min(promo.valeur, finalPrice);
+          finalPrice = Math.round((finalPrice - reduction) * 100) / 100;
+
+          // Incrémenter les utilisations
+          await prisma.promoCode.update({
+            where: { id: promo.id },
+            data: { utilisations: { increment: 1 } },
+          });
+        }
+      }
+    }
+
+    const amountCents = Math.round(finalPrice * 100);
     const commissionRate = Number(process.env.COMMISSION_RATE ?? 0.1);
     const applicationFee = Math.round(amountCents * commissionRate);
 

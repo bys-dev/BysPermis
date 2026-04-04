@@ -20,20 +20,28 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "BYS Formation — Récupérez vos points près de chez vous au meilleur prix",
+  title: {
+    default: "BYS Formation — Marketplace de formations permis & sécurité routière",
+    template: "%s | BYS Formation",
+  },
   description:
-    "Trouvez un stage de récupération de points permis agréé près de chez vous. Réservez en ligne, recevez votre convocation automatiquement. Centres agréés Ministère de l'Intérieur.",
+    "Trouvez et réservez votre stage de récupération de points, permis B, moto, FIMO, FCO. Comparez les centres agréés près de chez vous.",
   keywords: [
-    "récupération de points",
+    "stage récupération points",
+    "permis de conduire",
+    "formation FIMO",
     "stage permis",
-    "points permis",
-    "stage agréé",
-    "BYS Formation",
-    "FIMO",
+    "auto-école",
+    "récupération de points",
     "FCO",
-    "permis B",
     "sécurité routière",
+    "BYS Formation",
   ],
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "BYS Formation",
+  },
 };
 
 export default function RootLayout({

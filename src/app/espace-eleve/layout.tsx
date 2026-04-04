@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,6 +14,7 @@ import {
   faGraduationCap,
   faCreditCard,
 } from "@fortawesome/free-solid-svg-icons";
+import { useNotifications } from "@/lib/useNotifications";
 
 const sidebarLinks = [
   { href: "/espace-eleve", label: "Accueil", icon: faHouse, exact: true },
@@ -28,21 +28,7 @@ const sidebarLinks = [
 
 export default function EspaceEleveLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    fetch("/api/notifications")
-      .then(async (r) => {
-        if (!r.ok) return;
-        const data = await r.json();
-        if (Array.isArray(data)) {
-          setUnreadCount(data.filter((n: { isRead: boolean }) => !n.isRead).length);
-        }
-      })
-      .catch(() => {
-        // Silently fail — badge just won't show
-      });
-  }, [pathname]); // Re-fetch on navigation
+  const { unreadCount } = useNotifications();
 
   function isActive(href: string, exact?: boolean) {
     if (exact) return pathname === href;

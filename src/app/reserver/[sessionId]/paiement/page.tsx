@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLock, faCalendarDays, faLocationDot, faShieldHalved,
   faAward, faArrowLeft, faCircleCheck, faSpinner, faEuroSign,
+  faTag, faCheck, faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
@@ -48,8 +49,8 @@ const MOCK_SESSION: SessionData = {
   adresse: "",
 };
 
-// ─── Formulaire Stripe intégré ────────────────────────────
-function CheckoutForm({ sessionId, prix }: { sessionId: string; prix: number }) {
+// ─── Formulaire Stripe intégré ─���──────────────────���───────
+function CheckoutForm({ sessionId, prix, promoCode }: { sessionId: string; prix: number; promoCode: string | null }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -136,6 +137,10 @@ function CheckoutForm({ sessionId, prix }: { sessionId: string; prix: number }) 
         )}
       </button>
 
+      {promoCode && (
+        <input type="hidden" name="promoCode" value={promoCode} />
+      )}
+
       <p className="text-center text-xs text-gray-400">
         En payant, vous acceptez nos{" "}
         <Link href="/cgu" className="text-blue-600 hover:underline">CGU</Link>{" "}
@@ -159,7 +164,82 @@ export default function PaiementPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [session, setSession] = useState<SessionData>(MOCK_SESSION);
 
+  // Promo code state
+  const [promoInput, setPromoInput] = useState("");
+  const [promoCode, setPromoCode] = useState<string | null>(null);
+  const [promoReduction, setPromoReduction] = useState<number>(0);
+  const [promoDescription, setPromoDescription] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
   const s = session;
+  const displayPrice = promoCode ? Math.round((s.prix - promoReduction) * 100) / 100 : s.prix;
+
+  async function handleApplyPromo() {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    setPromoError(null);
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput.trim(), montant: s.prix }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setPromoCode(promoInput.trim().toUpperCase());
+        setPromoReduction(data.reduction);
+        setPromoDescription(data.description);
+        setPromoError(null);
+      } else {
+        setPromoError(data.error ?? "Code invalide");
+        setPromoCode(null);
+        setPromoReduction(0);
+        setPromoDescription(null);
+      }
+    } catch {
+      setPromoError("Erreur de validation. Veuillez réessayer.");
+    } finally {
+      setPromoLoading(false);
+    }
+  }
+
+  function handleRemovePromo() {
+    setPromoCode(null);
+    setPromoReduction(0);
+    setPromoDescription(null);
+    setPromoError(null);
+    setPromoInput("");
+  }
+
+  function createPaymentIntent(code?: string | null) {
+    const bodyPayload: Record<string, string> = { sessionId };
+    if (code) bodyPayload.promoCode = code;
+
+    fetch("/api/stripe/create-payment-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyPayload),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.clientSecret) setClientSecret(data.clientSecret);
+        else {
+          if (process.env.NODE_ENV === "development") {
+            setClientSecret("pi_test_placeholder_secret_test");
+          } else {
+            setLoadError(data.error ?? "Impossible d'initialiser le paiement.");
+          }
+        }
+      })
+      .catch(() => {
+        if (process.env.NODE_ENV === "development") {
+          setClientSecret("pi_test_placeholder_secret_test");
+        } else {
+          setLoadError("Erreur de connexion. Veuillez réessayer.");
+        }
+      });
+  }
 
   useEffect(() => {
     // Fetch session data
@@ -177,31 +257,7 @@ export default function PaiementPage() {
     setStagiaire(JSON.parse(stored));
 
     // Créer le PaymentIntent
-    fetch("/api/stripe/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.clientSecret) setClientSecret(data.clientSecret);
-        else {
-          // En dev sans API key, utiliser un client_secret de test
-          if (process.env.NODE_ENV === "development") {
-            setClientSecret("pi_test_placeholder_secret_test");
-          } else {
-            setLoadError(data.error ?? "Impossible d'initialiser le paiement.");
-          }
-        }
-      })
-      .catch(() => {
-        // En dev sans serveur, afficher le formulaire quand même
-        if (process.env.NODE_ENV === "development") {
-          setClientSecret("pi_test_placeholder_secret_test");
-        } else {
-          setLoadError("Erreur de connexion. Veuillez réessayer.");
-        }
-      });
+    createPaymentIntent();
   }, [sessionId, router]);
 
   return (
@@ -269,7 +325,7 @@ export default function PaiementPage() {
                 locale: "fr",
               }}
             >
-              <CheckoutForm sessionId={sessionId} prix={s.prix} />
+              <CheckoutForm sessionId={sessionId} prix={displayPrice} promoCode={promoCode} />
             </Elements>
           ) : (
             <div className="flex items-center justify-center py-12 gap-3 text-gray-400">
@@ -282,6 +338,60 @@ export default function PaiementPage() {
 
       {/* ── Récapitulatif ── */}
       <div className="space-y-4">
+        {/* Code promo */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+          <h3 className="font-display font-bold text-sm text-gray-900 mb-3 flex items-center gap-2">
+            <FontAwesomeIcon icon={faTag} className="text-blue-500 text-xs" />
+            Code promo
+          </h3>
+          {promoCode ? (
+            <div className="flex items-center justify-between gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
+              <div className="flex items-center gap-2 min-w-0">
+                <FontAwesomeIcon icon={faCheck} className="text-green-600 text-xs shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-green-800 truncate">{promoCode}</p>
+                  <p className="text-xs text-green-600">-{promoReduction} € {promoDescription && `· ${promoDescription}`}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleRemovePromo}
+                className="text-green-500 hover:text-red-500 transition-colors shrink-0"
+                title="Retirer le code"
+              >
+                <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
+                placeholder="Entrez votre code"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 placeholder-gray-400 uppercase"
+              />
+              <button
+                onClick={handleApplyPromo}
+                disabled={promoLoading || !promoInput.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {promoLoading ? (
+                  <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                ) : (
+                  "Appliquer"
+                )}
+              </button>
+            </div>
+          )}
+          {promoError && (
+            <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+              <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
+              {promoError}
+            </p>
+          )}
+        </div>
+
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
           <h2 className="font-display font-bold text-sm text-gray-900 mb-4 uppercase tracking-wider">Récapitulatif</h2>
           <div className="space-y-3">
@@ -319,13 +429,22 @@ export default function PaiementPage() {
             <span className="text-gray-400 text-sm">Stage</span>
             <span>{s.prix} €</span>
           </div>
+          {promoCode && promoReduction > 0 && (
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-green-400 text-sm flex items-center gap-1.5">
+                <FontAwesomeIcon icon={faTag} className="text-[10px]" />
+                Code promo ({promoCode})
+              </span>
+              <span className="text-green-400 font-medium">-{promoReduction} €</span>
+            </div>
+          )}
           <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
             <span className="text-gray-400 text-sm">Frais de dossier</span>
             <span className="text-green-400 text-sm font-medium">Offerts</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="font-bold text-lg">Total TTC</span>
-            <span className="font-bold text-2xl">{s.prix} €</span>
+            <span className="font-bold text-2xl">{displayPrice} €</span>
           </div>
           <p className="text-gray-500 text-xs mt-2 flex items-center gap-1">
             <FontAwesomeIcon icon={faEuroSign} className="text-[10px]" />

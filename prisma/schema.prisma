@@ -106,6 +106,7 @@ model User {
   messages        TicketMessage[]
   notifications   Notification[]
   reviews         Review[]
+  invoices        Invoice[]
 
   @@map("users")
 }
@@ -154,6 +155,8 @@ model Centre {
   membres               CentreMembre[]
   emailTemplates        EmailTemplate[]
   payments              CentrePayment[]
+  invoices              Invoice[]
+  promoCodes            PromoCode[]
   subscriptionPlanId    String?
   subscriptionPlan      SubscriptionPlan?  @relation(fields: [subscriptionPlanId], references: [id])
 
@@ -293,8 +296,33 @@ model Reservation {
   user              User              @relation(fields: [userId], references: [id])
   sessionId         String
   session           Session           @relation(fields: [sessionId], references: [id])
+  invoice           Invoice?
 
   @@map("reservations")
+}
+
+// ─── FACTURES ────────────────────────────────────────────
+
+model Invoice {
+  id            String   @id @default(cuid())
+  numero        String   @unique  // FAC-2026-0001
+  type          String             // "ELEVE" | "CENTRE_COMMISSION" | "CENTRE_ABONNEMENT"
+  montantHT     Float
+  tva           Float
+  montantTTC    Float
+  status        String   @default("PAYEE")  // "PAYEE" | "EN_ATTENTE" | "ANNULEE"
+  pdfUrl        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  centreId      String?
+  centre        Centre?  @relation(fields: [centreId], references: [id])
+  reservationId String?  @unique
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
+
+  @@map("invoices")
 }
 
 // ─── SUPPORT / TICKETS ───────────────────────────────────
@@ -417,6 +445,27 @@ model CentrePayment {
   centre        Centre   @relation(fields: [centreId], references: [id])
 
   @@map("centre_payments")
+}
+
+// ─── CODES PROMO ─────────────────────────────────────────
+
+model PromoCode {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  description     String?
+  type            String   // "POURCENTAGE" | "MONTANT_FIXE"
+  valeur          Float    // 10 = 10% or 10€
+  minAchat        Float?   // Minimum purchase amount
+  maxUtilisations Int?     // Max total uses (null = unlimited)
+  utilisations    Int      @default(0)
+  dateDebut       DateTime
+  dateFin         DateTime
+  isActive        Boolean  @default(true)
+  centreId        String?  // null = platform-wide, centreId = centre-specific
+  centre          Centre?  @relation(fields: [centreId], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@map("promo_codes")
 }
 
 // ─── PARAMETRES PLATEFORME ───────────────────────────────
