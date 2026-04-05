@@ -10,6 +10,9 @@ async function main() {
 
   // ─── NETTOYAGE (ordre inverse des dépendances) ───────────
   console.log("🗑️  Suppression des données existantes...");
+  await (prisma as any).favorite.deleteMany();
+  await (prisma as any).message.deleteMany();
+  await (prisma as any).article.deleteMany();
   await (prisma as any).promoCode.deleteMany();
   await (prisma as any).invoice.deleteMany();
   await (prisma as any).emailTemplate.deleteMany();
@@ -1903,6 +1906,77 @@ async function main() {
   ]);
   console.log(`✅ ${promoCodes.length} codes promo créés.\n`);
 
+  // ─── ARTICLES / BLOG ────────────────────────────────────────
+  console.log("📝 Création des articles de blog...");
+  const articles = await Promise.all([
+    (prisma as any).article.create({
+      data: {
+        titre: "Comment fonctionne un stage de récupération de points ?",
+        slug: "comment-fonctionne-stage-recuperation-points",
+        extrait: "Découvrez le déroulement d'un stage de récupération de points : inscription, programme sur 2 jours, récupération de 4 points et attestation.",
+        contenu: `<h2>Qu'est-ce qu'un stage de récupération de points ?</h2>
+<p>Le stage de sensibilisation à la sécurité routière, communément appelé stage de récupération de points, est une formation de 2 jours consécutifs (14 heures) qui permet de récupérer jusqu'à 4 points sur votre permis de conduire.</p>
+<h2>Qui peut participer ?</h2>
+<p>Tout titulaire d'un permis de conduire ayant perdu des points peut effectuer un stage volontaire, à condition de ne pas avoir effectué de stage dans les 12 derniers mois. Le stage peut aussi être imposé par un juge ou dans le cadre du permis probatoire.</p>
+<h2>Le déroulement du stage</h2>
+<p>Le stage se déroule sur 2 jours consécutifs dans un centre agréé par la préfecture. Il est animé par deux professionnels : un psychologue et un expert en sécurité routière. Le programme comprend des échanges, des études de cas et des ateliers de sensibilisation.</p>
+<h2>Combien de points peut-on récupérer ?</h2>
+<p>À l'issue du stage, vous récupérez jusqu'à 4 points, dans la limite du plafond de votre permis (12 points pour un permis classique, 6 à 12 points pour un permis probatoire). Les points sont crédités le lendemain du dernier jour de stage.</p>`,
+        image: null,
+        categorie: "conseils",
+        tags: ["recuperation de points", "stage", "permis"],
+        isPublished: true,
+        publishedAt: new Date("2026-03-15"),
+        authorId: admin.id,
+      },
+    }),
+    (prisma as any).article.create({
+      data: {
+        titre: "Nouvelle réglementation 2026 : ce qui change pour le permis de conduire",
+        slug: "nouvelle-reglementation-2026-permis-conduire",
+        extrait: "La réforme du permis de conduire 2026 apporte plusieurs changements importants. Passage en revue des nouvelles mesures.",
+        contenu: `<h2>Les principaux changements de 2026</h2>
+<p>L'année 2026 marque un tournant dans la politique de sécurité routière française. Plusieurs mesures entrent en vigueur pour moderniser le système du permis de conduire et renforcer la prévention.</p>
+<h2>Le permis dématérialisé</h2>
+<p>Le permis de conduire est désormais disponible sous forme dématérialisée via l'application France Identité. Cette version numérique a la même valeur légale que le document physique et peut être présentée lors des contrôles routiers.</p>
+<h2>Renforcement de la formation continue</h2>
+<p>Les stages de sensibilisation à la sécurité routière voient leur programme actualisé avec de nouveaux modules sur les mobilités douces, la conduite et les distracteurs (smartphone, GPS intégré).</p>
+<h2>Impact sur les centres de formation</h2>
+<p>Les centres de formation agréés doivent se conformer aux nouvelles exigences de qualité Qualiopi. Cela garantit aux stagiaires une formation de qualité, dispensée par des professionnels certifiés.</p>`,
+        image: null,
+        categorie: "reglementation",
+        tags: ["reglementation", "2026", "reforme", "permis"],
+        isPublished: true,
+        publishedAt: new Date("2026-03-20"),
+        authorId: admin.id,
+      },
+    }),
+    (prisma as any).article.create({
+      data: {
+        titre: "5 conseils pour ne pas perdre de points sur son permis",
+        slug: "5-conseils-ne-pas-perdre-points-permis",
+        extrait: "Adoptez les bons réflexes pour préserver votre capital points. Nos 5 conseils pratiques pour une conduite responsable au quotidien.",
+        contenu: `<h2>1. Respectez les limitations de vitesse</h2>
+<p>Les excès de vitesse représentent la première cause de perte de points en France. Un petit excès de moins de 20 km/h vous coûte déjà 1 point. Utilisez un régulateur de vitesse et restez vigilant dans les zones de changement de limitation.</p>
+<h2>2. Anticipez les contrôles d'alcoolémie</h2>
+<p>La conduite sous l'emprise de l'alcool est sévèrement sanctionnée : 6 points retirés pour un taux supérieur à 0,5 g/l. Prévoyez un conducteur désigné ou utilisez un éthylotest avant de prendre le volant.</p>
+<h2>3. Rangez votre téléphone</h2>
+<p>L'usage du téléphone au volant coûte 3 points et 135 euros d'amende. Activez le mode « ne pas déranger » ou utilisez un kit mains libres homologué.</p>
+<h2>4. Respectez les feux et stops</h2>
+<p>Griller un feu rouge ou un stop, c'est 4 points en moins et 135 euros d'amende. Ces infractions sont de plus en plus contrôlées par vidéo-verbalisation.</p>
+<h2>5. Maintenez votre véhicule en bon état</h2>
+<p>Des pneus usés, des feux défectueux ou un contrôle technique périmé peuvent entraîner des sanctions. Un véhicule bien entretenu est aussi un véhicule plus sûr.</p>`,
+        image: null,
+        categorie: "conseils",
+        tags: ["conseils", "points", "prevention", "securite routiere"],
+        isPublished: true,
+        publishedAt: new Date("2026-03-25"),
+        authorId: admin.id,
+      },
+    }),
+  ]);
+  console.log(`✅ ${articles.length} articles de blog créés.\n`);
+
   // ─── RÉSUMÉ ──────────────────────────────────────────────
   console.log("═══════════════════════════════════════════");
   console.log("🌱 Seeding terminé avec succès !");
@@ -1919,6 +1993,7 @@ async function main() {
   console.log(`  🔔 5 notifications`);
   console.log(`  📧 ${emailTemplates.length} templates d'emails`);
   console.log(`  🏷️  ${promoCodes.length} codes promo`);
+  console.log(`  📝 ${articles.length} articles de blog`);
   console.log(`  ⚙️  1 paramètre plateforme`);
   console.log("═══════════════════════════════════════════\n");
 }

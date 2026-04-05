@@ -426,11 +426,11 @@ function RechercheInner() {
       {/* Geoloc banner */}
       {detectedCity && !searchVille && (
         <div className="bg-blue-600/10 border-b border-blue-500/20 px-4 py-3">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm text-blue-300">
-              <FontAwesomeIcon icon={faLocationDot} className="text-blue-400" />
-              Position détectée : <span className="font-semibold text-white">{detectedCity}</span>
-              <span className="text-blue-400/60">— Afficher les stages à proximité ?</span>
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-300 flex-wrap">
+              <FontAwesomeIcon icon={faLocationDot} className="text-blue-400 shrink-0" />
+              <span>Position detectee : <span className="font-semibold text-white">{detectedCity}</span></span>
+              <span className="text-blue-400/60 hidden sm:inline">— Afficher les stages a proximite ?</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
@@ -704,7 +704,7 @@ function RechercheInner() {
 
             {/* Active filters pills */}
             {hasActiveFilters && (
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap sm:flex-wrap gap-2 mb-6 overflow-x-auto pb-1 -mx-1 px-1">
                 {searchQuery && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
                     &laquo; {searchQuery} &raquo;
@@ -771,7 +771,7 @@ function RechercheInner() {
                 <div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : stages.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
                 {stages.map((stage) => (
                   <div
                     key={stage.id}

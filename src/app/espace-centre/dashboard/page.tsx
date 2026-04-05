@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarDays, faEuroSign, faChartPie, faGraduationCap,
   faArrowTrendUp, faCircleCheck, faSpinner, faTriangleExclamation,
+  faFileExport, faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
@@ -33,10 +34,18 @@ const statusBadge: Record<string, { label: string; color: string; bg: string }> 
   REMBOURSEE: { label: "Remboursée", color: "text-orange-400", bg: "bg-orange-400/10" },
 };
 
+const exportOptions = [
+  { label: "Exporter les reservations (CSV)", type: "reservations" },
+  { label: "Exporter les sessions (CSV)", type: "sessions" },
+  { label: "Exporter les formations (CSV)", type: "formations" },
+  { label: "Exporter les revenus (CSV)", type: "revenus" },
+];
+
 export default function DashboardCentrePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/centre/stats")
@@ -114,32 +123,66 @@ export default function DashboardCentrePage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display font-bold text-2xl text-white mb-1">Tableau de bord</h1>
-        <p className="text-gray-500 text-sm">Bienvenue sur votre espace partenaire BYS Formation</p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="font-display font-bold text-xl sm:text-2xl text-white mb-1">Tableau de bord</h1>
+          <p className="text-gray-500 text-sm">Bienvenue sur votre espace partenaire BYS Formation</p>
+        </div>
+
+        {/* Export dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setExportOpen(!exportOpen)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-300 transition-all hover:bg-white/[0.07]"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+          >
+            <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5 text-blue-400" />
+            Exporter
+            <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-500" />
+          </button>
+          {exportOpen && (
+            <div
+              className="absolute right-0 top-full mt-2 w-64 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+              style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+            >
+              {exportOptions.map((opt) => (
+                <button
+                  key={opt.type}
+                  onClick={() => {
+                    window.open(`/api/centre/exports?type=${opt.type}`, "_blank");
+                    setExportOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/[0.06] transition-colors"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         {kpis.map((k) => (
-          <div key={k.label} className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${k.bg}`}>
-                <FontAwesomeIcon icon={k.icon} className={`w-4 h-4 ${k.color}`} />
+          <div key={k.label} className="rounded-xl p-3 sm:p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center ${k.bg}`}>
+                <FontAwesomeIcon icon={k.icon} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${k.color}`} />
               </div>
-              <FontAwesomeIcon icon={faArrowTrendUp} className="text-gray-700 w-3.5 h-3.5" />
+              <FontAwesomeIcon icon={faArrowTrendUp} className="text-gray-700 w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
-            <p className="font-bold text-2xl text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-xs text-gray-700 mt-0.5">{k.delta}</p>
+            <p className="font-bold text-lg sm:text-2xl text-white">{k.value}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">{k.label}</p>
+            <p className="text-[10px] sm:text-xs text-gray-700 mt-0.5 hidden sm:block">{k.delta}</p>
           </div>
         ))}
       </div>
 
       {/* Réservations récentes */}
       <div className="rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <h2 className="font-semibold text-white text-sm">Réservations récentes</h2>
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+          <h2 className="font-semibold text-white text-sm">Reservations recentes</h2>
           <Link href="/espace-centre/sessions" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
             Voir tout
           </Link>
@@ -155,7 +198,7 @@ export default function DashboardCentrePage() {
               const badge = statusBadge[r.status] ?? statusBadge["EN_ATTENTE"];
               const initials = r.eleve.split(" ").map((n) => n[0]).join("");
               return (
-                <div key={r.id} className="px-6 py-4 flex items-center gap-4">
+                <div key={r.id} className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
                   <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
                     <span className="text-xs font-bold text-gray-400">{initials}</span>
                   </div>

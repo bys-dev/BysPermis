@@ -103,10 +103,14 @@ model User {
   centre          Centre?            // Si CENTRE_OWNER
   centreMembres   CentreMembre[]     // Si formateur/admin/secrétaire d'un centre
   tickets         Ticket[]
-  messages        TicketMessage[]
+  ticketMessages  TicketMessage[]
   notifications   Notification[]
   reviews         Review[]
   invoices        Invoice[]
+  articles        Article[]
+  messagesSent    Message[]          @relation("messagesSent")
+  messagesReceived Message[]         @relation("messagesReceived")
+  favorites       Favorite[]
 
   @@map("users")
 }
@@ -230,6 +234,7 @@ model Formation {
   categorie     Categorie? @relation(fields: [categorieId], references: [id])
   sessions      Session[]
   reviews       Review[]
+  favorites     Favorite[]
 
   @@map("formations")
 }
@@ -297,6 +302,7 @@ model Reservation {
   sessionId         String
   session           Session           @relation(fields: [sessionId], references: [id])
   invoice           Invoice?
+  messages          Message[]
 
   @@map("reservations")
 }
@@ -477,4 +483,61 @@ model PlatformSettings {
   updatedAt          DateTime          @updatedAt
 
   @@map("platform_settings")
+}
+
+// ─── ARTICLES / BLOG ────────────────────────────────────
+
+model Article {
+  id          String    @id @default(cuid())
+  titre       String
+  slug        String    @unique
+  extrait     String    // Short excerpt for cards
+  contenu     String    // Full HTML content
+  image       String?   // Cover image URL
+  categorie   String?   // "actualites" | "conseils" | "reglementation" | "partenaires"
+  tags        String[]
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+
+  @@map("articles")
+}
+
+// ─── MESSAGERIE CENTRE-ELEVE ────────────────────────────
+
+model Message {
+  id        String   @id @default(cuid())
+  contenu   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  senderId    String
+  sender      User     @relation("messagesSent", fields: [senderId], references: [id])
+  receiverId  String
+  receiver    User     @relation("messagesReceived", fields: [receiverId], references: [id])
+
+  // Context
+  reservationId String?
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
+
+  @@map("messages")
+}
+
+// ─── FAVORIS / WISHLIST ─────────────────────────────────
+
+model Favorite {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formationId String
+  formation   Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, formationId])
+  @@map("favorites")
 }

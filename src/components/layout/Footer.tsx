@@ -6,9 +6,9 @@ import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-text text-gray-300 pt-16 pb-8 px-8">
+    <footer className="bg-brand-text text-gray-300 pt-12 sm:pt-16 pb-8 px-4 sm:px-8">
       <div className="max-w-[1440px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 mb-10 sm:mb-12">
           {/* Brand */}
           <div className="col-span-1 lg:col-span-2">
             <div className="flex items-center space-x-2 mb-6">
@@ -197,11 +197,11 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-gray-500 text-center lg:text-left">
+            <div className="text-xs sm:text-sm text-gray-500 text-center lg:text-left">
               © 2026 BYS Formation — SAS — SIRET : 987 512 381 00011 — Bât. 7,
               9 Chaussée Jules César, 95520 Osny
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-sm">
               <Link
                 href="/mentions-legales"
                 className="hover:text-white transition-colors"

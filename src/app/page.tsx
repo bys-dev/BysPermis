@@ -328,7 +328,7 @@ export default function Home() {
       <Header />
       <main>
         {/* ═══ 1. HERO — Dark navy, bold typography ═══ */}
-        <section className="relative bg-[#0A1628] pt-20 pb-24 px-4 sm:px-8 min-h-[720px] flex items-center overflow-hidden">
+        <section className="relative bg-[#0A1628] pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 min-h-[520px] sm:min-h-[720px] flex items-center overflow-hidden">
           {/* Subtle radial glow */}
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.1) 0%, transparent 70%)" }} />
 
@@ -337,14 +337,14 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto w-full relative z-10">
             <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
             <div className="max-w-4xl mx-auto lg:mx-0 lg:max-w-2xl text-center lg:text-left flex-1">
-              <div className="inline-flex items-center px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-8 backdrop-blur-sm">
-                {/* Mini drapeau français */}
-                <span className="inline-flex mr-2 rounded overflow-hidden">
+              <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6 sm:mb-8 backdrop-blur-sm max-w-full">
+                {/* Mini drapeau francais */}
+                <span className="inline-flex mr-2 rounded overflow-hidden shrink-0">
                   <span className="w-1.5 h-4 bg-blue-500" />
                   <span className="w-1.5 h-4 bg-white" />
                   <span className="w-1.5 h-4 bg-red-500" />
                 </span>
-                <span className="text-sm font-medium text-gray-300">
+                <span className="text-xs sm:text-sm font-medium text-gray-300 truncate">
                   Agréé Ministère de l&apos;Intérieur — Stages agréés préfecture 🇫🇷
                 </span>
               </div>
@@ -355,7 +355,7 @@ export default function Home() {
                 <br className="hidden sm:block" /> au meilleur prix
               </h1>
 
-              <p className="text-lg sm:text-xl text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto">
                 Stage agréé préfecture — Récupérez jusqu&apos;à 4 points en 2 jours.
                 Convocation immédiate par email. Plus de 150 centres partenaires en France.
               </p>
@@ -369,7 +369,7 @@ export default function Home() {
                   if (heroVille.trim()) params.set("ville", heroVille.trim());
                   router.push(`/recherche?${params.toString()}`);
                 }}
-                className="bg-white/[0.06] backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 max-w-4xl mx-auto"
+                className="bg-white/[0.06] backdrop-blur-md rounded-2xl border border-white/10 p-4 sm:p-6 md:p-8 max-w-4xl mx-auto"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
                   <div className="sm:col-span-5">
@@ -599,7 +599,7 @@ export default function Home() {
               <p className="text-base text-gray-500">Réservez votre stage en 4 étapes simples</p>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {steps.map((step) => (
                 <div key={step.number} className="text-center">
                   <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -924,13 +924,13 @@ export default function Home() {
                 <div key={item.question} className="bg-gray-50 rounded-2xl border border-brand-border overflow-hidden">
                   <button
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-gray-100 transition-colors duration-200"
+                    className="w-full px-4 sm:px-8 py-4 sm:py-6 flex items-center justify-between text-left hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <span className="font-semibold text-lg text-brand-text pr-4">{item.question}</span>
+                    <span className="font-semibold text-base sm:text-lg text-brand-text pr-4">{item.question}</span>
                     <FontAwesomeIcon icon={openFaq === index ? faChevronUp : faChevronDown} className="text-gray-400 flex-shrink-0" />
                   </button>
                   {openFaq === index && (
-                    <div className="px-8 pb-6">
+                    <div className="px-4 sm:px-8 pb-4 sm:pb-6">
                       <p className="text-gray-500 leading-relaxed">{item.answer}</p>
                     </div>
                   )}

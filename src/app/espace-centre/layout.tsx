@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartBar,
+  faChartLine,
   faGraduationCap,
   faCalendarDays,
   faCalendar,
@@ -19,6 +20,7 @@ import {
   faBookOpen,
   faPaintBrush,
   faEnvelope,
+  faComments,
   faFileInvoiceDollar,
   faCircleExclamation,
   faXmark,
@@ -42,6 +44,12 @@ const allNavItems: NavItem[] = [
     label: "Dashboard",
     icon: faChartBar,
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"],
+  },
+  {
+    href: "/espace-centre/statistiques",
+    label: "Statistiques",
+    icon: faChartLine,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
   },
   {
     href: "/espace-centre/formations",
@@ -90,6 +98,12 @@ const allNavItems: NavItem[] = [
     label: "Emails",
     icon: faEnvelope,
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/messages",
+    label: "Messages",
+    icon: faComments,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE"],
   },
   {
     href: "/espace-centre/promo",
@@ -328,7 +342,7 @@ export default function EspaceCentreLayout({ children }: { children: React.React
           </div>
         )}
 
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {children}
         </main>
       </div>

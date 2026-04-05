@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { requireCentreStaff } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 
+const MONTH_LABELS: Record<string, string> = {
+  "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril",
+  "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août",
+  "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre",
+};
+
 // GET /api/centre/stats — KPIs pour le dashboard centre
 export async function GET() {
   try {
@@ -25,6 +31,7 @@ export async function GET() {
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
     // Reservations this month (confirmed + completed)
     const reservationsCeMois = await prisma.reservation.count({
@@ -94,6 +101,121 @@ export async function GET() {
       tauxRemplissage = totalPlaces > 0 ? Math.round(((totalPlaces - restantes) / totalPlaces) * 100) : 0;
     }
 
+    // ── Monthly Revenue (last 6 months) ──
+    const reservations6Months = await prisma.reservation.findMany({
+      where: {
+        session: { formation: { centreId } },
+        createdAt: { gte: sixMonthsAgo },
+        status: { in: ["CONFIRMEE", "TERMINEE"] },
+      },
+      select: { montant: true, createdAt: true },
+    });
+
+    const monthlyRevenue: { month: string; label: string; revenue: number; reservations: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const monthNum = String(d.getMonth() + 1).padStart(2, "0");
+      const monthReservations = reservations6Months.filter((r) => {
+        const rd = new Date(r.createdAt);
+        return rd.getFullYear() === d.getFullYear() && rd.getMonth() === d.getMonth();
+      });
+      const monthRevenue = monthReservations.reduce(
+        (sum, r) => sum + r.montant * (1 - commissionRate / 100), 0
+      );
+      monthlyRevenue.push({
+        month: monthKey,
+        label: MONTH_LABELS[monthNum] ?? monthNum,
+        revenue: Math.round(monthRevenue),
+        reservations: monthReservations.length,
+      });
+    }
+
+    // ── Top 5 formations by reservation count ──
+    const allReservationsWithFormation = await prisma.reservation.findMany({
+      where: {
+        session: { formation: { centreId } },
+        status: { in: ["CONFIRMEE", "TERMINEE"] },
+      },
+      select: {
+        montant: true,
+        session: {
+          select: {
+            formation: { select: { id: true, titre: true } },
+          },
+        },
+      },
+    });
+
+    const formationMap = new Map<string, { titre: string; reservations: number; revenue: number }>();
+    for (const r of allReservationsWithFormation) {
+      const fId = r.session.formation.id;
+      const existing = formationMap.get(fId);
+      if (existing) {
+        existing.reservations++;
+        existing.revenue += r.montant * (1 - commissionRate / 100);
+      } else {
+        formationMap.set(fId, {
+          titre: r.session.formation.titre,
+          reservations: 1,
+          revenue: r.montant * (1 - commissionRate / 100),
+        });
+      }
+    }
+    const topFormations = Array.from(formationMap.values())
+      .sort((a, b) => b.reservations - a.reservations)
+      .slice(0, 5)
+      .map((f) => ({ ...f, revenue: Math.round(f.revenue) }));
+
+    // ── Status breakdown ──
+    const allStatuses = await prisma.reservation.findMany({
+      where: { session: { formation: { centreId } } },
+      select: { status: true },
+    });
+    const statusBreakdown = {
+      confirmees: allStatuses.filter((r) => r.status === "CONFIRMEE").length,
+      enAttente: allStatuses.filter((r) => r.status === "EN_ATTENTE").length,
+      annulees: allStatuses.filter((r) => r.status === "ANNULEE").length,
+      terminees: allStatuses.filter((r) => r.status === "TERMINEE").length,
+    };
+
+    // ── Average rating ──
+    const reviews = await prisma.review.findMany({
+      where: { formation: { centreId } },
+      select: { note: true, commentaire: true, createdAt: true, user: { select: { prenom: true, nom: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+    const averageRating = reviews.length > 0
+      ? Math.round((reviews.reduce((sum, r) => sum + r.note, 0) / reviews.length) * 10) / 10
+      : 0;
+
+    // ── Session occupancy per active session ──
+    const sessionsWithOccupancy = await prisma.session.findMany({
+      where: {
+        formation: { centreId },
+        status: "ACTIVE",
+      },
+      select: {
+        dateDebut: true,
+        placesTotal: true,
+        placesRestantes: true,
+        formation: { select: { titre: true } },
+      },
+      orderBy: { dateDebut: "asc" },
+      take: 10,
+    });
+
+    const sessionOccupancy = sessionsWithOccupancy.map((s) => ({
+      formation: s.formation.titre,
+      dateDebut: s.dateDebut,
+      placesTotal: s.placesTotal,
+      placesRestantes: s.placesRestantes,
+      taux: s.placesTotal > 0
+        ? Math.round(((s.placesTotal - s.placesRestantes) / s.placesTotal) * 100)
+        : 0,
+    }));
+
     return NextResponse.json({
       reservationsCeMois,
       revenusNets: Math.round(revenusNets * 100) / 100,
@@ -107,6 +229,18 @@ export async function GET() {
         date: r.session.dateDebut,
         status: r.status,
         montant: r.montant,
+      })),
+      // Enhanced stats
+      monthlyRevenue,
+      topFormations,
+      statusBreakdown,
+      averageRating,
+      sessionOccupancy,
+      recentReviews: reviews.map((r) => ({
+        note: r.note,
+        commentaire: r.commentaire,
+        createdAt: r.createdAt,
+        user: `${r.user.prenom} ${r.user.nom}`,
       })),
     });
   } catch (err) {

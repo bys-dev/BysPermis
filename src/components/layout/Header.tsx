@@ -20,6 +20,7 @@ import { useNotifications } from "@/lib/useNotifications";
 const navLinks = [
   { label: "Stages", href: "/recherche" },
   { label: "Nos Centres", href: "/centres" },
+  { label: "Blog", href: "/blog" },
   { label: "Espace Pro", href: "/inscription" },
   { label: "FAQ", href: "/faq" },
 ];
@@ -119,7 +120,7 @@ export default function Header() {
       </div>
 
       {/* Top bar */}
-      <div className="bg-gray-900 text-gray-300 text-[11px] tracking-wide text-center py-1.5 px-4 flex items-center justify-center gap-2">
+      <div className="bg-gray-900 text-gray-300 text-[10px] sm:text-[11px] tracking-wide text-center py-1.5 px-3 sm:px-4 flex items-center justify-center gap-2 overflow-hidden">
         <span className="inline-flex rounded overflow-hidden mr-1">
           <span className="w-1 h-3 bg-blue-500" />
           <span className="w-1 h-3 bg-white" />
@@ -130,16 +131,16 @@ export default function Header() {
 
       {/* Main header */}
       <div className="bg-white border-b border-brand-border">
-        <div className="max-w-[1440px] mx-auto px-8 py-4">
-          <div className="flex items-center justify-between gap-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3 sm:gap-4">
 
             {/* Logo + Nav */}
-            <div className="flex items-center space-x-12">
-              <Link href="/" className="flex items-center space-x-2.5 shrink-0">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-brand-accent">
-                  <span className="text-white font-display font-bold text-sm tracking-tight">BYS</span>
+            <div className="flex items-center space-x-6 lg:space-x-12 min-w-0">
+              <Link href="/" className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center bg-brand-accent">
+                  <span className="text-white font-display font-bold text-xs sm:text-sm tracking-tight">BYS</span>
                 </div>
-                <span className="font-display font-semibold text-xl text-brand-text">BYS Formation</span>
+                <span className="font-display font-semibold text-lg sm:text-xl text-brand-text hidden sm:inline">BYS Formation</span>
               </Link>
 
               <nav className="hidden lg:flex items-center space-x-8">
@@ -243,7 +244,7 @@ export default function Header() {
                     </button>
 
                     {notifOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                      <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
                         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                           <p className="text-sm font-semibold text-gray-800">Notifications</p>
                           {unreadCount > 0 && (
@@ -307,20 +308,36 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Burger mobile */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden text-gray-600 hover:text-brand-accent transition-colors"
-              aria-label="Menu"
-            >
-              <FontAwesomeIcon icon={mobileOpen ? faXmark : faBars} className="text-2xl" />
-            </button>
+            {/* Mobile: notification bell + burger */}
+            <div className="flex items-center gap-2 lg:hidden">
+              {isAuthenticated && (
+                <button
+                  onClick={() => setNotifOpen(!notifOpen)}
+                  className="relative text-gray-500 hover:text-brand-accent transition-colors p-2"
+                  title="Notifications"
+                >
+                  <FontAwesomeIcon icon={faBell} className="text-lg" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+              )}
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="text-gray-600 hover:text-brand-accent transition-colors p-1"
+                aria-label="Menu"
+              >
+                <FontAwesomeIcon icon={mobileOpen ? faXmark : faBars} className="text-2xl" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-brand-border bg-white px-8 pb-6">
+          <div className="lg:hidden border-t border-brand-border bg-white px-4 sm:px-8 pb-6">
             {/* Géoloc mobile */}
             <div className="pt-4 pb-3 border-b border-brand-border">
               <button

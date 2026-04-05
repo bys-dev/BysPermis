@@ -701,7 +701,7 @@ export default function FormationDetailPage() {
             </div>
 
             {/* Key Info Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10">
               <div className="bg-[#F9FAFB] rounded-xl p-5 border border-brand-border">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -754,9 +754,9 @@ export default function FormationDetailPage() {
 
         {/* ─── CONTENT + SIDEBAR ─── */}
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-10 lg:py-14">
-          <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
             {/* Main Content */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 order-2 lg:order-1">
               {/* Description */}
               <section className="bg-white rounded-xl border border-brand-border p-6 sm:p-8 mb-8">
                 <h2 className="font-display text-2xl font-bold text-brand-text mb-4">
@@ -1051,7 +1051,7 @@ export default function FormationDetailPage() {
             </div>
 
             {/* ─── SIDEBAR ─── */}
-            <aside className="w-full lg:w-[360px] shrink-0">
+            <aside className="w-full lg:w-[360px] shrink-0 order-1 lg:order-2">
               <div className="lg:sticky lg:top-36 space-y-6">
                 {/* Price + CTA Card */}
                 <div className="bg-white rounded-xl border border-brand-border p-6 shadow-sm">

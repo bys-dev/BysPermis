@@ -20,6 +20,7 @@ import {
   faRightFromBracket,
   faCrown,
   faTag,
+  faNewspaper,
 } from "@fortawesome/free-solid-svg-icons";
 
 type UserRole = "ADMIN" | "OWNER";
@@ -37,6 +38,7 @@ const baseNavItems = [
   { href: "/admin/support", icon: faHeadset, label: "Support" },
   { href: "/admin/statistiques", icon: faChartLine, label: "Statistiques" },
   { href: "/admin/promo", icon: faTag, label: "Codes promo" },
+  { href: "/admin/blog", icon: faNewspaper, label: "Blog" },
   { href: "/admin/parametres", icon: faCog, label: "Paramètres" },
 ];
 

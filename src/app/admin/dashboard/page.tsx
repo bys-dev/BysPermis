@@ -10,6 +10,7 @@ import {
   faCrown, faShieldHalved, faUserShield, faCog,
   faPercent, faScrewdriverWrench,
   faCalendarDay, faTicket,
+  faFileExport, faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice, formatDate } from "@/lib/utils";
 
@@ -83,11 +84,19 @@ const activityIcon = (type: string) => {
   return map[type] ?? map.reservation;
 };
 
+const adminExportOptions = [
+  { label: "Exporter les centres (CSV)", type: "centres" },
+  { label: "Exporter les utilisateurs (CSV)", type: "users" },
+  { label: "Exporter les reservations (CSV)", type: "reservations" },
+  { label: "Exporter les revenus (CSV)", type: "revenus" },
+];
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -236,17 +245,50 @@ export default function AdminDashboardPage() {
             Bienvenue{user ? `, ${user.prenom}` : ""}. Vue d&apos;ensemble de la plateforme BYS Permis
           </p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-400/10 border border-green-500/20">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-green-400 text-xs font-medium">Plateforme en ligne</span>
+        <div className="flex items-center gap-3">
+          {/* Export dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setExportOpen(!exportOpen)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-300 transition-all hover:bg-white/5 bg-[#0A1628] border border-white/10"
+            >
+              <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5 text-blue-400" />
+              <span className="hidden sm:inline">Exporter</span>
+              <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-500" />
+            </button>
+            {exportOpen && (
+              <div
+                className="absolute right-0 top-full mt-2 w-64 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+                style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                {adminExportOptions.map((opt) => (
+                  <button
+                    key={opt.type}
+                    onClick={() => {
+                      window.open(`/api/admin/exports?type=${opt.type}`, "_blank");
+                      setExportOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-400/10 border border-green-500/20">
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-green-400 text-xs font-medium">Plateforme en ligne</span>
+          </div>
         </div>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         {kpis.map((k) => (
-          <div key={k.label} className={`rounded-xl p-5 border bg-[#0A1628] ${k.border}`}>
-            <div className="flex items-start justify-between mb-4">
+          <div key={k.label} className={`rounded-xl p-3 sm:p-5 border bg-[#0A1628] ${k.border}`}>
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
               <div className={`w-10 h-10 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
               </div>
@@ -255,9 +297,9 @@ export default function AdminDashboardPage() {
                 {k.trend}
               </div>
             </div>
-            <p className="text-2xl font-bold text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
+            <p className="text-lg sm:text-2xl font-bold text-white">{k.value}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">{k.label}</p>
+            <p className="text-[10px] sm:text-[11px] text-gray-600 mt-0.5 hidden sm:block">{k.sub}</p>
           </div>
         ))}
       </div>
@@ -265,7 +307,7 @@ export default function AdminDashboardPage() {
       {/* Quick actions */}
       <div>
         <h2 className="text-white font-semibold text-sm mb-3">Actions rapides</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2">
           {quickActions.map((action) => (
             <Link
               key={action.href + action.label}
@@ -382,41 +424,66 @@ export default function AdminDashboardPage() {
         {stats.reservationsRecentes.length === 0 ? (
           <p className="text-gray-600 text-sm text-center py-8">Aucune reservation recente</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reference</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Eleve</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Stage</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Montant</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Commission</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Statut</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {stats.reservationsRecentes.map((r) => {
-                  const badge = statusBadge(r.status);
-                  return (
-                    <tr key={r.id} className="hover:bg-white/3 transition-colors">
-                      <td className="py-3 pr-4 text-blue-400 font-mono text-xs">{r.id.slice(0, 12)}</td>
-                      <td className="py-3 pr-4 text-white">{r.eleve}</td>
-                      <td className="py-3 pr-4 text-gray-400">{r.centre}</td>
-                      <td className="py-3 pr-4 text-gray-400 max-w-[160px] truncate">{r.stage}</td>
-                      <td className="py-3 pr-4 text-white font-semibold">{formatPrice(r.montant)}</td>
-                      <td className="py-3 pr-4 text-green-400 font-semibold">{formatPrice(r.montant * 0.1)}</td>
-                      <td className="py-3">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold border ${badge.cls}`}>
-                          {badge.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left">
+                    <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reference</th>
+                    <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Eleve</th>
+                    <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
+                    <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Stage</th>
+                    <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Montant</th>
+                    <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Commission</th>
+                    <th className="text-gray-500 font-medium text-xs pb-3">Statut</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {stats.reservationsRecentes.map((r) => {
+                    const badge = statusBadge(r.status);
+                    return (
+                      <tr key={r.id} className="hover:bg-white/3 transition-colors">
+                        <td className="py-3 pr-4 text-blue-400 font-mono text-xs">{r.id.slice(0, 12)}</td>
+                        <td className="py-3 pr-4 text-white">{r.eleve}</td>
+                        <td className="py-3 pr-4 text-gray-400">{r.centre}</td>
+                        <td className="py-3 pr-4 text-gray-400 max-w-[160px] truncate">{r.stage}</td>
+                        <td className="py-3 pr-4 text-white font-semibold">{formatPrice(r.montant)}</td>
+                        <td className="py-3 pr-4 text-green-400 font-semibold">{formatPrice(r.montant * 0.1)}</td>
+                        <td className="py-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold border ${badge.cls}`}>
+                            {badge.label}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {/* Mobile cards */}
+            <div className="md:hidden space-y-3">
+              {stats.reservationsRecentes.map((r) => {
+                const badge = statusBadge(r.status);
+                return (
+                  <div key={r.id} className="p-3 rounded-lg bg-white/3 border border-white/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white text-sm font-medium truncate">{r.eleve}</span>
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold border shrink-0 ${badge.cls}`}>
+                        {badge.label}
+                      </span>
+                    </div>
+                    <p className="text-gray-400 text-xs truncate mb-1">{r.stage}</p>
+                    <p className="text-gray-500 text-xs mb-2">{r.centre}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-semibold text-sm">{formatPrice(r.montant)}</span>
+                      <span className="text-green-400 text-xs font-semibold">Com. {formatPrice(r.montant * 0.1)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </div>
