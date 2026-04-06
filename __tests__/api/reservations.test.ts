@@ -54,6 +54,19 @@ const mockReservation = {
   commissionMontant: 25,
   stripePaymentId: "pi_test",
   createdAt: new Date("2026-03-10"),
+  session: {
+    dateDebut: new Date("2026-04-01T09:00:00"),
+    dateFin: new Date("2026-04-02T17:00:00"),
+    placesRestantes: 8,
+    formation: {
+      titre: "Stage récupération de points",
+      slug: "stage-recup-osny",
+      prix: 250,
+      lieu: "Osny",
+      duree: "2 jours",
+      centre: { nom: "BYS Formation Osny", ville: "Osny" },
+    },
+  },
 };
 
 describe("GET /api/reservations", () => {

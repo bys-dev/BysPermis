@@ -14,8 +14,14 @@ export async function GET(
     const { reservationId } = await params;
     const user = await requireAuth();
 
-    const reservation = await prisma.reservation.findUnique({
-      where: { id: reservationId },
+    // Chercher par ID ou par numéro de réservation
+    const reservation = await prisma.reservation.findFirst({
+      where: {
+        OR: [
+          { id: reservationId },
+          { numero: reservationId },
+        ],
+      },
       include: {
         session: {
           include: {

@@ -57,25 +57,39 @@ export async function getCurrentUser(): Promise<User | null> {
       (session.user.role as string | undefined) ??
       (session.user["https://byspermis.fr/role"] as string | undefined)
 
-    // Auto-create on first login
+    // Auto-create or link on first login
     if (!user) {
-      const validRole = ALL_ROLES.includes(tokenRole as typeof ALL_ROLES[number])
-        ? (tokenRole as typeof ALL_ROLES[number])
-        : "ELEVE"
+      const email = (session.user.email as string) ?? ""
 
-      const prenom = (session.user.given_name as string) ?? ""
-      const referralCode = `BYS-${prenom.toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`
+      // Check if user was pre-created by admin (via register/invite) with a different auth0Id
+      const existingByEmail = email ? await prisma.user.findUnique({ where: { email } }) : null
 
-      user = await prisma.user.create({
-        data: {
-          auth0Id,
-          email: (session.user.email as string) ?? "",
-          nom: (session.user.family_name as string) ?? (session.user.name as string) ?? "",
-          prenom,
-          role: validRole,
-          referralCode,
-        },
-      })
+      if (existingByEmail) {
+        // Link existing user to this Auth0 account (admin pre-created this user)
+        user = await prisma.user.update({
+          where: { id: existingByEmail.id },
+          data: { auth0Id },
+        })
+      } else {
+        // Brand new user — determine role from token or default to ELEVE
+        const validRole = ALL_ROLES.includes(tokenRole as typeof ALL_ROLES[number])
+          ? (tokenRole as typeof ALL_ROLES[number])
+          : "ELEVE"
+
+        const prenom = (session.user.given_name as string) ?? ""
+        const referralCode = `BYS-${prenom.toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`
+
+        user = await prisma.user.create({
+          data: {
+            auth0Id,
+            email,
+            nom: (session.user.family_name as string) ?? (session.user.name as string) ?? "",
+            prenom,
+            role: validRole,
+            referralCode,
+          },
+        })
+      }
     } else if (tokenRole && tokenRole !== user.role && ALL_ROLES.includes(tokenRole as typeof ALL_ROLES[number])) {
       // Sync role from Auth0 if it changed (e.g. admin promoted user)
       user = await prisma.user.update({

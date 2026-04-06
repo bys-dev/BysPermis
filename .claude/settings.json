@@ -1,7 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(xargs head:*)",
+      "Read(//tmp/**)",
+      "Bash(find '/c/Users/andry/Bureau/bys formations/byspermis' -name *tailwind*)",
+      "Bash(node -e \":*)",
+      "Bash(curl -s http://localhost:3001/api/formations)",
+      "Bash(node -e \"const d=[];process.stdin.on\\(''''data'''',c=>d.push\\(c\\)\\);process.stdin.on\\(''''end'''',\\(\\)=>{try{const r=JSON.parse\\(d.join\\(''''''''\\)\\); console.log\\(''''Port 3001 - Total:'''', r.total\\)}catch{console.log\\(''''Port 3001 - Not JSON''''\\)}}\\)\")",
+      "Bash(curl -s http://localhost:3002/api/formations)",
+      "Bash(node -e \"const d=[];process.stdin.on\\(''''data'''',c=>d.push\\(c\\)\\);process.stdin.on\\(''''end'''',\\(\\)=>{try{const r=JSON.parse\\(d.join\\(''''''''\\)\\); console.log\\(''''Port 3002 - Total:'''', r.total\\)}catch{console.log\\(''''Port 3002 - Not JSON''''\\)}}\\)\")",
+      "Bash(curl -s http://localhost:3001/api/centres)",
+      "Bash(curl -s http://localhost:3001/api/categories)",
+      "Bash(node -e \"const d=[];process.stdin.on\\(''''data'''',c=>d.push\\(c\\)\\);process.stdin.on\\(''''end'''',\\(\\)=>{JSON.parse\\(d.join\\(''''''''\\)\\).forEach\\(c=>console.log\\(''''  -'''', c.nom\\)\\)}\\)\")",
+      "Bash(curl -s http://localhost:3001/api/centres/bys-formation-osny)"
     ]
   }
 }

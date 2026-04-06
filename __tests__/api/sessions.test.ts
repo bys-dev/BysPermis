@@ -23,6 +23,10 @@ jest.mock("@/lib/auth0", () => ({
   requireCentre: jest.fn(),
 }));
 
+jest.mock("@/lib/centre-utils", () => ({
+  getUserCentreId: jest.fn().mockResolvedValue("centre_1"),
+}));
+
 import { prisma } from "@/lib/prisma";
 import { GET as getById } from "@/app/api/sessions/[id]/route";
 import { GET as getSessions, POST as postSession } from "@/app/api/sessions/route";
