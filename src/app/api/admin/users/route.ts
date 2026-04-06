@@ -172,6 +172,35 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const { id, ...data } = patchSchema.parse(body);
 
+    // Si on change le rôle, aussi mettre à jour Auth0 app_metadata
+    if (data.role) {
+      const user = await prisma.user.findUnique({ where: { id }, select: { auth0Id: true } });
+      if (user && !user.auth0Id.startsWith("local_")) {
+        try {
+          const domain = process.env.AUTH0_DOMAIN;
+          const clientId = process.env.AUTH0_CLIENT_ID;
+          const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+          if (domain && clientId && clientSecret) {
+            const tokenRes = await fetch(`https://${domain}/oauth/token`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ grant_type: "client_credentials", client_id: clientId, client_secret: clientSecret, audience: `https://${domain}/api/v2/` }),
+            });
+            if (tokenRes.ok) {
+              const { access_token } = await tokenRes.json() as { access_token: string };
+              await fetch(`https://${domain}/api/v2/users/${encodeURIComponent(user.auth0Id)}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${access_token}` },
+                body: JSON.stringify({ app_metadata: { role: data.role } }),
+              });
+            }
+          }
+        } catch {
+          console.warn("[PATCH users] Impossible de sync le rôle dans Auth0");
+        }
+      }
+    }
+
     const updated = await prisma.user.update({
       where: { id },
       data,
