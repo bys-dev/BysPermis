@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreOwner } from "@/lib/auth0";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 // POST /api/centre/request-validation — Centre owner requests admin validation
 
@@ -8,9 +9,16 @@ export async function POST() {
   try {
     const user = await requireCentreOwner();
 
-    // Find the centre owned by this user
+    // Find the active centre for this user
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) {
+      return NextResponse.json(
+        { error: "Centre introuvable." },
+        { status: 404 }
+      );
+    }
     const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
+      where: { id: centreId },
     });
 
     if (!centre) {

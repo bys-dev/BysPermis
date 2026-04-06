@@ -13,7 +13,6 @@ import {
   faGear,
   faArrowRightFromBracket,
   faChevronRight,
-  faBuilding,
   faHeadset,
   faUsers,
   faClipboardCheck,
@@ -22,11 +21,11 @@ import {
   faEnvelope,
   faComments,
   faFileInvoiceDollar,
-  faCircleExclamation,
   faXmark,
   faRocket,
   faTag,
 } from "@fortawesome/free-solid-svg-icons";
+import CentreSwitcher from "@/components/ui/CentreSwitcher";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 type CentreRole = "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE";
@@ -227,19 +226,9 @@ export default function EspaceCentreLayout({ children }: { children: React.React
           </Link>
         </div>
 
-        {/* Centre badge */}
-        <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">
-              <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-sm" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-white">Espace Centre</p>
-              <p className="text-xs text-gray-500">
-                {role ? roleBadgeLabels[role] : "Chargement…"}
-              </p>
-            </div>
-          </div>
+        {/* Centre switcher */}
+        <div className="border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+          <CentreSwitcher userRole={role} />
         </div>
 
         {/* Nav */}

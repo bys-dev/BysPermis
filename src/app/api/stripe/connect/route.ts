@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { requireCentre } from "@/lib/auth0";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 // POST /api/stripe/connect — Démarrer l'onboarding Stripe Connect
 export async function POST(req: NextRequest) {
   try {
     const user = await requireCentre();
-    const centre = await prisma.centre.findUnique({ where: { userId: user.id } });
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+    const centre = await prisma.centre.findUnique({ where: { id: centreId } });
     if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
 
     let stripeAccountId = centre.stripeAccountId;

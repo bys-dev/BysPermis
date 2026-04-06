@@ -580,7 +580,42 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ ${centres.length} centres créés.\n`);
+  // ─── 3a. MULTI-CENTRE: set activeCentreId + give BYS Osny a second centre ──
+
+  // Set activeCentreId for all centre owners
+  await Promise.all(
+    centreUsers.map((u: { id: string }, i: number) =>
+      (prisma as any).user.update({
+        where: { id: u.id },
+        data: { activeCentreId: centres[i].id },
+      })
+    )
+  );
+
+  // Give BYS Formation Osny owner (centreUsers[0]) a second centre to demo multi-centre
+  const centreOsny2 = await (prisma as any).centre.create({
+    data: {
+      nom: "BYS Formation Cergy",
+      slug: "bys-formation-cergy",
+      description:
+        "Second centre BYS Formation, situé à Cergy-Pontoise. Stages de récupération de points et formation professionnelle transport.",
+      adresse: "5 Place des Merveilles",
+      codePostal: "95800",
+      ville: "Cergy",
+      telephone: "01 34 25 99 88",
+      email: "cergy@bys-formation.fr",
+      latitude: 49.0363,
+      longitude: 2.0780,
+      profilCompletionPct: 60,
+      statut: "ACTIF",
+      isActive: true,
+      userId: centreUsers[0].id,
+      couleurPrimaire: "#2563EB",
+      couleurSecondaire: "#1E40AF",
+    },
+  });
+
+  console.log(`✅ ${centres.length + 1} centres créés (dont 1 second centre pour BYS Osny).\n`);
 
   // ─── 3b. MEMBRES DE CENTRES ──────────────────────────────
   console.log("👥 Création des membres de centres...");

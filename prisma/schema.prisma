@@ -98,9 +98,12 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Multi-centre: active centre selector
+  activeCentreId  String?
+
   // Relations
   reservations    Reservation[]
-  centre          Centre?            // Si CENTRE_OWNER
+  centres         Centre[]           // Si CENTRE_OWNER (peut en avoir plusieurs)
   centreMembres   CentreMembre[]     // Si formateur/admin/secrétaire d'un centre
   tickets         Ticket[]
   ticketMessages  TicketMessage[]
@@ -153,7 +156,7 @@ model Centre {
   reseauxSociaux        Json?
 
   // Relations
-  userId                String             @unique
+  userId                String
   user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   formations            Formation[]
   membres               CentreMembre[]

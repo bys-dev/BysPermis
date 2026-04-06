@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
 
       if (role === "CENTRE_OWNER" && centreName) {
         const slug = slugify(centreName) + "-" + Date.now().toString(36);
-        await tx.centre.create({
+        const centre = await tx.centre.create({
           data: {
             userId: user.id,
             nom: centreName.trim(),
@@ -126,6 +126,12 @@ export async function POST(req: NextRequest) {
             codePostal: "",
             ville: "",
           },
+        });
+
+        // Set the new centre as active
+        await tx.user.update({
+          where: { id: user.id },
+          data: { activeCentreId: centre.id },
         });
       }
 

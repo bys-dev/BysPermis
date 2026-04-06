@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreOwner } from "@/lib/auth0";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 // ─── GET /api/centre/payments — historique des paiements du centre ────
 export async function GET(req: NextRequest) {
   try {
     const user = await requireCentreOwner();
 
-    const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
-      select: { id: true },
-    });
-
-    if (!centre) {
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) {
       return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
     }
+    const centre = { id: centreId };
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type"); // COMMISSION | ABONNEMENT | REMBOURSEMENT

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireCentre } from "@/lib/auth0";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,8 +28,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch centre
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) {
+      return NextResponse.json(
+        { error: "Centre introuvable" },
+        { status: 404 }
+      );
+    }
     const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
+      where: { id: centreId },
     });
     if (!centre) {
       return NextResponse.json(

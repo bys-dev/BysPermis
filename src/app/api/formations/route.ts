@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireCentre } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
 import { haversineDistance } from "@/lib/geocoding";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 // ─── GET /api/formations ──────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -22,8 +23,9 @@ export async function GET(req: NextRequest) {
     if (mine === "1") {
       const { requireCentre } = await import("@/lib/auth0");
       const centreUser = await requireCentre();
-      const centre = await prisma.centre.findUnique({ where: { userId: centreUser.id } });
-      if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+      const centreId = await getUserCentreId(centreUser.id, centreUser.role);
+      if (!centreId) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+      const centre = { id: centreId };
 
       const formations = await prisma.formation.findMany({
         where: { centreId: centre.id },
@@ -225,7 +227,9 @@ const createSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const user = await requireCentre();
-    const centre = await prisma.centre.findUnique({ where: { userId: user.id } });
+    const centreIdForPost = await getUserCentreId(user.id, user.role);
+    if (!centreIdForPost) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+    const centre = await prisma.centre.findUnique({ where: { id: centreIdForPost } });
     if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
     if (centre.statut !== "ACTIF") return NextResponse.json({ error: "Votre centre n'est pas encore activé" }, { status: 403 });
 

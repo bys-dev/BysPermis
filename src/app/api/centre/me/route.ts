@@ -4,6 +4,7 @@ import * as Prisma from "@/generated/prisma/internal/prismaNamespace";
 import { z } from "zod";
 import { requireAuth, requireCentreManagement } from "@/lib/auth0";
 import { calculateCentreCompletion } from "@/lib/centre-completion";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 const centreSelect = {
   id: true, nom: true, slug: true, description: true,
@@ -22,8 +23,10 @@ const centreSelect = {
 export async function GET() {
   try {
     const user = await requireAuth();
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) return NextResponse.json({ error: "Aucun centre" }, { status: 404 });
     const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
+      where: { id: centreId },
       select: centreSelect,
     });
     if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
@@ -49,8 +52,11 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const data = updateSchema.parse(body);
 
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) return NextResponse.json({ error: "Aucun centre" }, { status: 404 });
+
     const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
+      where: { id: centreId },
       include: {
         formations: {
           where: { isActive: true },
@@ -121,8 +127,11 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const data = profileSchema.parse(body);
 
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) return NextResponse.json({ error: "Aucun centre" }, { status: 404 });
+
     const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
+      where: { id: centreId },
       include: {
         formations: {
           where: { isActive: true },

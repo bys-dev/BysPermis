@@ -103,20 +103,20 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Check if user or centre already exists ─────────
-    const existingUserWithCentre = await prisma.user.findUnique({
+    const existingUserWithCentres = await prisma.user.findUnique({
       where: { email },
-      include: { centre: true },
+      include: { centres: true },
     });
 
-    if (existingUserWithCentre?.centre) {
+    if (existingUserWithCentres?.centres && existingUserWithCentres.centres.length > 0) {
       return NextResponse.json(
         { error: "Cet email est deja associe a un centre." },
         { status: 409 }
       );
     }
 
-    const existingUserId = existingUserWithCentre?.id ?? null;
-    const existingUserRole = existingUserWithCentre?.role ?? null;
+    const existingUserId = existingUserWithCentres?.id ?? null;
+    const existingUserRole = existingUserWithCentres?.role ?? null;
 
     // ── Generate temp password ──────────────────────────
     const tempPassword = generateTempPassword();
@@ -189,6 +189,12 @@ export async function POST(req: NextRequest) {
           profilCompletionPct: 0,
           userId,
         },
+      });
+
+      // Set the new centre as active for the user
+      await tx.user.update({
+        where: { id: userId },
+        data: { activeCentreId: centre.id },
       });
 
       // Create notification for the new centre owner

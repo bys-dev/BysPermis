@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreStaff, requireCentreOwner, CENTRE_ROLES } from "@/lib/auth0";
-
-/**
- * Helper: find the centre associated with the current user.
- * Works for CENTRE_OWNER (via Centre.userId) and for staff (via CentreMembre).
- */
-async function getUserCentreId(userId: string, userRole: string): Promise<string | null> {
-  if (userRole === "CENTRE_OWNER") {
-    const centre = await prisma.centre.findUnique({ where: { userId }, select: { id: true } });
-    return centre?.id ?? null;
-  }
-
-  // For admins, formateurs, secrétaires — look up CentreMembre
-  const membership = await prisma.centreMembre.findFirst({
-    where: { userId },
-    select: { centreId: true },
-  });
-  return membership?.centreId ?? null;
-}
+import { getUserCentreId } from "@/lib/centre-utils";
 
 // GET /api/centre/membres — List all members of the current user's centre
 export async function GET() {
@@ -65,14 +48,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Rôle invalide" }, { status: 400 });
     }
 
-    // Find the owner's centre
-    const centre = await prisma.centre.findUnique({
-      where: { userId: owner.id },
-      select: { id: true },
-    });
-    if (!centre) {
+    // Find the owner's active centre
+    const centreId = await getUserCentreId(owner.id, owner.role);
+    if (!centreId) {
       return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
     }
+    const centre = { id: centreId };
 
     // Find user by email
     const targetUser = await prisma.user.findUnique({
@@ -134,14 +115,12 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "userId requis" }, { status: 400 });
     }
 
-    // Find the owner's centre
-    const centre = await prisma.centre.findUnique({
-      where: { userId: owner.id },
-      select: { id: true },
-    });
-    if (!centre) {
+    // Find the owner's active centre
+    const centreId = await getUserCentreId(owner.id, owner.role);
+    if (!centreId) {
       return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
     }
+    const centre = { id: centreId };
 
     // Cannot remove self
     if (userId === owner.id) {

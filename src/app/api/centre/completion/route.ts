@@ -2,14 +2,20 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreStaff } from "@/lib/auth0";
 import { calculateCentreCompletion } from "@/lib/centre-completion";
+import { getUserCentreId } from "@/lib/centre-utils";
 
 // GET /api/centre/completion — Get profile completion data for the current centre
 export async function GET() {
   try {
     const user = await requireCentreStaff();
 
+    const centreId = await getUserCentreId(user.id, user.role);
+    if (!centreId) {
+      return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+    }
+
     const centre = await prisma.centre.findUnique({
-      where: { userId: user.id },
+      where: { id: centreId },
       include: {
         formations: {
           where: { isActive: true },
