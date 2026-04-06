@@ -21,6 +21,7 @@ import {
   faCrown,
   faTag,
   faNewspaper,
+  faChartBar,
 } from "@fortawesome/free-solid-svg-icons";
 
 type UserRole = "ADMIN" | "OWNER";
@@ -43,6 +44,7 @@ const baseNavItems = [
 ];
 
 const ownerNavItems = [
+  { href: "/admin/analytics", icon: faChartBar, label: "Analytics" },
   { href: "/admin/roles", icon: faUserShield, label: "Rôles & Permissions" },
   { href: "/admin/configuration", icon: faScrewdriverWrench, label: "Configuration avancée" },
 ];

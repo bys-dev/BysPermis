@@ -17,6 +17,7 @@ import {
   faXmark,
   faFileLines,
   faCheck,
+  faAward,
 } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
@@ -521,6 +522,17 @@ export default function MesFormationsPage() {
                             </a>
                           )}
                         </>
+                      )}
+                      {group.category === "terminee" && group.reservations[0] && (
+                        <a
+                          href={`/api/attestations/${group.reservations[0].id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-500/20 transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faAward} className="w-3 h-3" />
+                          Attestation
+                        </a>
                       )}
                       {group.category === "terminee" && !group.review && (
                         <button

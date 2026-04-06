@@ -643,7 +643,19 @@ export default function ReservationDetailPage() {
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-all"
             >
               <FontAwesomeIcon icon={faFileLines} className="w-4 h-4" />
-              Télécharger la convocation
+              Telecharger la convocation
+            </a>
+          )}
+
+          {reservation.status === "TERMINEE" && (
+            <a
+              href={`/api/attestations/${reservation.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-green-700 transition-all"
+            >
+              <FontAwesomeIcon icon={faGraduationCap} className="w-4 h-4" />
+              Telecharger l&apos;attestation
             </a>
           )}
 

@@ -15,6 +15,7 @@ import {
   faCreditCard,
   faComments,
   faHeart,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNotifications } from "@/lib/useNotifications";
 
@@ -25,6 +26,7 @@ const sidebarLinks = [
   { href: "/espace-eleve/paiements", label: "Paiements", icon: faCreditCard },
   { href: "/espace-eleve/profil", label: "Mon profil", icon: faUser },
   { href: "/espace-eleve/messages", label: "Messages", icon: faComments },
+  { href: "/espace-eleve/fidelite", label: "Fidelite", icon: faStar },
   { href: "/espace-eleve/favoris", label: "Favoris", icon: faHeart },
   { href: "/espace-eleve/notifications", label: "Notifications", icon: faBell, showBadge: true },
   { href: "/espace-eleve/support", label: "Support", icon: faHeadset },

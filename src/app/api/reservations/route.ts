@@ -170,6 +170,77 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // 9. Loyalty points — gain de points sur réservation
+      const pointsEarned = Math.floor(reservation.montant);
+      await tx.loyaltyPoints.create({
+        data: {
+          userId: user.id,
+          points: pointsEarned,
+          type: "GAIN",
+          description: `Réservation #${reservation.numero}`,
+        },
+      });
+      const currentUser = await tx.user.findUniqueOrThrow({ where: { id: user.id } });
+      const newTotal = currentUser.totalPoints + pointsEarned;
+      const newLevel = newTotal >= 5000 ? "PLATINUM" : newTotal >= 1500 ? "GOLD" : newTotal >= 500 ? "SILVER" : "BRONZE";
+      await tx.user.update({
+        where: { id: user.id },
+        data: { totalPoints: newTotal, loyaltyLevel: newLevel },
+      });
+
+      // 10. Referral reward — première réservation d'un filleul
+      if (currentUser.referredBy) {
+        const previousReservations = await tx.reservation.count({
+          where: { userId: user.id, id: { not: reservation.id } },
+        });
+        if (previousReservations === 0) {
+          // C'est la première réservation du filleul
+          const referrer = await tx.user.findFirst({
+            where: { referralCode: currentUser.referredBy },
+          });
+          if (referrer) {
+            // 200 points au parrain
+            await tx.loyaltyPoints.create({
+              data: {
+                userId: referrer.id,
+                points: 200,
+                type: "GAIN",
+                description: `Parrainage — ${currentUser.prenom} ${currentUser.nom}`,
+              },
+            });
+            const referrerNewTotal = referrer.totalPoints + 200;
+            const referrerNewLevel = referrerNewTotal >= 5000 ? "PLATINUM" : referrerNewTotal >= 1500 ? "GOLD" : referrerNewTotal >= 500 ? "SILVER" : "BRONZE";
+            await tx.user.update({
+              where: { id: referrer.id },
+              data: { totalPoints: referrerNewTotal, loyaltyLevel: referrerNewLevel },
+            });
+            await tx.notification.create({
+              data: {
+                userId: referrer.id,
+                titre: "Bonus parrainage !",
+                contenu: `Votre filleul ${currentUser.prenom} a réservé son premier stage. Vous gagnez 200 points de fidélité !`,
+              },
+            });
+
+            // 100 points au filleul
+            await tx.loyaltyPoints.create({
+              data: {
+                userId: user.id,
+                points: 100,
+                type: "GAIN",
+                description: "Bonus de bienvenue (parrainage)",
+              },
+            });
+            const filleulNewTotal = newTotal + 100;
+            const filleulNewLevel = filleulNewTotal >= 5000 ? "PLATINUM" : filleulNewTotal >= 1500 ? "GOLD" : filleulNewTotal >= 500 ? "SILVER" : "BRONZE";
+            await tx.user.update({
+              where: { id: user.id },
+              data: { totalPoints: filleulNewTotal, loyaltyLevel: filleulNewLevel },
+            });
+          }
+        }
+      }
+
       return { reservation, session };
     });
 

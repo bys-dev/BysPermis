@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEnvelope,
@@ -49,11 +50,18 @@ const inputClass = "w-full pr-4 py-3 rounded-lg text-white placeholder-gray-500 
 const inputStyle = { background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' };
 
 export default function InscriptionPage() {
+  const searchParams = useSearchParams();
   const [accountType, setAccountType] = useState<AccountType>('eleve');
   const [form, setForm] = useState<FormState>(initialFormState);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState | 'global', string>>>({});
+  const [referralCode, setReferralCode] = useState<string>('');
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) setReferralCode(ref);
+  }, [searchParams]);
 
   function updateField(field: keyof FormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -87,7 +95,7 @@ export default function InscriptionPage() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, accountType }),
+        body: JSON.stringify({ ...form, accountType, referralCode: referralCode || undefined }),
       });
       const data = await res.json();
       if (!res.ok) {

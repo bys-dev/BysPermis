@@ -63,13 +63,17 @@ export async function getCurrentUser(): Promise<User | null> {
         ? (tokenRole as typeof ALL_ROLES[number])
         : "ELEVE"
 
+      const prenom = (session.user.given_name as string) ?? ""
+      const referralCode = `BYS-${prenom.toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`
+
       user = await prisma.user.create({
         data: {
           auth0Id,
           email: (session.user.email as string) ?? "",
           nom: (session.user.family_name as string) ?? (session.user.name as string) ?? "",
-          prenom: (session.user.given_name as string) ?? "",
+          prenom,
           role: validRole,
+          referralCode,
         },
       })
     } else if (tokenRole && tokenRole !== user.role && ALL_ROLES.includes(tokenRole as typeof ALL_ROLES[number])) {

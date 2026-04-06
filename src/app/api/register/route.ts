@@ -66,7 +66,7 @@ async function createAuth0User(params: {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { firstName, lastName, email, password, confirmPassword, accountType, acceptCGU, centreName } = body;
+    const { firstName, lastName, email, password, confirmPassword, accountType, acceptCGU, centreName, referralCode } = body;
 
     // ── Validation ────────────────────────────────────────
     if (!firstName?.trim()) return NextResponse.json({ error: "Prénom requis." }, { status: 400 });
@@ -103,8 +103,20 @@ export async function POST(req: NextRequest) {
       console.warn("[register] Auth0 Management API non disponible — mode dev");
     }
 
+    // ── Vérifier le code parrain s'il est fourni ──────────
+    let validReferralCode: string | undefined;
+    if (referralCode) {
+      const referrer = await prisma.user.findUnique({ where: { referralCode } });
+      if (referrer) {
+        validReferralCode = referralCode;
+      }
+      // Ignore silently if code is invalid
+    }
+
     // ── Créer en BDD (transaction) ────────────────────────
     const result = await prisma.$transaction(async (tx) => {
+      const generatedRefCode = `BYS-${firstName.trim().toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`;
+
       const user = await tx.user.create({
         data: {
           auth0Id: auth0Id ?? `local_${Date.now()}`,
@@ -112,6 +124,8 @@ export async function POST(req: NextRequest) {
           nom: lastName.trim(),
           prenom: firstName.trim(),
           role,
+          referralCode: generatedRefCode,
+          referredBy: validReferralCode,
         },
       });
 

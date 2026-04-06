@@ -46,6 +46,29 @@ export async function POST(
         },
         data: { status: "TERMINEE" },
       });
+
+      // Notify users that their attestation is available
+      const terminatedReservations = await prisma.reservation.findMany({
+        where: {
+          sessionId,
+          userId: { in: presentUserIds },
+          status: "TERMINEE",
+        },
+        include: {
+          session: { include: { formation: true } },
+        },
+      });
+
+      const notificationPromises = terminatedReservations.map((r) =>
+        prisma.notification.create({
+          data: {
+            userId: r.userId,
+            titre: "Attestation de formation disponible",
+            contenu: `Votre attestation pour "${r.session.formation.titre}" est disponible. Rendez-vous dans vos formations pour la telecharger.`,
+          },
+        })
+      );
+      await Promise.all(notificationPromises);
     }
 
     return NextResponse.json({

@@ -114,6 +114,11 @@ model User {
   messagesSent    Message[]          @relation("messagesSent")
   messagesReceived Message[]         @relation("messagesReceived")
   favorites       Favorite[]
+  loyaltyPoints   LoyaltyPoints[]
+  loyaltyLevel    String   @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM
+  totalPoints     Int      @default(0)
+  referralCode    String?  @unique  // Auto-generated, e.g. "BYS-JEAN42"
+  referredBy      String?           // referralCode of the person who referred them
 
   @@map("users")
 }
@@ -528,6 +533,21 @@ model Message {
   reservation   Reservation? @relation(fields: [reservationId], references: [id])
 
   @@map("messages")
+}
+
+// ─── PROGRAMME DE FIDÉLITÉ ──────────────────────────────
+
+model LoyaltyPoints {
+  id          String   @id @default(cuid())
+  points      Int
+  type        String   // "GAIN" | "DEPENSE"
+  description String
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("loyalty_points")
 }
 
 // ─── FAVORIS / WISHLIST ─────────────────────────────────
