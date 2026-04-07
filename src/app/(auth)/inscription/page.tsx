@@ -111,7 +111,7 @@ export default function InscriptionPage() {
   }
 
   if (success) {
-    const returnTo = accountType === 'centre' ? '/espace-centre' : '/espace-eleve';
+    const returnTo = '/dashboard';
     return (
       <div className="w-full max-w-md text-center">
         <div className="rounded-2xl p-10 backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>

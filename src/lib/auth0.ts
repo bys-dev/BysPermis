@@ -2,9 +2,73 @@ import { Auth0Client } from "@auth0/nextjs-auth0/server"
 import { prisma } from "@/lib/prisma"
 import type { User } from "@/generated/prisma/client"
 
-// ─── Auth0 Client v4 (reads APP_BASE_URL, AUTH0_DOMAIN, etc. from env) ───
+// ─── Namespace for custom claims injected by Auth0 Post-Login Action ───
+const ROLE_NAMESPACE = "https://byspermis.fr"
 
-export const auth0 = new Auth0Client()
+// ─── Role hierarchy levels (higher = more privileged) ────────────────
+const ROLE_LEVELS: Record<string, number> = {
+  OWNER: 100,
+  ADMIN: 90,
+  COMPTABLE: 70,
+  COMMERCIAL: 70,
+  SUPPORT: 60,
+  CENTRE_OWNER: 50,
+  CENTRE_ADMIN: 40,
+  CENTRE_FORMATEUR: 30,
+  CENTRE_SECRETAIRE: 20,
+  ELEVE: 10,
+}
+
+/**
+ * Check if `userRole` meets or exceeds `requiredRole` in the hierarchy.
+ * Example: hasRole("ADMIN", "SUPPORT") → true (90 >= 60)
+ */
+export function hasRole(userRole: string, requiredRole: string): boolean {
+  return (ROLE_LEVELS[userRole] ?? 0) >= (ROLE_LEVELS[requiredRole] ?? 0)
+}
+
+// ─── Auth0 Client v4 with beforeSessionSaved hook ───────────────────
+
+export const auth0 = new Auth0Client({
+  async beforeSessionSaved(session, idToken) {
+    // 1. Try to extract role from the idToken (JWT string)
+    if (idToken) {
+      let tokenClaims: Record<string, unknown> = {}
+      try {
+        const base64Url = idToken.split(".")[1]
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+            .join("")
+        )
+        tokenClaims = JSON.parse(jsonPayload)
+      } catch {
+        // Failed to parse JWT — fall through to other sources
+      }
+
+      // Read role from custom claim namespace (e.g. "https://byspermis.fr/role")
+      const roleFromToken =
+        (tokenClaims[ROLE_NAMESPACE + "/role"] as string | undefined) ??
+        (tokenClaims["role"] as string | undefined)
+
+      if (roleFromToken) {
+        session.user.appRole = roleFromToken
+      }
+    }
+
+    // 2. Also check session.user claims directly (Auth0 may inject them there)
+    if (!session.user.appRole) {
+      session.user.appRole =
+        (session.user.role as string | undefined) ??
+        (session.user[ROLE_NAMESPACE + "/role"] as string | undefined) ??
+        "ELEVE"
+    }
+
+    return session
+  },
+})
 
 // ─── Role groups ─────────────────────────────────────────
 
@@ -38,6 +102,7 @@ export { ALL_ROLES, CENTRE_ROLES, CENTRE_MANAGEMENT_ROLES, CENTRE_FINANCE_ROLES,
 /**
  * Get current user from session.
  * Auto-creates user in DB on first login (upsert pattern).
+ * Reads appRole from beforeSessionSaved hook, falls back to direct claims.
  * Returns null if not authenticated.
  */
 export async function getCurrentUser(): Promise<User | null> {
@@ -47,15 +112,16 @@ export async function getCurrentUser(): Promise<User | null> {
 
     const auth0Id = session.user.sub as string
 
-    // Try to find existing user
+    // Read role from session (set by beforeSessionSaved hook) or fallback to direct claims
+    const tokenRole =
+      (session.user.appRole as string | undefined) ??
+      (session.user.role as string | undefined) ??
+      (session.user[ROLE_NAMESPACE + "/role"] as string | undefined)
+
+    // Try to find existing user by auth0Id first, then by email
     let user = await prisma.user.findUnique({
       where: { auth0Id },
     })
-
-    // Read role from Auth0 token (injected by Post-Login Action)
-    const tokenRole =
-      (session.user.role as string | undefined) ??
-      (session.user["https://byspermis.fr/role"] as string | undefined)
 
     // Auto-create or link on first login
     if (!user) {
@@ -91,7 +157,7 @@ export async function getCurrentUser(): Promise<User | null> {
         })
       }
     } else if (tokenRole && tokenRole !== user.role && ALL_ROLES.includes(tokenRole as typeof ALL_ROLES[number])) {
-      // Sync role from Auth0 if it changed (e.g. admin promoted user)
+      // Sync role from Auth0 if it changed (e.g. admin promoted user via Auth0 dashboard)
       user = await prisma.user.update({
         where: { id: user.id },
         data: { role: tokenRole as typeof ALL_ROLES[number] },

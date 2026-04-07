@@ -7,6 +7,7 @@ const auth0 = new Auth0Client()
 // ─── Routes that require authentication ──────────────────────
 
 const PROTECTED_PATTERNS = [
+  /^\/dashboard(\/|$)/,
   /^\/espace-centre(\/|$)/,
   /^\/espace-eleve(\/|$)/,
   /^\/admin(\/|$)/,

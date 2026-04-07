@@ -8,7 +8,7 @@ import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 export default function ConnexionPage() {
   const searchParams = useSearchParams();
-  const returnTo = searchParams.get('returnTo') ?? '/espace-eleve';
+  const returnTo = searchParams.get('returnTo') ?? '/dashboard';
 
   return (
     <div className="w-full max-w-md">
