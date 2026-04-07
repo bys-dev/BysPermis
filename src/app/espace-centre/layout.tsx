@@ -21,6 +21,7 @@ import {
   faEnvelope,
   faComments,
   faFileInvoiceDollar,
+  faFileContract,
   faXmark,
   faRocket,
   faTag,
@@ -79,6 +80,12 @@ const allNavItems: NavItem[] = [
     label: "Disponibilites",
     icon: faCalendar,
     roles: ["CENTRE_FORMATEUR"],
+  },
+  {
+    href: "/espace-centre/contrats",
+    label: "Contrats",
+    icon: faFileContract,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
   },
   {
     href: "/espace-centre/equipe",
