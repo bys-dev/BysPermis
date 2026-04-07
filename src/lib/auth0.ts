@@ -164,6 +164,15 @@ export async function getCurrentUser(): Promise<User | null> {
       })
     }
 
+    // Sync emailVerified from Auth0 session
+    const isVerified = (session.user.email_verified as boolean) ?? false
+    if (user.emailVerified !== isVerified) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: isVerified },
+      })
+    }
+
     return user
   } catch {
     return null

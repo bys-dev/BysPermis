@@ -95,6 +95,13 @@ model User {
   ville         String?
   role          Role     @default(ELEVE)
   isBlocked     Boolean  @default(false)
+  emailVerified     Boolean  @default(false)
+  isProfileComplete Boolean  @default(false)
+  dateNaissance         DateTime?
+  numeroPermis          String?
+  dateObtentionPermis   DateTime?
+  categoriesPermis      String[]    // ["A", "B", "C", "D"]
+  newsletterOptIn       Boolean     @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -115,6 +122,7 @@ model User {
   messagesReceived Message[]         @relation("messagesReceived")
   favorites       Favorite[]
   loyaltyPoints   LoyaltyPoints[]
+  availabilities  Availability[]
   loyaltyLevel    String   @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM
   totalPoints     Int      @default(0)
   referralCode    String?  @unique  // Auto-generated, e.g. "BYS-JEAN42"
@@ -488,6 +496,8 @@ model PlatformSettings {
   id                 String            @id @default("default")
   commissionRate     Float             @default(10)
   monetisationModel  MonetisationModel @default(COMMISSION)
+  maintenanceMode    Boolean           @default(false)
+  maintenanceMessage String?
   updatedAt          DateTime          @updatedAt
 
   @@map("platform_settings")
@@ -563,4 +573,21 @@ model Favorite {
 
   @@unique([userId, formationId])
   @@map("favorites")
+}
+
+// ─── DISPONIBILITES FORMATEUR ──────────────────────────
+
+model Availability {
+  id        String   @id @default(cuid())
+  date      DateTime
+  startTime String   // "09:00"
+  endTime   String   // "17:00"
+  isBooked  Boolean  @default(false)
+  note      String?
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("availabilities")
 }

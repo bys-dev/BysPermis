@@ -10,6 +10,7 @@ async function main() {
 
   // ─── NETTOYAGE (ordre inverse des dépendances) ───────────
   console.log("🗑️  Suppression des données existantes...");
+  await (prisma as any).availability.deleteMany();
   await (prisma as any).loyaltyPoints.deleteMany();
   await (prisma as any).favorite.deleteMany();
   await (prisma as any).message.deleteMany();

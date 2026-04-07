@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth0"
 import { redirect } from "next/navigation"
+import { prisma } from "@/lib/prisma"
 
 /**
  * /dashboard — Server-side role-based redirect.
@@ -21,6 +22,30 @@ export default async function DashboardRedirectPage() {
 
   if (!user) {
     redirect("/connexion")
+  }
+
+  // Email verification check (skip for ADMIN/OWNER — social login auto-verifies)
+  if (!user.emailVerified && user.role !== "ADMIN" && user.role !== "OWNER") {
+    redirect("/dashboard/verify-email")
+  }
+
+  // Student onboarding check — only for ELEVE role
+  if (user.role === "ELEVE" && !user.isProfileComplete) {
+    redirect("/dashboard/onboarding")
+  }
+
+  // Maintenance mode check — non-admin users get redirected
+  if (user.role !== "ADMIN" && user.role !== "OWNER") {
+    let isMaintenanceMode = false
+    try {
+      const settings = await prisma.platformSettings.findUnique({ where: { id: "default" } })
+      isMaintenanceMode = settings?.maintenanceMode ?? false
+    } catch {
+      // If settings fetch fails, don't block — continue normally
+    }
+    if (isMaintenanceMode) {
+      redirect("/maintenance")
+    }
   }
 
   const role = user.role

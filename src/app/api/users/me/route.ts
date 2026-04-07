@@ -19,6 +19,13 @@ export async function GET() {
         codePostal: true,
         ville: true,
         role: true,
+        emailVerified: true,
+        isProfileComplete: true,
+        dateNaissance: true,
+        numeroPermis: true,
+        dateObtentionPermis: true,
+        categoriesPermis: true,
+        newsletterOptIn: true,
         createdAt: true,
       },
     });
@@ -39,6 +46,11 @@ const updateSchema = z.object({
   adresse: z.string().max(300).optional(),
   codePostal: z.string().max(10).optional(),
   ville: z.string().max(100).optional(),
+  dateNaissance: z.string().optional(),
+  numeroPermis: z.string().max(50).optional(),
+  dateObtentionPermis: z.string().optional(),
+  categoriesPermis: z.array(z.string()).optional(),
+  newsletterOptIn: z.boolean().optional(),
 });
 
 export async function PATCH(req: NextRequest) {
@@ -47,9 +59,41 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const data = updateSchema.parse(body);
 
+    // Build update payload, converting date strings to DateTime
+    const updateData: Record<string, unknown> = {};
+    if (data.prenom !== undefined) updateData.prenom = data.prenom;
+    if (data.nom !== undefined) updateData.nom = data.nom;
+    if (data.telephone !== undefined) updateData.telephone = data.telephone;
+    if (data.adresse !== undefined) updateData.adresse = data.adresse;
+    if (data.codePostal !== undefined) updateData.codePostal = data.codePostal;
+    if (data.ville !== undefined) updateData.ville = data.ville;
+    if (data.dateNaissance !== undefined) {
+      updateData.dateNaissance = data.dateNaissance ? new Date(data.dateNaissance) : null;
+    }
+    if (data.numeroPermis !== undefined) updateData.numeroPermis = data.numeroPermis || null;
+    if (data.dateObtentionPermis !== undefined) {
+      updateData.dateObtentionPermis = data.dateObtentionPermis ? new Date(data.dateObtentionPermis) : null;
+    }
+    if (data.categoriesPermis !== undefined) updateData.categoriesPermis = data.categoriesPermis;
+    if (data.newsletterOptIn !== undefined) updateData.newsletterOptIn = data.newsletterOptIn;
+
     const updated = await prisma.user.update({
       where: { id: user.id },
-      data,
+      data: updateData,
+    });
+
+    // Check if profile is complete (required: prenom, nom, telephone, ville)
+    const isComplete = !!(updated.prenom && updated.nom && updated.telephone && updated.ville);
+    if (isComplete !== updated.isProfileComplete) {
+      await prisma.user.update({
+        where: { id: updated.id },
+        data: { isProfileComplete: isComplete },
+      });
+    }
+
+    // Return profile with select
+    const profile = await prisma.user.findUnique({
+      where: { id: user.id },
       select: {
         id: true,
         email: true,
@@ -60,10 +104,18 @@ export async function PATCH(req: NextRequest) {
         codePostal: true,
         ville: true,
         role: true,
+        emailVerified: true,
+        isProfileComplete: true,
+        dateNaissance: true,
+        numeroPermis: true,
+        dateObtentionPermis: true,
+        categoriesPermis: true,
+        newsletterOptIn: true,
         createdAt: true,
       },
     });
-    return NextResponse.json(updated);
+
+    return NextResponse.json(profile);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues }, { status: 400 });

@@ -38,6 +38,7 @@ const putSchema = z.object({
   commissionRate: z.number().min(0).max(100).optional(),
   monetisationModel: z.enum(["COMMISSION", "ABONNEMENT", "HYBRIDE"]).optional(),
   maintenanceMode: z.boolean().optional(),
+  maintenanceMessage: z.string().nullable().optional(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -55,6 +56,8 @@ export async function PUT(req: NextRequest) {
     const updateData: Record<string, unknown> = {};
     if (data.commissionRate !== undefined) updateData.commissionRate = data.commissionRate;
     if (data.monetisationModel !== undefined) updateData.monetisationModel = data.monetisationModel;
+    if (data.maintenanceMode !== undefined) updateData.maintenanceMode = data.maintenanceMode;
+    if (data.maintenanceMessage !== undefined) updateData.maintenanceMessage = data.maintenanceMessage;
 
     const settings = await prisma.platformSettings.upsert({
       where: { id: "default" },
@@ -63,6 +66,8 @@ export async function PUT(req: NextRequest) {
         id: "default",
         commissionRate: data.commissionRate ?? 10,
         monetisationModel: data.monetisationModel ?? "COMMISSION",
+        maintenanceMode: data.maintenanceMode ?? false,
+        maintenanceMessage: data.maintenanceMessage ?? null,
       },
     });
 

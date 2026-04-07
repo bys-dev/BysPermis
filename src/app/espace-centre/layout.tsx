@@ -75,6 +75,12 @@ const allNavItems: NavItem[] = [
     roles: ["CENTRE_FORMATEUR"],
   },
   {
+    href: "/espace-centre/disponibilites",
+    label: "Disponibilites",
+    icon: faCalendar,
+    roles: ["CENTRE_FORMATEUR"],
+  },
+  {
     href: "/espace-centre/equipe",
     label: "Équipe",
     icon: faUsers,

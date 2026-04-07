@@ -20,6 +20,8 @@ type MonetisationModel = "COMMISSION" | "ABONNEMENT" | "HYBRIDE";
 interface Settings {
   commissionRate: number;
   monetisationModel: MonetisationModel;
+  maintenanceMode: boolean;
+  maintenanceMessage: string | null;
 }
 
 interface AdminUser {
@@ -42,6 +44,8 @@ export default function AdminParametresPage() {
   // Form state
   const [commissionRate, setCommissionRate] = useState(10);
   const [monetisationModel, setMonetisationModel] = useState<MonetisationModel>("COMMISSION");
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState("");
   const [platformName] = useState("BYS Permis");
   const [contactEmail] = useState("bysforma95@gmail.com");
 
@@ -56,6 +60,8 @@ export default function AdminParametresPage() {
         setSettings(settingsData);
         setCommissionRate(settingsData.commissionRate);
         setMonetisationModel(settingsData.monetisationModel);
+        setMaintenanceMode(settingsData.maintenanceMode ?? false);
+        setMaintenanceMessage(settingsData.maintenanceMessage ?? "");
       }
       if (userData && userData.role) {
         setUser(userData);
@@ -235,27 +241,72 @@ export default function AdminParametresPage() {
             <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400" />
             <h2 className="text-red-400 font-semibold text-sm">Zone dangereuse</h2>
           </div>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-red-400/5 border border-red-500/10">
-            <div>
-              <p className="text-white text-sm font-medium flex items-center gap-2">
-                <FontAwesomeIcon icon={faShieldHalved} className="text-red-400 text-xs" />
-                Mode maintenance
-              </p>
-              <p className="text-gray-500 text-xs mt-0.5">
-                Desactiver temporairement l&apos;acces public a la plateforme
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-red-400/5 border border-red-500/10">
+              <div>
+                <p className="text-white text-sm font-medium flex items-center gap-2">
+                  <FontAwesomeIcon icon={faShieldHalved} className="text-red-400 text-xs" />
+                  Mode maintenance
+                </p>
+                <p className="text-gray-500 text-xs mt-0.5">
+                  Desactiver temporairement l&apos;acces public a la plateforme
+                </p>
+              </div>
+              <button
+                aria-label="Activer ou desactiver le mode maintenance"
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  maintenanceMode ? "bg-red-600" : "bg-white/10 border border-white/10 hover:bg-white/15"
+                }`}
+                onClick={async () => {
+                  const newValue = !maintenanceMode;
+                  setMaintenanceMode(newValue);
+                  const res = await fetch("/api/admin/settings", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ maintenanceMode: newValue, maintenanceMessage: maintenanceMessage || null }),
+                  }).catch(() => null);
+                  if (res?.ok) {
+                    setMessage({ type: "success", text: newValue ? "Mode maintenance active." : "Mode maintenance desactive." });
+                  } else {
+                    setMaintenanceMode(!newValue); // revert
+                    setMessage({ type: "error", text: "Erreur lors du changement." });
+                  }
+                  setTimeout(() => setMessage(null), 3000);
+                }}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${maintenanceMode ? "translate-x-6" : "translate-x-1"}`} />
+              </button>
             </div>
-            <button
-              aria-label="Activer ou desactiver le mode maintenance"
-              className="relative inline-flex h-6 w-11 items-center rounded-full bg-white/10 border border-white/10 transition-colors hover:bg-white/15"
-              onClick={() => {
-                // Toggle would call PUT /api/admin/settings with maintenanceMode
-                setMessage({ type: "success", text: "Mode maintenance : fonctionnalite bientot disponible." });
-                setTimeout(() => setMessage(null), 3000);
-              }}
-            >
-              <span className="inline-block h-4 w-4 transform rounded-full bg-gray-400 transition-transform translate-x-1" />
-            </button>
+            {maintenanceMode && (
+              <div className="p-4 rounded-lg bg-red-400/5 border border-red-500/10">
+                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Message de maintenance (optionnel)</label>
+                <textarea
+                  value={maintenanceMessage}
+                  onChange={(e) => setMaintenanceMessage(e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-red-500/50 resize-none"
+                  placeholder="Nous effectuons une maintenance. Revenez bientot..."
+                />
+                <button
+                  onClick={async () => {
+                    const res = await fetch("/api/admin/settings", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ maintenanceMode: true, maintenanceMessage: maintenanceMessage || null }),
+                    }).catch(() => null);
+                    if (res?.ok) {
+                      setMessage({ type: "success", text: "Message de maintenance mis a jour." });
+                    } else {
+                      setMessage({ type: "error", text: "Erreur lors de la sauvegarde." });
+                    }
+                    setTimeout(() => setMessage(null), 3000);
+                  }}
+                  className="mt-2 px-4 py-1.5 rounded-lg bg-red-600/20 border border-red-500/20 text-red-400 text-xs font-medium hover:bg-red-600/30 transition-colors"
+                >
+                  Mettre a jour le message
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
