@@ -200,6 +200,30 @@ test.describe("3. API Routes publiques", () => {
     const res = await request.get("/api/centres/slug-inexistant");
     expect(res.status()).toBe(404);
   });
+
+  test("GET /api/articles retourne des articles avec les bons champs", async ({ request }) => {
+    const res = await request.get("/api/articles");
+    expect(res.status()).toBe(200);
+    const data = await res.json();
+    expect(data).toHaveProperty("articles");
+    expect(data.total).toBeGreaterThan(0);
+    const article = data.articles[0];
+    expect(article).toHaveProperty("titre");
+    expect(article).toHaveProperty("slug");
+    expect(article).toHaveProperty("extrait");
+    expect(article).toHaveProperty("categorie");
+  });
+
+  test("GET /api/subscription-plans retourne des plans avec commissionRate", async ({ request }) => {
+    const res = await request.get("/api/subscription-plans");
+    expect(res.status()).toBe(200);
+    const plans = await res.json();
+    expect(plans.length).toBe(3);
+    for (const plan of plans) {
+      expect(plan).toHaveProperty("commissionRate");
+      expect(typeof plan.commissionRate).toBe("number");
+    }
+  });
 });
 
 // ─────────────────────────────────────────────────────
@@ -377,6 +401,21 @@ test.describe("6. Sécurité & Auth", () => {
     const response = await page.goto("/admin");
     expect(response?.status()).toBeLessThan(500);
   });
+
+  test("GET /api/messages sans auth → 401/500", async ({ request }) => {
+    const res = await request.get("/api/messages");
+    expect([401, 500]).toContain(res.status());
+  });
+
+  test("GET /api/favorites sans auth → 401/500", async ({ request }) => {
+    const res = await request.get("/api/favorites");
+    expect([401, 500]).toContain(res.status());
+  });
+
+  test("GET /api/loyalty sans auth → 401", async ({ request }) => {
+    const res = await request.get("/api/loyalty");
+    expect(res.status()).toBe(401);
+  });
 });
 
 // ─────────────────────────────────────────────────────
@@ -523,5 +562,18 @@ test.describe("10. Navigation & UI", () => {
     // Vérifier que le error boundary existe
     await page.goto("/");
     expect(await page.locator("body").count()).toBe(1);
+  });
+
+  test("/blog se charge correctement", async ({ page }) => {
+    const res = await page.goto("/blog");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator("h1")).toBeVisible();
+  });
+
+  test("/sitemap.xml retourne du XML valide", async ({ request }) => {
+    const res = await request.get("/sitemap.xml");
+    expect(res.status()).toBe(200);
+    const text = await res.text();
+    expect(text).toContain("<?xml");
   });
 });

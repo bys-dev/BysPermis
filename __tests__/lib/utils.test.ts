@@ -65,6 +65,18 @@ describe('formatPrice', () => {
     const normalised = result.replace(/\s/g, ' ')
     expect(normalised).toMatch(/12\s*500\s*€/)
   })
+
+  it('formats a negative price', () => {
+    const result = formatPrice(-50)
+    const normalised = result.replace(/\s/g, ' ')
+    expect(normalised).toMatch(/-50\s*€/)
+  })
+
+  it('formats a very small decimal', () => {
+    const result = formatPrice(0.99)
+    const normalised = result.replace(/\s/g, ' ')
+    expect(normalised).toMatch(/0,99\s*€/)
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -93,6 +105,21 @@ describe('formatDate', () => {
   it('formats a string date in short format', () => {
     const result = formatDate(dateStr, 'short')
     expect(result).toBe('10/04/2026')
+  })
+
+  it('formate le 1er janvier correctement', () => {
+    const result = formatDate(new Date(2026, 0, 1))
+    expect(result).toMatch(/1 janvier 2026/)
+  })
+
+  it('formate le 31 decembre correctement', () => {
+    const result = formatDate(new Date(2026, 11, 31))
+    expect(result).toMatch(/31 décembre 2026/)
+  })
+
+  it('gere une date ISO string', () => {
+    const result = formatDate('2026-06-15T14:30:00Z', 'short')
+    expect(result).toMatch(/\d{2}\/\d{2}\/2026/)
   })
 })
 
@@ -124,6 +151,36 @@ describe('slugify', () => {
 
   it('returns empty string for empty input', () => {
     expect(slugify('')).toBe('')
+  })
+
+  it('gere les accents graves, aigus, circonflexes, tremas', () => {
+    expect(slugify('à è ù é ê ë î ô û ç')).toBe('a-e-u-e-e-e-i-o-u-c')
+  })
+
+  it('supprime les caracteres speciaux non-alphanumeriques', () => {
+    expect(slugify('Hello@World#2026!')).toBe('helloworld2026')
+  })
+
+  it('gere les underscores (supprimes avec les caracteres speciaux)', () => {
+    // slugify supprime d'abord les non-alphanumeriques (dont _),
+    // puis remplace les espaces par des tirets
+    expect(slugify('hello_world_test')).toBe('helloworldtest')
+  })
+
+  it('supprime les tirets en debut et fin', () => {
+    expect(slugify('--hello--world--')).toBe('hello-world')
+  })
+
+  it('gere les chiffres dans le texte', () => {
+    expect(slugify('Formation FIMO 140h')).toBe('formation-fimo-140h')
+  })
+
+  it('gere un texte uniquement avec des espaces', () => {
+    expect(slugify('   ')).toBe('')
+  })
+
+  it('gere un texte uniquement avec des caracteres speciaux', () => {
+    expect(slugify('!@#$%^&*()')).toBe('')
   })
 })
 
@@ -208,5 +265,23 @@ describe('calculateCommission', () => {
     const { commission, centreAmount } = calculateCommission(333, 7)
     expect(commission).toBe(23.31)
     expect(centreAmount).toBe(309.69)
+  })
+
+  it('calcule correctement avec un petit montant (1 euro)', () => {
+    const { commission, centreAmount } = calculateCommission(1, 10)
+    expect(commission).toBe(0.1)
+    expect(centreAmount).toBe(0.9)
+  })
+
+  it('commission + centreAmount = montant original', () => {
+    const montant = 549.99
+    const { commission, centreAmount } = calculateCommission(montant, 12)
+    expect(commission + centreAmount).toBeCloseTo(montant, 2)
+  })
+
+  it('gere un montant de 0', () => {
+    const { commission, centreAmount } = calculateCommission(0, 10)
+    expect(commission).toBe(0)
+    expect(centreAmount).toBe(0)
   })
 })
