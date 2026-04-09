@@ -146,28 +146,28 @@ export default function EspaceEleveLayout({ children }: { children: React.ReactN
           </div>
         </div>
 
-        {/* Mobile nav */}
-        <div className="lg:hidden flex gap-1 px-4 py-3 border-b overflow-x-auto" style={{ borderColor: "rgba(255,255,255,0.07)", background: "#0D1D3A" }}>
+        {/* Mobile nav — scrollable icon bar */}
+        <div className="lg:hidden flex gap-1 px-2 py-2 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: "rgba(255,255,255,0.07)", background: "#0D1D3A", WebkitOverflowScrolling: "touch" }}>
           {sidebarLinks.map((link) => {
             const active = isActive(link.href, link.exact);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                title={link.label}
+                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors shrink-0 min-w-[52px] ${
                   active
-                    ? "text-white bg-white/10"
-                    : "text-gray-400 hover:text-white"
+                    ? "text-blue-400 bg-blue-500/10"
+                    : "text-gray-500 hover:text-white"
                 }`}
-                style={active ? undefined : { background: "rgba(255,255,255,0.05)" }}
               >
                 <div className="relative">
-                  <FontAwesomeIcon icon={link.icon} className="w-3 h-3" />
+                  <FontAwesomeIcon icon={link.icon} className="w-4 h-4" />
                   {link.showBadge && unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
+                    <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-red-500" />
                   )}
                 </div>
-                {link.label}
+                <span className="hidden sm:inline">{link.label}</span>
               </Link>
             );
           })}
