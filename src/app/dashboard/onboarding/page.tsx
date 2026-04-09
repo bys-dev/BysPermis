@@ -70,12 +70,12 @@ export default function OnboardingPage() {
             prenom: data.prenom ?? "",
             nom: data.nom ?? "",
             telephone: data.telephone ?? "",
-            dateNaissance: data.dateNaissance ? data.dateNaissance.slice(0, 10) : "",
+            dateNaissance: data.dateNaissance ? (() => { const d = data.dateNaissance.slice(0, 10); const [y, m, dd] = d.split("-"); return dd && m && y ? `${dd}/${m}/${y}` : ""; })() : "",
             adresse: data.adresse ?? "",
             codePostal: data.codePostal ?? "",
             ville: data.ville ?? "",
             numeroPermis: data.numeroPermis ?? "",
-            dateObtentionPermis: data.dateObtentionPermis ? data.dateObtentionPermis.slice(0, 10) : "",
+            dateObtentionPermis: data.dateObtentionPermis ? (() => { const d = data.dateObtentionPermis.slice(0, 10); const [y, m, dd] = d.split("-"); return dd && m && y ? `${dd}/${m}/${y}` : ""; })() : "",
             categoriesPermis: data.categoriesPermis ?? [],
             newsletterOptIn: data.newsletterOptIn ?? true,
           }));
@@ -98,6 +98,23 @@ export default function OnboardingPage() {
     });
   }
 
+  // Convert jj/mm/aaaa → yyyy-mm-dd ISO for API
+  function frDateToISO(fr: string): string | undefined {
+    if (!fr || fr.length !== 10) return undefined;
+    const [d, m, y] = fr.split("/");
+    if (!d || !m || !y || y.length !== 4) return undefined;
+    return `${y}-${m}-${d}`;
+  }
+
+  // Convert yyyy-mm-dd ISO → jj/mm/aaaa for display
+  function isoToFrDate(iso: string): string {
+    if (!iso) return "";
+    const d = iso.slice(0, 10); // "2026-04-09"
+    const [y, m, dd] = d.split("-");
+    if (!y || !m || !dd) return "";
+    return `${dd}/${m}/${y}`;
+  }
+
   async function saveStep() {
     setSaving(true);
     setError(null);
@@ -109,7 +126,7 @@ export default function OnboardingPage() {
         prenom: form.prenom,
         nom: form.nom,
         telephone: form.telephone,
-        dateNaissance: form.dateNaissance || undefined,
+        dateNaissance: frDateToISO(form.dateNaissance),
       };
     } else if (step === 1) {
       payload = {
@@ -120,7 +137,7 @@ export default function OnboardingPage() {
     } else if (step === 2) {
       payload = {
         numeroPermis: form.numeroPermis || undefined,
-        dateObtentionPermis: form.dateObtentionPermis || undefined,
+        dateObtentionPermis: frDateToISO(form.dateObtentionPermis),
         categoriesPermis: form.categoriesPermis,
       };
     } else if (step === 3) {
@@ -269,9 +286,17 @@ export default function OnboardingPage() {
               <div>
                 <label className="text-gray-400 text-xs font-medium mb-1.5 block">Date de naissance</label>
                 <input
-                  type="date"
+                  type="text"
                   value={form.dateNaissance}
-                  onChange={(e) => updateField("dateNaissance", e.target.value)}
+                  onChange={(e) => {
+                    let v = e.target.value.replace(/[^\d]/g, "");
+                    if (v.length > 8) v = v.slice(0, 8);
+                    if (v.length >= 5) v = v.slice(0, 2) + "/" + v.slice(2, 4) + "/" + v.slice(4);
+                    else if (v.length >= 3) v = v.slice(0, 2) + "/" + v.slice(2);
+                    updateField("dateNaissance", v);
+                  }}
+                  placeholder="jj/mm/aaaa"
+                  maxLength={10}
                   className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500/50"
                 />
               </div>
@@ -335,9 +360,17 @@ export default function OnboardingPage() {
               <div>
                 <label className="text-gray-400 text-xs font-medium mb-1.5 block">Date d&apos;obtention</label>
                 <input
-                  type="date"
+                  type="text"
                   value={form.dateObtentionPermis}
-                  onChange={(e) => updateField("dateObtentionPermis", e.target.value)}
+                  onChange={(e) => {
+                    let v = e.target.value.replace(/[^\d]/g, "");
+                    if (v.length > 8) v = v.slice(0, 8);
+                    if (v.length >= 5) v = v.slice(0, 2) + "/" + v.slice(2, 4) + "/" + v.slice(4);
+                    else if (v.length >= 3) v = v.slice(0, 2) + "/" + v.slice(2);
+                    updateField("dateObtentionPermis", v);
+                  }}
+                  placeholder="jj/mm/aaaa"
+                  maxLength={10}
                   className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500/50"
                 />
               </div>
