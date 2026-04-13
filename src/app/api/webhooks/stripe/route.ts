@@ -222,7 +222,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Désactiver le body parser Next.js pour les webhooks Stripe
-export const config = {
-  api: { bodyParser: false },
-};
