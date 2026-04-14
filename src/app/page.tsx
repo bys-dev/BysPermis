@@ -327,16 +327,27 @@ export default function Home() {
     <>
       <Header />
       <main>
-        {/* ═══ 1. HERO — Dark navy, bold typography ═══ */}
+        {/* ═══ 1. HERO — Dark navy avec image permis+radar en fond ═══ */}
         <section className="relative bg-[#0A1628] pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 min-h-[520px] sm:min-h-[720px] flex items-center overflow-hidden">
+          {/* Image de fond permis + radar */}
+          <div className="absolute inset-0 z-0" aria-hidden="true">
+            <img
+              src="/hero-radar-permis.jpg"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-30"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628] via-[#0A1628]/90 to-[#0A1628]/50" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-transparent to-transparent" />
+          </div>
+
           {/* Subtle radial glow */}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.1) 0%, transparent 70%)" }} />
+          <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.1) 0%, transparent 70%)" }} />
 
           {/* Particules bleu-blanc-rouge animées */}
           <TricoloreParticles />
           <div className="max-w-[1440px] mx-auto w-full relative z-10">
-            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            <div className="max-w-4xl mx-auto lg:mx-0 lg:max-w-2xl text-center lg:text-left flex-1">
+            <div className="flex flex-col items-center">
+            <div className="max-w-4xl mx-auto text-center flex-1">
               <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6 sm:mb-8 backdrop-blur-sm max-w-full">
                 {/* Mini drapeau francais */}
                 <span className="inline-flex mr-2 rounded overflow-hidden shrink-0">
@@ -419,7 +430,7 @@ export default function Home() {
               </form>
 
               {/* Trusted by strip */}
-              <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-sm text-gray-300">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-300">
                 <span className="flex items-center gap-2">
                   <svg className="inline-block w-5 h-3.5 rounded-sm overflow-hidden" viewBox="0 0 30 20">
                     <rect width="10" height="20" x="0" fill="#002395"/>
@@ -446,14 +457,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Image radar + permis — desktop only */}
-            <div className="hidden lg:block lg:flex-1 lg:max-w-xl">
-              <img
-                src="/hero-radar-permis.jpg"
-                alt="Radar et permis de conduire — Récupérez vos points"
-                className="relative z-10 w-full max-w-lg mx-auto lg:max-w-none rounded-2xl shadow-2xl border border-white/10 object-cover"
-              />
-            </div>
             </div>
           </div>
         </section>
