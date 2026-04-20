@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+import { rateLimit } from "@/lib/rate-limit";
 
 // ─── Auth0 Management API helper ─────────────────────────
 
@@ -65,6 +66,13 @@ async function createAuth0User(params: {
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = rateLimit(req, {
+      max: 10,
+      windowMs: 60 * 1000,
+      keyPrefix: "register",
+    });
+    if (limited) return limited;
+
     const body = await req.json();
     const { firstName, lastName, email, password, confirmPassword, accountType, acceptCGU, centreName, referralCode } = body;
 

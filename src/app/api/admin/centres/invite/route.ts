@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
 import { sendCentreInvitationEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 // ─── Auth0 Management API helper ─────────────────────────
 
@@ -63,6 +64,21 @@ async function createAuth0User(params: {
   return user.user_id as string;
 }
 
+function computeInitialCompletion(fields: {
+  adresse?: string;
+  codePostal?: string;
+  ville?: string;
+  telephone?: string;
+}): number {
+  // Rough completion: each pre-filled field counts for 5%. Max 20% pre-onboarding.
+  let pct = 0;
+  if (fields.adresse?.trim()) pct += 5;
+  if (fields.codePostal?.trim()) pct += 5;
+  if (fields.ville?.trim()) pct += 5;
+  if (fields.telephone?.trim()) pct += 5;
+  return pct;
+}
+
 function generateTempPassword(): string {
   const chars =
     "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
@@ -77,10 +93,17 @@ function generateTempPassword(): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = rateLimit(req, {
+      max: 20,
+      windowMs: 60 * 1000,
+      keyPrefix: "admin-invite",
+    });
+    if (limited) return limited;
+
     await requireAdmin();
 
     const body = await req.json();
-    const { nom, email, ville } = body;
+    const { nom, email, ville, adresse, codePostal, telephone, siret } = body;
 
     // ── Validation ──────────────────────────────────────
     if (!nom?.trim()) {
@@ -181,12 +204,13 @@ export async function POST(req: NextRequest) {
         data: {
           nom: nom.trim(),
           slug,
-          adresse: "",
-          codePostal: "",
-          ville: ville?.trim() ?? "",
+          adresse: (adresse ?? "").toString().trim(),
+          codePostal: (codePostal ?? "").toString().trim(),
+          ville: (ville ?? "").toString().trim(),
+          telephone: telephone ? telephone.toString().trim() : null,
           statut: "EN_ATTENTE",
           isActive: false,
-          profilCompletionPct: 0,
+          profilCompletionPct: computeInitialCompletion({ adresse, codePostal, ville, telephone }),
           userId,
         },
       });

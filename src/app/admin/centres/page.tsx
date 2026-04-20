@@ -8,6 +8,7 @@ import {
   faAward, faLocationDot, faEuro, faUsers, faCalendarDay,
   faEnvelope, faPhone, faGlobe, faEllipsisVertical, faPlus, faXmark,
   faPaperPlane, faCircleCheck, faShieldHalved,
+  faHashtag, faSignature, faRoad, faMapPin, faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate, formatPrice } from "@/lib/utils";
 
@@ -62,9 +63,49 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [ville, setVille] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [codePostal, setCodePostal] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [siret, setSiret] = useState("");
+  const [siretLookup, setSiretLookup] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  };
+  const inputClass =
+    "w-full pl-10 pr-4 py-2.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all";
+
+  async function lookupSiret(raw: string) {
+    const digits = raw.replace(/\s+/g, "");
+    if (digits.length !== 14 || !/^\d{14}$/.test(digits)) return;
+    setSiretLookup("loading");
+    try {
+      const res = await fetch(
+        `https://recherche-entreprises.api.gouv.fr/search?q=${digits}&per_page=1`
+      );
+      const data = await res.json();
+      const first = data?.results?.[0];
+      const siege = first?.siege;
+      if (!siege) throw new Error("siret_not_found");
+      if (!nom.trim()) setNom(first.nom_raison_sociale ?? first.nom_complet ?? "");
+      if (!adresse.trim()) {
+        const parts = [siege.numero_voie, siege.type_voie, siege.libelle_voie]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
+        if (parts) setAdresse(parts);
+      }
+      if (!codePostal.trim() && siege.code_postal) setCodePostal(siege.code_postal);
+      if (!ville.trim() && siege.libelle_commune) setVille(siege.libelle_commune);
+      setSiretLookup("ok");
+    } catch {
+      setSiretLookup("error");
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,7 +116,15 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
       const res = await fetch("/api/admin/centres/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nom, email, ville: ville || undefined }),
+        body: JSON.stringify({
+          nom,
+          email,
+          ville: ville || undefined,
+          adresse: adresse || undefined,
+          codePostal: codePostal || undefined,
+          telephone: telephone || undefined,
+          siret: siret || undefined,
+        }),
       });
       const data = await res.json();
 
@@ -99,18 +148,20 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-md mx-4 rounded-xl p-6 shadow-2xl"
+        className="relative w-full max-w-lg mx-4 rounded-xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
         style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faPaperPlane} className="text-blue-400" />
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">Inviter un centre</h2>
-              <p className="text-gray-500 text-xs">Creer un acces pour un nouveau centre partenaire</p>
+              <p className="text-gray-500 text-xs">
+                Saisissez le SIRET pour pré-remplir automatiquement les informations
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
@@ -123,53 +174,219 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
             <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
               <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
             </div>
-            <p className="text-green-400 font-semibold text-lg">Invitation envoyee !</p>
-            <p className="text-gray-500 text-sm mt-1">Le centre a ete cree et l'email d'invitation envoye.</p>
+            <p className="text-green-400 font-semibold text-lg">Invitation envoyée !</p>
+            <p className="text-gray-500 text-sm mt-1">
+              Le centre a été créé et l&apos;email d&apos;invitation envoyé.
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+            {/* ÉTAPE 1 — SIRET auto-complete */}
+            <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                  1
+                </span>
+                <span className="text-xs font-medium text-blue-300">
+                  Remplissage rapide par SIRET
+                </span>
+              </div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                Nom du centre *
+                SIRET <span className="text-gray-600">(optionnel, 14 chiffres)</span>
               </label>
-              <input
-                type="text"
-                value={nom}
-                onChange={(e) => setNom(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
-                placeholder="Ex: Centre de Formation ABC"
-              />
+              <div className="relative">
+                <FontAwesomeIcon
+                  icon={faHashtag}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                />
+                <input
+                  type="text"
+                  value={siret}
+                  onChange={(e) => {
+                    setSiret(e.target.value);
+                    setSiretLookup("idle");
+                  }}
+                  onBlur={(e) => lookupSiret(e.target.value)}
+                  className={inputClass}
+                  style={inputStyle}
+                  placeholder="123 456 789 00012"
+                  inputMode="numeric"
+                  maxLength={18}
+                />
+                {siretLookup === "loading" && (
+                  <FontAwesomeIcon
+                    icon={faSpinner}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-400 animate-spin w-3.5 h-3.5"
+                  />
+                )}
+                {siretLookup === "ok" && (
+                  <FontAwesomeIcon
+                    icon={faWandMagicSparkles}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-green-400 w-3.5 h-3.5"
+                    title="Champs pré-remplis"
+                  />
+                )}
+                {siretLookup === "error" && (
+                  <FontAwesomeIcon
+                    icon={faCircleXmark}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-red-400 w-3.5 h-3.5"
+                    title="SIRET introuvable"
+                  />
+                )}
+              </div>
+              {siretLookup === "ok" && (
+                <p className="mt-1.5 text-[11px] text-green-400 flex items-center gap-1.5">
+                  <FontAwesomeIcon icon={faCircleCheck} className="w-3 h-3" />
+                  Champs ci-dessous pré-remplis depuis l&apos;INSEE
+                </p>
+              )}
             </div>
 
+            {/* ÉTAPE 2 — Infos centre */}
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                Email du proprietaire *
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
-                placeholder="proprietaire@centre.fr"
-              />
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/10 text-white text-[10px] font-bold">
+                  2
+                </span>
+                <span className="text-xs font-medium text-gray-400">Identité du centre</span>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                    Nom du centre *
+                  </label>
+                  <div className="relative">
+                    <FontAwesomeIcon
+                      icon={faSignature}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                    />
+                    <input
+                      type="text"
+                      value={nom}
+                      onChange={(e) => setNom(e.target.value)}
+                      required
+                      className={inputClass}
+                      style={inputStyle}
+                      placeholder="Ex: Centre de Formation ABC"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                    Email du propriétaire *
+                  </label>
+                  <div className="relative">
+                    <FontAwesomeIcon
+                      icon={faEnvelope}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                    />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className={inputClass}
+                      style={inputStyle}
+                      placeholder="proprietaire@centre.fr"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                    Téléphone <span className="text-gray-600">(optionnel)</span>
+                  </label>
+                  <div className="relative">
+                    <FontAwesomeIcon
+                      icon={faPhone}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                    />
+                    <input
+                      type="tel"
+                      value={telephone}
+                      onChange={(e) => setTelephone(e.target.value)}
+                      className={inputClass}
+                      style={inputStyle}
+                      placeholder="01 23 45 67 89"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
+            {/* ÉTAPE 3 — Adresse */}
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                Ville <span className="text-gray-600">(optionnel)</span>
-              </label>
-              <input
-                type="text"
-                value={ville}
-                onChange={(e) => setVille(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}
-                placeholder="Paris, Lyon, Marseille..."
-              />
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/10 text-white text-[10px] font-bold">
+                  3
+                </span>
+                <span className="text-xs font-medium text-gray-400">Adresse</span>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                    Adresse <span className="text-gray-600">(optionnel)</span>
+                  </label>
+                  <div className="relative">
+                    <FontAwesomeIcon
+                      icon={faRoad}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                    />
+                    <input
+                      type="text"
+                      value={adresse}
+                      onChange={(e) => setAdresse(e.target.value)}
+                      className={inputClass}
+                      style={inputStyle}
+                      placeholder="12 rue de la Paix"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-5 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                      Code postal
+                    </label>
+                    <div className="relative">
+                      <FontAwesomeIcon
+                        icon={faMapPin}
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                      />
+                      <input
+                        type="text"
+                        value={codePostal}
+                        onChange={(e) => setCodePostal(e.target.value)}
+                        className={inputClass}
+                        style={inputStyle}
+                        placeholder="75001"
+                        inputMode="numeric"
+                        maxLength={5}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-span-3">
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                      Ville
+                    </label>
+                    <div className="relative">
+                      <FontAwesomeIcon
+                        icon={faLocationDot}
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                      />
+                      <input
+                        type="text"
+                        value={ville}
+                        onChange={(e) => setVille(e.target.value)}
+                        className={inputClass}
+                        style={inputStyle}
+                        placeholder="Paris"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {error && (
@@ -200,7 +417,7 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faPaperPlane} className="w-3.5 h-3.5" />
-                    Envoyer l'invitation
+                    Envoyer l&apos;invitation
                   </>
                 )}
               </button>

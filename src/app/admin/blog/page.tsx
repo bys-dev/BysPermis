@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import {
   faPlus,
   faEdit,
@@ -255,16 +256,13 @@ export default function AdminBlogPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1.5">
-                  Contenu (HTML)
+                  Contenu de l&apos;article
                 </label>
-                <textarea
+                <RichTextEditor
                   value={form.contenu}
-                  onChange={(e) =>
-                    setForm({ ...form, contenu: e.target.value })
-                  }
-                  required
-                  rows={10}
-                  className="w-full bg-white/5 border border-white/10 text-white rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-red-500/50"
+                  onChange={(html) => setForm({ ...form, contenu: html })}
+                  placeholder="Rédigez votre article — utilisez la barre d'outils pour formater le texte…"
+                  minHeight={320}
                 />
               </div>
 

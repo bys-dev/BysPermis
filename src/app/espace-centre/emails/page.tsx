@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -277,14 +278,13 @@ export default function EmailTemplatesPage() {
               {/* Body editor */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                  Contenu HTML
+                  Contenu de l&apos;email
                 </label>
-                <textarea
+                <RichTextEditor
                   value={editBody}
-                  onChange={(e) => setEditBody(e.target.value)}
-                  rows={16}
-                  className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm font-mono leading-relaxed"
-                  placeholder="Contenu HTML de l'email..."
+                  onChange={(html) => setEditBody(html)}
+                  placeholder="Tapez le contenu de l'email — utilisez les boutons { variables } ci-dessus pour insérer des champs dynamiques…"
+                  minHeight={340}
                 />
               </div>
 

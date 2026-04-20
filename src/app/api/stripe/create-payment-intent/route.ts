@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
+import { rateLimit } from "@/lib/rate-limit";
 
 const schema = z.object({
   sessionId: z.string().min(1),
@@ -11,6 +12,13 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = rateLimit(req, {
+      max: 15,
+      windowMs: 60 * 1000,
+      keyPrefix: "payment-intent",
+    });
+    if (limited) return limited;
+
     const user = await requireAuth();
     const body = await req.json();
     const { sessionId, promoCode } = schema.parse(body);

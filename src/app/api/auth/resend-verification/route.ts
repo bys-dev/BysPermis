@@ -1,16 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth0";
+import { rateLimit } from "@/lib/rate-limit";
 
 /**
  * POST /api/auth/resend-verification
  * Triggers Auth0 Management API to resend verification email.
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
+    const limited = rateLimit(req, {
+      max: 3,
+      windowMs: 60 * 1000,
+      keyPrefix: "resend-verif",
+    });
+    if (limited) return limited;
+
     const user = await requireAuth();
 
     // Get Auth0 Management API token
-    const domain = process.env.AUTH0_ISSUER_BASE_URL?.replace("https://", "").replace("http://", "");
+    const domain =
+      process.env.AUTH0_ISSUER_BASE_URL?.replace("https://", "").replace("http://", "") ??
+      process.env.AUTH0_DOMAIN;
     const clientId = process.env.AUTH0_MANAGEMENT_CLIENT_ID;
     const clientSecret = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET;
 

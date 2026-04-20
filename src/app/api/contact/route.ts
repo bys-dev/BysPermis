@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { resend } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 const ContactSchema = z.object({
   nom: z.string().min(1, "Nom requis"),
@@ -14,6 +15,13 @@ const TO = "bysforma95@gmail.com";
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = rateLimit(req, {
+      max: 5,
+      windowMs: 60 * 1000,
+      keyPrefix: "contact",
+    });
+    if (limited) return limited;
+
     const body = await req.json();
     const parsed = ContactSchema.safeParse(body);
 
