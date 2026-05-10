@@ -51,20 +51,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 // PATCH /api/tickets/:id — staff: changer le statut
+const patchSchema = z.object({
+  status: z.enum(["OUVERT", "EN_COURS", "RESOLU", "FERME"]),
+});
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     await requireSupport();
-    const { status } = await req.json();
-    if (!["OUVERT", "EN_COURS", "RESOLU", "FERME"].includes(status)) {
-      return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
+    const body = await req.json();
+    const parsed = patchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
+    const { status } = parsed.data;
     const ticket = await prisma.ticket.update({
       where: { id },
-      data: { status: status as "OUVERT" | "EN_COURS" | "RESOLU" | "FERME" },
+      data: { status },
     });
     return NextResponse.json(ticket);
   } catch (err) {
+    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });
     const message = err instanceof Error ? err.message : "Erreur serveur";
     if (message === "Non authentifié" || message === "Non autorisé") {
       return NextResponse.json({ error: message }, { status: 401 });
