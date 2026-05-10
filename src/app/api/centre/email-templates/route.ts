@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreManagement } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
+import { sanitizeHtml } from "@/lib/utils";
+import { z } from "zod";
 
 /**
  * All template slugs with their default metadata.
@@ -74,16 +76,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { slug, sujet, contenu, reset } = body as {
-      slug: string;
-      sujet?: string;
-      contenu?: string;
-      reset?: boolean;
-    };
-
-    if (!slug || !TEMPLATE_SLUGS.includes(slug as typeof TEMPLATE_SLUGS[number])) {
-      return NextResponse.json({ error: "Slug de template invalide" }, { status: 400 });
+    const postSchema = z.object({
+      slug: z.enum(TEMPLATE_SLUGS),
+      sujet: z.string().max(300).optional(),
+      contenu: z.string().max(50000).optional(),
+      reset: z.boolean().optional(),
+    });
+    const parsed = postSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
+    const { slug, sujet, contenu, reset } = parsed.data;
 
     // Reset: delete the centre-specific override
     if (reset) {
@@ -97,6 +100,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "sujet et contenu requis" }, { status: 400 });
     }
 
+    // Sanitize HTML body (strip <script>, event handlers, javascript: URLs)
+    const safeContenu = sanitizeHtml(contenu);
+    const safeSujet = sujet.replace(/[<>]/g, ""); // pas de HTML dans le sujet
+
     // Get default template to copy variables and nom
     const defaultTemplate = await prisma.emailTemplate.findFirst({
       where: { slug, centreId: null },
@@ -105,22 +112,25 @@ export async function POST(req: NextRequest) {
     const template = await prisma.emailTemplate.upsert({
       where: { slug_centreId: { slug, centreId } },
       update: {
-        sujet,
-        contenu,
+        sujet: safeSujet,
+        contenu: safeContenu,
         updatedAt: new Date(),
       },
       create: {
         slug,
         nom: defaultTemplate?.nom ?? slug,
-        sujet,
-        contenu,
+        sujet: safeSujet,
+        contenu: safeContenu,
         variables: defaultTemplate?.variables ?? [],
         centreId,
       },
     });
 
     return NextResponse.json(template);
-  } catch {
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues }, { status: 400 });
+    }
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 }

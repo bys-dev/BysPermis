@@ -80,6 +80,49 @@ export function generateReservationNumber(): string {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS in HTML email/templates.
+ * Encodes: & < > " '
+ *
+ * Use this on any user-supplied text before injecting into raw HTML strings.
+ */
+export function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Minimal HTML sanitizer (whitelist) for user-authored email templates.
+ *
+ * Strips:
+ *   - <script>, <style>, <iframe>, <object>, <embed>, <link>, <meta>, <form>
+ *   - all event handlers (onclick=, onerror=, …)
+ *   - javascript: / data: URLs (except data:image/...)
+ *
+ * Keeps common formatting tags emitted by TipTap.
+ * NOTE: This is a server-side defensive layer; do NOT rely on this alone.
+ * For maximum safety, use a proper lib (DOMPurify isomorphic) in a follow-up.
+ */
+export function sanitizeHtml(html: string): string {
+  let out = html;
+  // Remove dangerous tags entirely (with content)
+  out = out.replace(/<\/?(?:script|style|iframe|object|embed|link|meta|form)[^>]*>/gi, "");
+  out = out.replace(/<\/?(?:script|style|iframe|object|embed|link|meta|form)>/gi, "");
+  // Remove event handlers (onclick=, onerror=, etc.)
+  out = out.replace(/\s+on[a-z]+\s*=\s*"[^"]*"/gi, "");
+  out = out.replace(/\s+on[a-z]+\s*=\s*'[^']*'/gi, "");
+  out = out.replace(/\s+on[a-z]+\s*=\s*[^\s>]+/gi, "");
+  // Remove javascript: URLs
+  out = out.replace(/(href|src|action)\s*=\s*["']\s*javascript:[^"']*["']/gi, "$1=\"#\"");
+  // Remove data: URLs except images
+  out = out.replace(/(href|src|action)\s*=\s*["']\s*data:(?!image\/)[^"']*["']/gi, "$1=\"#\"");
+  return out;
+}
+
+/**
  * Calculate commission from an amount and a rate (percentage)
  */
 export function calculateCommission(

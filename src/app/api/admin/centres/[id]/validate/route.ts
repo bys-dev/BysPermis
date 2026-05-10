@@ -30,13 +30,30 @@ export async function POST(
       );
     }
 
-    // Activate centre
-    const updated = await prisma.centre.update({
-      where: { id },
-      data: {
-        statut: "ACTIF",
-        isActive: true,
-      },
+    // Activate centre + promote owner to CENTRE_OWNER (if still ELEVE)
+    const updated = await prisma.$transaction(async (tx) => {
+      const c = await tx.centre.update({
+        where: { id },
+        data: {
+          statut: "ACTIF",
+          isActive: true,
+        },
+      });
+
+      // Anti-self-promotion: l'élève qui a soumis le centre est promu
+      // CENTRE_OWNER seulement après cette validation admin.
+      const owner = await tx.user.findUnique({
+        where: { id: c.userId },
+        select: { role: true },
+      });
+      if (owner?.role === "ELEVE") {
+        await tx.user.update({
+          where: { id: c.userId },
+          data: { role: "CENTRE_OWNER" },
+        });
+      }
+
+      return c;
     });
 
     // Create notification for centre owner
