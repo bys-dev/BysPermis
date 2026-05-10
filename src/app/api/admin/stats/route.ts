@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth0";
+import { requirePlatformStaff } from "@/lib/auth0";
 
-// GET /api/admin/stats — KPIs super-admin
+// GET /api/admin/stats — KPIs plateforme (tout staff BYS)
 export async function GET() {
   try {
-    await requireAdmin();
+    await requirePlatformStaff();
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);

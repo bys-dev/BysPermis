@@ -60,13 +60,13 @@ describe('Footer', () => {
 
   it('affiche la description de l\'entreprise', () => {
     render(<Footer />)
-    expect(screen.getByText(/partenaire de confiance/)).toBeInTheDocument()
+    expect(screen.getByText(/marketplace de référence/)).toBeInTheDocument()
   })
 
-  it('affiche les liens des formations', () => {
+  it('affiche les liens des stages par ville', () => {
     render(<Footer />)
-    expect(screen.getByText('Récupération de points')).toBeInTheDocument()
-    expect(screen.getByText('FIMO / FCO')).toBeInTheDocument()
+    expect(screen.getByText('Trouver un stage')).toBeInTheDocument()
+    expect(screen.getByText('Stage à Paris')).toBeInTheDocument()
   })
 
   it('affiche les liens sociaux avec aria-label', () => {

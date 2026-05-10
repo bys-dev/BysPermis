@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rechercher un stage — Récupération de points, permis, FIMO, FCO",
+  title: "Rechercher un stage de récupération de points",
   description:
-    "Recherchez et comparez les stages de récupération de points, formations permis B, moto, FIMO et FCO près de chez vous. Réservation en ligne, centres agréés préfecture.",
+    "Recherchez et comparez les stages agréés de récupération de points près de chez vous. Réservation en ligne, centres agréés Ministère de l'Intérieur, jusqu'à 4 points récupérés en 2 jours.",
   keywords: [
-    "recherche stage",
-    "récupération de points",
+    "recherche stage récupération points",
     "stage permis près de chez moi",
-    "formation FIMO",
-    "FCO",
-    "auto-école",
+    "stage 48N",
+    "stage 48SI",
+    "stage volontaire récupération points",
+    "stage agréé préfecture",
   ],
 };
 

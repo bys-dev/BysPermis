@@ -14,8 +14,6 @@ import {
   faChevronDown,
   faChevronUp,
   faShieldHalved,
-  faCar,
-  faTruck,
   faIdCard,
   faGavel,
   faBalanceScale,
@@ -35,7 +33,6 @@ import {
   faXmark,
   faStar,
   faClipboardList,
-  faRoad,
   faBolt,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -173,8 +170,8 @@ interface FeaturedCourse {
 
 const featuredCourses: FeaturedCourse[] = [
   {
-    title: "Stage récupération de points — 2 jours",
-    desc: "Stage agréé préfecture permettant de récupérer jusqu'à 4 points sur votre permis de conduire. Encadré par des formateurs certifiés.",
+    title: "Stage récupération de points — Osny",
+    desc: "Stage agréé préfecture du Val-d'Oise. Récupérez jusqu'à 4 points sur votre permis en 2 jours, encadré par un psychologue et un expert sécurité routière.",
     tag: "Récupération de points",
     duration: "2 jours",
     modality: "Présentiel",
@@ -184,26 +181,26 @@ const featuredCourses: FeaturedCourse[] = [
     icon: faShieldHalved,
   },
   {
-    title: "FIMO Marchandises — 140h",
-    desc: "Formation Initiale Minimale Obligatoire pour le transport de marchandises. Qualification indispensable pour exercer le métier de conducteur routier.",
-    tag: "FIMO",
-    duration: "140h (4 semaines)",
+    title: "Stage récupération de points — Paris 11",
+    desc: "Stage agréé préfecture de Paris au cœur du 11ème arrondissement. Sessions garanties chaque semaine, formateurs BAFM avec plus de 10 ans d'expérience.",
+    tag: "Récupération de points",
+    duration: "2 jours",
     modality: "Présentiel",
-    centre: "Centre Pro Transport",
-    price: "2 800 €",
-    places: 12,
-    icon: faTruck,
+    centre: "Conduite Plus Paris",
+    price: "280 €",
+    places: 5,
+    icon: faShieldHalved,
   },
   {
-    title: "Permis B accéléré — 30h",
-    desc: "Formule intensive pour obtenir votre permis de conduire rapidement. Cours de code et heures de conduite inclus dans un programme condensé.",
-    tag: "Permis B",
-    duration: "30h",
-    modality: "Hybride",
-    centre: "Auto-école BYS",
-    price: "1 500 €",
-    places: 5,
-    icon: faCar,
+    title: "Stage récupération de points — Lyon Part-Dieu",
+    desc: "Stage agréé préfecture du Rhône, à deux pas de la gare Part-Dieu. Ambiance bienveillante, accueil café et déjeuner inclus.",
+    tag: "Récupération de points",
+    duration: "2 jours",
+    modality: "Présentiel",
+    centre: "CFSR Lyon",
+    price: "230 €",
+    places: 9,
+    icon: faShieldHalved,
   },
 ];
 
@@ -262,7 +259,7 @@ const faqItems: FaqEntry[] = [
   },
 ];
 
-const popularTags: string[] = ["Récupération de points", "Stage 48N", "Permis B accéléré", "FIMO", "Sécurité routière"];
+const popularTags: string[] = ["Stage 48N", "Stage 48SI", "Stage volontaire", "Stage permis probatoire", "Stage weekend", "Stage Paris", "Stage Lyon", "Stage Marseille"];
 
 interface KeyStat {
   value: string;
@@ -302,13 +299,6 @@ interface LiveFormation {
   sessions: { placesRestantes: number }[];
 }
 
-function iconForCategorie(nom: string): IconDefinition {
-  if (nom.includes("point") || nom.includes("sensib")) return faShieldHalved;
-  if (nom.includes("FIMO") || nom.includes("FCO") || nom.includes("transport")) return faTruck;
-  if (nom.includes("Permis") || nom.includes("moto")) return faCar;
-  return faClipboardList;
-}
-
 export default function Home() {
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -334,10 +324,10 @@ export default function Home() {
             <img
               src="/hero-radar-permis.jpg"
               alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-30"
+              className="absolute inset-0 w-full h-full object-cover opacity-70"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628] via-[#0A1628]/90 to-[#0A1628]/50" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/55 to-[#0A1628]/25" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/70 via-transparent to-transparent" />
           </div>
 
           {/* Subtle radial glow */}
@@ -389,7 +379,7 @@ export default function Home() {
                       <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
                       <input
                         type="text"
-                        placeholder="Récupération de points, FIMO..."
+                        placeholder="Stage récupération de points, lettre 48N…"
                         value={heroSearch}
                         onChange={(e) => setHeroSearch(e.target.value)}
                         className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
@@ -690,7 +680,7 @@ export default function Home() {
                 ville: f.centre.ville,
                 price: `${f.prix} €`,
                 places: f.sessions[0]?.placesRestantes ?? 0,
-                icon: iconForCategorie(f.categorie?.nom ?? ""),
+                icon: faShieldHalved,
               })) : featuredCourses.map((c) => ({ ...c, id: c.title, slug: "", ville: "Île-de-France" }))).map((course) => (
                 <div key={course.id} className="bg-white rounded-2xl border border-brand-border overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer flex flex-col">
                   {/* Gradient top border */}

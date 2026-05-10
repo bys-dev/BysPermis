@@ -22,9 +22,9 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
-              Le groupe BYS Formation est votre partenaire de confiance pour les
-              stages de récupération de points permis et les formations
-              professionnelles liées à la mobilité. Agréé Ministère de
+              BYS Formation est la marketplace de référence pour les stages
+              agréés de récupération de points du permis de conduire. Tous nos
+              centres partenaires sont agréés par le Ministère de
               l&apos;Intérieur.
             </p>
 
@@ -70,42 +70,42 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/formations/recuperation-de-points"
-                  className="hover:text-white transition-colors"
-                >
-                  Récupération de points
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/formations/permis-b-accelere"
-                  className="hover:text-white transition-colors"
-                >
-                  Permis B accéléré
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/formations/fimo-fco"
-                  className="hover:text-white transition-colors"
-                >
-                  FIMO / FCO
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/formations/sensibilisation-securite-routiere"
-                  className="hover:text-white transition-colors"
-                >
-                  Sensibilisation sécurité routière
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/recherche"
                   className="hover:text-white transition-colors"
                 >
-                  Toutes les formations
+                  Trouver un stage
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/paris"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Paris
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/lyon"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Lyon
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/marseille"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Marseille
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/comment-ca-marche"
+                  className="hover:text-white transition-colors"
+                >
+                  Comment ça marche
                 </Link>
               </li>
             </ul>

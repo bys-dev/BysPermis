@@ -28,18 +28,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const villeDecoded = capitalize(decodeURIComponent(ville));
 
   return {
-    title: `Stages permis à ${villeDecoded} — Récupération de points, FIMO, FCO`,
-    description: `Trouvez et réservez votre stage de récupération de points à ${villeDecoded}. Comparez les centres agréés, les prix et les dates disponibles. Réservation en ligne sécurisée.`,
+    title: `Stage de récupération de points à ${villeDecoded}`,
+    description: `Trouvez et réservez votre stage de récupération de points à ${villeDecoded}. Comparez les centres agréés Ministère de l'Intérieur, les prix et les dates disponibles. Réservation en ligne sécurisée.`,
     keywords: [
       `stage récupération points ${villeDecoded}`,
-      `permis ${villeDecoded}`,
-      `auto-école ${villeDecoded}`,
-      `formation FIMO ${villeDecoded}`,
       `stage permis ${villeDecoded}`,
+      `stage 48N ${villeDecoded}`,
+      `stage agréé préfecture ${villeDecoded}`,
+      `récupérer points permis ${villeDecoded}`,
     ],
     openGraph: {
-      title: `Stages permis à ${villeDecoded}`,
-      description: `Comparez les centres agréés et réservez votre stage à ${villeDecoded}.`,
+      title: `Stage de récupération de points à ${villeDecoded}`,
+      description: `Comparez les centres agréés et réservez votre stage de récupération de points à ${villeDecoded}.`,
       type: "website",
       locale: "fr_FR",
       siteName: "BYS Formation",
@@ -115,11 +115,11 @@ export default async function StagesVillePage({ params }: Props) {
               <span className="text-white">{villeDecoded}</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-bold mb-4">
-              Stages permis à {villeDecoded}
+              Stage de récupération de points à {villeDecoded}
             </h1>
             <p className="text-gray-400 text-lg max-w-2xl">
-              Trouvez et réservez votre stage de récupération de points, formation permis ou FIMO/FCO
-              à {villeDecoded}. Tous nos centres sont agréés par la préfecture.
+              Trouvez et réservez votre stage de récupération de points à {villeDecoded}.
+              Tous nos centres sont agréés par la préfecture (Ministère de l&apos;Intérieur).
             </p>
             <div className="flex items-center gap-4 mt-6">
               <span className="inline-flex items-center gap-2 text-sm text-blue-400">
@@ -263,10 +263,10 @@ export default async function StagesVillePage({ params }: Props) {
                 crédités le lendemain du dernier jour de stage.
               </p>
               <p>
-                En plus des stages de récupération de points, nos centres à {villeDecoded}{" "}
-                proposent également des formations au permis B, des formations FIMO et FCO
-                pour les professionnels du transport, ainsi que des stages de sensibilisation
-                à la sécurité routière.
+                Tous nos centres partenaires à {villeDecoded} sont agréés par la préfecture
+                (Ministère de l&apos;Intérieur) pour dispenser le « stage de sensibilisation à la
+                sécurité routière et de prévention des risques », nom officiel du stage de
+                récupération de points. Vous pouvez en effectuer un par période de 12 mois.
               </p>
             </div>
           </div>

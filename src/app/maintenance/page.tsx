@@ -55,7 +55,7 @@ export default async function MaintenancePage() {
         {/* Footer */}
         <div className="mt-12 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <p className="text-gray-600 text-xs">
-            BYS Formation — Plateforme de formations professionnelles
+            BYS Formation — Stages agrees de recuperation de points
           </p>
         </div>
       </div>

@@ -21,20 +21,21 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: "BYS Formation — Marketplace de formations permis & sécurité routière",
+    default: "BYS Formation — Stages agréés de récupération de points",
     template: "%s | BYS Formation",
   },
   description:
-    "Trouvez et réservez votre stage de récupération de points, permis B, moto, FIMO, FCO. Comparez les centres agréés près de chez vous.",
+    "Trouvez et réservez votre stage de récupération de points du permis de conduire. Tous nos centres sont agréés Ministère de l'Intérieur. Récupérez jusqu'à 4 points en 2 jours.",
   keywords: [
     "stage récupération points",
-    "permis de conduire",
-    "formation FIMO",
+    "stage récupération de points",
     "stage permis",
-    "auto-école",
-    "récupération de points",
-    "FCO",
-    "sécurité routière",
+    "stage 48N",
+    "stage 48SI",
+    "stage volontaire permis",
+    "récupérer points permis",
+    "stage sensibilisation sécurité routière",
+    "stage agréé préfecture",
     "BYS Formation",
   ],
   openGraph: {

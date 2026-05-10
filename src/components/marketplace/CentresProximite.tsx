@@ -30,13 +30,13 @@ interface Centre {
 }
 
 const allCentres: Centre[] = [
-  { id: 1, nom: "BYS Formation — Osny", slug: "bys-formation-osny", ville: "Osny", departement: "95", note: 4.9, avisCount: 387, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Permis B accéléré", "FIMO/FCO"], formations: 14 },
-  { id: 2, nom: "BYS Formation — Cergy", slug: "bys-formation-cergy", ville: "Cergy", departement: "95", note: 4.8, avisCount: 264, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Permis B accéléré"], formations: 11 },
-  { id: 3, nom: "BYS Formation — Paris", slug: "bys-formation-paris", ville: "Paris", departement: "75", note: 4.9, avisCount: 512, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Stage 48N", "FIMO/FCO"], formations: 12 },
-  { id: 4, nom: "BYS Formation — Lyon", slug: "bys-formation-lyon", ville: "Lyon", departement: "69", note: 4.8, avisCount: 198, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Permis B accéléré"], formations: 8 },
-  { id: 5, nom: "Auto-école Dupont", slug: "auto-ecole-dupont", ville: "Cergy", departement: "95", note: 4.6, avisCount: 143, isQualiopi: true, isAgreePrefecture: true, isBYS: false, specialites: ["Récupération de points"], formations: 3 },
+  { id: 1, nom: "BYS Formation — Osny", slug: "bys-formation-osny", ville: "Osny", departement: "95", note: 4.9, avisCount: 387, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Stage 48N", "Stage volontaire"], formations: 4 },
+  { id: 2, nom: "BYS Formation — Cergy", slug: "bys-formation-cergy", ville: "Cergy", departement: "95", note: 4.8, avisCount: 264, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Stage weekend"], formations: 3 },
+  { id: 3, nom: "BYS Formation — Paris", slug: "bys-formation-paris", ville: "Paris", departement: "75", note: 4.9, avisCount: 512, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Stage 48N", "Stage 48SI"], formations: 5 },
+  { id: 4, nom: "BYS Formation — Lyon", slug: "bys-formation-lyon", ville: "Lyon", departement: "69", note: 4.8, avisCount: 198, isQualiopi: true, isAgreePrefecture: true, isBYS: true, specialites: ["Récupération de points", "Stage weekend"], formations: 3 },
+  { id: 5, nom: "Auto-école Dupont", slug: "auto-ecole-dupont", ville: "Cergy", departement: "95", note: 4.6, avisCount: 143, isQualiopi: true, isAgreePrefecture: true, isBYS: false, specialites: ["Récupération de points"], formations: 2 },
   { id: 6, nom: "Centre Formation Routière", slug: "cfr-pontoise", ville: "Pontoise", departement: "95", note: 4.5, avisCount: 89, isQualiopi: false, isAgreePrefecture: true, isBYS: false, specialites: ["Récupération de points", "Stage 48N"], formations: 2 },
-  { id: 7, nom: "Sécurité Route Formation", slug: "srf-paris", ville: "Paris", departement: "75", note: 4.7, avisCount: 231, isQualiopi: true, isAgreePrefecture: true, isBYS: false, specialites: ["Récupération de points", "Sécurité routière"], formations: 5 },
+  { id: 7, nom: "Sécurité Route Formation", slug: "srf-paris", ville: "Paris", departement: "75", note: 4.7, avisCount: 231, isQualiopi: true, isAgreePrefecture: true, isBYS: false, specialites: ["Récupération de points", "Stage 48SI"], formations: 3 },
   { id: 8, nom: "Formation Conduite Pro", slug: "fcp-versailles", ville: "Versailles", departement: "78", note: 4.4, avisCount: 76, isQualiopi: false, isAgreePrefecture: true, isBYS: false, specialites: ["Récupération de points"], formations: 2 },
 ];
 

@@ -301,6 +301,13 @@ export const mockRequireComptable = jest.fn(async () => {
   return checkRole(currentUser, ["COMPTABLE", "ADMIN", "OWNER"]);
 });
 
+const PLATFORM_ROLES = ["SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER"];
+
+export const mockRequirePlatformStaff = jest.fn(async () => {
+  if (!currentUser) throw new Error("Non authentifié");
+  return checkRole(currentUser, PLATFORM_ROLES);
+});
+
 export const mockRequireAdmin = jest.fn(async () => {
   if (!currentUser) throw new Error("Non authentifié");
   return checkRole(currentUser, PLATFORM_ADMIN_ROLES);
@@ -325,6 +332,7 @@ export function getAuth0Mocks() {
     requireCentreOwner: mockRequireCentreOwner,
     requireSupport: mockRequireSupport,
     requireComptable: mockRequireComptable,
+    requirePlatformStaff: mockRequirePlatformStaff,
     requireAdmin: mockRequireAdmin,
     requireOwner: mockRequireOwner,
     requireCentre: mockRequireCentreStaff,

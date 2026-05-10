@@ -66,7 +66,7 @@ export default function BlogPage() {
           </h1>
           <p className="text-blue-100 max-w-2xl mx-auto text-lg">
             Retrouvez nos articles sur la securite routiere, la reglementation du permis de conduire
-            et les actualites de la formation professionnelle.
+            et l&apos;actualite des stages de recuperation de points.
           </p>
         </div>
       </section>

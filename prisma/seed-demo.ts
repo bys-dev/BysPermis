@@ -71,7 +71,7 @@ const articleCategories = [
   "Sécurité routière",
   "Actualité",
   "Guide stage",
-  "Permis de conduire",
+  "Législation permis",
 ];
 
 const articleTemplates = [
@@ -164,17 +164,16 @@ const articleTemplates = [
 <p><em>À savoir :</em> BYS Formation ne peut pas vérifier votre solde pour vous — ces démarches restent strictement personnelles.</p>`,
   },
   {
-    titre: "FIMO / FCO : les formations obligatoires pour les conducteurs pros",
-    extrait: "Transport de marchandises ou de personnes : les formations continues obligatoires tous les 5 ans.",
-    contenu: `<h2>FIMO et FCO : de quoi parle-t-on ?</h2>
-<p>La <strong>FIMO</strong> (Formation Initiale Minimale Obligatoire) s'adresse aux nouveaux conducteurs professionnels (transport marchandises ou voyageurs). Durée : 140h.</p>
-<p>La <strong>FCO</strong> (Formation Continue Obligatoire) est à renouveler tous les 5 ans pour conserver le droit de conduire en transport professionnel. Durée : 35h.</p>
-<h3>Financement</h3>
-<ul>
-  <li>CPF (Compte Personnel de Formation)</li>
-  <li>OPCO (employeurs)</li>
-  <li>Pôle Emploi (demandeurs d'emploi)</li>
-</ul>`,
+    titre: "Lettre 48N, 48SI : décoder les courriers de la préfecture",
+    extrait: "Vous avez reçu une lettre de la préfecture sur votre permis ? Voici comment l'interpréter et réagir.",
+    contenu: `<h2>Les courriers préfectoraux les plus courants</h2>
+<h3>La lettre 48N</h3>
+<p>Adressée aux conducteurs en <strong>permis probatoire</strong> qui perdent 3 points ou plus en une seule infraction. Elle impose un stage obligatoire dans un délai de 4 mois.</p>
+<h3>La lettre 48SI</h3>
+<p>Notification d'une <strong>invalidation du permis</strong> pour solde de points nul. Le permis est annulé : il faut repasser le code (et la conduite si plus de 3 ans depuis l'obtention).</p>
+<h3>La lettre 48</h3>
+<p>Information simple sur un retrait de points. Aucune action obligatoire, mais il est recommandé de faire un stage volontaire si le solde devient bas.</p>
+<p><em>À noter :</em> en cas de réception d'un de ces courriers, conservez-le précieusement — il vous sera demandé en préfecture et lors du stage.</p>`,
   },
   {
     titre: "Nos conseils pour bien choisir votre centre de formation",

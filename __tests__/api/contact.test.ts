@@ -12,6 +12,11 @@ jest.mock("@/lib/email", () => ({
   },
 }));
 
+// Désactiver le rate limit en mémoire (sinon il persiste entre tests)
+jest.mock("@/lib/rate-limit", () => ({
+  rateLimit: jest.fn().mockReturnValue(null),
+}));
+
 import { resend } from "@/lib/email";
 import { POST } from "@/app/api/contact/route";
 

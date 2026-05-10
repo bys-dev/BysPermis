@@ -34,6 +34,8 @@ async function main() {
   console.log("✅ Données supprimées.\n");
 
   // ─── 1. CATÉGORIES ───────────────────────────────────────
+  // Scope V1 (mai 2026) : une seule catégorie, le stage de récupération de points.
+  // Le modèle Categorie reste en place pour permettre d'autres catégories dans le futur.
   console.log("📂 Création des catégories...");
   const categories = await Promise.all([
     (prisma as any).categorie.create({
@@ -45,73 +47,10 @@ async function main() {
         ordre: 1,
       },
     }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Permis B",
-        description: "Formation complète au permis de conduire voiture. Apprentissage du code de la route et de la conduite.",
-        icon: "car",
-        couleur: "#10B981",
-        ordre: 2,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "FIMO Marchandises",
-        description: "Formation Initiale Minimale Obligatoire pour le transport de marchandises. Obligatoire pour conduire des véhicules de plus de 3,5 tonnes.",
-        icon: "truck",
-        couleur: "#F59E0B",
-        ordre: 3,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "FCO Marchandises",
-        description: "Formation Continue Obligatoire pour les conducteurs de transport de marchandises. Renouvellement tous les 5 ans.",
-        icon: "truck",
-        couleur: "#EF4444",
-        ordre: 4,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Transport de personnes",
-        description: "Formations pour le transport de voyageurs : FIMO, FCO et capacité professionnelle.",
-        icon: "bus",
-        couleur: "#8B5CF6",
-        ordre: 5,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Sensibilisation sécurité routière",
-        description: "Stages de sensibilisation aux risques routiers pour les entreprises et les particuliers.",
-        icon: "warning",
-        couleur: "#F97316",
-        ordre: 6,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Permis moto",
-        description: "Formation au permis A1, A2 et passerelle A. Conduisez en toute sécurité sur deux roues.",
-        icon: "motorcycle",
-        couleur: "#06B6D4",
-        ordre: 7,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Eco-conduite",
-        description: "Apprenez à conduire de manière économique et écologique. Réduisez votre consommation de carburant jusqu'à 15%.",
-        icon: "leaf",
-        couleur: "#22C55E",
-        ordre: 8,
-      },
-    }),
   ]);
 
-  const [catRecup, catPermisB, catFIMO, catFCO, catTransport, catSensibilisation, catMoto, catEco] = categories;
-  console.log(`✅ ${categories.length} catégories créées.\n`);
+  const [catRecup] = categories;
+  console.log(`✅ ${categories.length} catégorie créée.\n`);
 
   // ─── 1b. PLANS D'ABONNEMENT ──────────────────────────────
   console.log("💎 Création des plans d'abonnement...");
@@ -460,7 +399,7 @@ async function main() {
         nom: "BYS Formation Osny",
         slug: "bys-formation-osny",
         description:
-          "Centre agréé préfecture du Val-d'Oise, spécialisé dans les stages de récupération de points et la formation professionnelle transport.",
+          "Centre agréé préfecture du Val-d'Oise, spécialisé dans les stages de récupération de points du permis de conduire.",
         adresse: "Bât. 7, 9 Chaussée Jules César",
         codePostal: "95520",
         ville: "Osny",
@@ -476,7 +415,7 @@ async function main() {
         // Personnalisation
         couleurPrimaire: "#2563EB",
         couleurSecondaire: "#1E40AF",
-        presentationHtml: "<p>Bienvenue chez <strong>BYS Formation</strong>, votre centre de formation agréé par la préfecture du Val-d'Oise.</p><p>Nous sommes spécialisés dans les <strong>stages de récupération de points</strong> et la <strong>formation professionnelle transport</strong> (FIMO, FCO). Notre équipe de formateurs expérimentés vous accompagne dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de réussite supérieur à 95%</li><li>Formateurs certifiés et passionnés</li></ul>",
+        presentationHtml: "<p>Bienvenue chez <strong>BYS Formation</strong>, votre centre agréé par la préfecture du Val-d'Oise pour les <strong>stages de récupération de points du permis de conduire</strong>. Nos formateurs (psychologue + expert sécurité routière) vous accompagnent sur 2 jours dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de satisfaction supérieur à 95%</li><li>Formateurs certifiés BAFM</li></ul>",
         horaires: "Lundi - Vendredi : 8h30 - 18h30\nSamedi : 9h00 - 13h00\nDimanche : Fermé",
         equipements: ["Salle climatisée", "Parking gratuit", "Wifi", "Simulateur", "Accès PMR", "Véhicules récents"],
         certifications: ["Qualiopi", "Agréé Préfecture", "Datadock", "CPF"],
@@ -493,7 +432,7 @@ async function main() {
         nom: "Conduite Plus Paris",
         slug: "conduite-plus-paris",
         description:
-          "Auto-école et centre de formation au cœur du 11ème arrondissement de Paris. Stages de récupération de points et formations permis B toute l'année.",
+          "Centre agréé préfecture de Paris, situé au cœur du 11ème arrondissement. Stages de récupération de points toute l'année.",
         adresse: "45 Avenue de la République",
         codePostal: "75011",
         ville: "Paris",
@@ -509,7 +448,7 @@ async function main() {
         // Personnalisation
         couleurPrimaire: "#10B981",
         couleurSecondaire: "#059669",
-        presentationHtml: "<p><strong>Conduite Plus</strong> est votre auto-école de référence dans le 11ème arrondissement de Paris.</p><p>Que vous souhaitiez passer votre permis B, récupérer vos points ou suivre une formation complémentaire, notre équipe dynamique est là pour vous guider vers la réussite.</p>",
+        presentationHtml: "<p><strong>Conduite Plus</strong> est votre centre de référence dans le 11ème arrondissement de Paris pour les stages de récupération de points. Notre équipe dynamique vous accompagne sur 2 jours dans une démarche bienveillante et constructive.</p>",
         horaires: "Lundi - Vendredi : 9h00 - 19h00\nSamedi : 10h00 - 17h00\nDimanche : Fermé",
         equipements: ["Salle climatisée", "Wifi", "Salle de code", "Véhicules récents"],
         certifications: ["Agréé Préfecture", "Label qualité"],
@@ -526,7 +465,7 @@ async function main() {
         nom: "CFSR Lyon",
         slug: "cfsr-lyon",
         description:
-          "Centre de Formation à la Sécurité Routière en Rhône-Alpes. Agréé préfecture du Rhône, nous proposons des stages de récupération de points, des formations FIMO/FCO et des stages de sensibilisation.",
+          "Centre de Formation à la Sécurité Routière en Rhône-Alpes. Agréé préfecture du Rhône, nous proposons des stages de récupération de points dans une ambiance bienveillante.",
         adresse: "12 Rue de la Part-Dieu",
         codePostal: "69003",
         ville: "Lyon",
@@ -546,7 +485,7 @@ async function main() {
         nom: "Permis Express Marseille",
         slug: "permis-express-marseille",
         description:
-          "Centre de formation situé dans le 8ème arrondissement de Marseille. Spécialisé dans les stages accélérés de récupération de points et les formations au permis moto.",
+          "Centre agréé préfecture des Bouches-du-Rhône, situé dans le 8ème arrondissement de Marseille. Spécialisé dans les stages express de récupération de points (2 jours).",
         adresse: "78 Boulevard Michelet",
         codePostal: "13008",
         ville: "Marseille",
@@ -566,7 +505,7 @@ async function main() {
         nom: "Sécurité Routière Nantes",
         slug: "securite-routiere-nantes",
         description:
-          "Nouveau centre de formation à Nantes, en attente de validation préfectorale. Nous proposerons des stages de récupération de points et des formations éco-conduite.",
+          "Nouveau centre à Nantes, en attente de validation préfectorale. Nous proposerons des stages de récupération de points en plein centre-ville.",
         adresse: "22 Rue de Strasbourg",
         codePostal: "44000",
         ville: "Nantes",
@@ -600,7 +539,7 @@ async function main() {
       nom: "BYS Formation Cergy",
       slug: "bys-formation-cergy",
       description:
-        "Second centre BYS Formation, situé à Cergy-Pontoise. Stages de récupération de points et formation professionnelle transport.",
+        "Second centre BYS Formation, situé à Cergy-Pontoise. Stages de récupération de points du permis de conduire.",
       adresse: "5 Place des Merveilles",
       codePostal: "95800",
       ville: "Cergy",
@@ -722,55 +661,7 @@ async function main() {
     },
   });
 
-  const formBysFIMO = await (prisma as any).formation.create({
-    data: {
-      titre: "FIMO Marchandises",
-      slug: "fimo-marchandises-osny",
-      description:
-        "Formation Initiale Minimale Obligatoire pour le transport de marchandises. Cette formation de 140 heures est obligatoire pour tout conducteur souhaitant exercer le métier de conducteur routier de marchandises.",
-      objectifs:
-        "Maîtriser les règles de sécurité et la réglementation du transport. Perfectionner la conduite rationnelle. Connaître l'environnement économique et social du transport routier.",
-      programme:
-        "Module 1 : Perfectionnement à la conduite rationnelle (65h). Module 2 : Réglementation (28h). Module 3 : Santé, sécurité routière et environnement (28h). Module 4 : Service et logistique (19h).",
-      prerequis: "Être titulaire du permis C ou CE en cours de validité. Aptitude médicale à jour.",
-      publicCible: "Futurs conducteurs routiers de marchandises",
-      duree: "140h",
-      prix: 2900,
-      modalite: "PRESENTIEL",
-      lieu: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[0].id,
-      categorieId: catFIMO.id,
-    },
-  });
-
-  const formBysFCO = await (prisma as any).formation.create({
-    data: {
-      titre: "FCO Marchandises",
-      slug: "fco-marchandises-osny",
-      description:
-        "Formation Continue Obligatoire de 5 jours pour les conducteurs routiers de marchandises. Renouvellement obligatoire tous les 5 ans pour maintenir sa carte de qualification conducteur.",
-      objectifs:
-        "Actualiser les connaissances en matière de réglementation. Perfectionner les pratiques de conduite sécuritaire. Sensibiliser à la sécurité routière et à l'éco-conduite.",
-      programme:
-        "Bilan des connaissances, conduite rationnelle et éco-conduite, réglementation sociale et transport, santé et sécurité routière, évaluation finale.",
-      prerequis: "Être titulaire d'une carte de qualification conducteur marchandises.",
-      publicCible: "Conducteurs routiers de marchandises en exercice",
-      duree: "5 jours (35h)",
-      prix: 1800,
-      modalite: "PRESENTIEL",
-      lieu: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[0].id,
-      categorieId: catFCO.id,
-    },
-  });
-
-  // Conduite Plus Paris — 3 formations
+  // Conduite Plus Paris — 1 formation (récup points uniquement, scope V1)
   const formParisRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Paris 11ème",
@@ -795,55 +686,7 @@ async function main() {
     },
   });
 
-  const formParisPermisB = await (prisma as any).formation.create({
-    data: {
-      titre: "Formation Permis B - Conduite Plus Paris",
-      slug: "permis-b-conduite-plus-paris",
-      description:
-        "Formation complète au permis de conduire catégorie B. Pack comprenant le code de la route et 30 heures de conduite avec un moniteur diplômé. Véhicules récents à double commande.",
-      objectifs:
-        "Obtenir le code de la route. Maîtriser la conduite d'un véhicule léger. Réussir l'examen pratique du permis de conduire.",
-      programme:
-        "Phase 1 : Code de la route (accès illimité en ligne + séances en salle). Phase 2 : 30 heures de conduite (manœuvres, circulation, autoroute). Phase 3 : Préparation à l'examen.",
-      prerequis: "Avoir 17 ans minimum (conduite accompagnée) ou 18 ans. Pièce d'identité et justificatif de domicile.",
-      publicCible: "Candidats au permis de conduire",
-      duree: "30h",
-      prix: 1590,
-      modalite: "PRESENTIEL",
-      lieu: "45 Avenue de la République, 75011 Paris",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[1].id,
-      categorieId: catPermisB.id,
-    },
-  });
-
-  const formParisMoto = await (prisma as any).formation.create({
-    data: {
-      titre: "Permis Moto A2 - Paris",
-      slug: "permis-moto-a2-paris",
-      description:
-        "Formation au permis moto A2 incluant le plateau et la circulation. Motos-écoles Yamaha MT-07 récentes. Équipement de protection fourni pour les séances de conduite.",
-      objectifs:
-        "Maîtriser les épreuves du plateau. Circuler en toute sécurité en milieu urbain et interurbain. Obtenir le permis A2.",
-      programme:
-        "Code moto (ETM), 20h de plateau (manœuvres lentes et rapides), 12h de circulation, examen blanc.",
-      prerequis: "Avoir 18 ans minimum. Être titulaire de l'ASSR2 ou de l'ASR.",
-      publicCible: "Candidats au permis moto",
-      duree: "32h",
-      prix: 1350,
-      modalite: "PRESENTIEL",
-      lieu: "45 Avenue de la République, 75011 Paris",
-      isQualiopi: true,
-      isCPF: false,
-      isActive: true,
-      centreId: centres[1].id,
-      categorieId: catMoto.id,
-    },
-  });
-
-  // CFSR Lyon — 3 formations
+  // CFSR Lyon — 1 formation (récup points uniquement, scope V1)
   const formLyonRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Lyon",
@@ -868,55 +711,7 @@ async function main() {
     },
   });
 
-  const formLyonFIMO = await (prisma as any).formation.create({
-    data: {
-      titre: "FIMO Marchandises - Lyon",
-      slug: "fimo-marchandises-lyon",
-      description:
-        "Formation FIMO Marchandises de 140 heures à Lyon. Notre piste privée de 3 000 m² permet un apprentissage optimal de la conduite poids lourd. Taux de réussite de 95%.",
-      objectifs:
-        "Obtenir la qualification initiale de conducteur routier. Maîtriser la conduite rationnelle d'un poids lourd. Connaître la réglementation sociale européenne.",
-      programme:
-        "Conduite rationnelle (65h), réglementation (28h), santé-sécurité-environnement (28h), logistique et service (19h). Examen final inclus.",
-      prerequis: "Permis C ou CE valide. Visite médicale favorable.",
-      publicCible: "Futurs conducteurs poids lourd en région lyonnaise",
-      duree: "140h",
-      prix: 3100,
-      modalite: "PRESENTIEL",
-      lieu: "12 Rue de la Part-Dieu, 69003 Lyon",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[2].id,
-      categorieId: catFIMO.id,
-    },
-  });
-
-  const formLyonSensibilisation = await (prisma as any).formation.create({
-    data: {
-      titre: "Sensibilisation sécurité routière entreprise",
-      slug: "sensibilisation-securite-routiere-lyon",
-      description:
-        "Formation de sensibilisation aux risques routiers destinée aux entreprises. Réduisez les accidents de trajet et de mission de vos collaborateurs grâce à cette journée de formation interactive.",
-      objectifs:
-        "Sensibiliser les salariés aux risques routiers professionnels. Réduire le nombre d'accidents de trajet. Promouvoir une culture de la sécurité routière en entreprise.",
-      programme:
-        "Les chiffres du risque routier professionnel, les facteurs de risque (alcool, téléphone, fatigue), ateliers pratiques (simulateur, parcours lunettes d'alcoolémie), plan d'action individuel.",
-      prerequis: "Aucun prérequis. Formation ouverte à tous les salariés.",
-      publicCible: "Entreprises et collectivités de la région lyonnaise",
-      duree: "1 jour (7h)",
-      prix: 350,
-      modalite: "PRESENTIEL",
-      lieu: "12 Rue de la Part-Dieu, 69003 Lyon",
-      isQualiopi: true,
-      isCPF: false,
-      isActive: true,
-      centreId: centres[2].id,
-      categorieId: catSensibilisation.id,
-    },
-  });
-
-  // Permis Express Marseille — 2 formations
+  // Permis Express Marseille — 1 formation (récup points uniquement, scope V1)
   const formMarseilleRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Marseille",
@@ -941,31 +736,7 @@ async function main() {
     },
   });
 
-  const formMarseilleMoto = await (prisma as any).formation.create({
-    data: {
-      titre: "Permis Moto A2 - Marseille",
-      slug: "permis-moto-a2-marseille",
-      description:
-        "Passez votre permis moto sous le soleil de Marseille ! Formation complète A2 avec des moniteurs passionnés. Notre piste privée offre des conditions idéales d'apprentissage.",
-      objectifs:
-        "Réussir l'examen du plateau moto. Maîtriser la circulation en milieu urbain et péri-urbain. Conduire une moto en toute confiance.",
-      programme:
-        "ETM (code moto en ligne), plateau (20h de manœuvres), circulation (12h en conditions réelles), examen blanc plateau et circulation.",
-      prerequis: "18 ans minimum. ASSR2 ou ASR.",
-      publicCible: "Candidats au permis moto dans la région marseillaise",
-      duree: "32h",
-      prix: 1250,
-      modalite: "PRESENTIEL",
-      lieu: "78 Boulevard Michelet, 13008 Marseille",
-      isQualiopi: true,
-      isCPF: false,
-      isActive: true,
-      centreId: centres[3].id,
-      categorieId: catMoto.id,
-    },
-  });
-
-  // Sécurité Routière Nantes — 2 formations (centre en attente)
+  // Sécurité Routière Nantes — 1 formation (centre en attente, récup points uniquement)
   const formNantesRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Nantes",
@@ -990,36 +761,12 @@ async function main() {
     },
   });
 
-  const formNantesEco = await (prisma as any).formation.create({
-    data: {
-      titre: "Formation Eco-conduite",
-      slug: "eco-conduite-nantes",
-      description:
-        "Apprenez à réduire votre consommation de carburant jusqu'à 15% grâce à notre formation éco-conduite. Idéal pour les entreprises souhaitant réduire leur empreinte carbone et leurs coûts de déplacement.",
-      objectifs:
-        "Réduire la consommation de carburant. Diminuer l'usure du véhicule. Adopter une conduite plus souple et sécuritaire.",
-      programme:
-        "Diagnostic initial de conduite, principes de l'éco-conduite, exercices pratiques sur route, comparaison avant/après, remise du certificat.",
-      prerequis: "Permis B valide.",
-      publicCible: "Particuliers et entreprises soucieux de l'environnement",
-      duree: "1 jour (7h)",
-      prix: 290,
-      modalite: "PRESENTIEL",
-      lieu: "22 Rue de Strasbourg, 44000 Nantes",
-      isQualiopi: false,
-      isCPF: false,
-      isActive: false,
-      centreId: centres[4].id,
-      categorieId: catEco.id,
-    },
-  });
-
   const allFormations = [
-    formBysRecup, formBysFIMO, formBysFCO,
-    formParisRecup, formParisPermisB, formParisMoto,
-    formLyonRecup, formLyonFIMO, formLyonSensibilisation,
-    formMarseilleRecup, formMarseilleMoto,
-    formNantesRecup, formNantesEco,
+    formBysRecup,
+    formParisRecup,
+    formLyonRecup,
+    formMarseilleRecup,
+    formNantesRecup,
   ];
   console.log(`✅ ${allFormations.length} formations créées.\n`);
 
@@ -1073,50 +820,6 @@ async function main() {
       },
     }),
 
-    // BYS Osny - FIMO (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 14, 8),
-        dateFin: d(2026, 5, 8, 17),
-        placesTotal: 12,
-        placesRestantes: 4,
-        status: "ACTIVE",
-        formationId: formBysFIMO.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 1, 8),
-        dateFin: d(2026, 6, 26, 17),
-        placesTotal: 12,
-        placesRestantes: 10,
-        status: "ACTIVE",
-        formationId: formBysFIMO.id,
-      },
-    }),
-
-    // BYS Osny - FCO (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 5, 4, 8),
-        dateFin: d(2026, 5, 8, 17),
-        placesTotal: 15,
-        placesRestantes: 7,
-        status: "ACTIVE",
-        formationId: formBysFCO.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 7, 6, 8),
-        dateFin: d(2026, 7, 10, 17),
-        placesTotal: 15,
-        placesRestantes: 15,
-        status: "ACTIVE",
-        formationId: formBysFCO.id,
-      },
-    }),
-
     // Paris - Récup (3 sessions, 1 passée)
     (prisma as any).session.create({
       data: {
@@ -1146,50 +849,6 @@ async function main() {
         placesRestantes: 16,
         status: "ACTIVE",
         formationId: formParisRecup.id,
-      },
-    }),
-
-    // Paris - Permis B (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 1, 9),
-        dateFin: d(2026, 5, 15, 17),
-        placesTotal: 10,
-        placesRestantes: 2,
-        status: "ACTIVE",
-        formationId: formParisPermisB.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 1, 9),
-        dateFin: d(2026, 7, 15, 17),
-        placesTotal: 10,
-        placesRestantes: 8,
-        status: "ACTIVE",
-        formationId: formParisPermisB.id,
-      },
-    }),
-
-    // Paris - Moto (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 7, 8),
-        dateFin: d(2026, 5, 2, 17),
-        placesTotal: 8,
-        placesRestantes: 1,
-        status: "ACTIVE",
-        formationId: formParisMoto.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 15, 8),
-        dateFin: d(2026, 7, 10, 17),
-        placesTotal: 8,
-        placesRestantes: 6,
-        status: "ACTIVE",
-        formationId: formParisMoto.id,
       },
     }),
 
@@ -1225,40 +884,6 @@ async function main() {
       },
     }),
 
-    // Lyon - FIMO (1 session)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 5, 18, 8),
-        dateFin: d(2026, 6, 12, 17),
-        placesTotal: 12,
-        placesRestantes: 6,
-        status: "ACTIVE",
-        formationId: formLyonFIMO.id,
-      },
-    }),
-
-    // Lyon - Sensibilisation (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 15, 9),
-        dateFin: d(2026, 4, 15, 17),
-        placesTotal: 25,
-        placesRestantes: 10,
-        status: "ACTIVE",
-        formationId: formLyonSensibilisation.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 3, 9),
-        dateFin: d(2026, 6, 3, 17),
-        placesTotal: 25,
-        placesRestantes: 25,
-        status: "ACTIVE",
-        formationId: formLyonSensibilisation.id,
-      },
-    }),
-
     // Marseille - Récup (3 sessions, 1 complète)
     (prisma as any).session.create({
       data: {
@@ -1291,17 +916,6 @@ async function main() {
       },
     }),
 
-    // Marseille - Moto (1 session)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 5, 11, 8),
-        dateFin: d(2026, 6, 5, 17),
-        placesTotal: 8,
-        placesRestantes: 3,
-        status: "ACTIVE",
-        formationId: formMarseilleMoto.id,
-      },
-    }),
   ]);
 
   console.log(`✅ ${sessions.length} sessions créées.\n`);
@@ -1347,7 +961,7 @@ async function main() {
         ville: "Lyon",
         numeroPermis: "07BB89012",
         userId: eleves[1].id,
-        sessionId: sessions[16].id, // Lyon récup complète
+        sessionId: sessions[8].id, // Lyon récup #2
       },
     }),
     // Lucas → Marseille Récup session complète (terminée)
@@ -1367,7 +981,7 @@ async function main() {
         ville: "Marseille",
         numeroPermis: "13CC45678",
         userId: eleves[2].id,
-        sessionId: sessions[22].id, // Marseille récup complète
+        sessionId: sessions[11].id, // Marseille récup #2
       },
     }),
     // Amina → Paris Récup session 2 (active)
@@ -1387,90 +1001,13 @@ async function main() {
         ville: "Bordeaux",
         numeroPermis: "33DD90123",
         userId: eleves[3].id,
-        sessionId: sessions[10].id, // Paris récup active
-      },
-    }),
-    // Pierre → BYS FIMO session 1
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0005",
-        status: "CONFIRMEE",
-        montant: 2900,
-        commissionMontant: 290,
-        civilite: "M.",
-        nom: "Garnier",
-        prenom: "Pierre",
-        email: "pierre.garnier@free.fr",
-        telephone: "06 55 66 77 88",
-        adresse: "56 Rue Nationale",
-        codePostal: "59000",
-        ville: "Lille",
-        numeroPermis: "59EE12345",
-        userId: eleves[4].id,
-        sessionId: sessions[4].id, // BYS FIMO
-      },
-    }),
-    // Sophie → Paris Permis B session 1
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0006",
-        status: "CONFIRMEE",
-        montant: 1590,
-        commissionMontant: 159,
-        civilite: "Mme",
-        nom: "Lemaire",
-        prenom: "Sophie",
-        email: "sophie.lemaire@yahoo.fr",
-        telephone: "06 66 77 88 99",
-        adresse: "19 Allée des Demoiselles",
-        codePostal: "31000",
-        ville: "Toulouse",
-        userId: eleves[5].id,
-        sessionId: sessions[12].id, // Paris Permis B
-      },
-    }),
-    // Youssef → Lyon Sensibilisation session 1
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0007",
-        status: "EN_ATTENTE",
-        montant: 350,
-        commissionMontant: 35,
-        civilite: "M.",
-        nom: "El Mansouri",
-        prenom: "Youssef",
-        email: "youssef.elmansouri@gmail.com",
-        telephone: "06 77 88 99 00",
-        adresse: "41 Rue du Maréchal Foch",
-        codePostal: "44000",
-        ville: "Nantes",
-        userId: eleves[6].id,
-        sessionId: sessions[20].id, // Lyon Sensibilisation
-      },
-    }),
-    // Chloé → Marseille Moto
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0008",
-        status: "CONFIRMEE",
-        montant: 1250,
-        commissionMontant: 125,
-        civilite: "Mme",
-        nom: "Bernard",
-        prenom: "Chloé",
-        email: "chloe.bernard@laposte.net",
-        telephone: "06 88 99 00 11",
-        adresse: "7 Quai des Bateliers",
-        codePostal: "67000",
-        ville: "Strasbourg",
-        userId: eleves[7].id,
-        sessionId: sessions[24].id, // Marseille Moto
+        sessionId: sessions[6].id, // Paris récup #3
       },
     }),
     // Alexandre → BYS Osny Récup session 2
     (prisma as any).reservation.create({
       data: {
-        numero: "RES-2026-0009",
+        numero: "RES-2026-0005",
         status: "EN_ATTENTE",
         montant: 250,
         commissionMontant: 25,
@@ -1490,7 +1027,7 @@ async function main() {
     // Karim → Paris Récup complète (terminée - double réservation, different stage)
     (prisma as any).reservation.create({
       data: {
-        numero: "RES-2026-0010",
+        numero: "RES-2026-0006",
         status: "TERMINEE",
         montant: 280,
         commissionMontant: 28,
@@ -1504,7 +1041,7 @@ async function main() {
         ville: "Paris",
         numeroPermis: "12AA34567",
         userId: eleves[0].id,
-        sessionId: sessions[9].id, // Paris récup complète
+        sessionId: sessions[5].id, // Paris récup #2
       },
     }),
   ]);
@@ -1572,9 +1109,9 @@ async function main() {
         isActive: true,
       },
       {
-        question: "Peut-on financer une formation avec le CPF ?",
+        question: "Le stage de récupération de points est-il éligible au CPF ?",
         reponse:
-          "Certaines formations sont éligibles au Compte Personnel de Formation (CPF), notamment les formations FIMO, FCO et le permis B. Les stages de récupération de points ne sont pas éligibles au CPF. Pour utiliser votre CPF, rendez-vous sur moncompteformation.gouv.fr et recherchez la formation souhaitée. Nos centres partenaires Qualiopi vous accompagnent dans les démarches.",
+          "Non. Les stages de récupération de points (officiellement « stages de sensibilisation à la sécurité routière ») ne sont pas éligibles au Compte Personnel de Formation (CPF). Le règlement les considère comme un dispositif de prévention administratif, pas comme une formation professionnelle. Le paiement se fait directement par carte bancaire au moment de la réservation.",
         categorie: "Financement",
         ordre: 8,
         isActive: true,
@@ -1615,7 +1152,7 @@ async function main() {
       {
         titre: "Bienvenue sur BYS Formation !",
         contenu:
-          "Bonjour Amina, bienvenue sur BYS Formation. Trouvez facilement un stage de récupération de points ou une formation professionnelle près de chez vous.",
+          "Bonjour Amina, bienvenue sur BYS Formation. Trouvez facilement un stage de récupération de points agréé près de chez vous.",
         isRead: false,
         userId: eleves[3].id,
       },
@@ -1762,7 +1299,7 @@ async function main() {
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour <strong>{{prenom}} {{nom}}</strong>,</p>
-    <p>Bienvenue sur <strong>BYS Formation</strong>, votre plateforme de stages agréés et de formations professionnelles.</p>
+    <p>Bienvenue sur <strong>BYS Formation</strong>, votre plateforme de référence pour les stages agréés de récupération de points du permis de conduire.</p>
     <p>Avec BYS Formation, vous pouvez :</p>
     <ul style="color:#4B5563;line-height:1.8">
       <li>Trouver un stage de récupération de points près de chez vous</li>

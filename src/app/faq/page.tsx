@@ -114,7 +114,7 @@ const faqCategories: FaqCategory[] = [
       {
         question: "Le stage peut-il être pris en charge par le CPF ?",
         answer:
-          "Non, les stages de récupération de points ne sont pas éligibles au CPF (Compte Personnel de Formation). En revanche, certaines formations professionnelles proposées sur notre plateforme (FIMO, FCO, permis B) peuvent être éligibles au CPF. Les centres concernés affichent le badge \"Éligible CPF\" sur leur fiche.",
+          "Non. Les stages de récupération de points (officiellement « stages de sensibilisation à la sécurité routière ») ne sont pas éligibles au Compte Personnel de Formation (CPF). Le règlement les considère comme un dispositif de prévention administratif, pas comme une formation professionnelle continue. Le paiement se fait directement par carte bancaire au moment de la réservation.",
       },
       {
         question: "Quelle est la politique d'annulation et de remboursement ?",
