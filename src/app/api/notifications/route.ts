@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth0";
+import { requireAuth, requireRole, PLATFORM_ROLES } from "@/lib/auth0";
 import { z } from "zod";
 
 // ─── GET /api/notifications — toutes les notifications de l'utilisateur ───
@@ -53,7 +53,14 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// ─── POST /api/notifications — créer une notification (usage système) ───
+// ─── POST /api/notifications — créer une notification ────────
+/**
+ * Restreint au staff plateforme (SUPPORT/COMPTABLE/COMMERCIAL/ADMIN/OWNER)
+ * pour empêcher l'usurpation de notifications cross-user (IDOR).
+ *
+ * Les workflows internes (réservation, parrainage, etc.) créent
+ * directement via prisma, sans passer par cette route.
+ */
 const createSchema = z.object({
   userId: z.string().min(1),
   titre: z.string().min(1).max(200),
@@ -62,8 +69,8 @@ const createSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    // Only authenticated users can create notifications (system/admin use)
-    await requireAuth();
+    // Only platform staff can create notifications via API
+    await requireRole(PLATFORM_ROLES);
     const body = await req.json();
     const data = createSchema.parse(body);
 
@@ -80,6 +87,14 @@ export async function POST(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues }, { status: 400 });
     }
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    if (err instanceof Error) {
+      if (err.message === "Non autorisé") {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+      }
+      if (err.message === "Non authentifié") {
+        return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+      }
+    }
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -78,7 +78,8 @@ export async function GET(
       dateEmission: formatDate(reservation.createdAt),
       organisme: {
         nom: centre.nom,
-        siret: "908 058 092 00028",
+        // SIRET depuis la BDD; placeholder si non rempli (cas dev/centre incomplet)
+        siret: centre.siret ?? "À COMPLÉTER PAR LE CENTRE",
         adresse: centre.adresse,
         codePostal: centre.codePostal,
         ville: centre.ville,

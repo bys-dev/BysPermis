@@ -29,6 +29,7 @@ enum Role {
 
 enum ReservationStatus {
   EN_ATTENTE
+  EN_ATTENTE_PAIEMENT  // Réservation créée, en attente de validation Stripe (placeholder anti race-condition)
   CONFIRMEE
   ANNULEE
   REMBOURSEE
@@ -145,6 +146,7 @@ model Centre {
   telephone             String?
   email                 String?
   siteWeb               String?
+  siret                 String?            // N° SIRET (utilisé pour les contrats)
   stripeAccountId       String?
   stripeCustomerId      String?
   stripeOnboardingDone  Boolean            @default(false)
@@ -573,6 +575,24 @@ model Favorite {
 
   @@unique([userId, formationId])
   @@map("favorites")
+}
+
+// ─── IDEMPOTENCE WEBHOOKS (Stripe, Auth0, etc.) ─────────
+
+/**
+ * Track processed webhook events to ensure idempotence.
+ * Stripe (and other providers) may deliver the same event multiple times.
+ * Inserting on each event with a unique constraint on id+provider prevents
+ * double-processing (e.g. double commission, duplicate reservations).
+ */
+model WebhookEvent {
+  id          String   @id                 // Event id from provider (e.g. Stripe evt_xxx)
+  provider    String                       // "stripe" | "auth0" | ...
+  type        String                       // Event type (e.g. payment_intent.succeeded)
+  processedAt DateTime @default(now())
+
+  @@unique([provider, id])
+  @@map("webhook_events")
 }
 
 // ─── DISPONIBILITES FORMATEUR ──────────────────────────

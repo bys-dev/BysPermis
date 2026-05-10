@@ -3,6 +3,12 @@ import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 
+/**
+ * Stripe webhook handler with:
+ *   - Signature verification (constructEvent)
+ *   - Idempotence via the WebhookEvent table (event.id unique)
+ *   - Reservation status sync on payment_intent.succeeded / failed / refunded
+ */
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -15,6 +21,23 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[Webhook] Signature error:", err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
+
+  // ─── Idempotence: refuse de retraiter un event déjà vu ──────────
+  try {
+    await prisma.webhookEvent.create({
+      data: { id: event.id, provider: "stripe", type: event.type },
+    });
+  } catch (err) {
+    // P2002 = unique constraint violation → event déjà traité, on renvoie 200 OK
+    const code = (err as { code?: string } | null)?.code;
+    if (code === "P2002") {
+      console.info(`[Webhook] event ${event.id} (${event.type}) already processed — skipping`);
+      return NextResponse.json({ received: true, alreadyProcessed: true });
+    }
+    // Autre erreur DB : log + 500 pour que Stripe retry
+    console.error("[Webhook] Idempotence check failed:", err);
+    return NextResponse.json({ error: "Idempotence check failed" }, { status: 500 });
   }
 
   try {
@@ -37,6 +60,17 @@ export async function POST(req: NextRequest) {
           where: { stripePaymentId: pi.id },
           data: { status: "ANNULEE" },
         });
+        // Re-libérer la place côté session
+        const reservations = await prisma.reservation.findMany({
+          where: { stripePaymentId: pi.id, status: "ANNULEE" },
+          select: { sessionId: true },
+        });
+        for (const r of reservations) {
+          await prisma.session.update({
+            where: { id: r.sessionId },
+            data: { placesRestantes: { increment: 1 } },
+          });
+        }
         break;
       }
 
@@ -218,7 +252,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (err) {
     console.error("[Webhook] Handler error:", err);
+    // Important : si le handler échoue après avoir inséré le WebhookEvent,
+    // on supprime l'entry pour permettre à Stripe de retry.
+    await prisma.webhookEvent.delete({ where: { id: event.id } }).catch(() => {});
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
   }
 }
-
