@@ -19,7 +19,10 @@ const outfit = Outfit({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://byspermis.fr";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
     default: "BYS Formation — Marketplace de formations permis & sécurité routière",
     template: "%s | BYS Formation",
@@ -37,10 +40,15 @@ export const metadata: Metadata = {
     "sécurité routière",
     "BYS Formation",
   ],
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "fr_FR",
     siteName: "BYS Formation",
+    url: APP_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

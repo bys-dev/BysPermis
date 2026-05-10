@@ -28,9 +28,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       };
     }
 
+    const description = formation.description.slice(0, 155);
+
     return {
-      title: `${formation.titre} — ${formation.centre.ville}`,
-      description: formation.description.slice(0, 160),
+      title: `${formation.titre} | BYS Formation`,
+      description,
       keywords: [
         formation.titre,
         formation.centre.nom,
@@ -39,9 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "formation",
         "permis",
       ],
+      alternates: { canonical: `/formations/${slug}` },
       openGraph: {
-        title: formation.titre,
-        description: formation.description.slice(0, 160),
+        title: `${formation.titre} — ${formation.centre.ville}`,
+        description,
+        url: `/formations/${slug}`,
         type: "website",
         locale: "fr_FR",
         siteName: "BYS Formation",

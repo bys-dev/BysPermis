@@ -1,9 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import HomeFaq from "@/components/marketplace/HomeFaq";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -17,12 +16,27 @@ import {
   faBuilding,
   faChartLine,
   faHeadset,
-  faChevronDown,
-  faChevronUp,
   faCheckCircle,
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+  title: "Comment ça marche ? — Réserver un stage de récupération de points",
+  description:
+    "Découvrez comment réserver votre stage de récupération de points en 4 étapes simples sur BYS Formation. Convocation immédiate, paiement sécurisé.",
+  alternates: { canonical: "/comment-ca-marche" },
+  openGraph: {
+    title: "Comment ça marche ? | BYS Formation",
+    description: "4 étapes simples pour réserver votre stage et récupérer 4 points.",
+    url: "/comment-ca-marche",
+    type: "website",
+    locale: "fr_FR",
+    siteName: "BYS Formation",
+  },
+};
 
 // ─── DATA ────────────────────────────────────────────────
 
@@ -137,8 +151,6 @@ const faqItems: FaqItem[] = [
 // ─── PAGE ────────────────────────────────────────────────
 
 export default function CommentCaMarchePage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <Header />
@@ -385,34 +397,7 @@ export default function CommentCaMarchePage() {
                 Questions fréquentes
               </h2>
             </div>
-            <div className="space-y-3">
-              {faqItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="bg-[#F9FAFB] rounded-xl border border-brand-border overflow-hidden"
-                >
-                  <button
-                    onClick={() =>
-                      setOpenFaq(openFaq === index ? null : index)
-                    }
-                    className="w-full flex items-center justify-between p-5 text-left"
-                  >
-                    <span className="font-semibold text-brand-text pr-4">
-                      {item.question}
-                    </span>
-                    <FontAwesomeIcon
-                      icon={openFaq === index ? faChevronUp : faChevronDown}
-                      className="text-gray-400 flex-shrink-0"
-                    />
-                  </button>
-                  {openFaq === index && (
-                    <div className="px-5 pb-5 text-gray-500 leading-relaxed">
-                      {item.answer}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <HomeFaq items={faqItems} />
           </div>
         </section>
 

@@ -19,8 +19,34 @@ interface Props {
   params: Promise<{ ville: string }>;
 }
 
+export const revalidate = 3600;
+
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function slugifyVille(ville: string): string {
+  return ville
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+export async function generateStaticParams() {
+  try {
+    const centres = await prisma.centre.findMany({
+      where: { isActive: true, statut: "ACTIF" },
+      select: { ville: true },
+      distinct: ["ville"],
+      take: 100,
+    });
+    return centres
+      .filter((c) => c.ville)
+      .map((c) => ({ ville: slugifyVille(c.ville) }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -37,12 +63,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `formation FIMO ${villeDecoded}`,
       `stage permis ${villeDecoded}`,
     ],
+    alternates: { canonical: `/stages/${ville}` },
     openGraph: {
       title: `Stages permis à ${villeDecoded}`,
       description: `Comparez les centres agréés et réservez votre stage à ${villeDecoded}.`,
       type: "website",
       locale: "fr_FR",
       siteName: "BYS Formation",
+      url: `/stages/${ville}`,
     },
   };
 }
