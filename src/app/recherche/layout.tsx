@@ -12,6 +12,16 @@ export const metadata: Metadata = {
     "stage volontaire récupération points",
     "stage agréé préfecture",
   ],
+  alternates: { canonical: "/recherche" },
+  openGraph: {
+    title: "Rechercher un stage | BYS Formation",
+    description:
+      "Comparez les centres agréés préfecture et réservez votre stage en ligne.",
+    url: "/recherche",
+    type: "website",
+    locale: "fr_FR",
+    siteName: "BYS Formation",
+  },
 };
 
 export default function RechercheLayout({ children }: { children: React.ReactNode }) {
