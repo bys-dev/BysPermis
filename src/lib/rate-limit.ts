@@ -37,11 +37,23 @@ async function getUpstashLimiter(opts: RateLimitOptions): Promise<UpstashLimiter
   if (cached) return cached;
 
   try {
-    // Imports dynamiques pour ne pas casser le build si lib non installée
-    const [{ Ratelimit }, { Redis }] = await Promise.all([
-      import("@upstash/ratelimit"),
-      import("@upstash/redis"),
+    // Imports dynamiques par variable string pour éviter la résolution TS
+    // si les libs ne sont pas installées. À installer via :
+    //   npm install @upstash/ratelimit @upstash/redis
+    const rlName = "@upstash/" + "ratelimit";
+    const redisName = "@upstash/" + "redis";
+    const [rlMod, redisMod] = await Promise.all([
+      import(rlName),
+      import(redisName),
     ]);
+    const { Ratelimit } = rlMod as {
+      Ratelimit: (new (config: unknown) => UpstashLimiter) & {
+        slidingWindow: (max: number, window: string) => unknown;
+      };
+    };
+    const { Redis } = redisMod as {
+      Redis: new (config: { url: string; token: string }) => unknown;
+    };
     const redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL!,
       token: process.env.UPSTASH_REDIS_REST_TOKEN!,
