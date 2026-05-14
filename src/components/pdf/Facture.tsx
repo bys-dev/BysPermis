@@ -3,6 +3,7 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 
@@ -11,6 +12,23 @@ export interface FactureData {
   numero: string; // FAC-2026-0001
   dateEmission: string;
   dateEcheance: string;
+  emetteur: {
+    nom: string;
+    raisonSociale?: string;
+    siret?: string;
+    tva?: string;
+    ape?: string;
+    adresse: string;
+    codePostal: string;
+    ville: string;
+    email?: string;
+    telephone?: string;
+    iban?: string;
+    bic?: string;
+    logoUrl?: string;
+    mentionsLegales?: string;
+    cgv?: string;
+  };
   client: {
     nom: string;
     prenom: string;
@@ -72,8 +90,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   logoText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 13 },
+  logoImage: { width: 44, height: 44, objectFit: "contain" },
   headerTitle: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 18, marginTop: 4 },
   headerSub: { color: "#9CA3AF", fontSize: 9, marginTop: 2 },
   factureBadge: {
@@ -246,13 +266,14 @@ function formatEuro(n: number): string {
 
 // ─── Component ────────────────────────────────────────────
 export function Facture({ data }: { data: FactureData }) {
-  const { numero, dateEmission, dateEcheance, client, lignes, montantHT, tva, montantTTC, paiement } = data;
+  const { numero, dateEmission, dateEcheance, emetteur, client, lignes, montantHT, tva, montantTTC, paiement } = data;
   const isPaid = paiement.status === "Payé";
+  const emetteurDisplay = emetteur.raisonSociale ?? emetteur.nom;
 
   return (
     <Document
-      title={`Facture ${numero} — BYS Formation`}
-      author="BYS Formation"
+      title={`Facture ${numero} — ${emetteurDisplay}`}
+      author={emetteurDisplay}
       subject={`Facture ${numero}`}
     >
       <Page size="A4" style={styles.page}>
@@ -260,10 +281,14 @@ export function Facture({ data }: { data: FactureData }) {
         <View style={styles.header}>
           <View>
             <View style={styles.logoBox}>
-              <Text style={styles.logoText}>BYS</Text>
+              {emetteur.logoUrl ? (
+                <Image src={emetteur.logoUrl} style={styles.logoImage} />
+              ) : (
+                <Text style={styles.logoText}>{emetteurDisplay.slice(0, 3).toUpperCase()}</Text>
+              )}
             </View>
-            <Text style={styles.headerTitle}>BYS Formation</Text>
-            <Text style={styles.headerSub}>Plateforme de stages agréés Préfecture</Text>
+            <Text style={styles.headerTitle}>{emetteurDisplay}</Text>
+            <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>
           </View>
           <View style={styles.factureBadge}>
             <Text style={styles.factureBadgeText}>FACTURE</Text>
@@ -302,24 +327,48 @@ export function Facture({ data }: { data: FactureData }) {
               <Text style={styles.cardTitle}>Émetteur</Text>
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Raison sociale</Text>
-                <Text style={styles.rowValue}>BYS Formation</Text>
+                <Text style={styles.rowValue}>{emetteurDisplay}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Adresse</Text>
-                <Text style={styles.rowValue}>Bât. 7, 9 Chaussée Jules César{"\n"}95520 Osny</Text>
+                <Text style={styles.rowValue}>{emetteur.adresse}{"\n"}{emetteur.codePostal} {emetteur.ville}</Text>
               </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>SIRET</Text>
-                <Text style={styles.rowValue}>908 058 092 00028</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>N° TVA</Text>
-                <Text style={styles.rowValue}>FR 32 908058092</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Email</Text>
-                <Text style={styles.rowValue}>bysforma95@gmail.com</Text>
-              </View>
+              {emetteur.siret ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>SIRET</Text>
+                  <Text style={styles.rowValue}>{emetteur.siret}</Text>
+                </View>
+              ) : null}
+              {emetteur.tva ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>N° TVA</Text>
+                  <Text style={styles.rowValue}>{emetteur.tva}</Text>
+                </View>
+              ) : null}
+              {emetteur.ape ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Code APE</Text>
+                  <Text style={styles.rowValue}>{emetteur.ape}</Text>
+                </View>
+              ) : null}
+              {emetteur.email ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Email</Text>
+                  <Text style={styles.rowValue}>{emetteur.email}</Text>
+                </View>
+              ) : null}
+              {emetteur.iban ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>IBAN</Text>
+                  <Text style={styles.rowValue}>{emetteur.iban}</Text>
+                </View>
+              ) : null}
+              {emetteur.bic ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>BIC</Text>
+                  <Text style={styles.rowValue}>{emetteur.bic}</Text>
+                </View>
+              ) : null}
             </View>
 
             {/* Client */}
@@ -404,28 +453,43 @@ export function Facture({ data }: { data: FactureData }) {
             </View>
           </View>
 
-          {/* Mentions légales */}
-          <View style={styles.legalBox}>
-            <Text style={styles.legalTitle}>Mentions légales</Text>
-            <Text style={styles.legalText}>
-              En cas de retard de paiement, une pénalité de 3 fois le taux d&apos;intérêt légal sera appliquée, conformément à l&apos;article L.441-10 du Code de commerce.
-              {"\n"}Une indemnité forfaitaire de 40 € pour frais de recouvrement sera due en cas de retard de paiement (art. D.441-5 du Code de commerce).
-              {"\n"}Pas d&apos;escompte pour paiement anticipé.
-              {"\n"}Conditions de paiement : paiement à réception par carte bancaire via Stripe.
-            </Text>
-          </View>
+          {/* Mentions légales / CGV */}
+          {emetteur.mentionsLegales ? (
+            <View style={styles.legalBox}>
+              <Text style={styles.legalTitle}>Mentions légales</Text>
+              <Text style={styles.legalText}>{emetteur.mentionsLegales}</Text>
+            </View>
+          ) : (
+            <View style={styles.legalBox}>
+              <Text style={styles.legalTitle}>Mentions légales</Text>
+              <Text style={styles.legalText}>
+                En cas de retard de paiement, une pénalité de 3 fois le taux d&apos;intérêt légal sera appliquée, conformément à l&apos;article L.441-10 du Code de commerce.
+                {"\n"}Une indemnité forfaitaire de 40 € pour frais de recouvrement sera due en cas de retard de paiement (art. D.441-5 du Code de commerce).
+                {"\n"}Pas d&apos;escompte pour paiement anticipé.
+                {"\n"}Conditions de paiement : paiement à réception par carte bancaire via Stripe.
+              </Text>
+            </View>
+          )}
+          {emetteur.cgv ? (
+            <View style={styles.legalBox}>
+              <Text style={styles.legalTitle}>Conditions générales de vente</Text>
+              <Text style={styles.legalText}>{emetteur.cgv}</Text>
+            </View>
+          ) : null}
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerBrand}>BYS Formation — bysforma95@gmail.com</Text>
-          <Text style={styles.footerText}>Bât. 7, 9 Chaussée Jules César, 95520 Osny</Text>
-          <Text style={styles.footerText}>SIRET : 908 058 092 00028</Text>
+          <Text style={styles.footerBrand}>{emetteurDisplay}{emetteur.email ? ` — ${emetteur.email}` : ""}</Text>
+          <Text style={styles.footerText}>{emetteur.adresse}, {emetteur.codePostal} {emetteur.ville}</Text>
+          <Text style={styles.footerText}>{emetteur.siret ? `SIRET : ${emetteur.siret}` : "—"}</Text>
         </View>
         <View style={{ backgroundColor: colors.navy, paddingHorizontal: 40, paddingBottom: 10 }}>
           <Text style={styles.footerLegal}>
-            BYS Formation — SIRET 908 058 092 00028 — TVA FR 32 908058092
-            {"\n"}Organisme de formation enregistré — Bât. 7, 9 Chaussée Jules César, 95520 Osny
+            {emetteurDisplay}
+            {emetteur.siret ? ` — SIRET ${emetteur.siret}` : ""}
+            {emetteur.tva ? ` — TVA ${emetteur.tva}` : ""}
+            {"\n"}{emetteur.adresse}, {emetteur.codePostal} {emetteur.ville}
           </Text>
         </View>
       </Page>

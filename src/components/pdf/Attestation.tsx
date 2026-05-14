@@ -3,6 +3,7 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 
@@ -32,11 +33,16 @@ export interface AttestationData {
   };
   centre: {
     nom: string;
+    raisonSociale?: string;
+    siret?: string;
     adresse: string;
     codePostal: string;
     ville: string;
     telephone?: string;
     email?: string;
+    logoUrl?: string;
+    signatureUrl?: string;
+    nomResponsable?: string;
   };
   verificationUrl?: string;
 }
@@ -79,8 +85,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   logoText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 13 },
+  logoImage: { width: 44, height: 44, objectFit: "contain" },
+  signatureImage: { width: 110, height: 50, objectFit: "contain", marginBottom: 4 },
   headerTitle: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 18, marginTop: 4 },
   headerSub: { color: "#9CA3AF", fontSize: 9, marginTop: 2 },
   attestBadge: {
@@ -244,10 +253,12 @@ export function Attestation({ data }: { data: AttestationData }) {
     HYBRIDE: "Hybride",
   };
 
+  const centreDisplay = centre.raisonSociale ?? centre.nom;
+
   return (
     <Document
       title={`Attestation de formation — ${numeroAttestation}`}
-      author="BYS Formation"
+      author={centreDisplay}
       subject={`Attestation ${formation.titre} — ${stagiaire.prenom} ${stagiaire.nom}`}
     >
       <Page size="A4" style={styles.page}>
@@ -255,10 +266,14 @@ export function Attestation({ data }: { data: AttestationData }) {
         <View style={styles.header}>
           <View>
             <View style={styles.logoBox}>
-              <Text style={styles.logoText}>BYS</Text>
+              {centre.logoUrl ? (
+                <Image src={centre.logoUrl} style={styles.logoImage} />
+              ) : (
+                <Text style={styles.logoText}>{centreDisplay.slice(0, 3).toUpperCase()}</Text>
+              )}
             </View>
-            <Text style={styles.headerTitle}>BYS Formation</Text>
-            <Text style={styles.headerSub}>Plateforme de stages agrees Prefecture</Text>
+            <Text style={styles.headerTitle}>{centreDisplay}</Text>
+            <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>
           </View>
           <View style={styles.attestBadge}>
             <Text style={styles.attestBadgeText}>ATTESTATION</Text>
@@ -278,7 +293,7 @@ export function Attestation({ data }: { data: AttestationData }) {
           <View style={styles.titleSection}>
             <Text style={styles.mainTitle}>ATTESTATION DE FORMATION</Text>
             <Text style={styles.subtitle}>
-              Document officiel delivre par {centre.nom}
+              Document officiel délivré par {centreDisplay}
             </Text>
           </View>
 
@@ -306,10 +321,10 @@ export function Attestation({ data }: { data: AttestationData }) {
             {stagiaire.ville ? (
               <Text>, demeurant a <Text style={styles.bodyTextBold}>{stagiaire.adresse ? `${stagiaire.adresse}, ` : ""}{stagiaire.codePostal} {stagiaire.ville}</Text></Text>
             ) : null}
-            , a suivi avec succes la formation{" "}
+            , a suivi avec succès la formation{" "}
             <Text style={styles.bodyTextBold}>{formation.titre}</Text>{" "}
-            dispensee par le centre de formation{" "}
-            <Text style={styles.bodyTextBold}>{centre.nom}</Text>, situe a{" "}
+            dispensée par le centre de formation{" "}
+            <Text style={styles.bodyTextBold}>{centreDisplay}</Text>, situé à{" "}
             <Text style={styles.bodyTextBold}>{centre.adresse}, {centre.codePostal} {centre.ville}</Text>.
           </Text>
 
@@ -378,15 +393,21 @@ export function Attestation({ data }: { data: AttestationData }) {
               <Text style={styles.cardTitle}>Centre de formation</Text>
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Nom</Text>
-                <Text style={styles.rowValue}>{centre.nom}</Text>
+                <Text style={styles.rowValue}>{centreDisplay}</Text>
               </View>
+              {centre.siret ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>SIRET</Text>
+                  <Text style={styles.rowValue}>{centre.siret}</Text>
+                </View>
+              ) : null}
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Adresse</Text>
                 <Text style={styles.rowValue}>{centre.adresse}{"\n"}{centre.codePostal} {centre.ville}</Text>
               </View>
               {centre.telephone && (
                 <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Telephone</Text>
+                  <Text style={styles.rowLabel}>Téléphone</Text>
                   <Text style={styles.rowValue}>{centre.telephone}</Text>
                 </View>
               )}
@@ -410,28 +431,33 @@ export function Attestation({ data }: { data: AttestationData }) {
           {/* Signatures */}
           <View style={styles.signBlock}>
             <View style={styles.signBox}>
-              <Text style={styles.signTitle}>Signature du formateur</Text>
+              <Text style={styles.signTitle}>
+                {centre.nomResponsable ? `Signature de ${centre.nomResponsable}` : "Signature du formateur"}
+              </Text>
               <View style={styles.signLine} />
-              <Text style={styles.signLabel}>Fait a {centre.ville}, le {dateDelivrance}</Text>
+              <Text style={styles.signLabel}>Fait à {centre.ville}, le {dateDelivrance}</Text>
             </View>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>Cachet & signature du centre</Text>
+              {centre.signatureUrl ? (
+                <Image src={centre.signatureUrl} style={styles.signatureImage} />
+              ) : null}
               <View style={styles.signLine} />
-              <Text style={styles.signLabel}>{centre.nom}</Text>
+              <Text style={styles.signLabel}>{centreDisplay}</Text>
             </View>
           </View>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerBrand}>BYS Formation — bysforma95@gmail.com</Text>
-          <Text style={styles.footerText}>Bat. 7, 9 Chaussee Jules Cesar, 95520 Osny</Text>
-          <Text style={styles.footerText}>Lun-Ven : 9h-18h</Text>
+          <Text style={styles.footerBrand}>{centreDisplay}{centre.email ? ` — ${centre.email}` : ""}</Text>
+          <Text style={styles.footerText}>{centre.adresse}, {centre.codePostal} {centre.ville}</Text>
+          <Text style={styles.footerText}>{centre.telephone ?? "—"}</Text>
         </View>
         <View style={{ backgroundColor: colors.navy, paddingHorizontal: 40, paddingBottom: 10 }}>
           <Text style={styles.footerLegal}>
-            Cette attestation est delivree conformement aux dispositions du Code du travail relatives a la formation professionnelle.
-            {"\n"}BYS Formation — SIRET 908 058 092 00028 — Bat. 7, 9 Chaussee Jules Cesar, 95520 Osny
+            Cette attestation est délivrée conformément aux dispositions du Code du travail relatives à la formation professionnelle.
+            {"\n"}{centreDisplay}{centre.siret ? ` — SIRET ${centre.siret}` : ""} — {centre.adresse}, {centre.codePostal} {centre.ville}
           </Text>
         </View>
       </Page>
