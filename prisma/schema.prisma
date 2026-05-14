@@ -170,6 +170,18 @@ model Centre {
   certifications        String[]
   reseauxSociaux        Json?
 
+  // Facturation / juridique
+  raisonSociale          String?
+  tva                    String?    // ex "FR12345678901"
+  ape                    String?    // ex "8559A"
+  iban                   String?
+  bic                    String?
+  mentionsLegales        String?
+  cgv                    String?
+  nomResponsable         String?
+  signatureUrl           String?    // URL image signature
+  commissionRateOverride Float?     // null = utilise COMMISSION_RATE global
+
   // Relations
   userId                String
   user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
