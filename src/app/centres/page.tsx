@@ -109,17 +109,26 @@ function CentresInner() {
           url.searchParams.set("ville", searchVille);
         }
         const res = await fetch(url.toString());
-        const data = await res.json();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mapped: Centre[] = data.map((c: any) => ({
+        type ApiFormation = { titre: string; isQualiopi: boolean };
+        type ApiCentre = {
+          id: string;
+          nom: string;
+          slug: string;
+          ville?: string | null;
+          formations?: ApiFormation[];
+          _count?: { formations?: number };
+          distance?: number | null;
+        };
+        const data: ApiCentre[] = await res.json();
+        const mapped: Centre[] = data.map((c) => ({
           id: c.id,
           nom: c.nom,
           slug: c.slug,
           ville: c.ville ?? "",
-          isQualiopi: c.formations?.some((f: any) => f.isQualiopi) ?? false,
+          isQualiopi: c.formations?.some((f) => f.isQualiopi) ?? false,
           isBYS: c.nom.toLowerCase().includes("bys"),
           nombreFormations: c._count?.formations ?? 0,
-          specialites: [...new Set(c.formations?.map((f: any) => f.titre.split(" ").slice(0, 3).join(" ")) ?? [])].slice(0, 4) as string[],
+          specialites: [...new Set(c.formations?.map((f) => f.titre.split(" ").slice(0, 3).join(" ")) ?? [])].slice(0, 4),
           distance: c.distance ?? null,
         }));
         // When not using geo, BYS toujours en premier

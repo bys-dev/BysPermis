@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Seed scripts use `any` for Prisma's dynamic create payloads (nested includes,
+// connect-or-create, polymorphic upserts). Strict typing here would add 100s of
+// lines of Prisma.XxxCreateInput boilerplate for zero runtime benefit. Out of
+// production code path.
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
