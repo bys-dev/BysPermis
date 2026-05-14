@@ -86,6 +86,43 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      // ── Stripe Connect: transfer vers le centre ───────────
+      case "transfer.created": {
+        const transfer = event.data.object as Stripe.Transfer;
+        const destination =
+          typeof transfer.destination === "string"
+            ? transfer.destination
+            : transfer.destination?.id ?? null;
+        if (destination) {
+          const centre = await prisma.centre.findFirst({
+            where: { stripeAccountId: destination },
+            select: { id: true },
+          });
+          if (centre) {
+            // Idempotent: skip if a CentrePayment already exists for this transfer
+            const existing = await prisma.centrePayment.findFirst({
+              where: { stripeId: transfer.id, centreId: centre.id },
+            });
+            if (!existing) {
+              const amount = (transfer.amount ?? 0) / 100;
+              await prisma.centrePayment.create({
+                data: {
+                  centreId: centre.id,
+                  type: "COMMISSION",
+                  montant: amount,
+                  description:
+                    transfer.description ?? `Transfert Stripe Connect ${transfer.id}`,
+                  stripeId: transfer.id,
+                  status: "PAYE",
+                  periode: new Date().toISOString().slice(0, 7),
+                },
+              });
+            }
+          }
+        }
+        break;
+      }
+
       // ── Stripe Connect: onboarding centre terminé ─────────
       case "account.updated": {
         const account = event.data.object as Stripe.Account;

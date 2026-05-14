@@ -133,3 +133,20 @@ export function calculateCommission(
   const centreAmount = Math.round((amount - commission) * 100) / 100;
   return { commission, centreAmount };
 }
+
+/**
+ * Resolve the effective commission rate for a given centre.
+ *
+ * Order of precedence:
+ *   1. centre.commissionRateOverride (per-centre negotiated rate, set by platform admin)
+ *   2. process.env.COMMISSION_RATE  (global platform rate)
+ *   3. 0.1 fallback                 (10%)
+ *
+ * Returns a fraction in [0, 1] (e.g. 0.08 for 8%).
+ */
+export function getCommissionRate(centre: { commissionRateOverride: number | null }): number {
+  if (centre.commissionRateOverride !== null && centre.commissionRateOverride !== undefined) {
+    return centre.commissionRateOverride;
+  }
+  return Number(process.env.COMMISSION_RATE ?? 0.1);
+}

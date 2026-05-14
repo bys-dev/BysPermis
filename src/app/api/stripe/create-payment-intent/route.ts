@@ -4,7 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
 import { rateLimit } from "@/lib/rate-limit";
-import { calculateCommission, generateReservationNumber } from "@/lib/utils";
+import { calculateCommission, generateReservationNumber, getCommissionRate } from "@/lib/utils";
 
 const schema = z.object({
   sessionId: z.string().min(1),
@@ -89,8 +89,11 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      const commissionRate = Number(process.env.COMMISSION_RATE ?? 0.1) * 100;
-      const { commission } = calculateCommission(finalPrice, commissionRate);
+      const commissionRateFraction = getCommissionRate(centre);
+      if (centre.commissionRateOverride !== null && centre.commissionRateOverride !== undefined) {
+        console.info(`[create-payment-intent] centre ${centre.id} override rate=${centre.commissionRateOverride}`);
+      }
+      const { commission } = calculateCommission(finalPrice, commissionRateFraction * 100);
 
       // Crée la réservation en EN_ATTENTE_PAIEMENT (placeholder).
       // Pré-remplit avec les infos User (l'élève complétera le formulaire).
@@ -121,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     // ─── 2. Créer le PaymentIntent Stripe ────────────────────────
     const amountCents = Math.round(txResult.finalPrice * 100);
-    const commissionRate = Number(process.env.COMMISSION_RATE ?? 0.1);
+    const commissionRate = getCommissionRate(txResult.centre);
     const applicationFee = Math.round(amountCents * commissionRate);
 
     const paymentIntentData: Parameters<typeof stripe.paymentIntents.create>[0] = {

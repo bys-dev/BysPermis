@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
-import { calculateCommission } from "@/lib/utils";
+import { calculateCommission, getCommissionRate } from "@/lib/utils";
 import { sendConfirmationEmail, sendCentreNotificationEmail, resend } from "@/lib/email";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { formatDate } from "@/lib/utils";
@@ -121,8 +121,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Calculer la commission (au cas où elle n'aurait pas été calculée)
-    const commissionRate = Number(process.env.COMMISSION_RATE ?? 0.1) * 100;
-    const { commission } = calculateCommission(placeholder.montant, commissionRate);
+    const placeholderCentre = placeholder.session.formation.centre;
+    const commissionFraction = getCommissionRate(placeholderCentre);
+    if (placeholderCentre.commissionRateOverride !== null && placeholderCentre.commissionRateOverride !== undefined) {
+      console.info(`[reservations.POST] centre ${placeholderCentre.id} override rate=${placeholderCentre.commissionRateOverride}`);
+    }
+    const { commission } = calculateCommission(placeholder.montant, commissionFraction * 100);
 
     // 4. Update transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -295,7 +299,7 @@ export async function POST(req: NextRequest) {
             eleveName: `${data.prenom} ${data.nom}`,
             formationTitle: result.reservation.session.formation.titre,
             sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
-            amount: result.reservation.montant * (1 - Number(process.env.COMMISSION_RATE ?? 0.1)),
+            amount: result.reservation.montant * (1 - getCommissionRate(centre)),
           })
         );
       }
