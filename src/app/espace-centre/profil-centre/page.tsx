@@ -28,6 +28,7 @@ import {
   faLinkedin,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
+import { ImageUploadField } from "@/components/centre/ImageUploadField";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ interface CentreProfile {
   telephone: string | null;
   email: string | null;
   siteWeb: string | null;
+  logo: string | null;
   bannerImage: string | null;
   couleurPrimaire: string | null;
   couleurSecondaire: string | null;
@@ -189,6 +191,7 @@ export default function ProfilCentrePage() {
           telephone: form.telephone || null,
           email: form.email || null,
           siteWeb: form.siteWeb || null,
+          logo: form.logo || null,
           bannerImage: form.bannerImage || null,
           couleurPrimaire: form.couleurPrimaire || null,
           couleurSecondaire: form.couleurSecondaire || null,
@@ -689,42 +692,36 @@ export default function ProfilCentrePage() {
             )}
           </div>
 
+          {/* Logo */}
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+              <FontAwesomeIcon icon={faImage} className="text-blue-400 w-4 h-4" />
+              Logo du centre
+            </h2>
+            <ImageUploadField
+              kind="logo"
+              currentUrl={form.logo}
+              onUploaded={(url) => updateField("logo", url)}
+              label="Logo (affiche en haut de la fiche publique et sur les contrats)"
+              hint="PNG transparent recommande, format carre, max 1MB"
+              previewClassName="h-32"
+            />
+          </div>
+
           {/* Banner */}
           <div className="rounded-xl p-6" style={cardStyle}>
             <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
               <FontAwesomeIcon icon={faImage} className="text-blue-400 w-4 h-4" />
               Image de banniere
             </h2>
-            <input
-              type="url"
-              value={form.bannerImage || ""}
-              onChange={(e) => updateField("bannerImage", e.target.value)}
-              className={inputClass}
-              style={inputStyle}
-              placeholder="https://exemple.fr/banner.jpg"
+            <ImageUploadField
+              kind="bannerImage"
+              currentUrl={form.bannerImage}
+              onUploaded={(url) => updateField("bannerImage", url)}
+              label="Banniere (entete de la fiche publique)"
+              hint="Format recommande : 1200x400px, max 2MB"
+              previewClassName="h-40"
             />
-            <p className="text-xs text-gray-600 mt-2">
-              Entrez l&apos;URL d&apos;une image (format recommande : 1200x400px).
-              L&apos;upload de fichier sera disponible prochainement.
-            </p>
-            {form.bannerImage && (
-              <div className="mt-4">
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-1.5">
-                  <FontAwesomeIcon icon={faEye} className="w-3 h-3" />
-                  Apercu de la banniere
-                </p>
-                <div className="rounded-lg overflow-hidden h-32">
-                  <img
-                    src={form.bannerImage}
-                    alt="Banner preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Live preview */}
