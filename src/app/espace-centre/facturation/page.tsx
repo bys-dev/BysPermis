@@ -16,6 +16,8 @@ import {
   faArrowUpRightFromSquare,
   faXmark,
   faFilter,
+  faFilePdf,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice, formatDate } from "@/lib/utils";
 
@@ -56,20 +58,20 @@ interface SubscriptionInfo {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  PAYE: { label: "Paye", color: "text-green-400", bg: "bg-green-400/10", border: "border-green-400/20" },
-  EN_ATTENTE: { label: "En attente", color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-400/20" },
+  PAYE: { label: "Paye", color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
+  EN_ATTENTE: { label: "En attente", color: "text-gray-300", bg: "bg-white/5", border: "border-white/10" },
   ECHOUE: { label: "Echoue", color: "text-red-400", bg: "bg-red-400/10", border: "border-red-400/20" },
 };
 
 const TYPE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   COMMISSION: { label: "Commission", color: "text-blue-400", bg: "bg-blue-400/10" },
-  ABONNEMENT: { label: "Abonnement", color: "text-purple-400", bg: "bg-purple-400/10" },
-  REMBOURSEMENT: { label: "Remboursement", color: "text-orange-400", bg: "bg-orange-400/10" },
+  ABONNEMENT: { label: "Abonnement", color: "text-blue-300", bg: "bg-blue-300/10" },
+  REMBOURSEMENT: { label: "Remboursement", color: "text-gray-300", bg: "bg-white/5" },
 };
 
 const SUB_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  ACTIVE: { label: "Actif", color: "text-green-400" },
-  PAST_DUE: { label: "Paiement en retard", color: "text-orange-400" },
+  ACTIVE: { label: "Actif", color: "text-blue-400" },
+  PAST_DUE: { label: "Paiement en retard", color: "text-red-400" },
   ANNULEE: { label: "Annule", color: "text-red-400" },
   TRIALING: { label: "Periode d'essai", color: "text-blue-400" },
 };
@@ -178,6 +180,9 @@ export default function FacturationPage() {
         <p className="text-gray-500 text-sm">Suivi de vos paiements, commissions et abonnement</p>
       </div>
 
+      {/* Recap commission (toujours visible) */}
+      <CommissionRecap data={data} loading={loading} />
+
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-lg" style={{ background: "rgba(255,255,255,0.04)" }}>
         {tabs.map((tab) => (
@@ -242,27 +247,27 @@ function OverviewTab({
       value: loading ? "..." : formatPrice(data?.totaux.paye ?? 0),
       sub: "Total des commissions reglees",
       icon: faEuro,
-      color: "text-green-400",
-      bg: "bg-green-400/10",
-      border: "border-green-500/20",
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+      border: "border-blue-500/20",
     },
     {
       label: "Abonnement actuel",
       value: loadingSub ? "..." : subscription?.plan ? `${subscription.plan.nom} — ${subscription.plan.prix}\u20AC/mois` : "Aucun",
       sub: subscription?.plan ? `Commission ${subscription.plan.commissionRate}%` : "Commission standard 10%",
       icon: faCrown,
-      color: "text-purple-400",
-      bg: "bg-purple-400/10",
-      border: "border-purple-500/20",
+      color: "text-blue-300",
+      bg: "bg-blue-300/10",
+      border: "border-blue-400/20",
     },
     {
       label: "En attente",
       value: loading ? "..." : formatPrice(data?.totaux.enAttente ?? 0),
       sub: "Commissions a regler",
       icon: faClock,
-      color: "text-orange-400",
-      bg: "bg-orange-400/10",
-      border: "border-orange-500/20",
+      color: "text-gray-300",
+      bg: "bg-white/5",
+      border: "border-white/10",
     },
   ];
 
@@ -288,7 +293,7 @@ function OverviewTab({
       {subscription?.plan && (
         <div className="rounded-xl p-5 border border-white/8 bg-[#0A1628]">
           <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
-            <FontAwesomeIcon icon={faCrown} className="text-purple-400 w-4 h-4" />
+            <FontAwesomeIcon icon={faCrown} className="text-blue-300 w-4 h-4" />
             Abonnement en cours
           </h3>
           <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)" }}>
@@ -393,14 +398,25 @@ function HistoryTab({
             <option value="REMBOURSEMENT">Remboursements</option>
           </select>
         </div>
-        <button
-          onClick={onExport}
-          disabled={!data?.payments.length}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600/15 text-blue-400 text-sm font-medium border border-blue-500/20 hover:bg-blue-600/25 transition-colors disabled:opacity-50"
-        >
-          <FontAwesomeIcon icon={faFileExport} className="text-xs" />
-          Exporter CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onExport}
+            disabled={!data?.payments.length}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600/15 text-blue-400 text-sm font-medium border border-blue-500/20 hover:bg-blue-600/25 transition-colors disabled:opacity-50"
+          >
+            <FontAwesomeIcon icon={faFileExport} className="text-xs" />
+            Exporter CSV
+          </button>
+          {/* TODO: la route /api/centre/payments/export n'existe pas encore. Bouton desactive en attendant. */}
+          <button
+            disabled
+            title="Disponible prochainement"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-500 text-sm font-medium border border-white/10 disabled:opacity-50 cursor-not-allowed"
+          >
+            <FontAwesomeIcon icon={faFilePdf} className="text-xs" />
+            Telecharger releve PDF
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -530,7 +546,7 @@ function SubscriptionTab({
       {/* Plan details */}
       <div className="rounded-xl p-6 border border-white/8 bg-[#0A1628]">
         <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
-          <FontAwesomeIcon icon={faCrown} className="text-purple-400 w-4 h-4" />
+          <FontAwesomeIcon icon={faCrown} className="text-blue-300 w-4 h-4" />
           Votre plan
         </h3>
 
@@ -572,9 +588,9 @@ function SubscriptionTab({
         )}
 
         {subscription.cancelAtPeriodEnd && (
-          <div className="flex items-start gap-3 p-4 rounded-lg mb-5" style={{ background: "rgba(251,146,60,0.1)", border: "1px solid rgba(251,146,60,0.2)" }}>
-            <FontAwesomeIcon icon={faCircleExclamation} className="text-orange-400 w-4 h-4 mt-0.5" />
-            <p className="text-xs text-orange-300">
+          <div className="flex items-start gap-3 p-4 rounded-lg mb-5" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+            <FontAwesomeIcon icon={faCircleExclamation} className="text-red-400 w-4 h-4 mt-0.5" />
+            <p className="text-xs text-red-300">
               Votre abonnement est programme pour etre annule. Il restera actif jusqu&apos;a la fin de la periode en cours.
             </p>
           </div>
@@ -618,6 +634,59 @@ function SubscriptionTab({
             </button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Commission Recap ──────────────────────────────────────
+function CommissionRecap({ data, loading }: { data: PaymentData | null; loading: boolean }) {
+  // Calcul cote client: filtre les paiements de type COMMISSION
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+  const commissions = (data?.payments ?? []).filter((p) => p.type === "COMMISSION");
+  const paid = commissions.filter((p) => p.status === "PAYE");
+  const pending = commissions.filter((p) => p.status === "EN_ATTENTE");
+
+  const sumByPeriod = (list: Payment[], since: Date): number =>
+    list
+      .filter((p) => new Date(p.createdAt) >= since)
+      .reduce((acc, p) => acc + (p.montant || 0), 0);
+
+  const moisPaye = sumByPeriod(paid, startOfMonth);
+  const anneePaye = sumByPeriod(paid, startOfYear);
+  const enAttente = pending.reduce((acc, p) => acc + (p.montant || 0), 0);
+  const totalPayouts = paid.reduce((acc, p) => acc + (p.montant || 0), 0);
+
+  const cards = [
+    { label: "Commission ce mois", value: moisPaye, hint: "Total preleve sur le mois en cours" },
+    { label: "Commission cette annee", value: anneePaye, hint: "Cumul depuis le 1er janvier" },
+    { label: "Payouts recus", value: totalPayouts, hint: "Total commissions reglees" },
+    { label: "En attente", value: enAttente, hint: "Commissions a regler" },
+  ];
+
+  return (
+    <div className="rounded-xl p-5 border border-white/8 bg-[#0A1628]">
+      <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
+        <FontAwesomeIcon icon={faChartLine} className="text-blue-400 w-4 h-4" />
+        Recap commission
+      </h3>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {cards.map((c) => (
+          <div
+            key={c.label}
+            className="rounded-lg p-3 border border-white/8"
+            style={{ background: "rgba(255,255,255,0.03)" }}
+          >
+            <p className="text-[11px] text-gray-500 mb-1">{c.label}</p>
+            <p className="text-lg font-bold text-white">
+              {loading ? "..." : formatPrice(c.value)}
+            </p>
+            <p className="text-[10px] text-gray-600 mt-0.5">{c.hint}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
