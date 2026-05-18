@@ -1,9 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ContactForm from "@/components/contact/ContactForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEnvelope,
@@ -11,24 +10,29 @@ import {
   faClock,
   faBuilding,
   faArrowRight,
-  faPaperPlane,
-  faCircleCheck,
-  faSpinner,
   faShieldHalved,
   faChevronRight,
   faPhone,
   faHeadset,
-  faComments,
 } from "@fortawesome/free-solid-svg-icons";
 
-const subjectOptions = [
-  { value: "", label: "Sélectionnez un sujet" },
-  { value: "reservation", label: "Réservation / Stage" },
-  { value: "partenariat", label: "Devenir centre partenaire" },
-  { value: "support", label: "Support technique" },
-  { value: "facturation", label: "Facturation / Paiement" },
-  { value: "autre", label: "Autre demande" },
-];
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+  title: "Contact — BYS Formation",
+  description:
+    "Contactez l'équipe BYS Formation pour toute question sur les stages, le partenariat ou le support technique. Réponse sous 24h ouvrées.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact — BYS Formation",
+    description:
+      "Une question sur un stage, un partenariat ou besoin d'aide ? Notre équipe répond sous 24h.",
+    url: "/contact",
+    type: "website",
+    locale: "fr_FR",
+    siteName: "BYS Formation",
+  },
+};
 
 const faqLinks = [
   { question: "Comment réserver un stage ?", href: "/comment-ca-marche" },
@@ -37,48 +41,38 @@ const faqLinks = [
   { question: "Consulter toute la FAQ", href: "/faq" },
 ];
 
+const heroContacts = [
+  { icon: faEnvelope, label: "Email", value: "bysforma95@gmail.com", href: "mailto:bysforma95@gmail.com" },
+  { icon: faPhone, label: "Téléphone", value: "01 34 25 XX XX" },
+  { icon: faLocationDot, label: "Adresse", value: "Osny (95) — Val-d'Oise" },
+  { icon: faClock, label: "Horaires", value: "Lun – Ven : 9h – 18h" },
+];
+
+const sidebarContacts = [
+  { icon: faEnvelope, label: "Email", value: "bysforma95@gmail.com", href: "mailto:bysforma95@gmail.com" },
+  { icon: faPhone, label: "Téléphone", value: "01 34 25 XX XX", href: "tel:+33134250000" },
+  { icon: faLocationDot, label: "Adresse", value: "Bât. 7, 9 Chaussée Jules César, 95520 Osny" },
+  { icon: faClock, label: "Horaires", value: "Lun – Ven : 9h – 18h" },
+];
+
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ nom: "", email: "", sujet: "", message: "" });
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (res.ok) {
-        setSent(true);
-        setFormData({ nom: "", email: "", sujet: "", message: "" });
-      }
-    } catch {
-      // silently fail in dev
-    } finally {
-      setSending(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <Header />
 
       <main>
-        {/* ─── Hero dark navy ─── */}
+        {/* Hero */}
         <section className="relative overflow-hidden bg-[#0A1628] text-white py-20 lg:py-28 px-4">
-          {/* Glow effects */}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.15) 0%, transparent 70%)" }} />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.15) 0%, transparent 70%)",
+            }}
+          />
           <div className="absolute top-10 left-[10%] w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-10 right-[15%] w-56 h-56 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Barre tricolore */}
           <div className="absolute bottom-0 left-0 right-0 h-1 flex">
             <div className="flex-1 bg-blue-600" />
             <div className="flex-1 bg-white" />
@@ -86,9 +80,12 @@ export default function ContactPage() {
           </div>
 
           <div className="relative max-w-[1440px] mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6 border" style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6 border"
+              style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)" }}
+            >
               <FontAwesomeIcon icon={faHeadset} className="text-blue-400 text-xs" />
-              <span className="text-gray-300">Contact & Support</span>
+              <span className="text-gray-300">Contact &amp; Support</span>
             </div>
             <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white">
               Contactez-nous
@@ -98,24 +95,23 @@ export default function ContactPage() {
               Notre équipe répond sous 24h ouvrées.
             </p>
 
-            {/* Infos rapides — cards */}
             <div className="flex flex-wrap justify-center gap-4 mt-10">
-              {[
-                { icon: faEnvelope, label: "Email", value: "bysforma95@gmail.com", href: "mailto:bysforma95@gmail.com" },
-                { icon: faPhone, label: "Téléphone", value: "01 34 25 XX XX" },
-                { icon: faLocationDot, label: "Adresse", value: "Osny (95) — Val-d'Oise" },
-                { icon: faClock, label: "Horaires", value: "Lun – Ven : 9h – 18h" },
-              ].map((info) => (
+              {heroContacts.map((info) => (
                 <div
                   key={info.label}
                   className="flex items-center gap-3 px-5 py-3 rounded-xl text-sm"
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
                 >
                   <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
                     <FontAwesomeIcon icon={info.icon} className="text-blue-400 w-3.5 h-3.5" />
                   </div>
                   {info.href ? (
-                    <a href={info.href} className="text-gray-300 hover:text-white transition-colors">{info.value}</a>
+                    <a href={info.href} className="text-gray-300 hover:text-white transition-colors">
+                      {info.value}
+                    </a>
                   ) : (
                     <span className="text-gray-300">{info.value}</span>
                   )}
@@ -125,115 +121,23 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* ─── Form + Sidebar ─── */}
+        {/* Form + Sidebar */}
         <section className="py-16 px-4 sm:px-8">
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-3 gap-10">
-
-              {/* ── Formulaire (2/3) ── */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 lg:p-10 shadow-sm hover:shadow-md transition-shadow">
-                  {/* Header formulaire */}
-                  <div className="flex items-start gap-4 mb-8">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
-                      <FontAwesomeIcon icon={faComments} className="text-white w-5 h-5" />
-                    </div>
-                    <div>
-                      <h2 className="font-display font-bold text-2xl text-gray-900">Envoyez-nous un message</h2>
-                      <p className="text-gray-500 text-sm mt-1">Réponse garantie sous 24 heures ouvrées.</p>
-                    </div>
-                  </div>
-
-                  {sent ? (
-                    <div className="text-center py-16">
-                      <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-6 border-4 border-green-100 shadow-lg shadow-green-100">
-                        <FontAwesomeIcon icon={faCircleCheck} className="text-green-500 text-4xl" />
-                      </div>
-                      <h3 className="font-display font-bold text-2xl text-gray-900 mb-3">Message envoyé !</h3>
-                      <p className="text-gray-500 max-w-md mx-auto mb-8 text-sm leading-relaxed">
-                        Merci pour votre message. Notre équipe vous répondra dans les meilleurs délais.
-                      </p>
-                      <button
-                        onClick={() => setSent(false)}
-                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-semibold text-sm hover:border-blue-500 hover:text-blue-600 transition-all"
-                      >
-                        Envoyer un autre message
-                      </button>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-5">
-                        <div>
-                          <label htmlFor="nom" className="block text-sm font-semibold text-gray-700 mb-2">Nom complet</label>
-                          <input
-                            type="text" id="nom" name="nom" value={formData.nom} onChange={handleChange} required
-                            placeholder="Jean Dupont"
-                            className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder-gray-400 bg-gray-50/80 border border-gray-200 text-gray-800 hover:border-gray-300"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Adresse email</label>
-                          <input
-                            type="email" id="email" name="email" value={formData.email} onChange={handleChange} required
-                            placeholder="jean@exemple.fr"
-                            className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder-gray-400 bg-gray-50/80 border border-gray-200 text-gray-800 hover:border-gray-300"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="sujet" className="block text-sm font-semibold text-gray-700 mb-2">Sujet</label>
-                        <div className="relative">
-                          <select
-                            id="sujet" name="sujet" value={formData.sujet} onChange={handleChange} required
-                            className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all bg-gray-50/80 border border-gray-200 text-gray-800 hover:border-gray-300 appearance-none cursor-pointer"
-                          >
-                            {subjectOptions.map((o) => (
-                              <option key={o.value} value={o.value} disabled={o.value === ""}>{o.label}</option>
-                            ))}
-                          </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
-                        <textarea
-                          id="message" name="message" value={formData.message} onChange={handleChange} required rows={6}
-                          placeholder="Décrivez votre demande en détail..."
-                          className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder-gray-400 bg-gray-50/80 border border-gray-200 text-gray-800 hover:border-gray-300 resize-none"
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2">
-                        <p className="text-xs text-gray-400 hidden sm:block">
-                          Vos données sont protégées conformément au RGPD.
-                        </p>
-                        <button
-                          type="submit"
-                          disabled={sending}
-                          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-60 text-white font-semibold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30"
-                        >
-                          {sending
-                            ? <><FontAwesomeIcon icon={faSpinner} className="animate-spin" />Envoi en cours…</>
-                            : <><FontAwesomeIcon icon={faPaperPlane} />Envoyer le message</>
-                          }
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </div>
+                <ContactForm />
               </div>
 
-              {/* ── Sidebar (1/3) ── */}
+              {/* Sidebar (statique) */}
               <div className="space-y-5">
-
-                {/* Carte dark navy — centre partenaire */}
-                <div className="rounded-2xl p-7 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0A1628 0%, #0f2044 100%)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div
+                  className="rounded-2xl p-7 text-white relative overflow-hidden"
+                  style={{
+                    background: "linear-gradient(135deg, #0A1628 0%, #0f2044 100%)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
                   <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl" />
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl" />
                   <div className="relative">
@@ -242,16 +146,19 @@ export default function ContactPage() {
                     </div>
                     <h3 className="font-display font-bold text-lg mb-2">Vous êtes un centre ?</h3>
                     <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                      Rejoignez le réseau BYS Formation. Remplissez vos sessions et recevez 90% de chaque réservation.
+                      Rejoignez le réseau BYS Formation. Remplissez vos sessions et recevez 90% de
+                      chaque réservation.
                     </p>
-                    <Link href="/inscription" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-all shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30">
+                    <Link
+                      href="/inscription"
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-all shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
+                    >
                       Devenir partenaire
                       <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
                     </Link>
                   </div>
                 </div>
 
-                {/* Infos contact */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-7 shadow-sm">
                   <h3 className="font-display font-bold text-base text-gray-900 mb-5 flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -260,44 +167,55 @@ export default function ContactPage() {
                     Nos coordonnées
                   </h3>
                   <div className="space-y-4">
-                    {[
-                      { icon: faEnvelope, label: "Email", value: "bysforma95@gmail.com", href: "mailto:bysforma95@gmail.com" },
-                      { icon: faPhone, label: "Téléphone", value: "01 34 25 XX XX", href: "tel:+33134250000" },
-                      { icon: faLocationDot, label: "Adresse", value: "Bât. 7, 9 Chaussée Jules César, 95520 Osny" },
-                      { icon: faClock, label: "Horaires", value: "Lun – Ven : 9h – 18h" },
-                    ].map((info) => (
+                    {sidebarContacts.map((info) => (
                       <div key={info.label} className="flex gap-3 group">
                         <div className="w-10 h-10 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center shrink-0 transition-colors">
                           <FontAwesomeIcon icon={info.icon} className="text-blue-600 w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-0.5">{info.label}</p>
-                          {info.href
-                            ? <a href={info.href} className="text-sm text-gray-800 font-medium hover:text-blue-600 transition-colors">{info.value}</a>
-                            : <p className="text-sm text-gray-800 font-medium">{info.value}</p>
-                          }
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-0.5">
+                            {info.label}
+                          </p>
+                          {info.href ? (
+                            <a
+                              href={info.href}
+                              className="text-sm text-gray-800 font-medium hover:text-blue-600 transition-colors"
+                            >
+                              {info.value}
+                            </a>
+                          ) : (
+                            <p className="text-sm text-gray-800 font-medium">{info.value}</p>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* FAQ rapide */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-7 shadow-sm">
-                  <h3 className="font-display font-bold text-base text-gray-900 mb-1">Questions fréquentes</h3>
-                  <p className="text-gray-400 text-xs mb-4">Peut-être avez-vous déjà votre réponse ?</p>
+                  <h3 className="font-display font-bold text-base text-gray-900 mb-1">
+                    Questions fréquentes
+                  </h3>
+                  <p className="text-gray-400 text-xs mb-4">
+                    Peut-être avez-vous déjà votre réponse ?
+                  </p>
                   <ul className="space-y-1.5">
                     {faqLinks.map((faq) => (
                       <li key={faq.href}>
-                        <Link href={faq.href} className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-600 transition-all group border border-transparent hover:border-blue-100">
-                          <FontAwesomeIcon icon={faChevronRight} className="w-2.5 h-2.5 text-gray-300 group-hover:text-blue-500 transition-colors shrink-0" />
+                        <Link
+                          href={faq.href}
+                          className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-600 transition-all group border border-transparent hover:border-blue-100"
+                        >
+                          <FontAwesomeIcon
+                            icon={faChevronRight}
+                            className="w-2.5 h-2.5 text-gray-300 group-hover:text-blue-500 transition-colors shrink-0"
+                          />
                           {faq.question}
                         </Link>
                       </li>
                     ))}
                   </ul>
                 </div>
-
               </div>
             </div>
           </div>

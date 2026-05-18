@@ -3,8 +3,22 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+
+// Leaflet doit être chargé côté client uniquement (utilise `window`).
+const CentresMap = dynamic(
+  () => import("@/components/marketplace/CentresMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[500px] w-full rounded-xl border border-brand-border bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center">
+        <span className="text-gray-400 text-sm">Chargement de la carte…</span>
+      </div>
+    ),
+  }
+);
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -32,6 +46,10 @@ interface Centre {
   nom: string;
   slug: string;
   ville: string;
+  adresse?: string;
+  logo?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   isQualiopi: boolean;
   isBYS: boolean;
   nombreFormations: number;
@@ -109,17 +127,34 @@ function CentresInner() {
           url.searchParams.set("ville", searchVille);
         }
         const res = await fetch(url.toString());
-        const data = await res.json();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mapped: Centre[] = data.map((c: any) => ({
+        type ApiFormation = { titre: string; isQualiopi: boolean };
+        type ApiCentre = {
+          id: string;
+          nom: string;
+          slug: string;
+          ville?: string | null;
+          adresse?: string | null;
+          logo?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          formations?: ApiFormation[];
+          _count?: { formations?: number };
+          distance?: number | null;
+        };
+        const data: ApiCentre[] = await res.json();
+        const mapped: Centre[] = data.map((c) => ({
           id: c.id,
           nom: c.nom,
           slug: c.slug,
           ville: c.ville ?? "",
-          isQualiopi: c.formations?.some((f: any) => f.isQualiopi) ?? false,
+          adresse: c.adresse ?? undefined,
+          logo: c.logo ?? null,
+          latitude: c.latitude ?? null,
+          longitude: c.longitude ?? null,
+          isQualiopi: c.formations?.some((f) => f.isQualiopi) ?? false,
           isBYS: c.nom.toLowerCase().includes("bys"),
           nombreFormations: c._count?.formations ?? 0,
-          specialites: [...new Set(c.formations?.map((f: any) => f.titre.split(" ").slice(0, 3).join(" ")) ?? [])].slice(0, 4) as string[],
+          specialites: [...new Set(c.formations?.map((f) => f.titre.split(" ").slice(0, 3).join(" ")) ?? [])].slice(0, 4),
           distance: c.distance ?? null,
         }));
         // When not using geo, BYS toujours en premier
@@ -262,20 +297,29 @@ function CentresInner() {
                 href={`/centres/${centre.slug}`}
                 className={`card p-0 overflow-hidden flex flex-col group ${centre.isBYS ? "ring-2 ring-brand-accent shadow-lg" : ""}`}
               >
-                {/* Logo placeholder */}
-                <div className={`h-32 flex items-center justify-center ${centre.isBYS ? "bg-gradient-to-br from-blue-600 to-blue-800" : "bg-gradient-to-br from-blue-50 to-indigo-50"}`}>
-                  {centre.isBYS ? (
-                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                      <span className="font-display font-bold text-blue-600 text-xl">BYS</span>
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center border border-brand-border">
+                {/* Logo du centre */}
+                <div className={`h-32 flex items-center justify-center p-4 ${centre.isBYS ? "bg-gradient-to-br from-blue-600 to-blue-800" : "bg-gradient-to-br from-blue-50 to-indigo-50"}`}>
+                  <div className={`w-20 h-20 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden ${centre.isBYS ? "" : "border border-brand-border"}`}>
+                    {centre.logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={centre.logo}
+                        alt={centre.nom}
+                        className="w-full h-full object-contain p-1.5"
+                      />
+                    ) : centre.isBYS ? (
+                      <img
+                        src="/colored-logo.svg"
+                        alt={centre.nom}
+                        className="w-full h-full object-contain p-1.5"
+                      />
+                    ) : (
                       <FontAwesomeIcon
                         icon={faBuilding}
                         className="text-brand-accent text-2xl"
                       />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 <div className="p-5 flex flex-col flex-1">
@@ -359,34 +403,35 @@ function CentresInner() {
         )}
       </section>
 
-      {/* Map placeholder */}
+      {/* Carte interactive des centres */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="bg-white border border-brand-border rounded-xl overflow-hidden">
-          <div className="p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-            <div className="w-20 h-20 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
-              <FontAwesomeIcon icon={faMapLocationDot} className="text-brand-accent text-3xl" />
-            </div>
-            <div className="text-center md:text-left">
-              <h3 className="font-display font-bold text-xl text-brand-text mb-2">
-                Bientot : carte interactive
-              </h3>
-              <p className="text-gray-500 max-w-lg">
-                Nous travaillons sur une carte interactive pour vous aider à trouver
-                le centre de formation le plus proche de chez vous. Restez connecté !
-              </p>
-            </div>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+            <FontAwesomeIcon icon={faMapLocationDot} className="text-brand-accent" />
           </div>
-          {/* Visual map placeholder */}
-          <div className="h-64 bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center border-t border-brand-border">
-            <div className="text-center">
-              <FontAwesomeIcon
-                icon={faMapLocationDot}
-                className="text-5xl text-blue-200 mb-3"
-              />
-              <p className="text-gray-400 font-medium">Carte interactive en cours de développement</p>
-            </div>
+          <div>
+            <h3 className="font-display font-bold text-xl text-brand-text">Trouvez un centre sur la carte</h3>
+            <p className="text-gray-500 text-sm">
+              {centres.filter((c) => c.latitude && c.longitude).length} centre
+              {centres.filter((c) => c.latitude && c.longitude).length > 1 ? "s" : ""} géolocalisé
+              {centres.filter((c) => c.latitude && c.longitude).length > 1 ? "s" : ""}
+            </p>
           </div>
         </div>
+        <CentresMap
+          centres={centres
+            .filter((c) => c.latitude != null && c.longitude != null)
+            .map((c) => ({
+              id: c.id,
+              nom: c.nom,
+              slug: c.slug,
+              ville: c.ville,
+              adresse: c.adresse,
+              latitude: c.latitude as number,
+              longitude: c.longitude as number,
+              isBYS: c.isBYS,
+            }))}
+        />
       </section>
 
       {/* CTA for centres */}

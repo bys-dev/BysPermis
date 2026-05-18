@@ -285,7 +285,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {kpis.map((k) => (
           <div key={k.label} className={`rounded-xl p-3 sm:p-5 border bg-[#0A1628] ${k.border}`}>
             <div className="flex items-start justify-between mb-3 sm:mb-4">

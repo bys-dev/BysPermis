@@ -73,17 +73,29 @@ export async function GET(
     const year = new Date().getFullYear();
     const numeroContrat = `BYS-CTR-${year}-${reservation.numero}`;
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
+    const toAbsolute = (u: string | null) =>
+      u ? (u.startsWith("http") ? u : `${appUrl}${u}`) : undefined;
+
     const data = {
       numeroContrat,
       dateEmission: formatDate(reservation.createdAt),
       organisme: {
         nom: centre.nom,
-        siret: "908 058 092 00028",
+        raisonSociale: centre.raisonSociale ?? undefined,
+        siret: centre.siret ?? undefined,
+        tva: centre.tva ?? undefined,
+        ape: centre.ape ?? undefined,
         adresse: centre.adresse,
         codePostal: centre.codePostal,
         ville: centre.ville,
         email: centre.email ?? undefined,
         telephone: centre.telephone ?? undefined,
+        logoUrl: toAbsolute(centre.logo),
+        signatureUrl: toAbsolute(centre.signatureUrl),
+        nomResponsable: centre.nomResponsable ?? undefined,
+        mentionsLegales: centre.mentionsLegales ?? undefined,
+        cgv: centre.cgv ?? undefined,
       },
       stagiaire: {
         civilite: reservation.civilite ?? undefined,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { resend } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
+import { escapeHtml } from "@/lib/utils";
 
 const ContactSchema = z.object({
   nom: z.string().min(1, "Nom requis"),
@@ -31,6 +32,12 @@ export async function POST(req: NextRequest) {
 
     const { nom, email, sujet, message } = parsed.data;
 
+    // Escape all user inputs avant injection HTML (XSS prevention)
+    const safeNom = escapeHtml(nom);
+    const safeEmail = escapeHtml(email);
+    const safeSujet = escapeHtml(sujet);
+    const safeMessage = escapeHtml(message).replace(/\n/g, "<br/>");
+
     await resend.emails.send({
       from: FROM,
       to: TO,
@@ -42,20 +49,20 @@ export async function POST(req: NextRequest) {
           <table style="border-collapse:collapse;width:100%;margin:16px 0">
             <tr>
               <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151;width:100px">Nom</td>
-              <td style="padding:8px 0;color:#111827">${nom}</td>
+              <td style="padding:8px 0;color:#111827">${safeNom}</td>
             </tr>
             <tr>
               <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151">Email</td>
-              <td style="padding:8px 0;color:#111827"><a href="mailto:${email}">${email}</a></td>
+              <td style="padding:8px 0;color:#111827"><a href="mailto:${safeEmail}">${safeEmail}</a></td>
             </tr>
             <tr>
               <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151">Sujet</td>
-              <td style="padding:8px 0;color:#111827">${sujet}</td>
+              <td style="padding:8px 0;color:#111827">${safeSujet}</td>
             </tr>
           </table>
           <h3 style="color:#374151">Message</h3>
           <div style="background:#f9fafb;border-left:4px solid #3b82f6;padding:16px;border-radius:4px;color:#111827;line-height:1.6">
-            ${message.replace(/\n/g, "<br/>")}
+            ${safeMessage}
           </div>
           <p style="color:#9ca3af;font-size:12px;margin-top:24px">
             Envoyé depuis le formulaire de contact BYS Formations

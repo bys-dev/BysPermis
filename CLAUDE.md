@@ -7,7 +7,8 @@ Il contient tout le contexte du projet, les règles de développement et les com
 
 ## 🎯 Contexte projet
 
-**Plateforme** : Marketplace de formations professionnelles (sécurité routière, permis, transport)
+**Plateforme** : Marketplace dédiée EXCLUSIVEMENT aux stages de récupération de points du permis de conduire (stages agréés Ministère de l'Intérieur, dits « stages de sensibilisation à la sécurité routière »).
+**Scope V1 (mai 2026)** : aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.). Le modèle de données reste extensible mais aucun contenu/seed/page ne doit faire référence à d'autres produits. Voir CDC_BYS_Formation.md §Vision produit pour le détail.
 **Client** : BYS Formation — Sébastien — bysforma95@gmail.com
 **Prestataire** : Andrys MAGAR — Auto-entrepreneur — SIRET : 908 058 092 00028
 **Contrat** : 10 000 € — 5 mensualités de 2 000 € — Démarrage 9 mars 2026

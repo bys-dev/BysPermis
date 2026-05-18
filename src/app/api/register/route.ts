@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { rateLimit } from "@/lib/rate-limit";
+import { z } from "zod";
 
 // ─── Auth0 Management API helper ─────────────────────────
 
@@ -62,6 +63,39 @@ async function createAuth0User(params: {
   return user.user_id as string;
 }
 
+// ─── Zod validation ─────────────────────────────────────────
+// Mot de passe : >= 12 caractères, 1 maj, 1 chiffre, 1 spécial.
+const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}$/;
+
+const registerSchema = z.object({
+  firstName: z.string().trim().min(1, "Prénom requis").max(100),
+  lastName: z.string().trim().min(1, "Nom requis").max(100),
+  email: z.string().email("Email invalide").max(254),
+  password: z.string()
+    .min(12, "Le mot de passe doit contenir au moins 12 caractères.")
+    .regex(passwordRegex, "Le mot de passe doit contenir au moins 1 majuscule, 1 chiffre et 1 caractère spécial."),
+  confirmPassword: z.string(),
+  accountType: z.enum(["eleve", "centre"]).optional(),
+  acceptCGU: z.boolean(),
+  centreName: z.string().trim().max(200).optional(),
+  referralCode: z.string().trim().max(50).optional(),
+}).refine((d) => d.password === d.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas.",
+  path: ["confirmPassword"],
+}).refine((d) => d.acceptCGU, {
+  message: "Vous devez accepter les CGU.",
+  path: ["acceptCGU"],
+}).refine((d) => d.accountType !== "centre" || (d.centreName && d.centreName.length > 0), {
+  message: "Nom du centre requis.",
+  path: ["centreName"],
+});
+
+// Réponse générique pour anti-énumération
+const GENERIC_OK = NextResponse.json({
+  success: true,
+  message: "Si cet email n'est pas déjà utilisé, votre compte a été créé. Vérifiez votre boîte mail pour activer votre compte.",
+}, { status: 200 });
+
 // ─── POST /api/register ───────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -74,26 +108,28 @@ export async function POST(req: NextRequest) {
     if (limited) return limited;
 
     const body = await req.json();
-    const { firstName, lastName, email, password, confirmPassword, accountType, acceptCGU, centreName, referralCode } = body;
+    const parsed = registerSchema.safeParse(body);
 
-    // ── Validation ────────────────────────────────────────
-    if (!firstName?.trim()) return NextResponse.json({ error: "Prénom requis." }, { status: 400 });
-    if (!lastName?.trim()) return NextResponse.json({ error: "Nom requis." }, { status: 400 });
-    if (!email?.trim()) return NextResponse.json({ error: "Email requis." }, { status: 400 });
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Email invalide." }, { status: 400 });
-    if (!password) return NextResponse.json({ error: "Mot de passe requis." }, { status: 400 });
-    if (password.length < 8) return NextResponse.json({ error: "Le mot de passe doit contenir au moins 8 caractères." }, { status: 400 });
-    if (password !== confirmPassword) return NextResponse.json({ error: "Les mots de passe ne correspondent pas." }, { status: 400 });
-    if (!acceptCGU) return NextResponse.json({ error: "Vous devez accepter les CGU." }, { status: 400 });
-    if (accountType === "centre" && !centreName?.trim()) {
-      return NextResponse.json({ error: "Nom du centre requis." }, { status: 400 });
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Données invalides", details: parsed.error.flatten() },
+        { status: 400 }
+      );
     }
 
-    // ── Vérifier si email existe déjà en BDD ──────────────
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return NextResponse.json({ error: "Un compte existe déjà avec cet email." }, { status: 409 });
+    const { firstName, lastName, email, password, accountType, centreName, referralCode } = parsed.data;
 
-    const role = accountType === "centre" ? "CENTRE_OWNER" : "ELEVE";
+    // ── Vérifier si email existe déjà — réponse générique pour anti-énum ──
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      console.info(`[register] Tentative de création avec email existant: ${email}`);
+      return GENERIC_OK;
+    }
+
+    // ── Anti auto-promotion: tous les comptes démarrent en ELEVE ──
+    // Le rôle CENTRE_OWNER est attribué après validation admin du centre
+    // (voir /api/admin/centres/[id]/validate qui promote l'owner).
+    const role = "ELEVE";
 
     // ── Créer dans Auth0 (Management API) ─────────────────
     let auth0Id: string | null = null;
@@ -102,11 +138,14 @@ export async function POST(req: NextRequest) {
       auth0Id = await createAuth0User({ email, password, firstName, lastName, role, token });
     } catch (err) {
       if (err instanceof Error && err.message === "EMAIL_EXISTS") {
-        return NextResponse.json({ error: "Un compte existe déjà avec cet email." }, { status: 409 });
+        console.info(`[register] Auth0 retourne EMAIL_EXISTS pour: ${email}`);
+        return GENERIC_OK;
       }
       // En dev sans env vars, continuer sans Auth0
       if (process.env.NODE_ENV !== "development") {
-        throw err;
+        console.error("[register] Erreur Auth0 Management API:", err);
+        // On retourne quand même la réponse générique pour éviter la fuite d'info.
+        return GENERIC_OK;
       }
       console.warn("[register] Auth0 Management API non disponible — mode dev");
     }
@@ -122,35 +161,36 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Créer en BDD (transaction) ────────────────────────
-    const result = await prisma.$transaction(async (tx) => {
-      const generatedRefCode = `BYS-${firstName.trim().toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`;
+    await prisma.$transaction(async (tx) => {
+      const generatedRefCode = `BYS-${firstName.toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`;
 
       const user = await tx.user.create({
         data: {
           auth0Id: auth0Id ?? `local_${Date.now()}`,
           email,
-          nom: lastName.trim(),
-          prenom: firstName.trim(),
+          nom: lastName,
+          prenom: firstName,
           role,
           referralCode: generatedRefCode,
           referredBy: validReferralCode,
         },
       });
 
-      if (role === "CENTRE_OWNER" && centreName) {
+      // Pour les comptes "centre" : créer le Centre en EN_ATTENTE (statut
+      // par défaut) et le rattacher au user. Le user reste ELEVE jusqu'à
+      // la validation admin qui passera son rôle en CENTRE_OWNER.
+      if (accountType === "centre" && centreName) {
         const slug = slugify(centreName) + "-" + Date.now().toString(36);
         const centre = await tx.centre.create({
           data: {
             userId: user.id,
-            nom: centreName.trim(),
+            nom: centreName,
             slug,
             adresse: "",
             codePostal: "",
             ville: "",
           },
         });
-
-        // Set the new centre as active
         await tx.user.update({
           where: { id: user.id },
           data: { activeCentreId: centre.id },
@@ -160,14 +200,11 @@ export async function POST(req: NextRequest) {
       return user;
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Compte créé avec succès.",
-      user: { email: result.email, role: result.role },
-    }, { status: 201 });
+    return GENERIC_OK;
 
   } catch (err) {
     console.error("[POST /api/register]", err);
-    return NextResponse.json({ error: "Erreur serveur. Veuillez réessayer." }, { status: 500 });
+    // Réponse générique même en cas d'erreur serveur, pour éviter la fuite d'info.
+    return GENERIC_OK;
   }
 }

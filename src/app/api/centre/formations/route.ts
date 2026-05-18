@@ -56,15 +56,20 @@ export async function GET() {
 }
 
 // POST /api/centre/formations — create a new formation
+// Réglementation: stage récup points = uniquement PRESENTIEL, non éligible CPF.
 const createSchema = z.object({
   titre: z.string().min(3, "Titre trop court (min 3 caractères)").max(200),
   description: z.string().min(10, "Description trop courte (min 10 caractères)"),
   prix: z.number().positive("Le prix doit être positif"),
   duree: z.string().min(1, "Durée requise"),
-  modalite: z.enum(["PRESENTIEL", "DISTANCIEL", "HYBRIDE"]).default("PRESENTIEL"),
+  modalite: z.literal("PRESENTIEL").default("PRESENTIEL"),
+  stageType: z
+    .enum(["VOLONTAIRE", "PROBATOIRE", "LETTRE_48N", "LETTRE_48SI", "JUDICIAIRE", "COMPOSITION_PENALE"])
+    .default("VOLONTAIRE"),
+  pointsRecovered: z.number().int().min(1).max(4).default(4),
   lieu: z.string().max(300).optional().nullable(),
   isQualiopi: z.boolean().default(false),
-  isCPF: z.boolean().default(false),
+  isCPF: z.literal(false).default(false),
   categorieId: z.string().optional().nullable(),
   objectifs: z.string().max(5000).optional().nullable(),
   programme: z.string().max(10000).optional().nullable(),
@@ -111,6 +116,8 @@ export async function POST(req: NextRequest) {
         prix: data.prix,
         duree: data.duree,
         modalite: data.modalite,
+        stageType: data.stageType,
+        pointsRecovered: data.pointsRecovered,
         lieu: data.lieu ?? null,
         isQualiopi: data.isQualiopi,
         isCPF: data.isCPF,

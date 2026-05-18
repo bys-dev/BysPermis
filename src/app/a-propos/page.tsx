@@ -8,9 +8,22 @@ import {
   faBuilding, faShieldHalved, faGraduationCap, faArrowRight, faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
+export const dynamic = "force-static";
+
 export const metadata: Metadata = {
   title: "À propos — BYS Formation",
-  description: "Découvrez BYS Formation, la plateforme de référence pour réserver un stage de récupération de points permis agréé préfecture partout en France.",
+  description:
+    "Découvrez BYS Formation, la plateforme de référence pour réserver un stage de récupération de points permis agréé préfecture partout en France.",
+  alternates: { canonical: "/a-propos" },
+  openGraph: {
+    title: "À propos — BYS Formation",
+    description:
+      "La plateforme de référence pour les stages de récupération de points en France.",
+    url: "/a-propos",
+    type: "website",
+    locale: "fr_FR",
+    siteName: "BYS Formation",
+  },
 };
 
 const values = [

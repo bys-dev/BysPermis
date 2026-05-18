@@ -19,28 +19,37 @@ const outfit = Outfit({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://byspermis.fr";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
-    default: "BYS Formation — Marketplace de formations permis & sécurité routière",
+    default: "BYS Formation — Stages agréés de récupération de points",
     template: "%s | BYS Formation",
   },
   description:
-    "Trouvez et réservez votre stage de récupération de points, permis B, moto, FIMO, FCO. Comparez les centres agréés près de chez vous.",
+    "Trouvez et réservez votre stage de récupération de points du permis de conduire. Tous nos centres sont agréés Ministère de l'Intérieur. Récupérez jusqu'à 4 points en 2 jours.",
   keywords: [
     "stage récupération points",
-    "permis de conduire",
-    "formation FIMO",
+    "stage récupération de points",
     "stage permis",
-    "auto-école",
-    "récupération de points",
-    "FCO",
-    "sécurité routière",
+    "stage 48N",
+    "stage 48SI",
+    "stage volontaire permis",
+    "récupérer points permis",
+    "stage sensibilisation sécurité routière",
+    "stage agréé préfecture",
     "BYS Formation",
   ],
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "fr_FR",
     siteName: "BYS Formation",
+    url: APP_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

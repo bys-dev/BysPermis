@@ -82,10 +82,9 @@ const sortOptions = [
   { value: "date", label: "Date" },
 ];
 
+// Scope V1 : la réglementation impose le présentiel pour les stages récup points.
 const modaliteOptions = [
   { value: "PRESENTIEL", label: "Présentiel", icon: faBuilding },
-  { value: "DISTANCIEL", label: "Distanciel", icon: faLaptop },
-  { value: "HYBRIDE", label: "Hybride", icon: faCircleNodes },
 ];
 
 // ─── INNER COMPONENT (uses useSearchParams) ───────────────
@@ -307,7 +306,7 @@ function RechercheInner() {
   const allTypes = ["Tous les types", ...categories.map((c) => c.nom)];
 
   // Popular formations for "no results" state
-  const popularSearches = ["Récupération de points", "Stage 48N", "FIMO", "Permis B"];
+  const popularSearches = ["Stage 48N", "Stage 48SI", "Stage volontaire", "Stage Paris", "Stage Lyon", "Stage Marseille"];
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">

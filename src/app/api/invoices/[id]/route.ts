@@ -18,11 +18,12 @@ export async function GET(
       where: { id },
       include: {
         user: true,
+        centre: true,
         reservation: {
           include: {
             session: {
               include: {
-                formation: true,
+                formation: { include: { centre: true } },
               },
             },
           },
@@ -66,10 +67,39 @@ export async function GET(
       ANNULEE: "Annulée",
     };
 
+    // Use invoice.centre if attached, else fall back to centre via reservation
+    const emetteurCentre = invoice.centre ?? invoice.reservation?.session.formation.centre ?? null;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
+    const defaultLogo = `${appUrl}/colored-logo.png`;
+    const toAbsolute = (u: string | null) =>
+      u ? (u.startsWith("http") ? u : `${appUrl}${u}`) : undefined;
+    const logoOrDefault = (u: string | null) => toAbsolute(u) ?? defaultLogo;
+
+    const emetteur = emetteurCentre
+      ? {
+          nom: emetteurCentre.nom,
+          raisonSociale: emetteurCentre.raisonSociale ?? undefined,
+          siret: emetteurCentre.siret ?? undefined,
+          tva: emetteurCentre.tva ?? undefined,
+          ape: emetteurCentre.ape ?? undefined,
+          adresse: emetteurCentre.adresse,
+          codePostal: emetteurCentre.codePostal,
+          ville: emetteurCentre.ville,
+          email: emetteurCentre.email ?? undefined,
+          telephone: emetteurCentre.telephone ?? undefined,
+          iban: emetteurCentre.iban ?? undefined,
+          bic: emetteurCentre.bic ?? undefined,
+          logoUrl: logoOrDefault(emetteurCentre.logo),
+          mentionsLegales: emetteurCentre.mentionsLegales ?? undefined,
+          cgv: emetteurCentre.cgv ?? undefined,
+        }
+      : { nom: "—", adresse: "—", codePostal: "—", ville: "—" };
+
     const data = {
       numero: invoice.numero,
       dateEmission: formatDate(invoice.createdAt),
       dateEcheance: formatDate(invoice.createdAt), // Paiement immédiat
+      emetteur,
       client: {
         nom: clientNom,
         prenom: clientPrenom,

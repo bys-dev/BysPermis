@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireOwner } from "@/lib/auth0";
+import { requireAdmin } from "@/lib/auth0";
 
-// GET /api/admin/analytics — Advanced BI metrics (OWNER only)
+// GET /api/admin/analytics — Advanced BI metrics (OWNER + ADMIN)
 export async function GET() {
   try {
-    await requireOwner();
+    await requireAdmin();
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);

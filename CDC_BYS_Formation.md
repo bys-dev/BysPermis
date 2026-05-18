@@ -27,11 +27,14 @@
 ## 🎯 VISION & OBJECTIFS
 
 ### Vision produit
-BYS Formation est la plateforme de référence pour les stages de récupération de points permis et formations professionnelles liées à la mobilité en France.
+BYS Formation est la plateforme de référence en France pour les stages de récupération de points du permis de conduire (stages agréés Ministère de l'Intérieur, dits "stages de sensibilisation à la sécurité routière").
+
+> **Scope V1 (mai 2026) :** la plateforme et ses partenaires onboardés ne proposent QUE des stages de récupération de points. Aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.) n'est proposée à ce stade. Le modèle de données reste extensible pour autoriser d'autres catégories dans le futur, mais aucun contenu, aucun seed, aucune page publique ne doit faire référence à ces produits hors-scope.
 
 Elle résout 3 problèmes :
-1. **Pour les conducteurs** : trouver rapidement un stage agréé proche, disponible et finançable CPF — réserver et recevoir sa convocation en quelques minutes
-2. **Pour les centres de formation** : gérer leur activité entière depuis un seul dashboard — inscriptions, convocations automatiques, contrats, paiements, reporting
+
+1. **Pour les conducteurs** : trouver rapidement un stage de récupération de points agréé proche, disponible et finançable CPF — réserver et recevoir sa convocation en quelques minutes
+2. **Pour les centres agréés** : gérer leur activité de stages depuis un seul dashboard — inscriptions, convocations automatiques, contrats, paiements, reporting
 3. **Pour la plateforme** : monétiser via commission sur chaque réservation et/ou abonnement mensuel des centres partenaires
 
 ### Objectifs mesurables à 6 mois
@@ -331,9 +334,9 @@ Routes protégées par rôle :
 Sections obligatoires :
 - Header sticky avec logo, navigation, connexion/inscription
 - Hero avec badge "Agréé Ministère de l'Intérieur", H1, SearchBar 3 champs
-- Tags recherches populaires (récupération de points, FIMO, AAC...)
+- Tags recherches populaires (stage en weekend, stage 48h, stage en présentiel, principales villes, prix < 200€...) — uniquement liés à la récupération de points
 - Bande statistiques (formations, centres, élèves formés, satisfaction)
-- Grille catégories (8 catégories cliquables avec compteur)
+- Grille de raccourcis (par grande ville, par format weekend/semaine, par modalité présentiel/hybride) — V1 ne contient qu'une seule catégorie (stage récupération de points), donc on ne segmente pas par "catégorie produit"
 - Formations à la une (6 cards dynamiques depuis BDD)
 - Comment ça marche (4 étapes avec icônes)
 - CTA Centres partenaires (avantages + stats + témoignage)
@@ -349,8 +352,8 @@ Performance cible : LCP < 2.5s, score Lighthouse > 85
 Fonctionnalités :
 - Barre de recherche persistante (reprise des paramètres de l'accueil)
 - Panel filtres gauche (sticky sur desktop, drawer sur mobile) :
-  - Catégorie (checkboxes avec compteurs)
-  - Prix (range slider 0 → 2000 €)
+  - Catégorie (checkboxes avec compteurs) — masqué en V1 puisqu'il n'existe qu'une catégorie « stage récupération de points » ; le code/modèle reste prêt pour d'autres catégories futures
+  - Prix (range slider 0 → 350 €) — fourchette resserrée car les stages récup points sont entre ~150 € et ~290 €
   - Durée (< 1 jour / 2 jours / 1 semaine / 1 mois+)
   - Modalité (Présentiel / Distanciel / Hybride)
   - Certifications (Qualiopi / CPF)
@@ -642,7 +645,7 @@ Navigation : Dashboard / Centres / Utilisateurs / Paramètres / Reporting / Supp
 #### 6.1 Dashboard global
 - KPIs globaux : CA plateforme total / commissions / centres actifs / élèves total / réservations mois
 - Alertes critiques : centres en attente de validation / paiements échoués
-- Graphiques : évolution CA 12 mois / répartition par catégorie
+- Graphiques : évolution CA 12 mois / répartition par centre / répartition géographique (V1 : une seule catégorie produit, donc pas de breakdown catégorie)
 
 #### 6.2 Gestion centres
 - Liste tous les centres avec statut (EN_ATTENTE / ACTIF / SUSPENDU)

@@ -75,13 +75,22 @@ export async function GET(
       },
       centre: {
         nom: centre.nom,
+        raisonSociale: centre.raisonSociale ?? undefined,
+        siret: centre.siret ?? undefined,
         adresse: centre.adresse,
         codePostal: centre.codePostal,
         ville: centre.ville,
         telephone: centre.telephone ?? undefined,
         email: centre.email ?? undefined,
+        logoUrl: centre.logo
+          ? (centre.logo.startsWith("http") ? centre.logo : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}${centre.logo}`)
+          : undefined,
+        signatureUrl: centre.signatureUrl
+          ? (centre.signatureUrl.startsWith("http") ? centre.signatureUrl : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}${centre.signatureUrl}`)
+          : undefined,
+        nomResponsable: centre.nomResponsable ?? undefined,
       },
-      verificationUrl: `https://byspermis.fr/verification/${numeroAttestation}`,
+      verificationUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}/verification/${numeroAttestation}`,
     };
 
     const pdfBuffer = await renderToBuffer(

@@ -95,9 +95,9 @@ export default function DonneesPage() {
   const s = session;
 
   return (
-    <div className="grid lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
       {/* ── Formulaire ── */}
-      <div className="lg:col-span-2">
+      <div className="md:col-span-2">
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-7">
           <h1 className="font-display font-bold text-xl text-gray-900 mb-1">Vos informations</h1>
           <p className="text-gray-500 text-sm mb-7">Ces informations figureront sur votre convocation officielle.</p>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWrench, faClock } from "@fortawesome/free-solid-svg-icons";
@@ -20,9 +21,13 @@ export default async function MaintenancePage() {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#0A1628" }}>
       <div className="w-full max-w-md text-center">
         {/* Logo */}
-        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8">
-          <span className="font-bold text-xl text-white">BYS</span>
-        </div>
+        <Image
+          src="/transparent-logo.svg"
+          alt="BYS Formation"
+          width={200}
+          height={56}
+          className="h-14 w-auto mx-auto mb-8 brightness-0 invert"
+        />
 
         {/* Wrench icon */}
         <div className="w-20 h-20 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mx-auto mb-6">
@@ -55,7 +60,7 @@ export default async function MaintenancePage() {
         {/* Footer */}
         <div className="mt-12 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <p className="text-gray-600 text-xs">
-            BYS Formation — Plateforme de formations professionnelles
+            BYS Formation — Stages agrees de recuperation de points
           </p>
         </div>
       </div>
