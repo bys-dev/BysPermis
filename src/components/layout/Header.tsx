@@ -38,18 +38,18 @@ export default function Header() {
 
       {/* Main header */}
       <div className="bg-white border-b border-brand-border relative">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-3 sm:py-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-2 sm:py-2.5">
           <div className="flex items-center justify-between gap-3 sm:gap-4">
             {/* Logo + Nav — fully static */}
             <div className="flex items-center space-x-6 lg:space-x-12 min-w-0">
-              <Link href="/" className="flex items-center space-x-2 sm:space-x-2.5 shrink-0" aria-label="BYS Formation — accueil">
+              <Link href="/" className="flex items-center shrink-0" aria-label="BYS Formation — accueil">
                 <Image
                   src="/colored-logo.svg"
                   alt="BYS Formation"
-                  width={160}
-                  height={40}
+                  width={280}
+                  height={72}
                   priority
-                  className="h-9 sm:h-10 w-auto"
+                  className="h-14 sm:h-16 w-auto"
                 />
               </Link>
 
