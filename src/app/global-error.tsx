@@ -70,6 +70,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             >
               Réessayer
             </button>
+            {/* global-error renders outside Next's app shell — <Link> isn't available. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
               style={{

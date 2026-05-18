@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -60,18 +60,7 @@ export function CentresProximite() {
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
   const [centres, setCentres] = useState<Centre[]>([]);
 
-  // Charger la ville sauvegardée au montage
-  useEffect(() => {
-    const saved = localStorage.getItem("bys_city");
-    if (saved) {
-      applyCity(saved);
-    } else {
-      // Afficher les centres BYS par défaut
-      setCentres(allCentres.filter((c) => c.isBYS).slice(0, 4));
-    }
-  }, []);
-
-  function applyCity(cityName: string) {
+  const applyCity = useCallback((cityName: string) => {
     setCity(cityName);
     const d = getDept(cityName);
     setDept(d);
@@ -88,10 +77,19 @@ export function CentresProximite() {
       })
       .slice(0, 4);
 
-    // Si aucun résultat dans la zone, afficher les BYS
     setCentres(nearby.length > 0 ? nearby : allCentres.filter((c) => c.isBYS).slice(0, 4));
     setGeoStatus("found");
-  }
+  }, []);
+
+  // Charger la ville sauvegardée au montage
+  useEffect(() => {
+    const saved = localStorage.getItem("bys_city");
+    if (saved) {
+      applyCity(saved);
+    } else {
+      setCentres(allCentres.filter((c) => c.isBYS).slice(0, 4));
+    }
+  }, [applyCity]);
 
   function detect() {
     if (!navigator.geolocation) { setGeoStatus("error"); return; }

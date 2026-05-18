@@ -1,8 +1,20 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 export const alt = "BYS Formation — Stages agréés de récupération de points";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+// Embed logo PNG au build-time pour OG image fiable hors NEXT_PUBLIC_APP_URL.
+const logoBase64 = (() => {
+  try {
+    const p = join(process.cwd(), "public", "transparent-logo.png");
+    return `data:image/png;base64,${readFileSync(p).toString("base64")}`;
+  } catch {
+    return null;
+  }
+})();
 
 export default function OpenGraphImage() {
   return new ImageResponse(
@@ -24,29 +36,39 @@ export default function OpenGraphImage() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 16,
+            gap: 20,
             fontSize: 28,
             fontWeight: 600,
             color: "#93C5FD",
             letterSpacing: 1,
           }}
         >
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              background: "#FFFFFF",
-              color: "#0A1628",
-              borderRadius: 12,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 32,
-              fontWeight: 900,
-            }}
-          >
-            BYS
-          </div>
+          {logoBase64 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoBase64}
+              alt=""
+              height={72}
+              style={{ height: 72, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                background: "#FFFFFF",
+                color: "#0A1628",
+                borderRadius: 12,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 32,
+                fontWeight: 900,
+              }}
+            >
+              BYS
+            </div>
+          )}
           BYS FORMATION
         </div>
 

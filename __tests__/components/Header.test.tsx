@@ -61,14 +61,10 @@ describe('Header', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument()
   })
 
-  it('affiche le logo BYS', () => {
+  it('affiche le logo BYS Formation', () => {
     render(<Header />)
-    expect(screen.getByText('BYS')).toBeInTheDocument()
-  })
-
-  it('affiche le texte BYS Formation', () => {
-    render(<Header />)
-    expect(screen.getByText('BYS Formation')).toBeInTheDocument()
+    // Logo SVG avec alt accessibilité
+    expect(screen.getAllByAltText('BYS Formation').length).toBeGreaterThan(0)
   })
 
   it('affiche les liens de navigation', () => {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebookF, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
@@ -11,15 +12,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 mb-10 sm:mb-12">
           {/* Brand */}
           <div className="col-span-1 lg:col-span-2">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-10 h-10 bg-brand-accent rounded-lg flex items-center justify-center">
-                <span className="text-white font-display font-bold text-lg">
-                  BYS
-                </span>
-              </div>
-              <span className="font-display font-semibold text-xl text-white">
-                BYS Formation
-              </span>
+            <div className="mb-6">
+              <Image
+                src="/transparent-logo.svg"
+                alt="BYS Formation"
+                width={200}
+                height={50}
+                className="h-12 w-auto brightness-0 invert"
+              />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
               BYS Formation est la marketplace de référence pour les stages

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import HeaderInteractive from "./HeaderClient";
 
 const navLinks = [
@@ -41,15 +42,15 @@ export default function Header() {
           <div className="flex items-center justify-between gap-3 sm:gap-4">
             {/* Logo + Nav — fully static */}
             <div className="flex items-center space-x-6 lg:space-x-12 min-w-0">
-              <Link href="/" className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center bg-brand-accent">
-                  <span className="text-white font-display font-bold text-xs sm:text-sm tracking-tight">
-                    BYS
-                  </span>
-                </div>
-                <span className="font-display font-semibold text-lg sm:text-xl text-brand-text hidden sm:inline">
-                  BYS Formation
-                </span>
+              <Link href="/" className="flex items-center space-x-2 sm:space-x-2.5 shrink-0" aria-label="BYS Formation — accueil">
+                <Image
+                  src="/colored-logo.svg"
+                  alt="BYS Formation"
+                  width={160}
+                  height={40}
+                  priority
+                  className="h-9 sm:h-10 w-auto"
+                />
               </Link>
 
               <nav className="hidden lg:flex items-center space-x-8">

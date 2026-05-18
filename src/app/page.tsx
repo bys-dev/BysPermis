@@ -331,7 +331,17 @@ async function fetchLiveFormations(): Promise<LiveFormation[]> {
     const formations = await prisma.formation.findMany({
       where: {
         isActive: true,
+        modalite: "PRESENTIEL",
         centre: { isActive: true, statut: "ACTIF" },
+        // Scope V1 : uniquement les stages de récupération de points (Ministère de l'Intérieur).
+        OR: [
+          { categorie: { nom: { contains: "récup", mode: "insensitive" } } },
+          { categorie: { nom: { contains: "sensib", mode: "insensitive" } } },
+          { categorie: { nom: { contains: "48", mode: "insensitive" } } },
+          { categorie: { nom: { contains: "probatoire", mode: "insensitive" } } },
+          { titre: { contains: "récupération de points", mode: "insensitive" } },
+          { titre: { contains: "stage 48", mode: "insensitive" } },
+        ],
       },
       include: {
         categorie: { select: { nom: true } },
@@ -398,10 +408,10 @@ export default async function Home() {
               fill
               priority
               sizes="100vw"
-              className="object-cover opacity-30"
+              className="object-cover opacity-70"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628] via-[#0A1628]/90 to-[#0A1628]/50" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/95 via-[#0A1628]/70 to-[#0A1628]/30" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/40 to-transparent" />
           </div>
 
           <div

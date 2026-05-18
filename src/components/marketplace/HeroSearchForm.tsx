@@ -8,10 +8,10 @@ import { faMagnifyingGlass, faLocationDot } from "@fortawesome/free-solid-svg-ic
 
 const popularTags = [
   "Récupération de points",
+  "Stage volontaire",
   "Stage 48N",
-  "Permis B accéléré",
-  "FIMO",
-  "Sécurité routière",
+  "Stage 48SI",
+  "Permis probatoire",
 ];
 
 /**
@@ -46,7 +46,7 @@ export default function HeroSearchForm() {
             />
             <input
               type="text"
-              placeholder="Récupération de points, FIMO..."
+              placeholder="Récupération de points, 48N..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"

@@ -66,10 +66,14 @@ const updateSchema = z.object({
   description: z.string().min(10).optional(),
   prix: z.number().positive().optional(),
   duree: z.string().min(1).optional(),
-  modalite: z.enum(["PRESENTIEL", "DISTANCIEL", "HYBRIDE"]).optional(),
+  modalite: z.literal("PRESENTIEL").optional(),
+  stageType: z
+    .enum(["VOLONTAIRE", "PROBATOIRE", "LETTRE_48N", "LETTRE_48SI", "JUDICIAIRE", "COMPOSITION_PENALE"])
+    .optional(),
+  pointsRecovered: z.number().int().min(1).max(4).optional(),
   lieu: z.string().max(300).optional().nullable(),
   isQualiopi: z.boolean().optional(),
-  isCPF: z.boolean().optional(),
+  isCPF: z.literal(false).optional(),
   isActive: z.boolean().optional(),
   categorieId: z.string().optional().nullable(),
   objectifs: z.string().max(5000).optional().nullable(),

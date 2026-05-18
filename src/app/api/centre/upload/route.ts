@@ -12,20 +12,12 @@ import path from "path";
  *   - file: File (image/png | image/jpeg | image/svg+xml | image/webp), max 2 MB
  *   - kind: "logo" | "signature" | "bannerImage"
  *
- * Persists to `public/uploads/centres/{centreId}/{kind}-{timestamp}.{ext}` and
- * updates the matching Centre column with the public URL.
- *
- * NOTE — STORAGE BACKEND
- * On Vercel (or any other serverless prod host) the filesystem is read-only,
- * so this local-disk strategy only works in dev or on a long-lived VM.
- *
- * TODO (prod) — replace by Vercel Blob or S3:
- *   import { put } from "@vercel/blob";
- *   const blob = await put(`centres/${centreId}/${filename}`, buffer, { access: "public" });
- *   url = blob.url;
- * Then drop the fs.mkdir / fs.writeFile block below.
+ * Storage strategy:
+ *   - If `BLOB_READ_WRITE_TOKEN` env var is set → Vercel Blob (recommended in prod).
+ *   - Otherwise → local filesystem at `public/uploads/centres/{centreId}/`.
+ *     Local FS only works in dev or on a long-lived VM — Vercel serverless is read-only.
  */
-const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+const MAX_BYTES = 2 * 1024 * 1024;
 const ALLOWED_MIME: Record<string, string> = {
   "image/png": "png",
   "image/jpeg": "jpg",
@@ -34,6 +26,34 @@ const ALLOWED_MIME: Record<string, string> = {
 };
 const ALLOWED_KINDS = ["logo", "signature", "bannerImage"] as const;
 type UploadKind = (typeof ALLOWED_KINDS)[number];
+
+const HAS_BLOB = !!process.env.BLOB_READ_WRITE_TOKEN;
+
+async function uploadToBlob(
+  centreId: string,
+  filename: string,
+  contentType: string,
+  buffer: Buffer,
+): Promise<string> {
+  const { put } = await import("@vercel/blob");
+  const blob = await put(`centres/${centreId}/${filename}`, buffer, {
+    access: "public",
+    contentType,
+    addRandomSuffix: false,
+  });
+  return blob.url;
+}
+
+async function uploadToLocalFs(
+  centreId: string,
+  filename: string,
+  buffer: Buffer,
+): Promise<string> {
+  const dirAbs = path.join(process.cwd(), "public", "uploads", "centres", centreId);
+  await fs.mkdir(dirAbs, { recursive: true });
+  await fs.writeFile(path.join(dirAbs, filename), buffer);
+  return `/uploads/centres/${centreId}/${filename}`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,13 +84,11 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const timestamp = Date.now();
     const filename = `${kind}-${timestamp}.${ext}`;
-    const dirAbs = path.join(process.cwd(), "public", "uploads", "centres", centreId);
-    await fs.mkdir(dirAbs, { recursive: true });
-    await fs.writeFile(path.join(dirAbs, filename), buffer);
 
-    const url = `/uploads/centres/${centreId}/${filename}`;
+    const url = HAS_BLOB
+      ? await uploadToBlob(centreId, filename, file.type, buffer)
+      : await uploadToLocalFs(centreId, filename, buffer);
 
-    // Map kind to centre column
     const fieldMap: Record<UploadKind, "logo" | "signatureUrl" | "bannerImage"> = {
       logo: "logo",
       signature: "signatureUrl",
@@ -81,7 +99,7 @@ export async function POST(req: NextRequest) {
       data: { [fieldMap[kind]]: url },
     });
 
-    return NextResponse.json({ url, kind });
+    return NextResponse.json({ url, kind, storage: HAS_BLOB ? "blob" : "local" });
   } catch (err) {
     if (err instanceof Error && err.message === "Non authentifié") {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });

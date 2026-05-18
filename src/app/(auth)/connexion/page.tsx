@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faShieldHalved, faUserGraduate, faBuilding } from '@fortawesome/free-solid-svg-icons';
@@ -16,12 +17,14 @@ export default function ConnexionPage() {
       <div className="rounded-2xl p-8 sm:p-10 backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4 bg-blue-600">
-            <span className="font-display font-bold text-lg text-white">BYS</span>
-          </div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-white">
-            BYS Formation
-          </h1>
+          <Image
+            src="/transparent-logo.svg"
+            alt="BYS Formation"
+            width={200}
+            height={56}
+            priority
+            className="h-14 w-auto mx-auto mb-2 brightness-0 invert"
+          />
         </div>
 
         {/* Title */}

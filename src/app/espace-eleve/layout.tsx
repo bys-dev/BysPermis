@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -49,8 +50,15 @@ export default function EspaceEleveLayout({ children }: { children: React.ReactN
       <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
         {/* Logo */}
         <div className="px-6 py-6 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-3" aria-label="BYS Formation — accueil">
+            <Image
+              src="/transparent-logo.svg"
+              alt="BYS Formation"
+              width={36}
+              height={36}
+              className="h-9 w-auto brightness-0 invert"
+            />
+            <div className="hidden">
               <span className="font-bold text-sm text-white">BYS</span>
             </div>
             <span className="font-semibold text-white text-sm">BYS Formation</span>

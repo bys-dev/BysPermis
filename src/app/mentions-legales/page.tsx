@@ -63,10 +63,40 @@ export default function MentionsLegalesPage() {
             </p>
           </section>
 
+          {/* Prestataire technique */}
+          <section className="mb-10">
+            <h2 className="font-display text-xl font-semibold text-brand-text mb-4">
+              3. Prestataire technique
+            </h2>
+            <div className="leading-relaxed text-gray-700 space-y-1">
+              <p>
+                La conception, le développement et la maintenance technique du
+                site sont assurés par :
+              </p>
+              <ul className="list-none mt-3 space-y-1">
+                <li>
+                  <strong>Nom :</strong> Andrys MAGAR — Auto-entrepreneur
+                </li>
+                <li>
+                  <strong>SIRET :</strong> 908 058 092 00028
+                </li>
+                <li>
+                  <strong>Email :</strong>{" "}
+                  <a
+                    href="mailto:slformation7@gmail.com"
+                    className="text-brand-accent hover:text-brand-accent-hover underline"
+                  >
+                    slformation7@gmail.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </section>
+
           {/* Hébergeur */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold text-brand-text mb-4">
-              3. Hébergeur
+              4. Hébergeur
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-1">
               <ul className="list-none space-y-1">
@@ -95,7 +125,7 @@ export default function MentionsLegalesPage() {
           {/* Propriété intellectuelle */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold text-brand-text mb-4">
-              4. Propriété intellectuelle
+              5. Propriété intellectuelle
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>
@@ -123,7 +153,7 @@ export default function MentionsLegalesPage() {
           {/* Limitation de responsabilité */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold text-brand-text mb-4">
-              5. Limitation de responsabilité
+              6. Limitation de responsabilité
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>
@@ -152,7 +182,7 @@ export default function MentionsLegalesPage() {
           {/* Droit applicable */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold text-brand-text mb-4">
-              6. Droit applicable
+              7. Droit applicable
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>

@@ -7,6 +7,7 @@ import { calculateCommission, getCommissionRate } from "@/lib/utils";
 import { sendConfirmationEmail, sendCentreNotificationEmail, resend } from "@/lib/email";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { formatDate } from "@/lib/utils";
+import { renderConvocationPdf, renderInvoicePdfFromReservation } from "@/lib/pdf-helpers";
 
 // ─── GET /api/reservations — mes réservations ─────────────
 export async function GET() {
@@ -281,6 +282,18 @@ export async function POST(req: NextRequest) {
     const centre = result.reservation.session.formation.centre;
 
     try {
+      // Génère facture PDF + convocation PDF en parallèle (renderToBuffer est CPU-bound).
+      const [invoicePdf, convocationPdf] = await Promise.all([
+        renderInvoicePdfFromReservation(result.reservation.id).catch((err) => {
+          console.error("[POST /api/reservations] Invoice PDF render error:", err);
+          return null;
+        }),
+        renderConvocationPdf(result.reservation.id).catch((err) => {
+          console.error("[POST /api/reservations] Convocation PDF render error:", err);
+          return null;
+        }),
+      ]);
+
       const emailPromises: Promise<unknown>[] = [
         sendConfirmationEmail({
           to: data.email,
@@ -288,6 +301,9 @@ export async function POST(req: NextRequest) {
           formationTitle: result.reservation.session.formation.titre,
           sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
           centreName: centre.nom,
+          attachments: invoicePdf
+            ? [{ filename: invoicePdf.filename, content: invoicePdf.buffer }]
+            : undefined,
         }),
       ];
 
@@ -304,7 +320,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Convocation email via template system
+      // Email convocation via template, avec PDF joint
       const lienConvocation = `${APP_URL}/api/convocation/${result.reservation.id}`;
       const convocationVars: Record<string, string> = {
         prenom: data.prenom,
@@ -323,7 +339,15 @@ export async function POST(req: NextRequest) {
       emailPromises.push(
         renderEmailTemplate("convocation", centre.id, convocationVars)
           .then(({ subject, html }) =>
-            resend.emails.send({ from: FROM, to: data.email, subject, html })
+            resend.emails.send({
+              from: FROM,
+              to: data.email,
+              subject,
+              html,
+              ...(convocationPdf
+                ? { attachments: [{ filename: convocationPdf.filename, content: convocationPdf.buffer }] }
+                : {}),
+            })
           )
           .catch((err) => {
             console.error("[POST /api/reservations] Convocation email error:", err);

@@ -82,10 +82,9 @@ const sortOptions = [
   { value: "date", label: "Date" },
 ];
 
+// Scope V1 : la réglementation impose le présentiel pour les stages récup points.
 const modaliteOptions = [
   { value: "PRESENTIEL", label: "Présentiel", icon: faBuilding },
-  { value: "DISTANCIEL", label: "Distanciel", icon: faLaptop },
-  { value: "HYBRIDE", label: "Hybride", icon: faCircleNodes },
 ];
 
 // ─── INNER COMPONENT (uses useSearchParams) ───────────────
