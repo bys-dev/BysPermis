@@ -47,6 +47,7 @@ interface Centre {
   slug: string;
   ville: string;
   adresse?: string;
+  logo?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   isQualiopi: boolean;
@@ -132,6 +133,10 @@ function CentresInner() {
           nom: string;
           slug: string;
           ville?: string | null;
+          adresse?: string | null;
+          logo?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           formations?: ApiFormation[];
           _count?: { formations?: number };
           distance?: number | null;
@@ -142,6 +147,10 @@ function CentresInner() {
           nom: c.nom,
           slug: c.slug,
           ville: c.ville ?? "",
+          adresse: c.adresse ?? undefined,
+          logo: c.logo ?? null,
+          latitude: c.latitude ?? null,
+          longitude: c.longitude ?? null,
           isQualiopi: c.formations?.some((f) => f.isQualiopi) ?? false,
           isBYS: c.nom.toLowerCase().includes("bys"),
           nombreFormations: c._count?.formations ?? 0,
@@ -288,20 +297,29 @@ function CentresInner() {
                 href={`/centres/${centre.slug}`}
                 className={`card p-0 overflow-hidden flex flex-col group ${centre.isBYS ? "ring-2 ring-brand-accent shadow-lg" : ""}`}
               >
-                {/* Logo placeholder */}
-                <div className={`h-32 flex items-center justify-center ${centre.isBYS ? "bg-gradient-to-br from-blue-600 to-blue-800" : "bg-gradient-to-br from-blue-50 to-indigo-50"}`}>
-                  {centre.isBYS ? (
-                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                      <span className="font-display font-bold text-blue-600 text-xl">BYS</span>
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center border border-brand-border">
+                {/* Logo du centre */}
+                <div className={`h-32 flex items-center justify-center p-4 ${centre.isBYS ? "bg-gradient-to-br from-blue-600 to-blue-800" : "bg-gradient-to-br from-blue-50 to-indigo-50"}`}>
+                  <div className={`w-20 h-20 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden ${centre.isBYS ? "" : "border border-brand-border"}`}>
+                    {centre.logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={centre.logo}
+                        alt={centre.nom}
+                        className="w-full h-full object-contain p-1.5"
+                      />
+                    ) : centre.isBYS ? (
+                      <img
+                        src="/colored-logo.svg"
+                        alt={centre.nom}
+                        className="w-full h-full object-contain p-1.5"
+                      />
+                    ) : (
                       <FontAwesomeIcon
                         icon={faBuilding}
                         className="text-brand-accent text-2xl"
                       />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 <div className="p-5 flex flex-col flex-1">

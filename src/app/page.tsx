@@ -7,6 +7,8 @@ import { TricoloreParticles } from "@/components/ui/TricoloreParticles";
 import { CentresProximite } from "@/components/marketplace/CentresProximite";
 import HeroSearchForm from "@/components/marketplace/HeroSearchForm";
 import HomeFaq from "@/components/marketplace/HomeFaq";
+import JsonLd from "@/components/seo/JsonLd";
+import { serviceJsonLd } from "@/lib/seo/jsonld";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -322,7 +324,7 @@ interface LiveFormation {
   modalite: string;
   isQualiopi: boolean;
   categorie: { nom: string } | null;
-  centre: { nom: string; ville: string };
+  centre: { nom: string; ville: string; logo: string | null };
   sessions: { placesRestantes: number }[];
 }
 
@@ -345,7 +347,7 @@ async function fetchLiveFormations(): Promise<LiveFormation[]> {
       },
       include: {
         categorie: { select: { nom: true } },
-        centre: { select: { nom: true, ville: true } },
+        centre: { select: { nom: true, ville: true, logo: true } },
         sessions: {
           where: { status: "ACTIVE", dateDebut: { gte: new Date() } },
           orderBy: { dateDebut: "asc" },
@@ -383,6 +385,7 @@ export default async function Home() {
                 ? "Distanciel"
                 : "Hybride",
           centre: f.centre.nom,
+          centreLogo: f.centre.logo,
           ville: f.centre.ville,
           price: `${f.prix} €`,
           places: f.sessions[0]?.placesRestantes ?? 0,
@@ -392,11 +395,16 @@ export default async function Home() {
           ...c,
           id: c.title,
           slug: "",
+          centreLogo: null as string | null,
           ville: "Île-de-France",
         }));
 
   return (
     <>
+      <JsonLd
+        id="ld-home-service"
+        data={serviceJsonLd({ averagePrice: { min: 200, max: 280 } })}
+      />
       <Header />
       <main>
         {/* ═══ 1. HERO ═══ */}
@@ -759,10 +767,23 @@ export default async function Home() {
                     )}
 
                     <div className="flex items-center space-x-2 mb-5">
-                      <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 text-xs font-bold">
-                          {course.centre.charAt(0)}
-                        </span>
+                      <div className="w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                        {course.centreLogo ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={course.centreLogo.startsWith("http") ? course.centreLogo : course.centreLogo}
+                            alt={course.centre}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <Image
+                            src="/colored-logo.svg"
+                            alt={course.centre}
+                            width={32}
+                            height={32}
+                            className="w-full h-full object-contain p-0.5"
+                          />
+                        )}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-700">{course.centre}</span>
