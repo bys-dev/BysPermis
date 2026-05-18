@@ -193,14 +193,15 @@ export default function FaqPage() {
           <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl mb-4">
             Questions fréquentes
           </h1>
-          <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-gray-300 text-lg mb-0 max-w-2xl mx-auto">
             Retrouvez toutes les réponses à vos questions sur les stages de récupération de points,
             l&apos;inscription, le paiement et le déroulement du stage.
           </p>
-
-          <FaqContent categories={faqCategories} />
         </div>
       </section>
+
+      {/* Contenu FAQ (fond clair pour lisibilité) */}
+      <FaqContent categories={faqCategories} />
 
       {/* CTA */}
       <section className="bg-white border-t border-brand-border py-16 px-4">

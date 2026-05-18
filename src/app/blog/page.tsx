@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import BlogCategoryFilter from "@/components/blog/BlogCategoryFilter";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faNewspaper,
@@ -83,7 +85,9 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const total = articles.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gray-50">
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center">
@@ -181,6 +185,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
           </>
         )}
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
