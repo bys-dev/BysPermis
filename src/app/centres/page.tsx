@@ -3,8 +3,22 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+
+// Leaflet doit être chargé côté client uniquement (utilise `window`).
+const CentresMap = dynamic(
+  () => import("@/components/marketplace/CentresMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[500px] w-full rounded-xl border border-brand-border bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center">
+        <span className="text-gray-400 text-sm">Chargement de la carte…</span>
+      </div>
+    ),
+  }
+);
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -32,6 +46,9 @@ interface Centre {
   nom: string;
   slug: string;
   ville: string;
+  adresse?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   isQualiopi: boolean;
   isBYS: boolean;
   nombreFormations: number;
@@ -368,34 +385,35 @@ function CentresInner() {
         )}
       </section>
 
-      {/* Map placeholder */}
+      {/* Carte interactive des centres */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="bg-white border border-brand-border rounded-xl overflow-hidden">
-          <div className="p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-            <div className="w-20 h-20 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
-              <FontAwesomeIcon icon={faMapLocationDot} className="text-brand-accent text-3xl" />
-            </div>
-            <div className="text-center md:text-left">
-              <h3 className="font-display font-bold text-xl text-brand-text mb-2">
-                Bientot : carte interactive
-              </h3>
-              <p className="text-gray-500 max-w-lg">
-                Nous travaillons sur une carte interactive pour vous aider à trouver
-                le centre de formation le plus proche de chez vous. Restez connecté !
-              </p>
-            </div>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+            <FontAwesomeIcon icon={faMapLocationDot} className="text-brand-accent" />
           </div>
-          {/* Visual map placeholder */}
-          <div className="h-64 bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center border-t border-brand-border">
-            <div className="text-center">
-              <FontAwesomeIcon
-                icon={faMapLocationDot}
-                className="text-5xl text-blue-200 mb-3"
-              />
-              <p className="text-gray-400 font-medium">Carte interactive en cours de développement</p>
-            </div>
+          <div>
+            <h3 className="font-display font-bold text-xl text-brand-text">Trouvez un centre sur la carte</h3>
+            <p className="text-gray-500 text-sm">
+              {centres.filter((c) => c.latitude && c.longitude).length} centre
+              {centres.filter((c) => c.latitude && c.longitude).length > 1 ? "s" : ""} géolocalisé
+              {centres.filter((c) => c.latitude && c.longitude).length > 1 ? "s" : ""}
+            </p>
           </div>
         </div>
+        <CentresMap
+          centres={centres
+            .filter((c) => c.latitude != null && c.longitude != null)
+            .map((c) => ({
+              id: c.id,
+              nom: c.nom,
+              slug: c.slug,
+              ville: c.ville,
+              adresse: c.adresse,
+              latitude: c.latitude as number,
+              longitude: c.longitude as number,
+              isBYS: c.isBYS,
+            }))}
+        />
       </section>
 
       {/* CTA for centres */}
