@@ -416,10 +416,11 @@ export default async function Home() {
               fill
               priority
               sizes="100vw"
-              className="object-cover opacity-70"
+              className="object-cover opacity-90 brightness-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/95 via-[#0A1628]/70 to-[#0A1628]/30" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/40 to-transparent" />
+            {/* Voile lisibilité texte à gauche, image quasi-claire à droite */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/45 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/70 via-transparent to-transparent" />
           </div>
 
           <div

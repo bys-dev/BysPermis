@@ -49,7 +49,7 @@ export default function CentresMap({ centres }: { centres: MapCentre[] }) {
     : [46.6, 2.4];
 
   return (
-    <div className="h-[500px] w-full rounded-xl overflow-hidden border border-brand-border">
+    <div className="h-[360px] sm:h-[480px] lg:h-[560px] w-full rounded-xl overflow-hidden border border-brand-border">
       <MapContainer
         center={defaultCenter}
         zoom={geolocated.length ? 6 : 5}
