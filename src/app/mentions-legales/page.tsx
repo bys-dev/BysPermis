@@ -25,7 +25,8 @@ export default function MentionsLegalesPage() {
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-1">
               <p>
-                Le site <strong>bys-formation.fr</strong> est édité par :
+                La marketplace <strong>BYS Formation Permis</strong> (accessible
+                sur <strong>bys-permis.fr</strong>) est une marque éditée par :
               </p>
               <ul className="list-none mt-3 space-y-1">
                 <li>

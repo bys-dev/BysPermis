@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const alt = "BYS Formation — Stages agréés de récupération de points";
+export const alt = "BYS Formation Permis — Stages agréés de récupération de points";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -41,18 +41,18 @@ import { prisma } from "@/lib/prisma";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "BYS Formation — Stages récupération de points & formations permis",
+  title: "BYS Formation Permis — Stages récupération de points & formations permis",
   description:
     "Comparez et réservez votre stage de récupération de points près de chez vous. 150+ centres agréés préfecture, convocation immédiate, paiement sécurisé.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "BYS Formation — Marketplace de stages permis",
+    title: "BYS Formation Permis — Marketplace de stages permis",
     description:
       "Récupérez jusqu'à 4 points en 2 jours dans un centre agréé près de chez vous.",
     url: "/",
     type: "website",
     locale: "fr_FR",
-    siteName: "BYS Formation",
+    siteName: "BYS Formation Permis",
   },
 };
 
@@ -269,7 +269,7 @@ const faqItems = [
   {
     question: "Combien coûte un stage de récupération de points ?",
     answer:
-      "Le prix varie entre 200 € et 300 € selon le centre et la région. Sur BYS Formation, vous pouvez comparer les prix de tous les centres agréés près de chez vous pour trouver le meilleur tarif. Attention : les stages ne sont pas remboursés par la Sécurité sociale ni éligibles CPF.",
+      "Le prix varie entre 200 € et 300 € selon le centre et la région. Sur BYS Formation Permis, vous pouvez comparer les prix de tous les centres agréés près de chez vous pour trouver le meilleur tarif. Attention : les stages ne sont pas remboursés par la Sécurité sociale ni éligibles CPF.",
   },
   {
     question: "Quels documents dois-je apporter le jour du stage ?",

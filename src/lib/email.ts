@@ -38,7 +38,7 @@ export async function sendConfirmationEmail(params: {
       <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold">Centre</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.centreName}</td></tr>
     </table>
     <p>Votre <strong>facture</strong> est jointe à ce mail au format PDF. Votre <strong>convocation</strong> vous sera envoyée 48h avant la session.</p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation Permis</p>
   </div>
 </div>`,
     ...(params.attachments && params.attachments.length > 0
@@ -64,7 +64,7 @@ export async function sendConvocationEmail(params: {
       <h1>Convocation</h1>
       <p>Veuillez trouver ci-joint votre convocation pour la formation <strong>${params.formationTitle}</strong>.</p>
       <p>Numéro de réservation : <strong>${params.reservationNumber}</strong></p>
-      <p>Cordialement,<br/>L'équipe BYS Formations</p>
+      <p>Cordialement,<br/>L'équipe BYS Formation Permiss</p>
     `,
     attachments: [
       {
@@ -104,7 +104,7 @@ export async function sendCentreNotificationEmail(params: {
         <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Montant</td><td>${formattedAmount}</td></tr>
       </table>
       <p>Connectez-vous à votre espace pour gérer cette réservation.</p>
-      <p>Cordialement,<br/>L'équipe BYS Formations</p>
+      <p>Cordialement,<br/>L'équipe BYS Formation Permiss</p>
     `,
   });
 }

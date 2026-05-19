@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "BYS Formation — Stages récupération de points",
+    name: "BYS Formation Permis — Stages récupération de points",
     short_name: "BYS Permis",
     description:
       "Réservez votre stage de récupération de points près de chez vous. Stages agréés Ministère de l'Intérieur, convocation immédiate.",
