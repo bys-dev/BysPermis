@@ -96,6 +96,7 @@ function RechercheInner() {
   // Read initial values from URL
   const initialQ = searchParams.get("q") ?? "";
   const initialVille = searchParams.get("ville") ?? "";
+  const initialDept = searchParams.get("dept") ?? "";
   const initialType = searchParams.get("type") ?? "Tous les types";
   const initialModalite = searchParams.get("modalite") ?? "";
   const initialQualiopi = searchParams.get("isQualiopi") === "true";
@@ -106,6 +107,7 @@ function RechercheInner() {
 
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const [searchVille, setSearchVille] = useState(initialVille);
+  const [searchDept, setSearchDept] = useState(initialDept);
   const [selectedType, setSelectedType] = useState(initialType);
   const [selectedModalite, setSelectedModalite] = useState(initialModalite);
   const [qualiopiOnly, setQualiopiOnly] = useState(initialQualiopi);
@@ -120,6 +122,7 @@ function RechercheInner() {
   const [loading, setLoading] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
+  const [detectedDept, setDetectedDept] = useState<string | null>(null);
 
   // Suggestions state
   const [suggestions, setSuggestions] = useState<Suggestion>({ formations: [], villes: [] });
@@ -145,6 +148,8 @@ function RechercheInner() {
   useEffect(() => {
     const saved = localStorage.getItem("bys_city");
     if (saved) setDetectedCity(saved);
+    const savedDept = localStorage.getItem("bys_dept");
+    if (savedDept) setDetectedDept(savedDept);
   }, []);
 
   // Close suggestions on outside click
@@ -165,6 +170,7 @@ function RechercheInner() {
       const vals: Record<string, string> = {
         q: searchQuery,
         ville: searchVille,
+        dept: searchDept,
         type: selectedType,
         modalite: selectedModalite,
         isQualiopi: qualiopiOnly ? "true" : "",
@@ -184,7 +190,7 @@ function RechercheInner() {
       if (currentPage > 1 && !overrides?.page) params.set("page", String(currentPage));
       router.replace(`/recherche?${params.toString()}`, { scroll: false });
     },
-    [searchQuery, searchVille, selectedType, selectedModalite, qualiopiOnly, cpfOnly, prixMin, prixMax, tri, currentPage, router],
+    [searchQuery, searchVille, searchDept, selectedType, selectedModalite, qualiopiOnly, cpfOnly, prixMin, prixMax, tri, currentPage, router],
   );
 
   // Fetch formations from API with debounce
@@ -195,6 +201,7 @@ function RechercheInner() {
 
       if (searchQuery.trim()) params.set("q", searchQuery.trim());
       if (searchVille.trim()) params.set("ville", searchVille.trim());
+      if (searchDept.trim()) params.set("dept", searchDept.trim());
       if (selectedType !== "Tous les types") params.set("type", selectedType);
       if (selectedModalite) params.set("modalite", selectedModalite);
       if (qualiopiOnly) params.set("isQualiopi", "true");
@@ -257,7 +264,7 @@ function RechercheInner() {
     }, 250);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, searchVille, selectedType, selectedModalite, qualiopiOnly, cpfOnly, prixMin, prixMax, tri, currentPage]);
+  }, [searchQuery, searchVille, searchDept, selectedType, selectedModalite, qualiopiOnly, cpfOnly, prixMin, prixMax, tri, currentPage]);
 
   // Auto-suggestions for search query
   useEffect(() => {
@@ -428,12 +435,22 @@ function RechercheInner() {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
             <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-300 flex-wrap">
               <FontAwesomeIcon icon={faLocationDot} className="text-blue-400 shrink-0" />
-              <span>Position detectee : <span className="font-semibold text-white">{detectedCity}</span></span>
-              <span className="text-blue-400/60 hidden sm:inline">— Afficher les stages a proximite ?</span>
+              <span>
+                Position détectée :{" "}
+                <span className="font-semibold text-white">
+                  {detectedCity}
+                  {detectedDept ? ` (${detectedDept})` : ""}
+                </span>
+              </span>
+              <span className="text-blue-400/60 hidden sm:inline">— Afficher les stages à proximité ?</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => { setSearchVille(detectedCity); setCurrentPage(1); }}
+                onClick={() => {
+                  setSearchVille(detectedCity);
+                  if (detectedDept) setSearchDept(detectedDept);
+                  setCurrentPage(1);
+                }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors"
               >
                 <FontAwesomeIcon icon={faBolt} className="text-[10px]" />

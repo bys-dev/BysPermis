@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     // ── Filters ────────────────────────────────────────────
     const q = searchParams.get("q");
     const ville = searchParams.get("ville");
+    const dept = searchParams.get("dept");
     const type = searchParams.get("type");
     const prixMin = searchParams.get("prixMin");
     const prixMax = searchParams.get("prixMax");
@@ -92,6 +93,14 @@ export async function GET(req: NextRequest) {
           { lieu: { contains: ville, mode: "insensitive" } },
           { centre: { ville: { contains: ville, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
         ],
+      });
+    }
+
+    // Dept filter — sur les 2-3 premiers chiffres du code postal du centre.
+    // (Métropole = 2 chiffres, DOM-TOM 97x/98x = 3 chiffres).
+    if (dept && /^\d{2,3}$/.test(dept.trim())) {
+      where.AND.push({
+        centre: { codePostal: { startsWith: dept.trim() }, statut: "ACTIF", isActive: true },
       });
     }
 

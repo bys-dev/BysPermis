@@ -134,6 +134,7 @@ export default function HeaderInteractive() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
   const [city, setCity] = useState<string | null>(null);
+  const [dept, setDept] = useState<string | null>(null);
   const [geoOpen, setGeoOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const geoRef = useRef<HTMLDivElement>(null);
@@ -152,6 +153,8 @@ export default function HeaderInteractive() {
   useEffect(() => {
     const saved = localStorage.getItem("bys_city");
     if (saved) setCity(saved);
+    const savedDept = localStorage.getItem("bys_dept");
+    if (savedDept) setDept(savedDept);
 
     fetch("/api/users/me")
       .then((r) => {
@@ -182,10 +185,24 @@ export default function HeaderInteractive() {
             data.address?.village ||
             data.address?.municipality ||
             "Votre ville";
+          // Département FR métropolitaine : 2 premiers chiffres du code postal.
+          // DOM-TOM (97x, 98x) : on garde les 3 premiers chiffres.
+          const postcode: string | undefined = data.address?.postcode;
+          let deptCode: string | null = null;
+          if (postcode && /^\d{5}$/.test(postcode)) {
+            deptCode = postcode.startsWith("97") || postcode.startsWith("98")
+              ? postcode.slice(0, 3)
+              : postcode.slice(0, 2);
+          }
           setCity(cityName);
+          setDept(deptCode);
           localStorage.setItem("bys_city", cityName);
+          if (deptCode) localStorage.setItem("bys_dept", deptCode);
+          else localStorage.removeItem("bys_dept");
           setGeoStatus("success");
-          router.push(`/recherche?ville=${encodeURIComponent(cityName)}`);
+          const params = new URLSearchParams({ ville: cityName });
+          if (deptCode) params.set("dept", deptCode);
+          router.push(`/recherche?${params.toString()}`);
         } catch {
           setGeoStatus("error");
         }
@@ -200,8 +217,10 @@ export default function HeaderInteractive() {
 
   function clearLocation() {
     setCity(null);
+    setDept(null);
     setGeoStatus("idle");
     localStorage.removeItem("bys_city");
+    localStorage.removeItem("bys_dept");
     setGeoOpen(false);
   }
 
@@ -229,8 +248,14 @@ export default function HeaderInteractive() {
                 className="w-4 h-4"
               />
             )}
-            <span className="max-w-[120px] truncate">
-              {geoStatus === "loading" ? "Localisation…" : city ?? "Ma position"}
+            <span className="max-w-[160px] truncate">
+              {geoStatus === "loading"
+                ? "Localisation…"
+                : city
+                  ? dept
+                    ? `${city} (${dept})`
+                    : city
+                  : "Ma position"}
             </span>
             {city && <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 opacity-50" />}
           </button>
