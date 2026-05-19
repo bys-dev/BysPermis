@@ -6,6 +6,7 @@ import {
   faCalendarDays, faEuroSign, faChartPie, faGraduationCap,
   faArrowTrendUp, faCircleCheck, faSpinner, faTriangleExclamation,
   faFileExport, faChevronDown,
+  faImage, faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
@@ -46,6 +47,7 @@ export default function DashboardCentrePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
+  const [hasLogo, setHasLogo] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetch("/api/centre/stats")
@@ -59,6 +61,16 @@ export default function DashboardCentrePage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+
+    // Logo manquant ? On affiche un bandeau d'incitation.
+    fetch("/api/centre/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && typeof data === "object") {
+          setHasLogo(Boolean(data.logo));
+        }
+      })
+      .catch(() => null);
   }, []);
 
   if (loading) {
@@ -122,6 +134,31 @@ export default function DashboardCentrePage() {
 
   return (
     <div>
+      {/* Bandeau logo manquant */}
+      {hasLogo === false && (
+        <div className="mb-6 rounded-xl p-4 flex items-center gap-4 border border-yellow-500/30 bg-yellow-500/5">
+          <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0">
+            <FontAwesomeIcon icon={faImage} className="text-yellow-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-yellow-300">
+              Ajoutez le logo de votre centre
+            </p>
+            <p className="text-xs text-yellow-200/70 mt-0.5">
+              Votre logo s&apos;affichera sur la page d&apos;accueil, dans les résultats de recherche
+              et sur vos convocations / factures PDF.
+            </p>
+          </div>
+          <Link
+            href="/espace-centre/profil-centre?tab=design"
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 text-xs font-semibold transition-colors"
+          >
+            Téléverser
+            <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

@@ -111,7 +111,16 @@ export default function ProfilCentrePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabId>("informations");
+  // Lire ?tab=design dans l'URL pour ouvrir directement le bon onglet
+  // (utilisé par le bandeau "Ajoutez votre logo" du dashboard).
+  const initialTab: TabId =
+    typeof window !== "undefined"
+      ? (new URLSearchParams(window.location.search).get("tab") as TabId | null) ?? "informations"
+      : "informations";
+  const validTabs: TabId[] = ["informations", "presentation", "design", "reseaux"];
+  const [activeTab, setActiveTab] = useState<TabId>(
+    validTabs.includes(initialTab) ? initialTab : "informations"
+  );
 
   // Chip inputs
   const [newEquipement, setNewEquipement] = useState("");
