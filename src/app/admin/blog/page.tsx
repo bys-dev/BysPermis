@@ -1,8 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { RichTextEditor } from "@/components/ui/RichTextEditor";
+
+const RichTextEditor = dynamic(
+  () => import("@/components/ui/RichTextEditor").then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="border border-gray-200 rounded-lg p-4 text-sm text-gray-400">
+        Chargement de l&apos;éditeur…
+      </div>
+    ),
+  },
+);
 import {
   faPlus,
   faEdit,

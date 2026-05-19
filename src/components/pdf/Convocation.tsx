@@ -3,8 +3,8 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
-  Font,
 } from "@react-pdf/renderer";
 
 // ─── Types ────────────────────────────────────────────────
@@ -32,12 +32,16 @@ export interface ConvocationData {
   };
   centre: {
     nom: string;
+    raisonSociale?: string;
+    siret?: string;
     adresse: string;
     codePostal: string;
     ville: string;
     telephone?: string;
     email?: string;
     numAgrement?: string;
+    logoUrl?: string;
+    signatureUrl?: string;
   };
   montant: number;
   dateEmission: string;
@@ -80,8 +84,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   logoText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 13 },
+  logoImage: { width: 44, height: 44, objectFit: "contain" },
+  signatureImage: { width: 110, height: 50, objectFit: "contain", marginBottom: 4 },
   headerTitle: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 18, marginTop: 4 },
   headerSub: { color: "#9CA3AF", fontSize: 9, marginTop: 2 },
   convocBadge: {
@@ -187,11 +194,12 @@ const styles = StyleSheet.create({
 // ─── Component ────────────────────────────────────────────
 export function Convocation({ data }: { data: ConvocationData }) {
   const { reservationNumero, stagiaire, formation, session, centre, montant, dateEmission } = data;
+  const centreDisplay = centre.raisonSociale ?? centre.nom;
 
   return (
     <Document
-      title={`Convocation BYS Formation — ${reservationNumero}`}
-      author="BYS Formation"
+      title={`Convocation ${centreDisplay} — ${reservationNumero}`}
+      author={centreDisplay}
       subject={`${formation.titre} — ${session.dateDebut}`}
     >
       <Page size="A4" style={styles.page}>
@@ -199,10 +207,14 @@ export function Convocation({ data }: { data: ConvocationData }) {
         <View style={styles.header}>
           <View>
             <View style={styles.logoBox}>
-              <Text style={styles.logoText}>BYS</Text>
+              {centre.logoUrl ? (
+                <Image src={centre.logoUrl} style={styles.logoImage} />
+              ) : (
+                <Text style={styles.logoText}>{centreDisplay.slice(0, 3).toUpperCase()}</Text>
+              )}
             </View>
-            <Text style={styles.headerTitle}>BYS Formation</Text>
-            <Text style={styles.headerSub}>Plateforme de stages agréés Préfecture</Text>
+            <Text style={styles.headerTitle}>{centreDisplay}</Text>
+            <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>
           </View>
           <View style={styles.convocBadge}>
             <Text style={styles.convocBadgeText}>CONVOCATION</Text>
@@ -284,8 +296,14 @@ export function Convocation({ data }: { data: ConvocationData }) {
               <Text style={styles.cardTitle}>Centre de formation</Text>
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Nom</Text>
-                <Text style={styles.rowValue}>{centre.nom}</Text>
+                <Text style={styles.rowValue}>{centreDisplay}</Text>
               </View>
+              {centre.siret ? (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>SIRET</Text>
+                  <Text style={styles.rowValue}>{centre.siret}</Text>
+                </View>
+              ) : null}
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Adresse</Text>
                 <Text style={styles.rowValue}>{centre.adresse}{"\n"}{centre.codePostal} {centre.ville}</Text>
@@ -346,21 +364,24 @@ export function Convocation({ data }: { data: ConvocationData }) {
             </View>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>Cachet & signature du centre</Text>
+              {centre.signatureUrl ? (
+                <Image src={centre.signatureUrl} style={styles.signatureImage} />
+              ) : null}
               <View style={styles.signLine} />
-              <Text style={styles.signLabel}>{centre.nom}</Text>
+              <Text style={styles.signLabel}>{centreDisplay}</Text>
             </View>
           </View>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerBrand}>BYS Formation — bysforma95@gmail.com</Text>
-          <Text style={styles.footerText}>Bât. 7, 9 Chaussée Jules César, 95520 Osny</Text>
-          <Text style={styles.footerText}>Lun-Ven : 9h-18h</Text>
+          <Text style={styles.footerBrand}>{centreDisplay}{centre.email ? ` — ${centre.email}` : ""}</Text>
+          <Text style={styles.footerText}>{centre.adresse}, {centre.codePostal} {centre.ville}</Text>
+          <Text style={styles.footerText}>{centre.telephone ?? "—"}</Text>
         </View>
         <View style={{ backgroundColor: colors.navy, paddingHorizontal: 40, paddingBottom: 10 }}>
           <Text style={styles.footerLegal}>
-            Ce document constitue une convocation officielle délivrée par BYS Formation. En cas d&apos;absence non justifiée, aucun remboursement ne sera effectué.
+            Ce document constitue une convocation officielle délivrée par {centreDisplay}. En cas d&apos;absence non justifiée, aucun remboursement ne sera effectué.
             Stage agréé par la Préfecture conformément au Code de la route (art. R. 223-5).
           </Text>
         </View>

@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     // ── Filters ────────────────────────────────────────────
     const q = searchParams.get("q");
     const ville = searchParams.get("ville");
+    const dept = searchParams.get("dept");
     const type = searchParams.get("type");
     const prixMin = searchParams.get("prixMin");
     const prixMax = searchParams.get("prixMax");
@@ -47,37 +48,60 @@ export async function GET(req: NextRequest) {
     const duree = searchParams.get("duree");
     const tri = searchParams.get("tri");
 
+    // Scope V1: stages de récupération de points uniquement.
+    // Filtre par catégorie OU titre matching (tolère DB historique pas encore migrée).
+    const scopeRecupPoints = {
+      OR: [
+        { categorie: { nom: { contains: "récup", mode: "insensitive" as const } } },
+        { categorie: { nom: { contains: "sensib", mode: "insensitive" as const } } },
+        { categorie: { nom: { contains: "48", mode: "insensitive" as const } } },
+        { categorie: { nom: { contains: "probatoire", mode: "insensitive" as const } } },
+        { titre: { contains: "récupération de points", mode: "insensitive" as const } },
+        { titre: { contains: "stage 48", mode: "insensitive" as const } },
+        { titre: { contains: "sensibilisation", mode: "insensitive" as const } },
+      ],
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
       isActive: true,
+      modalite: "PRESENTIEL",
       centre: {
         statut: "ACTIF",
         isActive: true,
       },
+      AND: [scopeRecupPoints],
     };
 
     // Full-text search across multiple fields
     if (q && q.trim()) {
-      where.OR = [
-        { titre: { contains: q, mode: "insensitive" } },
-        { description: { contains: q, mode: "insensitive" } },
-        { centre: { nom: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
-        { centre: { ville: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
-        { categorie: { nom: { contains: q, mode: "insensitive" } } },
-      ];
+      where.AND.push({
+        OR: [
+          { titre: { contains: q, mode: "insensitive" } },
+          { description: { contains: q, mode: "insensitive" } },
+          { centre: { nom: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
+          { centre: { ville: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
+          { categorie: { nom: { contains: q, mode: "insensitive" } } },
+        ],
+      });
     }
 
     // Ville filter (on centre.ville or formation.lieu)
     if (ville && ville.trim()) {
-      where.AND = [
-        ...(where.AND ?? []),
-        {
-          OR: [
-            { lieu: { contains: ville, mode: "insensitive" } },
-            { centre: { ville: { contains: ville, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
-          ],
-        },
-      ];
+      where.AND.push({
+        OR: [
+          { lieu: { contains: ville, mode: "insensitive" } },
+          { centre: { ville: { contains: ville, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
+        ],
+      });
+    }
+
+    // Dept filter — sur les 2-3 premiers chiffres du code postal du centre.
+    // (Métropole = 2 chiffres, DOM-TOM 97x/98x = 3 chiffres).
+    if (dept && /^\d{2,3}$/.test(dept.trim())) {
+      where.AND.push({
+        centre: { codePostal: { startsWith: dept.trim() }, statut: "ACTIF", isActive: true },
+      });
     }
 
     // Category filter
@@ -89,16 +113,14 @@ export async function GET(req: NextRequest) {
     if (prixMin) where.prix = { ...(where.prix ?? {}), gte: Number(prixMin) };
     if (prixMax) where.prix = { ...(where.prix ?? {}), lte: Number(prixMax) };
 
-    // Modalité
-    if (modalite && ["PRESENTIEL", "DISTANCIEL", "HYBRIDE"].includes(modalite)) {
-      where.modalite = modalite;
-    }
+    // Modalité : scope V1 force PRESENTIEL, on ignore les autres valeurs.
+    // (champ where.modalite déjà fixé plus haut)
 
     // Qualiopi
     if (isQualiopi === "true") where.isQualiopi = true;
 
-    // CPF
-    if (isCPF === "true") where.isCPF = true;
+    // CPF (en V1, aucun stage récup points n'est éligible CPF — toujours false)
+    if (isCPF === "true") where.isCPF = false;
 
     // Durée
     if (duree && duree.trim()) {

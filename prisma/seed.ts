@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Seed scripts use `any` for Prisma's dynamic create payloads (nested includes,
+// connect-or-create, polymorphic upserts). Strict typing here would add 100s of
+// lines of Prisma.XxxCreateInput boilerplate for zero runtime benefit. Out of
+// production code path.
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -34,6 +39,8 @@ async function main() {
   console.log("✅ Données supprimées.\n");
 
   // ─── 1. CATÉGORIES ───────────────────────────────────────
+  // Scope V1 (mai 2026) : une seule catégorie, le stage de récupération de points.
+  // Le modèle Categorie reste en place pour permettre d'autres catégories dans le futur.
   console.log("📂 Création des catégories...");
   const categories = await Promise.all([
     (prisma as any).categorie.create({
@@ -45,73 +52,10 @@ async function main() {
         ordre: 1,
       },
     }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Permis B",
-        description: "Formation complète au permis de conduire voiture. Apprentissage du code de la route et de la conduite.",
-        icon: "car",
-        couleur: "#10B981",
-        ordre: 2,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "FIMO Marchandises",
-        description: "Formation Initiale Minimale Obligatoire pour le transport de marchandises. Obligatoire pour conduire des véhicules de plus de 3,5 tonnes.",
-        icon: "truck",
-        couleur: "#F59E0B",
-        ordre: 3,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "FCO Marchandises",
-        description: "Formation Continue Obligatoire pour les conducteurs de transport de marchandises. Renouvellement tous les 5 ans.",
-        icon: "truck",
-        couleur: "#EF4444",
-        ordre: 4,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Transport de personnes",
-        description: "Formations pour le transport de voyageurs : FIMO, FCO et capacité professionnelle.",
-        icon: "bus",
-        couleur: "#8B5CF6",
-        ordre: 5,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Sensibilisation sécurité routière",
-        description: "Stages de sensibilisation aux risques routiers pour les entreprises et les particuliers.",
-        icon: "warning",
-        couleur: "#F97316",
-        ordre: 6,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Permis moto",
-        description: "Formation au permis A1, A2 et passerelle A. Conduisez en toute sécurité sur deux roues.",
-        icon: "motorcycle",
-        couleur: "#06B6D4",
-        ordre: 7,
-      },
-    }),
-    (prisma as any).categorie.create({
-      data: {
-        nom: "Eco-conduite",
-        description: "Apprenez à conduire de manière économique et écologique. Réduisez votre consommation de carburant jusqu'à 15%.",
-        icon: "leaf",
-        couleur: "#22C55E",
-        ordre: 8,
-      },
-    }),
   ]);
 
-  const [catRecup, catPermisB, catFIMO, catFCO, catTransport, catSensibilisation, catMoto, catEco] = categories;
-  console.log(`✅ ${categories.length} catégories créées.\n`);
+  const [catRecup] = categories;
+  console.log(`✅ ${categories.length} catégorie créée.\n`);
 
   // ─── 1b. PLANS D'ABONNEMENT ──────────────────────────────
   console.log("💎 Création des plans d'abonnement...");
@@ -448,6 +392,175 @@ async function main() {
         role: "ELEVE",
       },
     }),
+    // Élèves supplémentaires pour densifier réservations, reviews et messagerie
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve010",
+        email: "julien.rousseau@gmail.com",
+        nom: "Rousseau",
+        prenom: "Julien",
+        telephone: "06 12 45 78 90",
+        adresse: "9 Rue des Acacias",
+        codePostal: "75012",
+        ville: "Paris",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve011",
+        email: "fanny.michel@outlook.fr",
+        nom: "Michel",
+        prenom: "Fanny",
+        telephone: "06 23 56 89 01",
+        adresse: "27 Boulevard Voltaire",
+        codePostal: "75011",
+        ville: "Paris",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve012",
+        email: "mehdi.belkacem@gmail.com",
+        nom: "Belkacem",
+        prenom: "Mehdi",
+        telephone: "06 34 67 90 12",
+        adresse: "14 Rue de la République",
+        codePostal: "69002",
+        ville: "Lyon",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve013",
+        email: "elodie.fournier@hotmail.fr",
+        nom: "Fournier",
+        prenom: "Élodie",
+        telephone: "06 45 78 01 23",
+        adresse: "5 Place Bellecour",
+        codePostal: "69002",
+        ville: "Lyon",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve014",
+        email: "nicolas.faure@free.fr",
+        nom: "Faure",
+        prenom: "Nicolas",
+        telephone: "06 56 89 12 34",
+        adresse: "33 Avenue du Prado",
+        codePostal: "13008",
+        ville: "Marseille",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve015",
+        email: "celine.barbier@gmail.com",
+        nom: "Barbier",
+        prenom: "Céline",
+        telephone: "06 67 90 23 45",
+        adresse: "11 Cours Julien",
+        codePostal: "13006",
+        ville: "Marseille",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve016",
+        email: "florian.morel@yahoo.fr",
+        nom: "Morel",
+        prenom: "Florian",
+        telephone: "06 78 01 34 56",
+        adresse: "8 Rue des Frères Lumière",
+        codePostal: "95800",
+        ville: "Cergy",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve017",
+        email: "sarah.benabid@gmail.com",
+        nom: "Benabid",
+        prenom: "Sarah",
+        telephone: "06 89 12 45 67",
+        adresse: "21 Boulevard Pereire",
+        codePostal: "75017",
+        ville: "Paris",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve018",
+        email: "thierry.lopez@orange.fr",
+        nom: "Lopez",
+        prenom: "Thierry",
+        telephone: "06 90 23 56 78",
+        adresse: "47 Rue de la Liberté",
+        codePostal: "95300",
+        ville: "Pontoise",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve019",
+        email: "ines.giraud@laposte.net",
+        nom: "Giraud",
+        prenom: "Inès",
+        telephone: "06 01 34 67 89",
+        adresse: "12 Allée Mendès France",
+        codePostal: "69007",
+        ville: "Lyon",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve020",
+        email: "kevin.roux@gmail.com",
+        nom: "Roux",
+        prenom: "Kévin",
+        telephone: "06 13 46 79 02",
+        adresse: "73 Avenue de la Capelette",
+        codePostal: "13010",
+        ville: "Marseille",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
+    (prisma as any).user.create({
+      data: {
+        auth0Id: "auth0|eleve021",
+        email: "manon.leclerc@outlook.fr",
+        nom: "Leclerc",
+        prenom: "Manon",
+        telephone: "06 24 57 80 13",
+        adresse: "3 Rue du Marché",
+        codePostal: "95520",
+        ville: "Osny",
+        role: "ELEVE",
+        emailVerified: true,
+      },
+    }),
   ]);
 
   console.log(`✅ ${5 + centreUsers.length + eleves.length} utilisateurs créés (owner, admin, support, comptable, commercial + centres + élèves).\n`);
@@ -460,7 +573,7 @@ async function main() {
         nom: "BYS Formation Osny",
         slug: "bys-formation-osny",
         description:
-          "Centre agréé préfecture du Val-d'Oise, spécialisé dans les stages de récupération de points et la formation professionnelle transport.",
+          "Centre agréé préfecture du Val-d'Oise, spécialisé dans les stages de récupération de points du permis de conduire.",
         adresse: "Bât. 7, 9 Chaussée Jules César",
         codePostal: "95520",
         ville: "Osny",
@@ -473,10 +586,13 @@ async function main() {
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[0].id,
+        // Identité visuelle — logo BYS officiel
+        logo: "https://bys-permis.fr/colored-logo.png",
+        bannerImage: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80",
         // Personnalisation
         couleurPrimaire: "#2563EB",
         couleurSecondaire: "#1E40AF",
-        presentationHtml: "<p>Bienvenue chez <strong>BYS Formation</strong>, votre centre de formation agréé par la préfecture du Val-d'Oise.</p><p>Nous sommes spécialisés dans les <strong>stages de récupération de points</strong> et la <strong>formation professionnelle transport</strong> (FIMO, FCO). Notre équipe de formateurs expérimentés vous accompagne dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de réussite supérieur à 95%</li><li>Formateurs certifiés et passionnés</li></ul>",
+        presentationHtml: "<p>Bienvenue chez <strong>BYS Formation</strong>, votre centre agréé par la préfecture du Val-d'Oise pour les <strong>stages de récupération de points du permis de conduire</strong>. Nos formateurs (psychologue + expert sécurité routière) vous accompagnent sur 2 jours dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de satisfaction supérieur à 95%</li><li>Formateurs certifiés BAFM</li></ul>",
         horaires: "Lundi - Vendredi : 8h30 - 18h30\nSamedi : 9h00 - 13h00\nDimanche : Fermé",
         equipements: ["Salle climatisée", "Parking gratuit", "Wifi", "Simulateur", "Accès PMR", "Véhicules récents"],
         certifications: ["Qualiopi", "Agréé Préfecture", "Datadock", "CPF"],
@@ -493,7 +609,7 @@ async function main() {
         nom: "Conduite Plus Paris",
         slug: "conduite-plus-paris",
         description:
-          "Auto-école et centre de formation au cœur du 11ème arrondissement de Paris. Stages de récupération de points et formations permis B toute l'année.",
+          "Centre agréé préfecture de Paris, situé au cœur du 11ème arrondissement. Stages de récupération de points toute l'année.",
         adresse: "45 Avenue de la République",
         codePostal: "75011",
         ville: "Paris",
@@ -506,10 +622,13 @@ async function main() {
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[1].id,
+        // Identité visuelle
+        logo: "https://api.dicebear.com/7.x/initials/svg?seed=CP%20Paris&backgroundColor=10B981&textColor=FFFFFF&fontWeight=700",
+        bannerImage: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=80",
         // Personnalisation
         couleurPrimaire: "#10B981",
         couleurSecondaire: "#059669",
-        presentationHtml: "<p><strong>Conduite Plus</strong> est votre auto-école de référence dans le 11ème arrondissement de Paris.</p><p>Que vous souhaitiez passer votre permis B, récupérer vos points ou suivre une formation complémentaire, notre équipe dynamique est là pour vous guider vers la réussite.</p>",
+        presentationHtml: "<p><strong>Conduite Plus</strong> est votre centre de référence dans le 11ème arrondissement de Paris pour les stages de récupération de points. Notre équipe dynamique vous accompagne sur 2 jours dans une démarche bienveillante et constructive.</p>",
         horaires: "Lundi - Vendredi : 9h00 - 19h00\nSamedi : 10h00 - 17h00\nDimanche : Fermé",
         equipements: ["Salle climatisée", "Wifi", "Salle de code", "Véhicules récents"],
         certifications: ["Agréé Préfecture", "Label qualité"],
@@ -526,7 +645,7 @@ async function main() {
         nom: "CFSR Lyon",
         slug: "cfsr-lyon",
         description:
-          "Centre de Formation à la Sécurité Routière en Rhône-Alpes. Agréé préfecture du Rhône, nous proposons des stages de récupération de points, des formations FIMO/FCO et des stages de sensibilisation.",
+          "Centre de Formation à la Sécurité Routière en Rhône-Alpes. Agréé préfecture du Rhône, nous proposons des stages de récupération de points dans une ambiance bienveillante.",
         adresse: "12 Rue de la Part-Dieu",
         codePostal: "69003",
         ville: "Lyon",
@@ -539,6 +658,8 @@ async function main() {
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[2].id,
+        logo: "https://api.dicebear.com/7.x/initials/svg?seed=CFSR%20Lyon&backgroundColor=DC2626&textColor=FFFFFF&fontWeight=700",
+        bannerImage: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=1200&q=80",
       },
     }),
     (prisma as any).centre.create({
@@ -546,7 +667,7 @@ async function main() {
         nom: "Permis Express Marseille",
         slug: "permis-express-marseille",
         description:
-          "Centre de formation situé dans le 8ème arrondissement de Marseille. Spécialisé dans les stages accélérés de récupération de points et les formations au permis moto.",
+          "Centre agréé préfecture des Bouches-du-Rhône, situé dans le 8ème arrondissement de Marseille. Spécialisé dans les stages express de récupération de points (2 jours).",
         adresse: "78 Boulevard Michelet",
         codePostal: "13008",
         ville: "Marseille",
@@ -559,6 +680,8 @@ async function main() {
         statut: "ACTIF",
         isActive: true,
         userId: centreUsers[3].id,
+        logo: "https://api.dicebear.com/7.x/initials/svg?seed=PE%20Marseille&backgroundColor=F59E0B&textColor=FFFFFF&fontWeight=700",
+        bannerImage: "https://images.unsplash.com/photo-1568827999250-3f6afff96e66?auto=format&fit=crop&w=1200&q=80",
       },
     }),
     (prisma as any).centre.create({
@@ -566,7 +689,7 @@ async function main() {
         nom: "Sécurité Routière Nantes",
         slug: "securite-routiere-nantes",
         description:
-          "Nouveau centre de formation à Nantes, en attente de validation préfectorale. Nous proposerons des stages de récupération de points et des formations éco-conduite.",
+          "Nouveau centre à Nantes, en attente de validation préfectorale. Nous proposerons des stages de récupération de points en plein centre-ville.",
         adresse: "22 Rue de Strasbourg",
         codePostal: "44000",
         ville: "Nantes",
@@ -578,6 +701,8 @@ async function main() {
         statut: "EN_ATTENTE",
         isActive: false,
         userId: centreUsers[4].id,
+        logo: "https://api.dicebear.com/7.x/initials/svg?seed=SR%20Nantes&backgroundColor=6366F1&textColor=FFFFFF&fontWeight=700",
+        bannerImage: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=80",
       },
     }),
   ]);
@@ -600,7 +725,7 @@ async function main() {
       nom: "BYS Formation Cergy",
       slug: "bys-formation-cergy",
       description:
-        "Second centre BYS Formation, situé à Cergy-Pontoise. Stages de récupération de points et formation professionnelle transport.",
+        "Second centre BYS Formation, situé à Cergy-Pontoise. Stages de récupération de points du permis de conduire.",
       adresse: "5 Place des Merveilles",
       codePostal: "95800",
       ville: "Cergy",
@@ -614,6 +739,8 @@ async function main() {
       userId: centreUsers[0].id,
       couleurPrimaire: "#2563EB",
       couleurSecondaire: "#1E40AF",
+      logo: "https://bys-permis.fr/colored-logo.png",
+      bannerImage: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1200&q=80",
     },
   });
 
@@ -722,55 +849,7 @@ async function main() {
     },
   });
 
-  const formBysFIMO = await (prisma as any).formation.create({
-    data: {
-      titre: "FIMO Marchandises",
-      slug: "fimo-marchandises-osny",
-      description:
-        "Formation Initiale Minimale Obligatoire pour le transport de marchandises. Cette formation de 140 heures est obligatoire pour tout conducteur souhaitant exercer le métier de conducteur routier de marchandises.",
-      objectifs:
-        "Maîtriser les règles de sécurité et la réglementation du transport. Perfectionner la conduite rationnelle. Connaître l'environnement économique et social du transport routier.",
-      programme:
-        "Module 1 : Perfectionnement à la conduite rationnelle (65h). Module 2 : Réglementation (28h). Module 3 : Santé, sécurité routière et environnement (28h). Module 4 : Service et logistique (19h).",
-      prerequis: "Être titulaire du permis C ou CE en cours de validité. Aptitude médicale à jour.",
-      publicCible: "Futurs conducteurs routiers de marchandises",
-      duree: "140h",
-      prix: 2900,
-      modalite: "PRESENTIEL",
-      lieu: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[0].id,
-      categorieId: catFIMO.id,
-    },
-  });
-
-  const formBysFCO = await (prisma as any).formation.create({
-    data: {
-      titre: "FCO Marchandises",
-      slug: "fco-marchandises-osny",
-      description:
-        "Formation Continue Obligatoire de 5 jours pour les conducteurs routiers de marchandises. Renouvellement obligatoire tous les 5 ans pour maintenir sa carte de qualification conducteur.",
-      objectifs:
-        "Actualiser les connaissances en matière de réglementation. Perfectionner les pratiques de conduite sécuritaire. Sensibiliser à la sécurité routière et à l'éco-conduite.",
-      programme:
-        "Bilan des connaissances, conduite rationnelle et éco-conduite, réglementation sociale et transport, santé et sécurité routière, évaluation finale.",
-      prerequis: "Être titulaire d'une carte de qualification conducteur marchandises.",
-      publicCible: "Conducteurs routiers de marchandises en exercice",
-      duree: "5 jours (35h)",
-      prix: 1800,
-      modalite: "PRESENTIEL",
-      lieu: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[0].id,
-      categorieId: catFCO.id,
-    },
-  });
-
-  // Conduite Plus Paris — 3 formations
+  // Conduite Plus Paris — 1 formation (récup points uniquement, scope V1)
   const formParisRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Paris 11ème",
@@ -795,55 +874,7 @@ async function main() {
     },
   });
 
-  const formParisPermisB = await (prisma as any).formation.create({
-    data: {
-      titre: "Formation Permis B - Conduite Plus Paris",
-      slug: "permis-b-conduite-plus-paris",
-      description:
-        "Formation complète au permis de conduire catégorie B. Pack comprenant le code de la route et 30 heures de conduite avec un moniteur diplômé. Véhicules récents à double commande.",
-      objectifs:
-        "Obtenir le code de la route. Maîtriser la conduite d'un véhicule léger. Réussir l'examen pratique du permis de conduire.",
-      programme:
-        "Phase 1 : Code de la route (accès illimité en ligne + séances en salle). Phase 2 : 30 heures de conduite (manœuvres, circulation, autoroute). Phase 3 : Préparation à l'examen.",
-      prerequis: "Avoir 17 ans minimum (conduite accompagnée) ou 18 ans. Pièce d'identité et justificatif de domicile.",
-      publicCible: "Candidats au permis de conduire",
-      duree: "30h",
-      prix: 1590,
-      modalite: "PRESENTIEL",
-      lieu: "45 Avenue de la République, 75011 Paris",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[1].id,
-      categorieId: catPermisB.id,
-    },
-  });
-
-  const formParisMoto = await (prisma as any).formation.create({
-    data: {
-      titre: "Permis Moto A2 - Paris",
-      slug: "permis-moto-a2-paris",
-      description:
-        "Formation au permis moto A2 incluant le plateau et la circulation. Motos-écoles Yamaha MT-07 récentes. Équipement de protection fourni pour les séances de conduite.",
-      objectifs:
-        "Maîtriser les épreuves du plateau. Circuler en toute sécurité en milieu urbain et interurbain. Obtenir le permis A2.",
-      programme:
-        "Code moto (ETM), 20h de plateau (manœuvres lentes et rapides), 12h de circulation, examen blanc.",
-      prerequis: "Avoir 18 ans minimum. Être titulaire de l'ASSR2 ou de l'ASR.",
-      publicCible: "Candidats au permis moto",
-      duree: "32h",
-      prix: 1350,
-      modalite: "PRESENTIEL",
-      lieu: "45 Avenue de la République, 75011 Paris",
-      isQualiopi: true,
-      isCPF: false,
-      isActive: true,
-      centreId: centres[1].id,
-      categorieId: catMoto.id,
-    },
-  });
-
-  // CFSR Lyon — 3 formations
+  // CFSR Lyon — 1 formation (récup points uniquement, scope V1)
   const formLyonRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Lyon",
@@ -868,55 +899,7 @@ async function main() {
     },
   });
 
-  const formLyonFIMO = await (prisma as any).formation.create({
-    data: {
-      titre: "FIMO Marchandises - Lyon",
-      slug: "fimo-marchandises-lyon",
-      description:
-        "Formation FIMO Marchandises de 140 heures à Lyon. Notre piste privée de 3 000 m² permet un apprentissage optimal de la conduite poids lourd. Taux de réussite de 95%.",
-      objectifs:
-        "Obtenir la qualification initiale de conducteur routier. Maîtriser la conduite rationnelle d'un poids lourd. Connaître la réglementation sociale européenne.",
-      programme:
-        "Conduite rationnelle (65h), réglementation (28h), santé-sécurité-environnement (28h), logistique et service (19h). Examen final inclus.",
-      prerequis: "Permis C ou CE valide. Visite médicale favorable.",
-      publicCible: "Futurs conducteurs poids lourd en région lyonnaise",
-      duree: "140h",
-      prix: 3100,
-      modalite: "PRESENTIEL",
-      lieu: "12 Rue de la Part-Dieu, 69003 Lyon",
-      isQualiopi: true,
-      isCPF: true,
-      isActive: true,
-      centreId: centres[2].id,
-      categorieId: catFIMO.id,
-    },
-  });
-
-  const formLyonSensibilisation = await (prisma as any).formation.create({
-    data: {
-      titre: "Sensibilisation sécurité routière entreprise",
-      slug: "sensibilisation-securite-routiere-lyon",
-      description:
-        "Formation de sensibilisation aux risques routiers destinée aux entreprises. Réduisez les accidents de trajet et de mission de vos collaborateurs grâce à cette journée de formation interactive.",
-      objectifs:
-        "Sensibiliser les salariés aux risques routiers professionnels. Réduire le nombre d'accidents de trajet. Promouvoir une culture de la sécurité routière en entreprise.",
-      programme:
-        "Les chiffres du risque routier professionnel, les facteurs de risque (alcool, téléphone, fatigue), ateliers pratiques (simulateur, parcours lunettes d'alcoolémie), plan d'action individuel.",
-      prerequis: "Aucun prérequis. Formation ouverte à tous les salariés.",
-      publicCible: "Entreprises et collectivités de la région lyonnaise",
-      duree: "1 jour (7h)",
-      prix: 350,
-      modalite: "PRESENTIEL",
-      lieu: "12 Rue de la Part-Dieu, 69003 Lyon",
-      isQualiopi: true,
-      isCPF: false,
-      isActive: true,
-      centreId: centres[2].id,
-      categorieId: catSensibilisation.id,
-    },
-  });
-
-  // Permis Express Marseille — 2 formations
+  // Permis Express Marseille — 1 formation (récup points uniquement, scope V1)
   const formMarseilleRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Marseille",
@@ -941,31 +924,32 @@ async function main() {
     },
   });
 
-  const formMarseilleMoto = await (prisma as any).formation.create({
+  // BYS Formation Cergy — 1 formation (second centre BYS, scope V1)
+  const formCergyRecup = await (prisma as any).formation.create({
     data: {
-      titre: "Permis Moto A2 - Marseille",
-      slug: "permis-moto-a2-marseille",
+      titre: "Stage de récupération de points - Cergy",
+      slug: "stage-recuperation-points-cergy",
       description:
-        "Passez votre permis moto sous le soleil de Marseille ! Formation complète A2 avec des moniteurs passionnés. Notre piste privée offre des conditions idéales d'apprentissage.",
+        "Stage agréé préfecture du Val-d'Oise, dispensé dans nos locaux de Cergy-Pontoise (à 5 min de la gare). Récupérez jusqu'à 4 points en 2 jours, mêmes formateurs et même qualité que notre centre d'Osny.",
       objectifs:
-        "Réussir l'examen du plateau moto. Maîtriser la circulation en milieu urbain et péri-urbain. Conduire une moto en toute confiance.",
+        "Récupérer jusqu'à 4 points. Identifier ses comportements à risque. Repartir avec une feuille de route personnelle.",
       programme:
-        "ETM (code moto en ligne), plateau (20h de manœuvres), circulation (12h en conditions réelles), examen blanc plateau et circulation.",
-      prerequis: "18 ans minimum. ASSR2 ou ASR.",
-      publicCible: "Candidats au permis moto dans la région marseillaise",
-      duree: "32h",
-      prix: 1250,
+        "Jour 1 : Accueil, analyse de l'accidentologie, focus vitesse et distances. Jour 2 : Alcool/stupéfiants, fatigue, distracteurs, engagement personnel, attestation.",
+      prerequis: "Permis de conduire en cours de validité. Pas de stage dans les 12 derniers mois.",
+      publicCible: "Conducteurs du Val-d'Oise et de l'ouest francilien",
+      duree: "2 jours",
+      prix: 240,
       modalite: "PRESENTIEL",
-      lieu: "78 Boulevard Michelet, 13008 Marseille",
+      lieu: "5 Place des Merveilles, 95800 Cergy",
       isQualiopi: true,
       isCPF: false,
       isActive: true,
-      centreId: centres[3].id,
-      categorieId: catMoto.id,
+      centreId: centreOsny2.id,
+      categorieId: catRecup.id,
     },
   });
 
-  // Sécurité Routière Nantes — 2 formations (centre en attente)
+  // Sécurité Routière Nantes — 1 formation (centre en attente, récup points uniquement)
   const formNantesRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Nantes",
@@ -990,36 +974,13 @@ async function main() {
     },
   });
 
-  const formNantesEco = await (prisma as any).formation.create({
-    data: {
-      titre: "Formation Eco-conduite",
-      slug: "eco-conduite-nantes",
-      description:
-        "Apprenez à réduire votre consommation de carburant jusqu'à 15% grâce à notre formation éco-conduite. Idéal pour les entreprises souhaitant réduire leur empreinte carbone et leurs coûts de déplacement.",
-      objectifs:
-        "Réduire la consommation de carburant. Diminuer l'usure du véhicule. Adopter une conduite plus souple et sécuritaire.",
-      programme:
-        "Diagnostic initial de conduite, principes de l'éco-conduite, exercices pratiques sur route, comparaison avant/après, remise du certificat.",
-      prerequis: "Permis B valide.",
-      publicCible: "Particuliers et entreprises soucieux de l'environnement",
-      duree: "1 jour (7h)",
-      prix: 290,
-      modalite: "PRESENTIEL",
-      lieu: "22 Rue de Strasbourg, 44000 Nantes",
-      isQualiopi: false,
-      isCPF: false,
-      isActive: false,
-      centreId: centres[4].id,
-      categorieId: catEco.id,
-    },
-  });
-
   const allFormations = [
-    formBysRecup, formBysFIMO, formBysFCO,
-    formParisRecup, formParisPermisB, formParisMoto,
-    formLyonRecup, formLyonFIMO, formLyonSensibilisation,
-    formMarseilleRecup, formMarseilleMoto,
-    formNantesRecup, formNantesEco,
+    formBysRecup,
+    formParisRecup,
+    formLyonRecup,
+    formMarseilleRecup,
+    formCergyRecup,
+    formNantesRecup,
   ];
   console.log(`✅ ${allFormations.length} formations créées.\n`);
 
@@ -1031,14 +992,15 @@ async function main() {
     new Date(year, month - 1, day, hour, 0, 0);
 
   const sessions = await Promise.all([
-    // BYS Osny - Récup (4 sessions)
+    // ─── BYS Osny - Récup ────────────────────────────────────
+    // Sessions passées (dateDebut < 2026-05-11) → statut PASSEE
     (prisma as any).session.create({
       data: {
         dateDebut: d(2026, 4, 6, 9),
         dateFin: d(2026, 4, 7, 17),
         placesTotal: 20,
         placesRestantes: 3,
-        status: "ACTIVE",
+        status: "PASSEE",
         formationId: formBysRecup.id,
       },
     }),
@@ -1048,24 +1010,76 @@ async function main() {
         dateFin: d(2026, 4, 21, 17),
         placesTotal: 20,
         placesRestantes: 12,
-        status: "ACTIVE",
+        status: "PASSEE",
         formationId: formBysRecup.id,
       },
     }),
+    // Session "en cours" - démarre aujourd'hui
     (prisma as any).session.create({
       data: {
         dateDebut: d(2026, 5, 11, 9),
         dateFin: d(2026, 5, 12, 17),
         placesTotal: 20,
-        placesRestantes: 20,
+        placesRestantes: 4,
+        status: "ACTIVE",
+        formationId: formBysRecup.id,
+      },
+    }),
+    // Sessions futures BYS Osny (6 supplémentaires : juin → septembre 2026)
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 6, 8, 9),
+        dateFin: d(2026, 6, 9, 17),
+        placesTotal: 20,
+        placesRestantes: 11,
         status: "ACTIVE",
         formationId: formBysRecup.id,
       },
     }),
     (prisma as any).session.create({
       data: {
-        dateDebut: d(2026, 6, 8, 9),
-        dateFin: d(2026, 6, 9, 17),
+        dateDebut: d(2026, 6, 22, 9),
+        dateFin: d(2026, 6, 23, 17),
+        placesTotal: 18,
+        placesRestantes: 0,
+        status: "COMPLETE",
+        formationId: formBysRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 7, 6, 9),
+        dateFin: d(2026, 7, 7, 17),
+        placesTotal: 20,
+        placesRestantes: 14,
+        status: "ACTIVE",
+        formationId: formBysRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 7, 20, 9),
+        dateFin: d(2026, 7, 21, 17),
+        placesTotal: 20,
+        placesRestantes: 17,
+        status: "ACTIVE",
+        formationId: formBysRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 8, 24, 9),
+        dateFin: d(2026, 8, 25, 17),
+        placesTotal: 18,
+        placesRestantes: 16,
+        status: "ACTIVE",
+        formationId: formBysRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 9, 14, 9),
+        dateFin: d(2026, 9, 15, 17),
         placesTotal: 20,
         placesRestantes: 18,
         status: "ACTIVE",
@@ -1073,58 +1087,14 @@ async function main() {
       },
     }),
 
-    // BYS Osny - FIMO (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 14, 8),
-        dateFin: d(2026, 5, 8, 17),
-        placesTotal: 12,
-        placesRestantes: 4,
-        status: "ACTIVE",
-        formationId: formBysFIMO.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 1, 8),
-        dateFin: d(2026, 6, 26, 17),
-        placesTotal: 12,
-        placesRestantes: 10,
-        status: "ACTIVE",
-        formationId: formBysFIMO.id,
-      },
-    }),
-
-    // BYS Osny - FCO (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 5, 4, 8),
-        dateFin: d(2026, 5, 8, 17),
-        placesTotal: 15,
-        placesRestantes: 7,
-        status: "ACTIVE",
-        formationId: formBysFCO.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 7, 6, 8),
-        dateFin: d(2026, 7, 10, 17),
-        placesTotal: 15,
-        placesRestantes: 15,
-        status: "ACTIVE",
-        formationId: formBysFCO.id,
-      },
-    }),
-
-    // Paris - Récup (3 sessions, 1 passée)
+    // ─── Paris - Récup ───────────────────────────────────────
     (prisma as any).session.create({
       data: {
         dateDebut: d(2026, 3, 2, 9),
         dateFin: d(2026, 3, 3, 17),
         placesTotal: 20,
         placesRestantes: 0,
-        status: "COMPLETE",
+        status: "PASSEE",
         formationId: formParisRecup.id,
       },
     }),
@@ -1134,73 +1104,110 @@ async function main() {
         dateFin: d(2026, 4, 14, 17),
         placesTotal: 20,
         placesRestantes: 5,
+        status: "PASSEE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    // Sessions futures Paris (8 sessions, cadence 2/mois)
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 5, 18, 9),
+        dateFin: d(2026, 5, 19, 17),
+        placesTotal: 20,
+        placesRestantes: 7,
         status: "ACTIVE",
         formationId: formParisRecup.id,
       },
     }),
     (prisma as any).session.create({
       data: {
-        dateDebut: d(2026, 5, 18, 9),
-        dateFin: d(2026, 5, 19, 17),
+        dateDebut: d(2026, 6, 1, 9),
+        dateFin: d(2026, 6, 2, 17),
+        placesTotal: 18,
+        placesRestantes: 0,
+        status: "COMPLETE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 6, 15, 9),
+        dateFin: d(2026, 6, 16, 17),
         placesTotal: 20,
+        placesRestantes: 9,
+        status: "ACTIVE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 7, 6, 9),
+        dateFin: d(2026, 7, 7, 17),
+        placesTotal: 20,
+        placesRestantes: 12,
+        status: "ACTIVE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 7, 20, 9),
+        dateFin: d(2026, 7, 21, 17),
+        placesTotal: 20,
+        placesRestantes: 4,
+        status: "ACTIVE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 8, 10, 9),
+        dateFin: d(2026, 8, 11, 17),
+        placesTotal: 18,
+        placesRestantes: 0,
+        status: "COMPLETE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 8, 24, 9),
+        dateFin: d(2026, 8, 25, 17),
+        placesTotal: 20,
+        placesRestantes: 15,
+        status: "ACTIVE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 9, 7, 9),
+        dateFin: d(2026, 9, 8, 17),
+        placesTotal: 20,
+        placesRestantes: 17,
+        status: "ACTIVE",
+        formationId: formParisRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 9, 21, 9),
+        dateFin: d(2026, 9, 22, 17),
+        placesTotal: 18,
         placesRestantes: 16,
         status: "ACTIVE",
         formationId: formParisRecup.id,
       },
     }),
 
-    // Paris - Permis B (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 1, 9),
-        dateFin: d(2026, 5, 15, 17),
-        placesTotal: 10,
-        placesRestantes: 2,
-        status: "ACTIVE",
-        formationId: formParisPermisB.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 1, 9),
-        dateFin: d(2026, 7, 15, 17),
-        placesTotal: 10,
-        placesRestantes: 8,
-        status: "ACTIVE",
-        formationId: formParisPermisB.id,
-      },
-    }),
-
-    // Paris - Moto (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 7, 8),
-        dateFin: d(2026, 5, 2, 17),
-        placesTotal: 8,
-        placesRestantes: 1,
-        status: "ACTIVE",
-        formationId: formParisMoto.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 15, 8),
-        dateFin: d(2026, 7, 10, 17),
-        placesTotal: 8,
-        placesRestantes: 6,
-        status: "ACTIVE",
-        formationId: formParisMoto.id,
-      },
-    }),
-
-    // Lyon - Récup (3 sessions, 1 complète)
+    // ─── Lyon - Récup ────────────────────────────────────────
     (prisma as any).session.create({
       data: {
         dateDebut: d(2026, 3, 9, 9),
         dateFin: d(2026, 3, 10, 17),
         placesTotal: 22,
         placesRestantes: 0,
-        status: "COMPLETE",
+        status: "PASSEE",
         formationId: formLyonRecup.id,
       },
     }),
@@ -1210,63 +1217,60 @@ async function main() {
         dateFin: d(2026, 4, 28, 17),
         placesTotal: 22,
         placesRestantes: 9,
-        status: "ACTIVE",
+        status: "PASSEE",
         formationId: formLyonRecup.id,
       },
     }),
+    // Sessions futures Lyon (4 sessions)
     (prisma as any).session.create({
       data: {
         dateDebut: d(2026, 6, 22, 9),
         dateFin: d(2026, 6, 23, 17),
-        placesTotal: 22,
-        placesRestantes: 22,
+        placesTotal: 16,
+        placesRestantes: 8,
+        status: "ACTIVE",
+        formationId: formLyonRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 7, 13, 9),
+        dateFin: d(2026, 7, 14, 17),
+        placesTotal: 16,
+        placesRestantes: 13,
+        status: "ACTIVE",
+        formationId: formLyonRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 8, 17, 9),
+        dateFin: d(2026, 8, 18, 17),
+        placesTotal: 16,
+        placesRestantes: 14,
+        status: "ACTIVE",
+        formationId: formLyonRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 9, 28, 9),
+        dateFin: d(2026, 9, 29, 17),
+        placesTotal: 14,
+        placesRestantes: 12,
         status: "ACTIVE",
         formationId: formLyonRecup.id,
       },
     }),
 
-    // Lyon - FIMO (1 session)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 5, 18, 8),
-        dateFin: d(2026, 6, 12, 17),
-        placesTotal: 12,
-        placesRestantes: 6,
-        status: "ACTIVE",
-        formationId: formLyonFIMO.id,
-      },
-    }),
-
-    // Lyon - Sensibilisation (2 sessions)
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 4, 15, 9),
-        dateFin: d(2026, 4, 15, 17),
-        placesTotal: 25,
-        placesRestantes: 10,
-        status: "ACTIVE",
-        formationId: formLyonSensibilisation.id,
-      },
-    }),
-    (prisma as any).session.create({
-      data: {
-        dateDebut: d(2026, 6, 3, 9),
-        dateFin: d(2026, 6, 3, 17),
-        placesTotal: 25,
-        placesRestantes: 25,
-        status: "ACTIVE",
-        formationId: formLyonSensibilisation.id,
-      },
-    }),
-
-    // Marseille - Récup (3 sessions, 1 complète)
+    // ─── Marseille - Récup ───────────────────────────────────
     (prisma as any).session.create({
       data: {
         dateDebut: d(2026, 3, 16, 9),
         dateFin: d(2026, 3, 17, 17),
         placesTotal: 18,
         placesRestantes: 0,
-        status: "COMPLETE",
+        status: "PASSEE",
         formationId: formMarseilleRecup.id,
       },
     }),
@@ -1276,32 +1280,74 @@ async function main() {
         dateFin: d(2026, 5, 5, 17),
         placesTotal: 18,
         placesRestantes: 7,
+        status: "PASSEE",
+        formationId: formMarseilleRecup.id,
+      },
+    }),
+    // Sessions futures Marseille (4 sessions)
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 6, 29, 9),
+        dateFin: d(2026, 6, 30, 17),
+        placesTotal: 14,
+        placesRestantes: 6,
         status: "ACTIVE",
         formationId: formMarseilleRecup.id,
       },
     }),
     (prisma as any).session.create({
       data: {
-        dateDebut: d(2026, 6, 29, 9),
-        dateFin: d(2026, 6, 30, 17),
-        placesTotal: 18,
-        placesRestantes: 18,
+        dateDebut: d(2026, 7, 27, 9),
+        dateFin: d(2026, 7, 28, 17),
+        placesTotal: 12,
+        placesRestantes: 0,
+        status: "COMPLETE",
+        formationId: formMarseilleRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 8, 31, 9),
+        dateFin: d(2026, 9, 1, 17),
+        placesTotal: 14,
+        placesRestantes: 10,
+        status: "ACTIVE",
+        formationId: formMarseilleRecup.id,
+      },
+    }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 9, 21, 9),
+        dateFin: d(2026, 9, 22, 17),
+        placesTotal: 14,
+        placesRestantes: 13,
         status: "ACTIVE",
         formationId: formMarseilleRecup.id,
       },
     }),
 
-    // Marseille - Moto (1 session)
+    // ─── BYS Cergy - Récup (2 sessions futures) ──────────────
     (prisma as any).session.create({
       data: {
-        dateDebut: d(2026, 5, 11, 8),
-        dateFin: d(2026, 6, 5, 17),
-        placesTotal: 8,
-        placesRestantes: 3,
+        dateDebut: d(2026, 7, 13, 9),
+        dateFin: d(2026, 7, 14, 17),
+        placesTotal: 16,
+        placesRestantes: 11,
         status: "ACTIVE",
-        formationId: formMarseilleMoto.id,
+        formationId: formCergyRecup.id,
       },
     }),
+    (prisma as any).session.create({
+      data: {
+        dateDebut: d(2026, 9, 14, 9),
+        dateFin: d(2026, 9, 15, 17),
+        placesTotal: 16,
+        placesRestantes: 15,
+        status: "ACTIVE",
+        formationId: formCergyRecup.id,
+      },
+    }),
+
   ]);
 
   console.log(`✅ ${sessions.length} sessions créées.\n`);
@@ -1310,11 +1356,11 @@ async function main() {
   console.log("🎫 Création des réservations...");
 
   const reservations = await Promise.all([
-    // Karim → BYS Osny Récup session 1 (presque pleine)
+    // Karim → BYS Osny Récup session 1 PASSEE (terminée)
     (prisma as any).reservation.create({
       data: {
         numero: "RES-2026-0001",
-        status: "CONFIRMEE",
+        status: "TERMINEE",
         montant: 250,
         commissionMontant: 25,
         civilite: "M.",
@@ -1327,10 +1373,10 @@ async function main() {
         ville: "Paris",
         numeroPermis: "12AA34567",
         userId: eleves[0].id,
-        sessionId: sessions[0].id,
+        sessionId: sessions[0].id, // BYS Récup #1 PASSEE
       },
     }),
-    // Marie → Lyon Récup session complète (terminée)
+    // Marie → Lyon Récup #2 PASSEE (terminée)
     (prisma as any).reservation.create({
       data: {
         numero: "RES-2026-0002",
@@ -1347,10 +1393,10 @@ async function main() {
         ville: "Lyon",
         numeroPermis: "07BB89012",
         userId: eleves[1].id,
-        sessionId: sessions[16].id, // Lyon récup complète
+        sessionId: sessions[21].id, // Lyon récup #2 PASSEE
       },
     }),
-    // Lucas → Marseille Récup session complète (terminée)
+    // Lucas → Marseille Récup #2 PASSEE (terminée)
     (prisma as any).reservation.create({
       data: {
         numero: "RES-2026-0003",
@@ -1367,10 +1413,10 @@ async function main() {
         ville: "Marseille",
         numeroPermis: "13CC45678",
         userId: eleves[2].id,
-        sessionId: sessions[22].id, // Marseille récup complète
+        sessionId: sessions[27].id, // Marseille récup #2 PASSEE
       },
     }),
-    // Amina → Paris Récup session 2 (active)
+    // Amina → Paris Récup session 2026-05-18 (active)
     (prisma as any).reservation.create({
       data: {
         numero: "RES-2026-0004",
@@ -1387,91 +1433,14 @@ async function main() {
         ville: "Bordeaux",
         numeroPermis: "33DD90123",
         userId: eleves[3].id,
-        sessionId: sessions[10].id, // Paris récup active
+        sessionId: sessions[11].id, // Paris récup 2026-05-18 ACTIVE
       },
     }),
-    // Pierre → BYS FIMO session 1
+    // Alexandre → BYS Osny Récup session 2 PASSEE
     (prisma as any).reservation.create({
       data: {
         numero: "RES-2026-0005",
-        status: "CONFIRMEE",
-        montant: 2900,
-        commissionMontant: 290,
-        civilite: "M.",
-        nom: "Garnier",
-        prenom: "Pierre",
-        email: "pierre.garnier@free.fr",
-        telephone: "06 55 66 77 88",
-        adresse: "56 Rue Nationale",
-        codePostal: "59000",
-        ville: "Lille",
-        numeroPermis: "59EE12345",
-        userId: eleves[4].id,
-        sessionId: sessions[4].id, // BYS FIMO
-      },
-    }),
-    // Sophie → Paris Permis B session 1
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0006",
-        status: "CONFIRMEE",
-        montant: 1590,
-        commissionMontant: 159,
-        civilite: "Mme",
-        nom: "Lemaire",
-        prenom: "Sophie",
-        email: "sophie.lemaire@yahoo.fr",
-        telephone: "06 66 77 88 99",
-        adresse: "19 Allée des Demoiselles",
-        codePostal: "31000",
-        ville: "Toulouse",
-        userId: eleves[5].id,
-        sessionId: sessions[12].id, // Paris Permis B
-      },
-    }),
-    // Youssef → Lyon Sensibilisation session 1
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0007",
-        status: "EN_ATTENTE",
-        montant: 350,
-        commissionMontant: 35,
-        civilite: "M.",
-        nom: "El Mansouri",
-        prenom: "Youssef",
-        email: "youssef.elmansouri@gmail.com",
-        telephone: "06 77 88 99 00",
-        adresse: "41 Rue du Maréchal Foch",
-        codePostal: "44000",
-        ville: "Nantes",
-        userId: eleves[6].id,
-        sessionId: sessions[20].id, // Lyon Sensibilisation
-      },
-    }),
-    // Chloé → Marseille Moto
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0008",
-        status: "CONFIRMEE",
-        montant: 1250,
-        commissionMontant: 125,
-        civilite: "Mme",
-        nom: "Bernard",
-        prenom: "Chloé",
-        email: "chloe.bernard@laposte.net",
-        telephone: "06 88 99 00 11",
-        adresse: "7 Quai des Bateliers",
-        codePostal: "67000",
-        ville: "Strasbourg",
-        userId: eleves[7].id,
-        sessionId: sessions[24].id, // Marseille Moto
-      },
-    }),
-    // Alexandre → BYS Osny Récup session 2
-    (prisma as any).reservation.create({
-      data: {
-        numero: "RES-2026-0009",
-        status: "EN_ATTENTE",
+        status: "TERMINEE",
         montant: 250,
         commissionMontant: 25,
         civilite: "M.",
@@ -1484,13 +1453,13 @@ async function main() {
         ville: "Osny",
         numeroPermis: "95FF67890",
         userId: eleves[8].id,
-        sessionId: sessions[1].id, // BYS Récup session 2
+        sessionId: sessions[1].id, // BYS Récup #2 PASSEE
       },
     }),
-    // Karim → Paris Récup complète (terminée - double réservation, different stage)
+    // Karim → Paris Récup #2 PASSEE (terminée - double réservation, different stage)
     (prisma as any).reservation.create({
       data: {
-        numero: "RES-2026-0010",
+        numero: "RES-2026-0006",
         status: "TERMINEE",
         montant: 280,
         commissionMontant: 28,
@@ -1504,12 +1473,133 @@ async function main() {
         ville: "Paris",
         numeroPermis: "12AA34567",
         userId: eleves[0].id,
-        sessionId: sessions[9].id, // Paris récup complète
+        sessionId: sessions[10].id, // Paris récup #2 PASSEE
       },
     }),
   ]);
 
   console.log(`✅ ${reservations.length} réservations créées.\n`);
+
+  // ─── 6b. RÉSERVATIONS SUPPLÉMENTAIRES (densité catalogue) ──
+  console.log("🎫 Création des réservations supplémentaires...");
+  const extraReservations = await Promise.all([
+    // ─── CONFIRMEE (futur, ~60%) ────────────────────────────
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0101", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "M.", nom: "Rousseau", prenom: "Julien", email: "julien.rousseau@gmail.com", telephone: "06 12 45 78 90", adresse: "9 Rue des Acacias", codePostal: "75012", ville: "Paris", numeroPermis: "75JR00001", userId: eleves[9].id, sessionId: sessions[3].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0102", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Michel", prenom: "Fanny", email: "fanny.michel@outlook.fr", telephone: "06 23 56 89 01", adresse: "27 Boulevard Voltaire", codePostal: "75011", ville: "Paris", numeroPermis: "75FM00002", userId: eleves[10].id, sessionId: sessions[13].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0103", status: "CONFIRMEE", montant: 230, commissionMontant: 23, civilite: "M.", nom: "Belkacem", prenom: "Mehdi", email: "mehdi.belkacem@gmail.com", telephone: "06 34 67 90 12", adresse: "14 Rue de la République", codePostal: "69002", ville: "Lyon", numeroPermis: "69MB00003", userId: eleves[11].id, sessionId: sessions[22].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0104", status: "CONFIRMEE", montant: 230, commissionMontant: 23, civilite: "Mme", nom: "Fournier", prenom: "Élodie", email: "elodie.fournier@hotmail.fr", telephone: "06 45 78 01 23", adresse: "5 Place Bellecour", codePostal: "69002", ville: "Lyon", numeroPermis: "69EF00004", userId: eleves[12].id, sessionId: sessions[23].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0105", status: "CONFIRMEE", montant: 220, commissionMontant: 22, civilite: "M.", nom: "Faure", prenom: "Nicolas", email: "nicolas.faure@free.fr", telephone: "06 56 89 12 34", adresse: "33 Avenue du Prado", codePostal: "13008", ville: "Marseille", numeroPermis: "13NF00005", userId: eleves[13].id, sessionId: sessions[28].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0106", status: "CONFIRMEE", montant: 220, commissionMontant: 22, civilite: "Mme", nom: "Barbier", prenom: "Céline", email: "celine.barbier@gmail.com", telephone: "06 67 90 23 45", adresse: "11 Cours Julien", codePostal: "13006", ville: "Marseille", numeroPermis: "13CB00006", userId: eleves[14].id, sessionId: sessions[30].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0107", status: "CONFIRMEE", montant: 240, commissionMontant: 24, civilite: "M.", nom: "Morel", prenom: "Florian", email: "florian.morel@yahoo.fr", telephone: "06 78 01 34 56", adresse: "8 Rue des Frères Lumière", codePostal: "95800", ville: "Cergy", numeroPermis: "95FM00007", userId: eleves[15].id, sessionId: sessions[32].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0108", status: "CONFIRMEE", montant: 280, commissionMontant: 28, civilite: "Mme", nom: "Benabid", prenom: "Sarah", email: "sarah.benabid@gmail.com", telephone: "06 89 12 45 67", adresse: "21 Boulevard Pereire", codePostal: "75017", ville: "Paris", numeroPermis: "75SB00008", userId: eleves[16].id, sessionId: sessions[14].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0109", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "M.", nom: "Lopez", prenom: "Thierry", email: "thierry.lopez@orange.fr", telephone: "06 90 23 56 78", adresse: "47 Rue de la Liberté", codePostal: "95300", ville: "Pontoise", numeroPermis: "95TL00009", userId: eleves[17].id, sessionId: sessions[5].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0110", status: "CONFIRMEE", montant: 230, commissionMontant: 23, civilite: "Mme", nom: "Giraud", prenom: "Inès", email: "ines.giraud@laposte.net", telephone: "06 01 34 67 89", adresse: "12 Allée Mendès France", codePostal: "69007", ville: "Lyon", numeroPermis: "69IG00010", userId: eleves[18].id, sessionId: sessions[24].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0111", status: "CONFIRMEE", montant: 220, commissionMontant: 22, civilite: "M.", nom: "Roux", prenom: "Kévin", email: "kevin.roux@gmail.com", telephone: "06 13 46 79 02", adresse: "73 Avenue de la Capelette", codePostal: "13010", ville: "Marseille", numeroPermis: "13KR00011", userId: eleves[19].id, sessionId: sessions[31].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0112", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Leclerc", prenom: "Manon", email: "manon.leclerc@outlook.fr", telephone: "06 24 57 80 13", adresse: "3 Rue du Marché", codePostal: "95520", ville: "Osny", numeroPermis: "95ML00012", userId: eleves[20].id, sessionId: sessions[7].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0113", status: "CONFIRMEE", montant: 280, commissionMontant: 28, civilite: "M.", nom: "Bouaziz", prenom: "Karim", email: "karim.bouaziz@gmail.com", telephone: "06 11 22 33 44", adresse: "8 Rue des Lilas", codePostal: "75020", ville: "Paris", numeroPermis: "12AA34567", userId: eleves[0].id, sessionId: sessions[17].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0114", status: "CONFIRMEE", montant: 230, commissionMontant: 23, civilite: "Mme", nom: "Durand", prenom: "Marie", email: "marie.durand@outlook.fr", telephone: "06 22 33 44 55", adresse: "14 Avenue Jean Jaurès", codePostal: "69007", ville: "Lyon", numeroPermis: "07BB89012", userId: eleves[1].id, sessionId: sessions[25].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0115", status: "CONFIRMEE", montant: 220, commissionMontant: 22, civilite: "M.", nom: "Martin", prenom: "Lucas", email: "lucas.martin@gmail.com", telephone: "06 33 44 55 66", adresse: "27 Boulevard Gambetta", codePostal: "13001", ville: "Marseille", numeroPermis: "13CC45678", userId: eleves[2].id, sessionId: sessions[30].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0116", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Lemaire", prenom: "Sophie", email: "sophie.lemaire@yahoo.fr", telephone: "06 66 77 88 99", adresse: "19 Allée des Demoiselles", codePostal: "31000", ville: "Toulouse", numeroPermis: "31SL45611", userId: eleves[5].id, sessionId: sessions[6].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0117", status: "CONFIRMEE", montant: 280, commissionMontant: 28, civilite: "M.", nom: "Garnier", prenom: "Pierre", email: "pierre.garnier@free.fr", telephone: "06 55 66 77 88", adresse: "56 Rue Nationale", codePostal: "59000", ville: "Lille", numeroPermis: "59PG23399", userId: eleves[4].id, sessionId: sessions[18].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0118", status: "CONFIRMEE", montant: 240, commissionMontant: 24, civilite: "M.", nom: "El Mansouri", prenom: "Youssef", email: "youssef.elmansouri@gmail.com", telephone: "06 77 88 99 00", adresse: "41 Rue du Maréchal Foch", codePostal: "44000", ville: "Nantes", numeroPermis: "44YE12321", userId: eleves[6].id, sessionId: sessions[33].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0119", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Bernard", prenom: "Chloé", email: "chloe.bernard@laposte.net", telephone: "06 88 99 00 11", adresse: "7 Quai des Bateliers", codePostal: "67000", ville: "Strasbourg", numeroPermis: "67CB55512", userId: eleves[7].id, sessionId: sessions[8].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0120", status: "CONFIRMEE", montant: 230, commissionMontant: 23, civilite: "Mme", nom: "Diallo", prenom: "Amina", email: "amina.diallo@hotmail.fr", telephone: "06 44 55 66 77", adresse: "3 Rue Sainte-Catherine", codePostal: "33000", ville: "Bordeaux", numeroPermis: "33DD90123", userId: eleves[3].id, sessionId: sessions[22].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0121", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "M.", nom: "Petit", prenom: "Alexandre", email: "alexandre.petit@orange.fr", telephone: "06 99 00 11 22", adresse: "23 Chaussée Jules César", codePostal: "95520", ville: "Osny", numeroPermis: "95FF67890", userId: eleves[8].id, sessionId: sessions[6].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0122", status: "CONFIRMEE", montant: 280, commissionMontant: 28, civilite: "Mme", nom: "Michel", prenom: "Fanny", email: "fanny.michel@outlook.fr", telephone: "06 23 56 89 01", adresse: "27 Boulevard Voltaire", codePostal: "75011", ville: "Paris", numeroPermis: "75FM00002", userId: eleves[10].id, sessionId: sessions[19].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0123", status: "CONFIRMEE", montant: 250, commissionMontant: 25, civilite: "M.", nom: "Faure", prenom: "Nicolas", email: "nicolas.faure@free.fr", telephone: "06 56 89 12 34", adresse: "33 Avenue du Prado", codePostal: "13008", ville: "Marseille", numeroPermis: "13NF00005", userId: eleves[13].id, sessionId: sessions[5].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0124", status: "CONFIRMEE", montant: 230, commissionMontant: 23, civilite: "M.", nom: "Belkacem", prenom: "Mehdi", email: "mehdi.belkacem@gmail.com", telephone: "06 34 67 90 12", adresse: "14 Rue de la République", codePostal: "69002", ville: "Lyon", numeroPermis: "69MB00003", userId: eleves[11].id, sessionId: sessions[25].id } }),
+
+    // ─── EN_ATTENTE (~15%) ──────────────────────────────────
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0125", status: "EN_ATTENTE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Leclerc", prenom: "Manon", email: "manon.leclerc@outlook.fr", telephone: "06 24 57 80 13", adresse: "3 Rue du Marché", codePostal: "95520", ville: "Osny", numeroPermis: "95ML00012", userId: eleves[20].id, sessionId: sessions[3].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0126", status: "EN_ATTENTE", montant: 280, commissionMontant: 28, civilite: "M.", nom: "Lopez", prenom: "Thierry", email: "thierry.lopez@orange.fr", telephone: "06 90 23 56 78", adresse: "47 Rue de la Liberté", codePostal: "95300", ville: "Pontoise", numeroPermis: "95TL00009", userId: eleves[17].id, sessionId: sessions[11].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0127", status: "EN_ATTENTE", montant: 220, commissionMontant: 22, civilite: "Mme", nom: "Barbier", prenom: "Céline", email: "celine.barbier@gmail.com", telephone: "06 67 90 23 45", adresse: "11 Cours Julien", codePostal: "13006", ville: "Marseille", numeroPermis: "13CB00006", userId: eleves[14].id, sessionId: sessions[28].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0128", status: "EN_ATTENTE", montant: 230, commissionMontant: 23, civilite: "M.", nom: "Roux", prenom: "Kévin", email: "kevin.roux@gmail.com", telephone: "06 13 46 79 02", adresse: "73 Avenue de la Capelette", codePostal: "13010", ville: "Marseille", numeroPermis: "13KR00011", userId: eleves[19].id, sessionId: sessions[31].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0129", status: "EN_ATTENTE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Giraud", prenom: "Inès", email: "ines.giraud@laposte.net", telephone: "06 01 34 67 89", adresse: "12 Allée Mendès France", codePostal: "69007", ville: "Lyon", numeroPermis: "69IG00010", userId: eleves[18].id, sessionId: sessions[23].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0130", status: "EN_ATTENTE", montant: 280, commissionMontant: 28, civilite: "M.", nom: "Morel", prenom: "Florian", email: "florian.morel@yahoo.fr", telephone: "06 78 01 34 56", adresse: "8 Rue des Frères Lumière", codePostal: "95800", ville: "Cergy", numeroPermis: "95FM00007", userId: eleves[15].id, sessionId: sessions[18].id } }),
+
+    // ─── ANNULEE (~10%) ─────────────────────────────────────
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0131", status: "ANNULEE", montant: 230, commissionMontant: 0, civilite: "Mme", nom: "Fournier", prenom: "Élodie", email: "elodie.fournier@hotmail.fr", telephone: "06 45 78 01 23", adresse: "5 Place Bellecour", codePostal: "69002", ville: "Lyon", numeroPermis: "69EF00004", userId: eleves[12].id, sessionId: sessions[24].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0132", status: "ANNULEE", montant: 250, commissionMontant: 0, civilite: "M.", nom: "Garnier", prenom: "Pierre", email: "pierre.garnier@free.fr", telephone: "06 55 66 77 88", adresse: "56 Rue Nationale", codePostal: "59000", ville: "Lille", numeroPermis: "59PG23399", userId: eleves[4].id, sessionId: sessions[7].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0133", status: "ANNULEE", montant: 240, commissionMontant: 0, civilite: "Mme", nom: "Bernard", prenom: "Chloé", email: "chloe.bernard@laposte.net", telephone: "06 88 99 00 11", adresse: "7 Quai des Bateliers", codePostal: "67000", ville: "Strasbourg", numeroPermis: "67CB55512", userId: eleves[7].id, sessionId: sessions[33].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0134", status: "ANNULEE", montant: 220, commissionMontant: 0, civilite: "M.", nom: "Martin", prenom: "Lucas", email: "lucas.martin@gmail.com", telephone: "06 33 44 55 66", adresse: "27 Boulevard Gambetta", codePostal: "13001", ville: "Marseille", numeroPermis: "13CC45678", userId: eleves[2].id, sessionId: sessions[29].id } }),
+
+    // ─── TERMINEE (sessions passées, ~15%) ─────────────────
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0135", status: "TERMINEE", montant: 280, commissionMontant: 28, civilite: "M.", nom: "Rousseau", prenom: "Julien", email: "julien.rousseau@gmail.com", telephone: "06 12 45 78 90", adresse: "9 Rue des Acacias", codePostal: "75012", ville: "Paris", numeroPermis: "75JR00001", userId: eleves[9].id, sessionId: sessions[9].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0136", status: "TERMINEE", montant: 280, commissionMontant: 28, civilite: "Mme", nom: "Michel", prenom: "Fanny", email: "fanny.michel@outlook.fr", telephone: "06 23 56 89 01", adresse: "27 Boulevard Voltaire", codePostal: "75011", ville: "Paris", numeroPermis: "75FM00002", userId: eleves[10].id, sessionId: sessions[10].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0137", status: "TERMINEE", montant: 230, commissionMontant: 23, civilite: "M.", nom: "Belkacem", prenom: "Mehdi", email: "mehdi.belkacem@gmail.com", telephone: "06 34 67 90 12", adresse: "14 Rue de la République", codePostal: "69002", ville: "Lyon", numeroPermis: "69MB00003", userId: eleves[11].id, sessionId: sessions[20].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0138", status: "TERMINEE", montant: 230, commissionMontant: 23, civilite: "Mme", nom: "Fournier", prenom: "Élodie", email: "elodie.fournier@hotmail.fr", telephone: "06 45 78 01 23", adresse: "5 Place Bellecour", codePostal: "69002", ville: "Lyon", numeroPermis: "69EF00004", userId: eleves[12].id, sessionId: sessions[21].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0139", status: "TERMINEE", montant: 220, commissionMontant: 22, civilite: "M.", nom: "Faure", prenom: "Nicolas", email: "nicolas.faure@free.fr", telephone: "06 56 89 12 34", adresse: "33 Avenue du Prado", codePostal: "13008", ville: "Marseille", numeroPermis: "13NF00005", userId: eleves[13].id, sessionId: sessions[26].id } }),
+    (prisma as any).reservation.create({ data: { numero: "RES-2026-0140", status: "TERMINEE", montant: 250, commissionMontant: 25, civilite: "Mme", nom: "Leclerc", prenom: "Manon", email: "manon.leclerc@outlook.fr", telephone: "06 24 57 80 13", adresse: "3 Rue du Marché", codePostal: "95520", ville: "Osny", numeroPermis: "95ML00012", userId: eleves[20].id, sessionId: sessions[0].id } }),
+  ]);
+  console.log(`✅ ${extraReservations.length} réservations supplémentaires créées (total ${reservations.length + extraReservations.length}).\n`);
+
+  // ─── 6c. REVIEWS ─────────────────────────────────────────
+  console.log("⭐ Création des avis (reviews)...");
+  const reviewsData = await Promise.all([
+    // 10 reviews à 5★
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Formation impeccable chez BYS Osny ! Les deux formateurs étaient pédagogues et bienveillants, on ne se sent pas jugé. J'ai récupéré mes 4 points sans souci, attestation reçue le lendemain.", userId: eleves[0].id, formationId: formBysRecup.id, createdAt: new Date("2026-04-10T14:30:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Centre très bien situé à Osny, parking gratuit en face. La salle est moderne, climatisée. Animateur très clair sur l'accidentologie, ça donne vraiment à réfléchir. Je recommande à 100%.", userId: eleves[8].id, formationId: formBysRecup.id, createdAt: new Date("2026-04-23T16:45:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Stage à Paris 11e très enrichissant. Bonne ambiance dans le groupe, échanges intéressants. Le déjeuner inclus était un vrai plus. 4 points récupérés comme promis.", userId: eleves[9].id, formationId: formParisRecup.id, createdAt: new Date("2026-03-05T11:20:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Formateurs au top à Conduite Plus, expert sécurité routière passionnant. Les horaires (9h-17h30) sont respectés, pauses régulières. Aucune perte de temps, contenu très dense.", userId: eleves[10].id, formationId: formParisRecup.id, createdAt: new Date("2026-04-16T09:15:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "CFSR Lyon : super accueil dès l'entrée, café et viennoiseries offerts. Le psychologue était vraiment à l'écoute, on échange sans tabou. Stage à conseiller absolument.", userId: eleves[1].id, formationId: formLyonRecup.id, createdAt: new Date("2026-03-12T13:40:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Très bonne expérience à CFSR Lyon, le centre est à 5 min à pied de la Part-Dieu c'est ultra pratique. Salle moderne, contenu pédagogique de qualité, 4 points récupérés.", userId: eleves[11].id, formationId: formLyonRecup.id, createdAt: new Date("2026-05-02T15:10:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Permis Express Marseille : stage parfaitement organisé, convocation reçue 10 jours avant. L'équipe est sympa et professionnelle, on apprend beaucoup en 2 jours. Top !", userId: eleves[2].id, formationId: formMarseilleRecup.id, createdAt: new Date("2026-03-19T17:25:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Excellent stage chez Permis Express, près du Prado très accessible en métro. Le formateur sécurité routière connaît son sujet sur le bout des doigts. Recommandé !", userId: eleves[13].id, formationId: formMarseilleRecup.id, createdAt: new Date("2026-05-07T10:50:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "BYS Cergy : centre récent, locaux nickel et bien insonorisés. Formateurs identiques à ceux d'Osny, même qualité. Idéal si on habite proche de la gare RER. 4 points récupérés.", userId: eleves[15].id, formationId: formCergyRecup.id, createdAt: new Date("2026-04-28T12:00:00Z") } }),
+    (prisma as any).review.create({ data: { note: 5, commentaire: "Je suis ravi de mon stage à BYS Osny. Mention spéciale au formateur Miguel, vraiment top. Les exercices pratiques en groupe sont les meilleurs moments du stage.", userId: eleves[20].id, formationId: formBysRecup.id, createdAt: new Date("2026-05-08T18:30:00Z") } }),
+
+    // 5 reviews à 4★
+    (prisma as any).review.create({ data: { note: 4, commentaire: "Bon stage à Paris, contenu pertinent mais 2 jours c'est dense, on ressort la tête bien remplie. Le repas de midi un peu juste pour le prix. Sinon récup 4 points OK.", userId: eleves[16].id, formationId: formParisRecup.id, createdAt: new Date("2026-02-18T14:00:00Z") } }),
+    (prisma as any).review.create({ data: { note: 4, commentaire: "Stage utile et bien mené à BYS Osny. Salle de stage agréable, équipements modernes. Bémol : la pause déjeuner est un peu courte (45 min), faut être rapide.", userId: eleves[16].id, formationId: formBysRecup.id, createdAt: new Date("2026-03-08T16:20:00Z") } }),
+    (prisma as any).review.create({ data: { note: 4, commentaire: "CFSR Lyon : bon stage globalement, formateurs compétents. La salle est un peu petite quand le groupe est complet (22 personnes). Sinon RAS, points récupérés sans souci.", userId: eleves[18].id, formationId: formLyonRecup.id, createdAt: new Date("2026-04-02T11:35:00Z") } }),
+    (prisma as any).review.create({ data: { note: 4, commentaire: "Stage chez Permis Express correct, formateurs disponibles. Le centre est facile d'accès en métro. Quelques temps morts l'après-midi du J2 mais sinon contenu utile.", userId: eleves[19].id, formationId: formMarseilleRecup.id, createdAt: new Date("2026-04-19T13:10:00Z") } }),
+    (prisma as any).review.create({ data: { note: 4, commentaire: "Très bon accueil à Conduite Plus, secrétaire au téléphone très pro. Le stage est intéressant, surtout la partie sur les distracteurs (smartphone). Je referai si besoin.", userId: eleves[17].id, formationId: formParisRecup.id, createdAt: new Date("2026-04-29T15:55:00Z") } }),
+
+    // 3 reviews à 3★
+    (prisma as any).review.create({ data: { note: 3, commentaire: "Stage correct à Marseille, contenu standard. Salle un peu vieillotte mais propre. Les points ont bien été crédités. Pour le prix (220€) c'est dans la moyenne.", userId: eleves[14].id, formationId: formMarseilleRecup.id, createdAt: new Date("2026-02-25T10:40:00Z") } }),
+    (prisma as any).review.create({ data: { note: 3, commentaire: "Stage qui fait le job à Lyon, sans plus. Formateurs OK mais pas spécialement passionnés. Cafetière en panne le J2 c'est un détail mais bon. Points récupérés c'est l'essentiel.", userId: eleves[12].id, formationId: formLyonRecup.id, createdAt: new Date("2026-03-26T17:00:00Z") } }),
+    (prisma as any).review.create({ data: { note: 3, commentaire: "Stage à Paris 11e, contenu intéressant mais format un peu scolaire à mon goût. Plus de cas pratiques auraient été bienvenus. Bonne organisation néanmoins, attestation rapide.", userId: eleves[3].id, formationId: formParisRecup.id, createdAt: new Date("2026-04-22T09:30:00Z") } }),
+  ]);
+  console.log(`✅ ${reviewsData.length} avis créés.\n`);
+
+  // ─── 6d. INVOICES ────────────────────────────────────────
+  console.log("🧾 Création des factures test...");
+  const invoicesData = await Promise.all([
+    // 4 PAYEE
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0001", type: "ELEVE", montantHT: 208.33, tva: 41.67, montantTTC: 250, status: "PAYEE", userId: eleves[0].id, centreId: centres[0].id, reservationId: reservations[0].id } }),
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0002", type: "ELEVE", montantHT: 191.67, tva: 38.33, montantTTC: 230, status: "PAYEE", userId: eleves[1].id, centreId: centres[2].id, reservationId: reservations[1].id } }),
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0003", type: "ELEVE", montantHT: 183.33, tva: 36.67, montantTTC: 220, status: "PAYEE", userId: eleves[2].id, centreId: centres[3].id, reservationId: reservations[2].id } }),
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0004", type: "ELEVE", montantHT: 233.33, tva: 46.67, montantTTC: 280, status: "PAYEE", userId: eleves[3].id, centreId: centres[1].id, reservationId: reservations[3].id } }),
+    // 2 EN_ATTENTE
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0005", type: "ELEVE", montantHT: 208.33, tva: 41.67, montantTTC: 250, status: "EN_ATTENTE", userId: eleves[9].id, centreId: centres[0].id, reservationId: extraReservations[0].id } }),
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0006", type: "ELEVE", montantHT: 191.67, tva: 38.33, montantTTC: 230, status: "EN_ATTENTE", userId: eleves[11].id, centreId: centres[2].id, reservationId: extraReservations[2].id } }),
+    // 1 ANNULEE
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0007", type: "ELEVE", montantHT: 191.67, tva: 38.33, montantTTC: 230, status: "ANNULEE", userId: eleves[12].id, centreId: centres[2].id, reservationId: extraReservations[26].id } }),
+    // 1 EN_RETARD (utilise status "EN_RETARD" — string libre, le champ status est String)
+    (prisma as any).invoice.create({ data: { numero: "FAC-2026-0008", type: "CENTRE_COMMISSION", montantHT: 250, tva: 50, montantTTC: 300, status: "EN_RETARD", centreId: centres[1].id } }),
+  ]);
+  console.log(`✅ ${invoicesData.length} factures créées.\n`);
+
+  // ─── 6e. MESSAGES (centre <-> élève) ────────────────────
+  console.log("💬 Création des messages...");
+  const messagesData = await Promise.all([
+    // Centre BYS Osny → Karim
+    (prisma as any).message.create({ data: { contenu: "Bonjour Karim, nous confirmons votre réservation pour la session du 6-7 avril. La convocation arrive dans la journée par email.", senderId: centreFormateur.id, receiverId: eleves[0].id, isRead: true, reservationId: reservations[0].id } }),
+    (prisma as any).message.create({ data: { contenu: "Merci pour la confirmation. Faut-il prévoir un repas ou est-ce inclus ?", senderId: eleves[0].id, receiverId: centreFormateur.id, isRead: true, reservationId: reservations[0].id } }),
+    (prisma as any).message.create({ data: { contenu: "Le déjeuner est inclus dans le stage, ne vous inquiétez pas. À très bientôt !", senderId: centreFormateur.id, receiverId: eleves[0].id, isRead: true, reservationId: reservations[0].id } }),
+    // Centre Paris → Amina
+    (prisma as any).message.create({ data: { contenu: "Bonjour Amina, votre réservation est confirmée pour la session du 18 mai. N'oubliez pas votre permis original le jour J.", senderId: centreSecretaire.id, receiverId: eleves[3].id, isRead: true, reservationId: reservations[3].id } }),
+    (prisma as any).message.create({ data: { contenu: "Bonjour, merci. Une question : puis-je arriver à 8h45 ou faut-il être à 9h pile ?", senderId: eleves[3].id, receiverId: centreSecretaire.id, isRead: true, reservationId: reservations[3].id } }),
+    (prisma as any).message.create({ data: { contenu: "L'accueil est ouvert dès 8h30, vous pouvez arriver en avance, ça nous arrange.", senderId: centreSecretaire.id, receiverId: eleves[3].id, isRead: false, reservationId: reservations[3].id } }),
+    // Centre BYS → Julien (futur stagiaire)
+    (prisma as any).message.create({ data: { contenu: "Bonjour Julien, bienvenue chez BYS Formation ! Votre stage du 8-9 juin est confirmé. Si vous avez des questions, n'hésitez pas.", senderId: centreAdmin.id, receiverId: eleves[9].id, isRead: true, reservationId: extraReservations[0].id } }),
+    (prisma as any).message.create({ data: { contenu: "Merci ! Le centre est-il accessible en bus depuis la gare ?", senderId: eleves[9].id, receiverId: centreAdmin.id, isRead: false, reservationId: extraReservations[0].id } }),
+    // Lyon → Mehdi
+    (prisma as any).message.create({ data: { contenu: "Bonjour Mehdi, votre réservation est enregistrée. Pensez à apporter votre relevé d'information intégral si vous en avez un.", senderId: centreUsers[2].id, receiverId: eleves[11].id, isRead: true, reservationId: extraReservations[2].id } }),
+    // Marseille → Nicolas
+    (prisma as any).message.create({ data: { contenu: "Bonjour Nicolas, suite à votre inscription : la session de juin est presque pleine, merci de venir à 8h45 le J1 pour l'émargement.", senderId: centreUsers[3].id, receiverId: eleves[13].id, isRead: false, reservationId: extraReservations[4].id } }),
+  ]);
+  console.log(`✅ ${messagesData.length} messages créés.\n`);
 
   // ─── 7. FAQ ──────────────────────────────────────────────
   console.log("❓ Création des FAQ...");
@@ -1572,9 +1662,9 @@ async function main() {
         isActive: true,
       },
       {
-        question: "Peut-on financer une formation avec le CPF ?",
+        question: "Le stage de récupération de points est-il éligible au CPF ?",
         reponse:
-          "Certaines formations sont éligibles au Compte Personnel de Formation (CPF), notamment les formations FIMO, FCO et le permis B. Les stages de récupération de points ne sont pas éligibles au CPF. Pour utiliser votre CPF, rendez-vous sur moncompteformation.gouv.fr et recherchez la formation souhaitée. Nos centres partenaires Qualiopi vous accompagnent dans les démarches.",
+          "Non. Les stages de récupération de points (officiellement « stages de sensibilisation à la sécurité routière ») ne sont pas éligibles au Compte Personnel de Formation (CPF). Le règlement les considère comme un dispositif de prévention administratif, pas comme une formation professionnelle. Le paiement se fait directement par carte bancaire au moment de la réservation.",
         categorie: "Financement",
         ordre: 8,
         isActive: true,
@@ -1615,7 +1705,7 @@ async function main() {
       {
         titre: "Bienvenue sur BYS Formation !",
         contenu:
-          "Bonjour Amina, bienvenue sur BYS Formation. Trouvez facilement un stage de récupération de points ou une formation professionnelle près de chez vous.",
+          "Bonjour Amina, bienvenue sur BYS Formation. Trouvez facilement un stage de récupération de points agréé près de chez vous.",
         isRead: false,
         userId: eleves[3].id,
       },
@@ -1633,9 +1723,100 @@ async function main() {
         isRead: false,
         userId: eleves[1].id,
       },
+      // ─── 15 notifications supplémentaires pour densifier l'activité ──
+      {
+        titre: "Réservation confirmée",
+        contenu: "Votre réservation RES-2026-0101 pour le stage des 8-9 juin 2026 chez BYS Formation Osny est confirmée. Convocation envoyée par email.",
+        isRead: false,
+        userId: eleves[9].id,
+      },
+      {
+        titre: "Bienvenue sur BYS Formation !",
+        contenu: "Bonjour Julien, bienvenue ! Nous avons trouvé 3 centres disponibles près de chez vous. Découvrez nos prochaines sessions.",
+        isRead: true,
+        userId: eleves[9].id,
+      },
+      {
+        titre: "Réservation confirmée",
+        contenu: "Votre réservation RES-2026-0103 pour le stage Lyon (22-23 juin 2026) est confirmée. Vous recevrez votre convocation par email sous 24h.",
+        isRead: false,
+        userId: eleves[11].id,
+      },
+      {
+        titre: "Nouveau message du centre",
+        contenu: "Le centre Conduite Plus Paris vous a envoyé un message concernant votre prochaine session. Consultez-le dans votre messagerie.",
+        isRead: false,
+        userId: eleves[3].id,
+      },
+      {
+        titre: "Rappel : stage dans 7 jours",
+        contenu: "Votre stage de récupération de points à Paris approche (18-19 mai 2026). Préparez vos documents : permis original + pièce d'identité.",
+        isRead: false,
+        userId: eleves[3].id,
+      },
+      {
+        titre: "Facture disponible",
+        contenu: "Votre facture FAC-2026-0001 est désormais disponible dans votre espace personnel, rubrique « Mes factures ».",
+        isRead: true,
+        userId: eleves[0].id,
+      },
+      {
+        titre: "Réservation en attente de paiement",
+        contenu: "Votre réservation RES-2026-0125 est en attente. Le paiement n'a pas été finalisé, merci de compléter le règlement sous 24h.",
+        isRead: false,
+        userId: eleves[20].id,
+      },
+      {
+        titre: "Bienvenue sur BYS Formation !",
+        contenu: "Bonjour Mehdi, bienvenue ! Plus de 30 sessions sont disponibles dans toute la France. Trouvez votre stage en quelques clics.",
+        isRead: false,
+        userId: eleves[11].id,
+      },
+      {
+        titre: "Nouvelle session ouverte près de chez vous",
+        contenu: "Une nouvelle session de récupération de points vient d'ouvrir à Cergy (5 Place des Merveilles), 13-14 juillet 2026. Encore 11 places.",
+        isRead: false,
+        userId: eleves[15].id,
+      },
+      {
+        titre: "Annulation enregistrée",
+        contenu: "Votre annulation pour la réservation RES-2026-0131 est bien prise en compte. Le remboursement sera effectué sous 5 jours ouvrés.",
+        isRead: true,
+        userId: eleves[12].id,
+      },
+      {
+        titre: "Votre attestation est disponible",
+        contenu: "Bravo Julien ! Votre stage de récupération de points à Paris est terminé. Téléchargez votre attestation depuis votre espace.",
+        isRead: false,
+        userId: eleves[9].id,
+      },
+      {
+        titre: "Promotion BIENVENUE10",
+        contenu: "Profitez de 10% sur votre première réservation avec le code BIENVENUE10. Valable jusqu'au 31 décembre 2026.",
+        isRead: false,
+        userId: eleves[16].id,
+      },
+      {
+        titre: "Nouveau message du centre",
+        contenu: "Le centre BYS Formation Osny vous a envoyé un message concernant votre stage à venir.",
+        isRead: false,
+        userId: eleves[9].id,
+      },
+      {
+        titre: "Réservation confirmée",
+        contenu: "Votre réservation RES-2026-0108 chez Conduite Plus Paris (6-7 juillet 2026) est confirmée. Bonne préparation !",
+        isRead: false,
+        userId: eleves[16].id,
+      },
+      {
+        titre: "Sondage satisfaction",
+        contenu: "Merci d'avoir suivi votre stage chez BYS Formation. Pourriez-vous prendre 1 minute pour nous laisser un avis ? Ça nous aide beaucoup !",
+        isRead: false,
+        userId: eleves[8].id,
+      },
     ],
   });
-  console.log("✅ 5 notifications créées.\n");
+  console.log("✅ 20 notifications créées.\n");
 
   // ─── EMAIL TEMPLATES PAR DÉFAUT ──────────────────────────
   console.log("📧 Création des templates d'emails par défaut...");
@@ -1762,7 +1943,7 @@ async function main() {
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour <strong>{{prenom}} {{nom}}</strong>,</p>
-    <p>Bienvenue sur <strong>BYS Formation</strong>, votre plateforme de stages agréés et de formations professionnelles.</p>
+    <p>Bienvenue sur <strong>BYS Formation</strong>, votre plateforme de référence pour les stages agréés de récupération de points du permis de conduire.</p>
     <p>Avec BYS Formation, vous pouvez :</p>
     <ul style="color:#4B5563;line-height:1.8">
       <li>Trouver un stage de récupération de points près de chez vous</li>
@@ -2011,6 +2192,218 @@ async function main() {
         authorId: admin.id,
       },
     }),
+    // ─── 5 articles supplémentaires (avril-mai 2026) ────────
+    (prisma as any).article.create({
+      data: {
+        titre: "Stage 48SI : pour qui, à quel prix ?",
+        slug: "stage-48si-pour-qui-quel-prix",
+        extrait: "La lettre 48SI marque l'invalidation de votre permis. Découvrez les conditions, le déroulé et le coût d'un stage 48SI en 2026.",
+        contenu: `<h2>La lettre 48SI : c'est quoi exactement ?</h2>
+<p>La lettre 48SI est la notification officielle adressée par le ministère de l'Intérieur lorsqu'un permis de conduire arrive à un <strong>solde de points nul</strong>. Elle entraîne automatiquement l'<strong>invalidation du permis</strong> pour une durée de 6 mois (1 an en cas de récidive).</p>
+<h2>Stage 48SI : que faut-il savoir ?</h2>
+<p>Contrairement au stage de récupération de points classique, le stage 48SI <em>n'a pas pour but de récupérer des points</em> — ils sont déjà tous perdus. Son objectif est différent :</p>
+<ul>
+  <li>Sensibiliser le conducteur aux risques routiers avant la repasse du permis</li>
+  <li>Conditionner l'obtention d'un nouveau titre de conduite</li>
+  <li>Réduire la probabilité de récidive</li>
+</ul>
+<h2>Prix d'un stage 48SI en 2026</h2>
+<p>Le coût se situe généralement entre <strong>200€ et 280€</strong>, dans la même fourchette qu'un stage volontaire de récupération de points. La durée est identique : <em>2 jours consécutifs (14 heures)</em>.</p>
+<h2>Quand effectuer le stage ?</h2>
+<p>Le stage doit obligatoirement avoir lieu <strong>avant de pouvoir repasser le code</strong> (et la conduite si vous avez le permis depuis moins de 3 ans). Sans attestation de stage, votre dossier de re-candidature en préfecture sera refusé.</p>
+<h2>Comment réserver ?</h2>
+<p>Sur BYS Formation, vous comparez en quelques clics les centres agréés près de chez vous, vous filtrez par date et vous réservez en ligne. Le règlement est sécurisé par Stripe et la convocation officielle vous est envoyée par email sous 24h.</p>
+<h2>Documents à présenter le jour J</h2>
+<ul>
+  <li>Pièce d'identité en cours de validité</li>
+  <li>La lettre 48SI originale (recommandé avec AR)</li>
+  <li>Votre permis de conduire (même invalidé)</li>
+  <li>Confirmation de réservation ou convocation</li>
+</ul>
+<p>Préparez ces documents la veille du stage pour éviter tout stress de dernière minute. Sans ces pièces, le centre est en droit de refuser votre participation.</p>`,
+        image: "https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14?auto=format&fit=crop&w=1200&q=80",
+        categorie: "reglementation",
+        tags: ["48SI", "invalidation", "stage", "permis"],
+        isPublished: true,
+        publishedAt: new Date("2026-04-08"),
+        authorId: admin.id,
+      },
+    }),
+    (prisma as any).article.create({
+      data: {
+        titre: "Récupérer 4 points en 48h : comment ça marche",
+        slug: "recuperer-4-points-en-48h-comment-ca-marche",
+        extrait: "Le stage de récupération de points permet de récupérer jusqu'à 4 points en 2 jours. On vous explique tout le processus, du choix du centre à la mise à jour effective du solde.",
+        contenu: `<h2>Le principe en 3 minutes</h2>
+<p>Le stage de sensibilisation à la sécurité routière, communément appelé <strong>stage de récupération de points</strong>, est une formation agréée qui permet de récupérer <strong>jusqu'à 4 points</strong> sur votre permis de conduire. Il se déroule sur 2 jours consécutifs (14 heures au total) dans un centre agréé par la préfecture.</p>
+<h2>Étape 1 — Vérifiez votre éligibilité</h2>
+<p>Pour pouvoir faire un stage volontaire, trois conditions :</p>
+<ul>
+  <li>Avoir un permis de conduire en cours de validité</li>
+  <li>Disposer d'au moins 1 point sur son permis (sinon c'est un stage 48SI obligatoire)</li>
+  <li>Ne pas avoir fait de stage dans les 12 derniers mois</li>
+</ul>
+<p>Vous pouvez vérifier votre solde gratuitement sur <code>mespoints.permisdeconduire.gouv.fr</code> via FranceConnect.</p>
+<h2>Étape 2 — Choisissez votre stage</h2>
+<p>Sur BYS Formation, comparez les <strong>5+ centres agréés</strong> (Osny, Paris, Lyon, Marseille, Cergy) selon vos critères :</p>
+<ul>
+  <li>Date qui vous arrange</li>
+  <li>Prix (entre 210€ et 280€)</li>
+  <li>Distance depuis chez vous</li>
+  <li>Avis des anciens stagiaires</li>
+</ul>
+<h2>Étape 3 — Réservez et payez en ligne</h2>
+<p>La réservation se fait en 3 minutes. Paiement sécurisé par Stripe (CB ou prélèvement). Vous recevez immédiatement :</p>
+<ul>
+  <li>La confirmation de réservation par email</li>
+  <li>Votre facture en PDF</li>
+  <li>La convocation officielle 48h à 7 jours avant le stage</li>
+</ul>
+<h2>Étape 4 — Le stage (jour 1 et 2)</h2>
+<p>Le stage est animé par deux professionnels : <em>un psychologue et un expert sécurité routière</em>. Le programme alterne échanges de groupe, études de cas, analyses statistiques et engagement personnel. <strong>Aucun examen, aucun jugement</strong> — l'objectif est la prise de conscience.</p>
+<h2>Étape 5 — Les points sont crédités</h2>
+<p>À l'issue du stage, vous recevez votre <strong>attestation de stage</strong>. Les 4 points sont automatiquement crédités sur votre permis dès le <em>lendemain</em>, dans la limite du capital maximal (12 points pour un permis classique).</p>
+<h2>Bon à savoir</h2>
+<p>Le stage de récupération de points n'est pas remboursable par l'assurance, ni éligible au CPF. C'est une démarche personnelle et volontaire qui reste à votre charge.</p>`,
+        image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80",
+        categorie: "conseils",
+        tags: ["recuperation", "stage", "points", "guide"],
+        isPublished: true,
+        publishedAt: new Date("2026-04-18"),
+        authorId: admin.id,
+      },
+    }),
+    (prisma as any).article.create({
+      data: {
+        titre: "Permis probatoire et stage 48N : guide 2026",
+        slug: "permis-probatoire-stage-48n-guide-2026",
+        extrait: "Vous avez reçu une lettre 48N ? On vous explique vos obligations, les délais à respecter et comment réserver votre stage rapidement.",
+        contenu: `<h2>Permis probatoire : un statut spécifique</h2>
+<p>Après l'obtention de votre permis, vous êtes en <strong>période probatoire pendant 3 ans</strong> (2 ans avec la conduite accompagnée). Pendant cette période, votre capital points est limité à <em>6 points au départ</em>, puis 2 points supplémentaires par an sans infraction.</p>
+<h2>La lettre 48N : à quoi correspond-elle ?</h2>
+<p>La lettre 48N est adressée aux conducteurs en permis probatoire qui perdent <strong>3 points ou plus en une seule infraction</strong>. Elle impose deux obligations :</p>
+<ol>
+  <li>Effectuer un <strong>stage de sensibilisation obligatoire</strong> dans un délai de 4 mois</li>
+  <li>À l'issue du stage, vous récupérez 4 points et le remboursement de l'amende forfaitaire est possible sous conditions</li>
+</ol>
+<h2>Combien de temps pour réagir ?</h2>
+<p>Vous avez <strong>4 mois</strong> à compter de la réception de la lettre 48N pour effectuer votre stage. Au-delà, vous risquez :</p>
+<ul>
+  <li>Une amende de 4ᵉ classe (jusqu'à 135€)</li>
+  <li>La suspension administrative du permis (jusqu'à 3 ans)</li>
+  <li>L'impossibilité de récupérer les points perdus</li>
+</ul>
+<h2>Comment trouver et réserver un stage 48N ?</h2>
+<p>Tous les centres agréés sur BYS Formation sont habilités à recevoir les stagiaires en obligation 48N. Réservez en ligne, indiquez « stage 48N » dans le champ <em>« motif de la formation »</em> lors de l'inscription pour pouvoir <strong>demander le remboursement de votre amende ensuite</strong>.</p>
+<h2>Le remboursement de l'amende : conditions</h2>
+<p>Vous pouvez demander le remboursement de votre amende forfaitaire si :</p>
+<ul>
+  <li>L'infraction est de catégorie 4 (-3 ou -4 points)</li>
+  <li>Le stage est effectué dans les 4 mois suivant la 48N</li>
+  <li>Vous adressez votre demande à l'ANTAI avec l'attestation de stage et le procès-verbal</li>
+</ul>
+<h2>Prix moyen et durée</h2>
+<p>Le stage 48N dure <em>2 jours</em> et coûte entre <strong>200€ et 280€</strong>. Ce coût reste à votre charge, mais peut être partiellement compensé par le remboursement de l'amende.</p>
+<h2>Conseils pour les jeunes conducteurs</h2>
+<p>Sur permis probatoire, prudence redoublée : la moindre infraction peut entraîner une chute rapide du solde. Anticipez : si vous perdez plus de 2 points, envisagez un stage volontaire <em>avant</em> de recevoir une éventuelle 48N.</p>`,
+        image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1200&q=80",
+        categorie: "reglementation",
+        tags: ["48N", "permis probatoire", "jeune conducteur", "stage obligatoire"],
+        isPublished: true,
+        publishedAt: new Date("2026-04-26"),
+        authorId: admin.id,
+      },
+    }),
+    (prisma as any).article.create({
+      data: {
+        titre: "Le top 10 des erreurs qui font perdre des points",
+        slug: "top-10-erreurs-perte-points-permis",
+        extrait: "Vitesse, téléphone, alcool, feu rouge… le classement des 10 infractions les plus fréquentes et leurs sanctions exactes en points et en euros.",
+        contenu: `<h2>Pourquoi connaître les sanctions ?</h2>
+<p>Mieux on connaît le barème des infractions, mieux on peut adapter sa conduite. Voici le <strong>top 10 des erreurs qui coûtent des points</strong> en 2026, avec les sanctions exactes prévues par le Code de la route.</p>
+<h2>1. Petit excès de vitesse (-1 point, 68€)</h2>
+<p>Excès de moins de 20 km/h hors agglomération. C'est l'infraction la plus fréquente : un radar mal anticipé suffit. Pour l'éviter, programmez un régulateur de vitesse.</p>
+<h2>2. Téléphone au volant (-3 points, 135€)</h2>
+<p>Même à l'arrêt à un feu rouge, tenir son téléphone est verbalisé. Utilisez un kit Bluetooth ou activez le mode « ne pas déranger ».</p>
+<h2>3. Non-port de la ceinture (-3 points, 135€)</h2>
+<p>L'erreur de débutant qui coûte cher. Le conducteur ET les passagers de moins de 18 ans sont sanctionnés.</p>
+<h2>4. Franchissement de ligne continue (-3 points, 135€)</h2>
+<p>Souvent dans des situations de dépassement ou de pénétration de bande d'urgence. Restez patient.</p>
+<h2>5. Stop ou feu rouge non respecté (-4 points, 135€)</h2>
+<p>Très contrôlé par caméras de vidéo-verbalisation. Marquez systématiquement un arrêt complet au stop.</p>
+<h2>6. Refus de priorité (-4 points, 135€)</h2>
+<p>Y compris à un piéton sur un passage protégé. Soyez vigilant en agglomération.</p>
+<h2>7. Excès entre 30 et 40 km/h (-3 points, 135€)</h2>
+<p>Souvent autour des autoroutes ou voies rapides en zones à 110/130 km/h.</p>
+<h2>8. Conduite en état d'alcoolémie (-6 points, 4500€)</h2>
+<p>Taux à partir de 0,5 g/L de sang. Au-delà de 0,8 g/L : suspension du permis et tribunal.</p>
+<h2>9. Conduite sous stupéfiants (-6 points, 4500€)</h2>
+<p>Même sanction que l'alcool. Les contrôles salivaires sont systématiques en cas de doute.</p>
+<h2>10. Grand excès de vitesse +50 km/h (-6 points, 1500€)</h2>
+<p>Suspension du permis immédiate possible. Confiscation du véhicule en récidive.</p>
+<h2>En cas de perte de points</h2>
+<p>Si votre solde devient critique (moins de 6 points), envisagez un stage de récupération <strong>volontaire</strong>. Vous récupérez jusqu'à 4 points en 2 jours, sans attendre une lettre 48N ou 48SI.</p>`,
+        image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+        categorie: "conseils",
+        tags: ["infractions", "barème", "perte points", "prevention"],
+        isPublished: true,
+        publishedAt: new Date("2026-05-03"),
+        authorId: admin.id,
+      },
+    }),
+    (prisma as any).article.create({
+      data: {
+        titre: "Stage volontaire vs stage obligatoire : que choisir ?",
+        slug: "stage-volontaire-vs-stage-obligatoire-comparatif",
+        extrait: "Stage volontaire ou imposé par la préfecture (48N, 48SI) ou par le juge ? Comparatif complet pour comprendre quel stage correspond à votre situation.",
+        contenu: `<h2>4 types de stages, 4 contextes différents</h2>
+<p>Tous les stages durent <strong>2 jours (14 heures)</strong> et coûtent entre 200€ et 280€. Le contenu pédagogique est identique. Ce qui change : <em>les motivations, les obligations légales et les conséquences en cas de non-réalisation</em>.</p>
+<h2>1. Le stage volontaire — pour anticiper</h2>
+<p>C'est le plus courant. <strong>Vous choisissez librement</strong> de faire un stage pour récupérer jusqu'à 4 points avant que votre solde ne devienne critique.</p>
+<ul>
+  <li><strong>Quand le faire ?</strong> Dès que votre solde descend sous 6 points</li>
+  <li><strong>Avantage :</strong> récupération immédiate de 4 points</li>
+  <li><strong>Délai à respecter :</strong> aucun, hors période de 12 mois depuis le dernier stage</li>
+  <li><strong>Limitation :</strong> 1 seul stage par année glissante</li>
+</ul>
+<h2>2. Le stage 48N — pour les jeunes conducteurs</h2>
+<p>Imposé par la préfecture aux conducteurs en <strong>permis probatoire</strong> qui ont perdu 3 points ou plus en une seule infraction.</p>
+<ul>
+  <li><strong>Délai :</strong> 4 mois après réception de la lettre</li>
+  <li><strong>Avantage :</strong> remboursement possible de l'amende</li>
+  <li><strong>Risque si non-respect :</strong> amende de 135€ et suspension du permis</li>
+</ul>
+<h2>3. Le stage 48SI — après invalidation</h2>
+<p>Imposé après une <strong>invalidation du permis pour solde nul</strong>. Indispensable pour pouvoir repasser le code.</p>
+<ul>
+  <li><strong>Quand :</strong> avant tout dépôt d'une nouvelle demande de permis</li>
+  <li><strong>Particularité :</strong> ne crédite pas de points (le permis est annulé)</li>
+  <li><strong>Avantage :</strong> condition sine qua non pour repasser le code</li>
+</ul>
+<h2>4. Le stage judiciaire — décision du tribunal</h2>
+<p>Imposé par un juge en peine complémentaire ou en alternative aux poursuites. <strong>Refuser = retour à la sanction initiale</strong> (souvent plus lourde).</p>
+<h2>Tableau récapitulatif</h2>
+<table>
+  <thead>
+    <tr><th>Type</th><th>Initiative</th><th>Récupération points</th><th>Délai</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Volontaire</td><td>Vous</td><td>+4 points</td><td>Libre</td></tr>
+    <tr><td>48N (probatoire)</td><td>Préfecture</td><td>+4 points</td><td>4 mois</td></tr>
+    <tr><td>48SI (invalidation)</td><td>Préfecture</td><td>0 (permis annulé)</td><td>Avant repasse</td></tr>
+    <tr><td>Judiciaire</td><td>Juge</td><td>0 ou +4 selon cas</td><td>Décision</td></tr>
+  </tbody>
+</table>
+<h2>Notre conseil</h2>
+<p><strong>N'attendez pas la lettre de la préfecture</strong>. Un stage volontaire effectué à temps évite une situation administrative compliquée et garantit que vous restez en règle. Sur BYS Formation, vous comparez les centres en quelques clics et réservez 100% en ligne.</p>`,
+        image: "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1200&q=80",
+        categorie: "conseils",
+        tags: ["comparatif", "stage volontaire", "stage obligatoire", "48N", "48SI"],
+        isPublished: true,
+        publishedAt: new Date("2026-05-09"),
+        authorId: admin.id,
+      },
+    }),
   ]);
   console.log(`✅ ${articles.length} articles de blog créés.\n`);
 
@@ -2020,14 +2413,17 @@ async function main() {
   console.log("═══════════════════════════════════════════");
   console.log(`  📂 ${categories.length} catégories`);
   console.log(`  💎 ${subscriptionPlans.length} plans d'abonnement`);
-  console.log(`  👤 ${1 + 1 + 1 + 1 + 1 + centreUsers.length + 3 + eleves.length} utilisateurs (1 owner, 1 admin, 1 support, 1 comptable, 1 commercial, 5 centre owners, 3 membres centre, 9 élèves)`);
-  console.log(`  🏢 ${centres.length} centres`);
+  console.log(`  👤 ${1 + 1 + 1 + 1 + 1 + centreUsers.length + 3 + eleves.length} utilisateurs (1 owner, 1 admin, 1 support, 1 comptable, 1 commercial, 5 centre owners, 3 membres centre, ${eleves.length} élèves)`);
+  console.log(`  🏢 ${centres.length + 1} centres (dont 1 second centre BYS Cergy)`);
   console.log(`  👥 3 membres de centres`);
   console.log(`  📚 ${allFormations.length} formations`);
   console.log(`  📅 ${sessions.length} sessions`);
-  console.log(`  🎫 ${reservations.length} réservations`);
+  console.log(`  🎫 ${reservations.length + extraReservations.length} réservations`);
+  console.log(`  ⭐ ${reviewsData.length} avis`);
+  console.log(`  🧾 ${invoicesData.length} factures`);
+  console.log(`  💬 ${messagesData.length} messages`);
   console.log(`  ❓ 8 FAQ`);
-  console.log(`  🔔 5 notifications`);
+  console.log(`  🔔 20 notifications`);
   console.log(`  📧 ${emailTemplates.length} templates d'emails`);
   console.log(`  🏷️  ${promoCodes.length} codes promo`);
   console.log(`  📝 ${articles.length} articles de blog`);

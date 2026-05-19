@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faShieldHalved, faLock } from "@fortawesome/free-solid-svg-icons";
@@ -21,11 +22,14 @@ export default function ReserverLayout({ children }: { children: React.ReactNode
       {/* Header minimal */}
       <header className="bg-[#0A1628] border-b border-white/8 px-4 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-xs">BYS</span>
-            </div>
-            <span className="text-white font-semibold text-sm hidden sm:block">BYS Formation</span>
+          <Link href="/" className="flex items-center gap-2" aria-label="BYS Formation — accueil">
+            <Image
+              src="/transparent-logo.svg"
+              alt="BYS Formation"
+              width={140}
+              height={36}
+              className="h-9 w-auto brightness-0 invert"
+            />
           </Link>
 
           {/* Steps */}

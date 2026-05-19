@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as Prisma from "@/generated/prisma/internal/prismaNamespace";
 import { z } from "zod";
-import { requireAuth, requireCentreManagement } from "@/lib/auth0";
+import { requireAuth, requireCentreManagement, PLATFORM_ADMIN_ROLES } from "@/lib/auth0";
 import { calculateCentreCompletion } from "@/lib/centre-completion";
 import { getUserCentreId } from "@/lib/centre-utils";
 
@@ -10,13 +10,18 @@ const centreSelect = {
   id: true, nom: true, slug: true, description: true,
   adresse: true, codePostal: true, ville: true,
   telephone: true, email: true, siteWeb: true,
+  siret: true,
   stripeAccountId: true, stripeOnboardingDone: true,
   subscriptionStatus: true,
   profilCompletionPct: true,
   statut: true, isActive: true,
-  bannerImage: true, couleurPrimaire: true, couleurSecondaire: true,
+  bannerImage: true, logo: true, couleurPrimaire: true, couleurSecondaire: true,
   presentationHtml: true, horaires: true,
   equipements: true, certifications: true, reseauxSociaux: true,
+  // Billing / juridique
+  raisonSociale: true, tva: true, ape: true, iban: true, bic: true,
+  mentionsLegales: true, cgv: true, nomResponsable: true, signatureUrl: true,
+  commissionRateOverride: true,
 } as const;
 
 // GET /api/centre/me
@@ -44,13 +49,36 @@ const updateSchema = z.object({
   ville: z.string().max(100).optional(),
   telephone: z.string().max(20).optional(),
   email: z.string().email().optional(),
+  // ── Facturation / juridique ──
+  raisonSociale: z.string().max(200).optional().nullable(),
+  siret: z.string().regex(/^\d{14}$/, "SIRET doit comporter 14 chiffres").optional().nullable(),
+  tva: z.string().regex(/^[A-Z]{2}\w{2,12}$/, "TVA invalide (ex: FR12345678901)").optional().nullable(),
+  ape: z.string().max(10).optional().nullable(),
+  iban: z.string().regex(/^[A-Z]{2}[0-9A-Z]{13,32}$/, "IBAN invalide").optional().nullable(),
+  bic: z.string().regex(/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/, "BIC invalide").optional().nullable(),
+  mentionsLegales: z.string().max(20000).optional().nullable(),
+  cgv: z.string().max(20000).optional().nullable(),
+  nomResponsable: z.string().max(200).optional().nullable(),
+  // commissionRateOverride: only platform admin/owner can set it
+  commissionRateOverride: z.number().min(0).max(1).optional().nullable(),
 });
 
 export async function PATCH(req: NextRequest) {
   try {
     const user = await requireAuth();
     const body = await req.json();
-    const data = updateSchema.parse(body);
+    const parsed = updateSchema.parse(body);
+
+    // ── Security: commissionRateOverride only editable by platform staff ──
+    const isPlatformAdmin = (PLATFORM_ADMIN_ROLES as readonly string[]).includes(user.role);
+    const { commissionRateOverride, ...rest } = parsed;
+    const data: typeof parsed = isPlatformAdmin
+      ? parsed
+      : (rest as typeof parsed);
+
+    if (commissionRateOverride !== undefined && !isPlatformAdmin) {
+      console.warn(`[PATCH /api/centre/me] user ${user.id} (${user.role}) tried to set commissionRateOverride — ignored`);
+    }
 
     const centreId = await getUserCentreId(user.id, user.role);
     if (!centreId) return NextResponse.json({ error: "Aucun centre" }, { status: 404 });

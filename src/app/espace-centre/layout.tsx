@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -231,11 +232,14 @@ export default function EspaceCentreLayout({ children }: { children: React.React
       <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
         {/* Logo */}
         <div className="px-6 py-6 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="font-bold text-sm text-white">BYS</span>
-            </div>
-            <span className="font-semibold text-white text-sm">BYS Formation</span>
+          <Link href="/" className="flex items-center gap-3" aria-label="BYS Formation — accueil">
+            <Image
+              src="/transparent-logo.svg"
+              alt="BYS Formation"
+              width={160}
+              height={36}
+              className="h-9 w-auto brightness-0 invert"
+            />
           </Link>
         </div>
 
@@ -281,10 +285,14 @@ export default function EspaceCentreLayout({ children }: { children: React.React
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar mobile */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 border-b" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="font-bold text-xs text-white">BYS</span>
-            </div>
+          <Link href="/" className="flex items-center gap-2" aria-label="BYS Formation — accueil">
+            <Image
+              src="/transparent-logo.svg"
+              alt="BYS Formation"
+              width={120}
+              height={32}
+              className="h-8 w-auto brightness-0 invert"
+            />
             <span className="font-semibold text-white text-sm">Espace Centre</span>
           </Link>
           <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">

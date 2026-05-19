@@ -1,12 +1,9 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import FaqContent from "@/components/faq/FaqContent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChevronDown,
   faEnvelope,
   faPhone,
   faShieldHalved,
@@ -14,12 +11,12 @@ import {
   faCreditCard,
   faClipboardList,
   faCircleCheck,
-  faMagnifyingGlass,
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
-// ─── TYPES ────────────────────────────────────────────────
+// Page statique — la FAQ est fixe, pas de fetch.
+export const dynamic = "force-static";
 
 interface FaqItem {
   question: string;
@@ -31,8 +28,6 @@ interface FaqCategory {
   icon: IconDefinition;
   items: FaqItem[];
 }
-
-// ─── FAQ DATA ─────────────────────────────────────────────
 
 const faqCategories: FaqCategory[] = [
   {
@@ -114,7 +109,7 @@ const faqCategories: FaqCategory[] = [
       {
         question: "Le stage peut-il être pris en charge par le CPF ?",
         answer:
-          "Non, les stages de récupération de points ne sont pas éligibles au CPF (Compte Personnel de Formation). En revanche, certaines formations professionnelles proposées sur notre plateforme (FIMO, FCO, permis B) peuvent être éligibles au CPF. Les centres concernés affichent le badge \"Éligible CPF\" sur leur fiche.",
+          "Non. Les stages de récupération de points (officiellement « stages de sensibilisation à la sécurité routière ») ne sont pas éligibles au Compte Personnel de Formation (CPF). Le règlement les considère comme un dispositif de prévention administratif, pas comme une formation professionnelle continue. Le paiement se fait directement par carte bancaire au moment de la réservation.",
       },
       {
         question: "Quelle est la politique d'annulation et de remboursement ?",
@@ -187,167 +182,36 @@ const faqCategories: FaqCategory[] = [
   },
 ];
 
-// ─── ACCORDION COMPONENT ──────────────────────────────────
-
-function AccordionItem({ item }: { item: FaqItem }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="border border-brand-border rounded-lg overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
-      >
-        <span className="font-medium text-brand-text pr-4">{item.question}</span>
-        <FontAwesomeIcon
-          icon={faChevronDown}
-          className={`text-gray-400 text-sm shrink-0 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      {open && (
-        <div className="px-5 pb-5 text-gray-600 leading-relaxed border-t border-brand-border pt-4">
-          {item.answer}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── PAGE COMPONENT ───────────────────────────────────────
-
 export default function FaqPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-  // Filter FAQ items by search
-  const filteredCategories = faqCategories
-    .map((cat) => ({
-      ...cat,
-      items: cat.items.filter((item) => {
-        if (!searchQuery) return true;
-        const q = searchQuery.toLowerCase();
-        return (
-          item.question.toLowerCase().includes(q) ||
-          item.answer.toLowerCase().includes(q)
-        );
-      }),
-    }))
-    .filter((cat) => cat.items.length > 0);
-
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <Header />
 
-      {/* Hero */}
+      {/* Hero (statique côté serveur) */}
       <section className="bg-[#0A1628] text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl mb-4">
             Questions fréquentes
           </h1>
-          <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-            Retrouvez toutes les réponses à vos questions sur les stages de
-            récupération de points, l&apos;inscription, le paiement et le déroulement du stage.
+          <p className="text-gray-300 text-lg mb-0 max-w-2xl mx-auto">
+            Retrouvez toutes les réponses à vos questions sur les stages de récupération de points,
+            l&apos;inscription, le paiement et le déroulement du stage.
           </p>
-
-          {/* Search */}
-          <div className="max-w-xl mx-auto relative">
-            <input
-              type="text"
-              placeholder="Rechercher une question..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3.5 pl-11 rounded-lg bg-white text-brand-text"
-            />
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-          </div>
         </div>
       </section>
 
-      {/* Category nav */}
-      <section className="border-b border-brand-border bg-white sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex overflow-x-auto gap-1 py-3 scrollbar-hide">
-            {faqCategories.map((cat) => (
-              <button
-                key={cat.title}
-                onClick={() => {
-                  setActiveCategory(activeCategory === cat.title ? null : cat.title);
-                  setSearchQuery("");
-                  const el = document.getElementById(cat.title);
-                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-                className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeCategory === cat.title
-                    ? "bg-brand-accent text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FontAwesomeIcon icon={cat.icon} className="mr-1.5" />
-                {cat.title}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Contenu FAQ (fond clair pour lisibilité) */}
+      <FaqContent categories={faqCategories} />
 
-      {/* FAQ content */}
-      <section className="max-w-4xl mx-auto px-4 py-12">
-        {filteredCategories.length > 0 ? (
-          <div className="space-y-12">
-            {filteredCategories.map((cat) => (
-              <div key={cat.title} id={cat.title}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <FontAwesomeIcon icon={cat.icon} className="text-brand-accent" />
-                  </div>
-                  <h2 className="font-display font-bold text-xl text-brand-text">
-                    {cat.title}
-                  </h2>
-                </div>
-                <div className="space-y-3">
-                  {cat.items.map((item) => (
-                    <AccordionItem key={item.question} item={item} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className="text-4xl text-gray-300 mb-4"
-            />
-            <h3 className="font-display font-semibold text-xl text-brand-text mb-2">
-              Aucun résultat trouvé
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Essayez avec d&apos;autres mots-clés ou consultez toutes les catégories.
-            </p>
-            <button
-              onClick={() => setSearchQuery("")}
-              className="btn-secondary text-sm px-6 py-2.5 rounded-lg"
-            >
-              Voir toutes les questions
-            </button>
-          </div>
-        )}
-      </section>
-
-      {/* Still have questions CTA */}
+      {/* CTA */}
       <section className="bg-white border-t border-brand-border py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display font-bold text-2xl md:text-3xl text-brand-text mb-4">
             Vous n&apos;avez pas trouvé la réponse à votre question ?
           </h2>
           <p className="text-gray-500 text-lg mb-8">
-            Notre équipe est disponible du lundi au vendredi de 9h à 18h pour
-            répondre à toutes vos questions.
+            Notre équipe est disponible du lundi au vendredi de 9h à 18h pour répondre à toutes vos
+            questions.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

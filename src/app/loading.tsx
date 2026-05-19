@@ -1,10 +1,19 @@
+import Image from "next/image";
+
 export default function Loading() {
   return (
     <div className="min-h-screen bg-[#0A1628] flex items-center justify-center">
       <div className="text-center">
         {/* Logo animé */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-600 mb-6 animate-pulse">
-          <span className="font-display font-bold text-xl text-white">BYS</span>
+        <div className="mb-6 animate-pulse inline-block">
+          <Image
+            src="/transparent-logo.svg"
+            alt="BYS Formation"
+            width={180}
+            height={56}
+            priority
+            className="h-14 w-auto brightness-0 invert"
+          />
         </div>
 
         {/* Barre tricolore animée */}

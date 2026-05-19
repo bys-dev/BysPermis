@@ -2,9 +2,11 @@ import { render, screen } from '@testing-library/react'
 
 // Mock next/link
 jest.mock('next/link', () => {
-  return ({ children, href, ...rest }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
+  const MockLink = ({ children, href, ...rest }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
     <a href={href} {...rest}>{children}</a>
   )
+  MockLink.displayName = 'MockNextLink'
+  return MockLink
 })
 
 // Mock FontAwesome
@@ -22,14 +24,10 @@ describe('Footer', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
-  it('affiche le texte BYS Formation', () => {
+  it('affiche le logo BYS Formation', () => {
     render(<Footer />)
-    expect(screen.getByText('BYS Formation')).toBeInTheDocument()
-  })
-
-  it('affiche le logo BYS', () => {
-    render(<Footer />)
-    expect(screen.getByText('BYS')).toBeInTheDocument()
+    // Logo SVG avec alt accessibilité
+    expect(screen.getAllByAltText('BYS Formation').length).toBeGreaterThan(0)
   })
 
   it('affiche le lien CGU', () => {
@@ -60,13 +58,13 @@ describe('Footer', () => {
 
   it('affiche la description de l\'entreprise', () => {
     render(<Footer />)
-    expect(screen.getByText(/partenaire de confiance/)).toBeInTheDocument()
+    expect(screen.getByText(/marketplace de référence/)).toBeInTheDocument()
   })
 
-  it('affiche les liens des formations', () => {
+  it('affiche les liens des stages par ville', () => {
     render(<Footer />)
-    expect(screen.getByText('Récupération de points')).toBeInTheDocument()
-    expect(screen.getByText('FIMO / FCO')).toBeInTheDocument()
+    expect(screen.getByText('Trouver un stage')).toBeInTheDocument()
+    expect(screen.getByText('Stage à Paris')).toBeInTheDocument()
   })
 
   it('affiche les liens sociaux avec aria-label', () => {

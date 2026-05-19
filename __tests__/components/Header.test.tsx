@@ -2,9 +2,11 @@ import { render, screen } from '@testing-library/react'
 
 // Mock next/link
 jest.mock('next/link', () => {
-  return ({ children, href, ...rest }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
+  const MockLink = ({ children, href, ...rest }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
     <a href={href} {...rest}>{children}</a>
   )
+  MockLink.displayName = 'MockNextLink'
+  return MockLink
 })
 
 // Mock next/navigation
@@ -59,14 +61,10 @@ describe('Header', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument()
   })
 
-  it('affiche le logo BYS', () => {
+  it('affiche le logo BYS Formation', () => {
     render(<Header />)
-    expect(screen.getByText('BYS')).toBeInTheDocument()
-  })
-
-  it('affiche le texte BYS Formation', () => {
-    render(<Header />)
-    expect(screen.getByText('BYS Formation')).toBeInTheDocument()
+    // Logo SVG avec alt accessibilité
+    expect(screen.getAllByAltText('BYS Formation').length).toBeGreaterThan(0)
   })
 
   it('affiche les liens de navigation', () => {

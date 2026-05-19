@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreStaff, requireCentreOwner, CENTRE_ROLES } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
+import { z } from "zod";
+
+const VALID_MEMBRE_ROLES = ["CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"] as const;
+
+const postSchema = z.object({
+  email: z.string().email("Email invalide").max(254),
+  role: z.enum(VALID_MEMBRE_ROLES),
+});
+
+const deleteSchema = z.object({
+  userId: z.string().min(1).regex(/^[a-z0-9]{20,}$/i, "userId invalide"),
+});
 
 // GET /api/centre/membres — List all members of the current user's centre
 export async function GET() {
@@ -36,17 +48,11 @@ export async function POST(req: NextRequest) {
     const owner = await requireCentreOwner();
 
     const body = await req.json();
-    const { email, role } = body as { email?: string; role?: string };
-
-    if (!email || !role) {
-      return NextResponse.json({ error: "Email et rôle requis" }, { status: 400 });
+    const parsed = postSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
-
-    // Validate role
-    const validRoles = ["CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"] as const;
-    if (!validRoles.includes(role as typeof validRoles[number])) {
-      return NextResponse.json({ error: "Rôle invalide" }, { status: 400 });
-    }
+    const { email, role } = parsed.data;
 
     // Find the owner's active centre
     const centreId = await getUserCentreId(owner.id, owner.role);
@@ -109,11 +115,11 @@ export async function DELETE(req: NextRequest) {
     const owner = await requireCentreOwner();
 
     const body = await req.json();
-    const { userId } = body as { userId?: string };
-
-    if (!userId) {
-      return NextResponse.json({ error: "userId requis" }, { status: 400 });
+    const parsed = deleteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
+    const { userId } = parsed.data;
 
     // Find the owner's active centre
     const centreId = await getUserCentreId(owner.id, owner.role);

@@ -1,7 +1,91 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth0";
+import { requireAuth, PLATFORM_ROLES } from "@/lib/auth0";
+
+/**
+ * Verify that a relationship exists between two users that justifies messaging.
+ * Returns true if any of:
+ *   - Either user is platform staff (SUPPORT/ADMIN/OWNER/etc.)
+ *   - They share a Reservation (élève of a centre + staff of that centre)
+ *   - They share a Ticket (support / ticket author)
+ *   - They already have an existing Message thread (prior auth granted)
+ */
+async function canMessage(userAId: string, userBId: string): Promise<boolean> {
+  if (userAId === userBId) return false;
+
+  // Platform staff can message anyone (support workflow)
+  const [a, b] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userAId }, select: { role: true } }),
+    prisma.user.findUnique({ where: { id: userBId }, select: { role: true } }),
+  ]);
+  if (!a || !b) return false;
+  const staffRoles = new Set<string>(PLATFORM_ROLES);
+  if (staffRoles.has(a.role) || staffRoles.has(b.role)) return true;
+
+  // Already existing thread → re-auth implicit
+  const existingMessage = await prisma.message.findFirst({
+    where: {
+      OR: [
+        { senderId: userAId, receiverId: userBId },
+        { senderId: userBId, receiverId: userAId },
+      ],
+    },
+    select: { id: true },
+  });
+  if (existingMessage) return true;
+
+  // Shared reservation (élève ↔ centre staff)
+  // Case 1 : A est élève (userId on Reservation), B est centre staff
+  const sharedAsElev = await prisma.reservation.findFirst({
+    where: {
+      OR: [
+        {
+          userId: userAId,
+          session: {
+            formation: {
+              centre: {
+                OR: [
+                  { userId: userBId }, // B is owner
+                  { membres: { some: { userId: userBId } } }, // B is staff
+                ],
+              },
+            },
+          },
+        },
+        {
+          userId: userBId,
+          session: {
+            formation: {
+              centre: {
+                OR: [
+                  { userId: userAId },
+                  { membres: { some: { userId: userAId } } },
+                ],
+              },
+            },
+          },
+        },
+      ],
+    },
+    select: { id: true },
+  });
+  if (sharedAsElev) return true;
+
+  // Shared ticket (support / ticket author)
+  const sharedTicket = await prisma.ticket.findFirst({
+    where: {
+      OR: [
+        { userId: userAId, messages: { some: { userId: userBId } } },
+        { userId: userBId, messages: { some: { userId: userAId } } },
+      ],
+    },
+    select: { id: true },
+  });
+  if (sharedTicket) return true;
+
+  return false;
+}
 
 // ─── GET /api/messages — Liste des conversations ────────────────
 export async function GET() {
@@ -94,6 +178,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Destinataire introuvable" },
         { status: 404 }
+      );
+    }
+
+    // ─── Anti-IDOR : vérifier la relation entre user et receiver ──
+    if (!(await canMessage(user.id, data.receiverId))) {
+      return NextResponse.json(
+        { error: "Vous ne pouvez pas envoyer un message à ce destinataire." },
+        { status: 403 }
       );
     }
 

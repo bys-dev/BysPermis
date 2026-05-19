@@ -44,11 +44,16 @@ export async function GET() {
 }
 
 // POST /api/centre/sessions — create a new session
+// Capacité légale: stage récup points = 6 stagiaires min, 20 max (arrêté du 26/06/2012).
 const createSchema = z.object({
   formationId: z.string().min(1, "Formation requise"),
   dateDebut: z.string().min(1, "Date de début requise"),
   dateFin: z.string().min(1, "Date de fin requise"),
-  placesTotal: z.number().int().min(1, "Minimum 1 place"),
+  placesTotal: z
+    .number()
+    .int()
+    .min(6, "Capacité légale : 6 stagiaires minimum")
+    .max(20, "Capacité légale : 20 stagiaires maximum"),
 });
 
 export async function POST(req: NextRequest) {
@@ -73,6 +78,15 @@ export async function POST(req: NextRequest) {
 
     if (dateFin <= dateDebut) {
       return NextResponse.json({ error: "La date de fin doit être après la date de début" }, { status: 400 });
+    }
+
+    // Stage récup points = 14h sur 2 jours consécutifs (arrêté 26/06/2012).
+    const durationHours = (dateFin.getTime() - dateDebut.getTime()) / 3_600_000;
+    if (durationHours < 20 || durationHours > 36) {
+      return NextResponse.json(
+        { error: "Un stage de récupération de points doit durer 2 jours consécutifs (14h effectives)" },
+        { status: 400 }
+      );
     }
 
     const session = await prisma.session.create({
@@ -123,7 +137,7 @@ const patchSchema = z.object({
   status: z.enum(["ACTIVE", "ANNULEE", "COMPLETE", "PASSEE"]).optional(),
   dateDebut: z.string().optional(),
   dateFin: z.string().optional(),
-  placesTotal: z.number().int().min(1).optional(),
+  placesTotal: z.number().int().min(6).max(20).optional(),
 });
 
 export async function PATCH(req: NextRequest) {

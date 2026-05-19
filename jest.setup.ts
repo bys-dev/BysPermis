@@ -1,10 +1,25 @@
 import '@testing-library/jest-dom'
 
+// @react-pdf/renderer is ESM and CPU-bound — irrelevant in unit tests.
+// Real PDF rendering is exercised via E2E + manual recette.
+jest.mock('@/lib/pdf-helpers', () => ({
+  renderConvocationPdf: async (id: string) => ({
+    buffer: Buffer.from(`mock-convocation-${id}`),
+    filename: `convocation-${id}.pdf`,
+  }),
+  renderInvoicePdfFromReservation: async (id: string) => ({
+    buffer: Buffer.from(`mock-invoice-${id}`),
+    filename: 'facture-mock.pdf',
+    invoiceNumero: 'FAC-MOCK-0001',
+  }),
+}))
+
 // ─── Polyfills pour l'environnement jsdom (Next.js 16) ────────
 if (typeof TextEncoder === 'undefined') {
-  const { TextEncoder, TextDecoder } = require('util');
-  global.TextEncoder = TextEncoder;
-  global.TextDecoder = TextDecoder;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const util = require('util');
+  global.TextEncoder = util.TextEncoder;
+  global.TextDecoder = util.TextDecoder;
 }
 
 if (typeof Request === 'undefined') {

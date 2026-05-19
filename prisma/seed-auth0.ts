@@ -28,6 +28,9 @@ type Role =
   | "COMPTABLE"
   | "COMMERCIAL"
   | "CENTRE_OWNER"
+  | "CENTRE_ADMIN"
+  | "CENTRE_FORMATEUR"
+  | "CENTRE_SECRETAIRE"
   | "ELEVE";
 
 type DemoUser = {
@@ -46,6 +49,9 @@ const DEMO_USERS: DemoUser[] = [
   { email: "comptabilite@bys-formation.fr", firstName: "Comptable", lastName: "BYS", role: "COMPTABLE" },
   { email: "commercial@bys-formation.fr", firstName: "Commercial", lastName: "BYS", role: "COMMERCIAL" },
   { email: "contact@bys-formation.fr", firstName: "Centre", lastName: "BYS Cergy", role: "CENTRE_OWNER" },
+  { email: "gestion@bys-formation.fr", firstName: "Linh", lastName: "Nguyen", role: "CENTRE_ADMIN" },
+  { email: "formateur@bys-formation.fr", firstName: "Miguel", lastName: "Garcia", role: "CENTRE_FORMATEUR" },
+  { email: "secretariat@autoecole-conduite-plus.fr", firstName: "Nathalie", lastName: "Petit", role: "CENTRE_SECRETAIRE" },
   { email: "marie.durand@outlook.fr", firstName: "Marie", lastName: "Durand", role: "ELEVE" },
 ];
 
@@ -95,39 +101,48 @@ async function markEmailVerified(domain: string, token: string, auth0Id: string,
   }
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function createAuth0User(
   domain: string,
   token: string,
   user: DemoUser,
 ): Promise<string> {
-  const res = await fetch(`https://${domain}/api/v2/users`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      email: user.email,
-      password: DEMO_PASSWORD,
-      connection: "Username-Password-Authentication",
-      email_verified: true,
-      name: `${user.firstName} ${user.lastName}`,
-      given_name: user.firstName,
-      family_name: user.lastName,
-      app_metadata: { role: user.role },
-      user_metadata: { firstName: user.firstName, lastName: user.lastName },
-    }),
-  });
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    const res = await fetch(`https://${domain}/api/v2/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        email: user.email,
+        password: DEMO_PASSWORD,
+        connection: "Username-Password-Authentication",
+        email_verified: true,
+        name: `${user.firstName} ${user.lastName}`,
+        given_name: user.firstName,
+        family_name: user.lastName,
+        app_metadata: { role: user.role },
+        user_metadata: { firstName: user.firstName, lastName: user.lastName },
+      }),
+    });
 
-  if (res.status === 409) {
-    return "EXISTS";
-  }
-  if (!res.ok) {
+    if (res.status === 409) return "EXISTS";
+    if (res.ok) {
+      const created = (await res.json()) as { user_id: string };
+      return created.user_id;
+    }
+    if (res.status === 429 && attempt < 5) {
+      const backoff = 2000 * attempt;
+      console.log(`   ⏳ rate limit Auth0, retry dans ${backoff}ms (tentative ${attempt}/5)…`);
+      await sleep(backoff);
+      continue;
+    }
     const err = await res.text();
     throw new Error(`Creation user ${user.email} echouee : ${err}`);
   }
-  const created = (await res.json()) as { user_id: string };
-  return created.user_id;
+  throw new Error(`Creation user ${user.email} echouee apres 5 tentatives`);
 }
 
 async function linkToPrismaUser(email: string, auth0Id: string, role: Role) {
@@ -160,7 +175,8 @@ async function main() {
   let already = 0;
   let linked = 0;
 
-  for (const user of DEMO_USERS) {
+  for (const [i, user] of DEMO_USERS.entries()) {
+    if (i > 0) await sleep(800);
     console.log(`👤 ${user.email} (${user.role})`);
 
     let auth0Id: string;

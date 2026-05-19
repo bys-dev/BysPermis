@@ -1,27 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCentreManagement } from "@/lib/auth0";
+import { requireCentreManagement, PLATFORM_ADMIN_ROLES } from "@/lib/auth0";
+import { getUserCentreId } from "@/lib/centre-utils";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { resend } from "@/lib/email";
 import { formatDate } from "@/lib/utils";
+import { z } from "zod";
 
 const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
 const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
+const sendSchema = z.object({
+  reservationId: z.string().min(1),
+});
+
 /**
  * POST /api/convocations/send
  * Send or re-send a convocation email for a reservation.
+ *
+ * Anti-IDOR: après requireCentreManagement(), vérifier que la réservation
+ * appartient bien à un centre que l'utilisateur gère.
  */
 export async function POST(req: NextRequest) {
   try {
-    await requireCentreManagement();
+    const user = await requireCentreManagement();
 
     const body = await req.json();
-    const { reservationId } = body as { reservationId: string };
-
-    if (!reservationId) {
-      return NextResponse.json({ error: "reservationId requis" }, { status: 400 });
-    }
+    const { reservationId } = sendSchema.parse(body);
 
     const reservation = await prisma.reservation.findUnique({
       where: { id: reservationId },
@@ -44,6 +49,15 @@ export async function POST(req: NextRequest) {
     const { session } = reservation;
     const { formation } = session;
     const centre = formation.centre;
+
+    // ─── Anti-IDOR: vérifier que l'utilisateur gère ce centre ──
+    const isPlatformAdmin = (PLATFORM_ADMIN_ROLES as readonly string[]).includes(user.role);
+    if (!isPlatformAdmin) {
+      const userCentreId = await getUserCentreId(user.id, user.role);
+      if (userCentreId !== centre.id) {
+        return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+      }
+    }
 
     const lienConvocation = `${APP_URL}/api/convocation/${reservation.id}`;
 
@@ -76,6 +90,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: "Convocation envoyée" });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues }, { status: 400 });
+    }
     console.error("[POST /api/convocations/send]", err);
     if (err instanceof Error && err.message === "Non autorisé") {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });

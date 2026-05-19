@@ -51,7 +51,7 @@ jest.mock("@/lib/geocoding", () => ({
 // ─── Helpers ────────────────────────────────────────────────
 
 function makeReq(url: string, method = "GET", body?: unknown): NextRequest {
-  const init: RequestInit = { method };
+  const init: { method: string; body?: string; headers?: Record<string, string> } = { method };
   if (body) {
     init.body = JSON.stringify(body);
     init.headers = { "Content-Type": "application/json" };
@@ -500,11 +500,19 @@ describe("Rôle SUPPORT", () => {
     expect(res.status).toBe(200);
   });
 
-  // SUPPORT ne peut PAS accéder aux stats admin
-  it("GET /api/admin/stats → 401 (pas admin)", async () => {
+  // SUPPORT accède aux KPIs plateforme (route stats = platform staff)
+  it("GET /api/admin/stats — accès platform staff", async () => {
     const { GET } = await import("@/app/api/admin/stats/route");
+    prismaMock.reservation.count.mockResolvedValue(0);
+    prismaMock.centre.count.mockResolvedValue(0);
+    prismaMock.user.count.mockResolvedValue(0);
+    prismaMock.ticket.count.mockResolvedValue(0);
+    prismaMock.reservation.findMany.mockResolvedValue([]);
+    prismaMock.centre.findMany.mockResolvedValue([]);
+    prismaMock.ticket.findMany.mockResolvedValue([]);
+
     const res = await GET();
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
   });
 
   // SUPPORT ne peut PAS gérer les utilisateurs
@@ -646,6 +654,7 @@ describe("Rôle OWNER", () => {
 
 describe("Matrice d'accès — refus croisés", () => {
   const ROLES_SANS_CENTRE = ["ELEVE", "SUPPORT", "COMPTABLE", "COMMERCIAL"];
+  // /api/admin/users reste strict ADMIN/OWNER (≠ /api/admin/stats qui est platform staff)
   const ROLES_SANS_ADMIN = ["ELEVE", "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE", "SUPPORT", "COMPTABLE", "COMMERCIAL"];
 
   describe.each(ROLES_SANS_CENTRE)("Rôle %s → pas d'accès centre", (role) => {
@@ -658,12 +667,12 @@ describe("Matrice d'accès — refus croisés", () => {
     });
   });
 
-  describe.each(ROLES_SANS_ADMIN)("Rôle %s → pas d'accès admin", (role) => {
+  describe.each(ROLES_SANS_ADMIN)("Rôle %s → pas d'accès admin strict", (role) => {
     beforeEach(() => loginAs(role));
 
-    it(`${role} ne peut pas GET /api/admin/stats`, async () => {
-      const { GET } = await import("@/app/api/admin/stats/route");
-      const res = await GET();
+    it(`${role} ne peut pas GET /api/admin/users`, async () => {
+      const { GET } = await import("@/app/api/admin/users/route");
+      const res = await GET(makeReq("/api/admin/users"));
       expect(res.status).toBe(401);
     });
   });

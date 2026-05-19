@@ -3,9 +3,13 @@ import { Resend } from "resend";
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr";
+// Logo embed pour emails — PNG fiable sur tous les clients (Outlook compris).
+const LOGO_IMG = `<img src="${APP_URL}/colored-logo.png" alt="BYS Formation" height="48" style="display:block;height:48px;width:auto;margin:0 auto 12px"/>`;
 
 /**
  * Send confirmation email after reservation.
+ * Si `attachments` est fourni, joint la (les) PJ — typiquement la facture PDF.
  */
 export async function sendConfirmationEmail(params: {
   to: string;
@@ -13,22 +17,33 @@ export async function sendConfirmationEmail(params: {
   formationTitle: string;
   sessionDate: string;
   centreName: string;
+  attachments?: { filename: string; content: Buffer }[];
 }): Promise<void> {
   await resend.emails.send({
     from: FROM,
     to: params.to,
     subject: `Confirmation de réservation ${params.reservationNumber}`,
-    html: `
-      <h1>Réservation confirmée</h1>
-      <p>Votre réservation <strong>${params.reservationNumber}</strong> a bien été enregistrée.</p>
-      <table style="border-collapse:collapse;margin:16px 0">
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Formation</td><td>${params.formationTitle}</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Date</td><td>${params.sessionDate}</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Centre</td><td>${params.centreName}</td></tr>
-      </table>
-      <p>Vous recevrez votre convocation par email avant la date de la session.</p>
-      <p>Cordialement,<br/>L'équipe BYS Formations</p>
-    `,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">Réservation confirmée</h1>
+    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Numéro : ${params.reservationNumber}</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour,</p>
+    <p>Votre réservation <strong>${params.reservationNumber}</strong> a bien été enregistrée.</p>
+    <table style="border-collapse:collapse;margin:16px 0;width:100%">
+      <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold;width:120px">Formation</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.formationTitle}</td></tr>
+      <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold">Date</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.sessionDate}</td></tr>
+      <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold">Centre</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.centreName}</td></tr>
+    </table>
+    <p>Votre <strong>facture</strong> est jointe à ce mail au format PDF. Votre <strong>convocation</strong> vous sera envoyée 48h avant la session.</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation Permis</p>
+  </div>
+</div>`,
+    ...(params.attachments && params.attachments.length > 0
+      ? { attachments: params.attachments }
+      : {}),
   });
 }
 
@@ -49,7 +64,7 @@ export async function sendConvocationEmail(params: {
       <h1>Convocation</h1>
       <p>Veuillez trouver ci-joint votre convocation pour la formation <strong>${params.formationTitle}</strong>.</p>
       <p>Numéro de réservation : <strong>${params.reservationNumber}</strong></p>
-      <p>Cordialement,<br/>L'équipe BYS Formations</p>
+      <p>Cordialement,<br/>L'équipe BYS Formation Permiss</p>
     `,
     attachments: [
       {
@@ -89,7 +104,7 @@ export async function sendCentreNotificationEmail(params: {
         <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Montant</td><td>${formattedAmount}</td></tr>
       </table>
       <p>Connectez-vous à votre espace pour gérer cette réservation.</p>
-      <p>Cordialement,<br/>L'équipe BYS Formations</p>
+      <p>Cordialement,<br/>L'équipe BYS Formation Permiss</p>
     `,
   });
 }
@@ -120,9 +135,7 @@ export async function sendCentreInvitationEmail(params: {
     subject: `Bienvenue sur BYS Formation — Votre espace centre est pret`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
-      <span style="color:#fff;font-weight:bold;font-size:18px">BYS</span>
-    </div>
+    ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Formation</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Votre espace centre est pret !</p>
   </div>
@@ -169,9 +182,7 @@ export async function sendCentreActivationEmail(params: {
     subject: `Votre centre est maintenant visible sur BYS Formation !`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
-      <span style="color:#fff;font-weight:bold;font-size:18px">BYS</span>
-    </div>
+    ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Felicitations !</h1>
     <p style="color:#4ADE80;margin:8px 0 0;font-size:14px;font-weight:bold">Votre centre est maintenant actif</p>
   </div>
@@ -219,9 +230,7 @@ export async function sendCentreRejectionEmail(params: {
     subject: `BYS Formation — Votre demande d'activation necessite des modifications`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
-      <span style="color:#fff;font-weight:bold;font-size:18px">BYS</span>
-    </div>
+    ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Modifications requises</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">${params.centreName}</p>
   </div>

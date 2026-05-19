@@ -228,6 +228,11 @@ export async function requireComptable(): Promise<User> {
   return requireRole(["COMPTABLE", "ADMIN", "OWNER"])
 }
 
+/** Any platform staff (SUPPORT, COMPTABLE, COMMERCIAL, ADMIN, OWNER) */
+export async function requirePlatformStaff(): Promise<User> {
+  return requireRole(PLATFORM_ROLES)
+}
+
 /** Platform admin (ADMIN or OWNER) */
 export async function requireAdmin(): Promise<User> {
   return requireRole(PLATFORM_ADMIN_ROLES)

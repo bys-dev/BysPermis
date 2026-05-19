@@ -62,6 +62,7 @@ RÈGLES :
 
 CONTEXTE PROJET :
 - Plateforme marketplace stages récupération de points permis
+- SCOPE V1 (mai 2026) : EXCLUSIVEMENT stages de récupération de points. Aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.). Le modèle de données reste extensible, mais ne génère aucun contenu / seed / page / test qui suggère un autre produit.
 - Client : BYS Formation (Sébastien + Bilal)
 - Budget : 10 000 € — 19 semaines — Démarrage 9 mars 2026
 - Stack : Next.js 14 + PostgreSQL + Prisma + Auth0 + Stripe

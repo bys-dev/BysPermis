@@ -134,7 +134,7 @@ describe('slugify', () => {
   })
 
   it('handles special characters', () => {
-    expect(slugify('Permis B — accéléré !')).toBe('permis-b-accelere')
+    expect(slugify('Stage 48N — récupération !')).toBe('stage-48n-recuperation')
   })
 
   it('trims leading and trailing whitespace / hyphens', () => {
@@ -172,7 +172,7 @@ describe('slugify', () => {
   })
 
   it('gere les chiffres dans le texte', () => {
-    expect(slugify('Formation FIMO 140h')).toBe('formation-fimo-140h')
+    expect(slugify('Stage 48N 14h')).toBe('stage-48n-14h')
   })
 
   it('gere un texte uniquement avec des espaces', () => {

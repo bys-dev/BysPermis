@@ -16,7 +16,15 @@ import {
   faArrowUpRightFromSquare,
   faCalendarDays,
   faXmark,
+  faFileInvoice,
+  faGavel,
+  faUserTie,
+  faTriangleExclamation,
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
+import { ImageUploadField } from "@/components/centre/ImageUploadField";
+
+// ─── TYPES ────────────────────────────────────────────────
 
 interface CentreInfo {
   nom: string;
@@ -26,6 +34,21 @@ interface CentreInfo {
   telephone: string;
   email: string;
   stripeOnboardingDone: boolean;
+  // Champs juridiques / facturation
+  raisonSociale?: string | null;
+  siret?: string | null;
+  tva?: string | null;
+  ape?: string | null;
+  iban?: string | null;
+  bic?: string | null;
+  // Mentions / CGV
+  mentionsLegales?: string | null;
+  cgv?: string | null;
+  // Responsable / signature
+  nomResponsable?: string | null;
+  signatureUrl?: string | null;
+  // Override commission
+  commissionRateOverride?: number | null;
 }
 
 interface SubscriptionInfo {
@@ -41,29 +64,78 @@ interface SubscriptionInfo {
   cancelAtPeriodEnd: boolean;
 }
 
-const MOCK: CentreInfo = {
-  nom: "BYS Formation",
-  adresse: "Bât. 7, 9 Chaussée Jules César",
-  codePostal: "95520",
-  ville: "Osny",
-  telephone: "01 30 30 30 30",
-  email: "bysforma95@gmail.com",
-  stripeOnboardingDone: false,
-};
+type TabId =
+  | "identite"
+  | "juridique"
+  | "mentions"
+  | "responsable"
+  | "stripe";
+
+const TABS: { id: TabId; label: string; icon: typeof faBuilding }[] = [
+  { id: "identite", label: "Identite & contact", icon: faBuilding },
+  { id: "juridique", label: "Identite juridique & facturation", icon: faFileInvoice },
+  { id: "mentions", label: "Mentions legales & CGV", icon: faGavel },
+  { id: "responsable", label: "Responsable & signature", icon: faUserTie },
+  { id: "stripe", label: "Stripe Connect", icon: faCreditCard },
+];
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  ACTIVE: { label: "Actif", color: "text-green-400" },
-  PAST_DUE: { label: "Paiement en retard", color: "text-orange-400" },
-  ANNULEE: { label: "Annulé", color: "text-red-400" },
-  TRIALING: { label: "Période d'essai", color: "text-blue-400" },
+  ACTIVE: { label: "Actif", color: "text-blue-400" },
+  PAST_DUE: { label: "Paiement en retard", color: "text-red-400" },
+  ANNULEE: { label: "Annule", color: "text-red-400" },
+  TRIALING: { label: "Periode d'essai", color: "text-blue-400" },
 };
 
+// ─── VALIDATIONS ──────────────────────────────────────────
+
+const IBAN_REGEX = /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/;
+const BIC_REGEX = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+const SIRET_REGEX = /^\d{14}$/;
+const TVA_REGEX = /^[A-Z]{2}[A-Z0-9]{2,12}$/;
+const APE_REGEX = /^\d{4}[A-Z]$/;
+
+function validateField(field: keyof CentreInfo, value: string): string | null {
+  if (!value) return null;
+  const v = value.replace(/\s+/g, "").toUpperCase();
+  switch (field) {
+    case "iban":
+      return IBAN_REGEX.test(v) ? null : "IBAN invalide";
+    case "bic":
+      return BIC_REGEX.test(v) ? null : "BIC invalide";
+    case "siret":
+      return SIRET_REGEX.test(v) ? null : "SIRET doit contenir 14 chiffres";
+    case "tva":
+      return TVA_REGEX.test(v) ? null : "Numero de TVA invalide";
+    case "ape":
+      return APE_REGEX.test(v) ? null : "Code APE invalide (ex: 8559A)";
+    default:
+      return null;
+  }
+}
+
+// ─── STYLES ───────────────────────────────────────────────
+
+const inputClass =
+  "w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all";
+const inputStyle = {
+  background: "rgba(255,255,255,0.07)",
+  border: "1px solid rgba(255,255,255,0.08)",
+};
+const cardStyle = {
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.07)",
+};
+
+// ─── PAGE ─────────────────────────────────────────────────
+
 export default function ParametresCentrePage() {
-  const [form, setForm] = useState<CentreInfo>(MOCK);
+  const [form, setForm] = useState<CentreInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [connectingStripe, setConnectingStripe] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>("identite");
 
   // Subscription state
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
@@ -72,16 +144,14 @@ export default function ParametresCentrePage() {
   const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
-    // Fetch centre info
     fetch("/api/centre/me")
       .then((r) => r.json())
-      .then((data) => {
+      .then((data: CentreInfo) => {
         if (data && data.nom) setForm(data);
       })
       .catch(() => null)
       .finally(() => setLoading(false));
 
-    // Fetch subscription info
     fetch("/api/stripe/subscription")
       .then((r) => r.json())
       .then((data: SubscriptionInfo) => {
@@ -91,8 +161,15 @@ export default function ParametresCentrePage() {
       .finally(() => setLoadingSub(false));
   }, []);
 
+  function update<K extends keyof CentreInfo>(key: K, value: CentreInfo[K]) {
+    if (!form) return;
+    setForm({ ...form, [key]: value });
+  }
+
   async function handleSave() {
+    if (!form) return;
     setSaving(true);
+    setError(null);
     try {
       const res = await fetch("/api/centre/me", {
         method: "PATCH",
@@ -104,16 +181,28 @@ export default function ParametresCentrePage() {
           ville: form.ville,
           telephone: form.telephone,
           email: form.email,
+          raisonSociale: form.raisonSociale ?? null,
+          siret: form.siret ?? null,
+          tva: form.tva ?? null,
+          ape: form.ape ?? null,
+          iban: form.iban ?? null,
+          bic: form.bic ?? null,
+          mentionsLegales: form.mentionsLegales ?? null,
+          cgv: form.cgv ?? null,
+          nomResponsable: form.nomResponsable ?? null,
+          signatureUrl: form.signatureUrl ?? null,
         }),
       });
-      if (res.ok) {
-        const updated = await res.json();
-        setForm(updated);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Erreur serveur");
       }
-    } catch {
-      // silently fail
+      const updated: CentreInfo = await res.json();
+      setForm(updated);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la sauvegarde");
     }
     setSaving(false);
   }
@@ -143,7 +232,12 @@ export default function ParametresCentrePage() {
   }
 
   async function handleCancelSubscription() {
-    if (!confirm("Êtes-vous sûr de vouloir annuler votre abonnement ? Il restera actif jusqu'à la fin de la période en cours.")) return;
+    if (
+      !confirm(
+        "Etes-vous sur de vouloir annuler votre abonnement ? Il restera actif jusqu'a la fin de la periode en cours."
+      )
+    )
+      return;
     setCancelling(true);
     try {
       const res = await fetch("/api/stripe/subscription", { method: "PUT" });
@@ -165,7 +259,7 @@ export default function ParametresCentrePage() {
     setCancelling(false);
   }
 
-  if (loading) {
+  if (loading || !form) {
     return (
       <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
         <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
@@ -174,34 +268,68 @@ export default function ParametresCentrePage() {
     );
   }
 
+  // Validation errors live
+  const ibanError = validateField("iban", form.iban || "");
+  const bicError = validateField("bic", form.bic || "");
+  const siretError = validateField("siret", form.siret || "");
+  const tvaError = validateField("tva", form.tva || "");
+  const apeError = validateField("ape", form.ape || "");
+
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="max-w-3xl space-y-6">
+      {/* Header */}
       <div>
         <h1 className="font-display font-bold text-2xl text-white mb-1">
-          Paramètres
+          Parametres
         </h1>
         <p className="text-gray-500 text-sm">
-          Gérez les informations de votre centre, votre abonnement et votre
+          Gerez les informations de votre centre, votre abonnement et votre
           compte Stripe
         </p>
       </div>
 
-      {/* Infos centre */}
-      <div
-        className="rounded-xl p-6"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faBuilding}
-            className="text-blue-400 w-4 h-4"
-          />
-          Informations du centre
-        </h2>
-        <div className="space-y-4">
+      {/* Error global */}
+      {error && (
+        <div
+          className="flex items-center gap-3 p-4 rounded-lg text-sm"
+          style={{
+            background: "rgba(239,68,68,0.1)",
+            border: "1px solid rgba(239,68,68,0.2)",
+          }}
+        >
+          <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400" />
+          <span className="text-red-400">{error}</span>
+        </div>
+      )}
+
+      {/* Tabs bar */}
+      <div className="border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        <div className="flex gap-1 flex-wrap">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-3 text-sm font-medium transition-all flex items-center gap-2 border-b-2 -mb-px ${
+                activeTab === tab.id
+                  ? "text-blue-400 border-blue-500"
+                  : "text-gray-400 hover:text-white border-transparent"
+              }`}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── TAB: IDENTITE & CONTACT ───────────────────────── */}
+      {activeTab === "identite" && (
+        <div className="rounded-xl p-6 space-y-4" style={cardStyle}>
+          <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+            <FontAwesomeIcon icon={faBuilding} className="text-blue-400 w-4 h-4" />
+            Identite & contact
+          </h2>
+
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-2">
               Nom du centre
@@ -209,14 +337,12 @@ export default function ParametresCentrePage() {
             <input
               type="text"
               value={form.nom}
-              onChange={(e) => setForm({ ...form, nom: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-              style={{
-                background: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
+              onChange={(e) => update("nom", e.target.value)}
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
+
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-2">
               Adresse
@@ -229,17 +355,13 @@ export default function ParametresCentrePage() {
               <input
                 type="text"
                 value={form.adresse}
-                onChange={(e) =>
-                  setForm({ ...form, adresse: e.target.value })
-                }
-                className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
+                onChange={(e) => update("adresse", e.target.value)}
+                className={`${inputClass} pl-9`}
+                style={inputStyle}
               />
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-2">
@@ -248,14 +370,9 @@ export default function ParametresCentrePage() {
               <input
                 type="text"
                 value={form.codePostal}
-                onChange={(e) =>
-                  setForm({ ...form, codePostal: e.target.value })
-                }
-                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
+                onChange={(e) => update("codePostal", e.target.value)}
+                className={inputClass}
+                style={inputStyle}
               />
             </div>
             <div>
@@ -265,19 +382,17 @@ export default function ParametresCentrePage() {
               <input
                 type="text"
                 value={form.ville}
-                onChange={(e) => setForm({ ...form, ville: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
+                onChange={(e) => update("ville", e.target.value)}
+                className={inputClass}
+                style={inputStyle}
               />
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-2">
-                Téléphone
+                Telephone
               </label>
               <div className="relative">
                 <FontAwesomeIcon
@@ -287,14 +402,9 @@ export default function ParametresCentrePage() {
                 <input
                   type="tel"
                   value={form.telephone}
-                  onChange={(e) =>
-                    setForm({ ...form, telephone: e.target.value })
-                  }
-                  className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.07)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                  }}
+                  onChange={(e) => update("telephone", e.target.value)}
+                  className={`${inputClass} pl-9`}
+                  style={inputStyle}
                 />
               </div>
             </div>
@@ -310,293 +420,499 @@ export default function ParametresCentrePage() {
                 <input
                   type="email"
                   value={form.email}
-                  onChange={(e) =>
-                    setForm({ ...form, email: e.target.value })
-                  }
-                  className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.07)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                  }}
+                  onChange={(e) => update("email", e.target.value)}
+                  className={`${inputClass} pl-9`}
+                  style={inputStyle}
                 />
               </div>
             </div>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
-          >
-            {saving ? "Sauvegarde..." : saved ? "Sauvegardé !" : "Sauvegarder"}
-          </button>
         </div>
-      </div>
+      )}
 
-      {/* Abonnement */}
-      <div
-        className="rounded-xl p-6"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faCrown}
-            className="text-blue-400 w-4 h-4"
-          />
-          Abonnement
-        </h2>
+      {/* ─── TAB: JURIDIQUE & FACTURATION ──────────────────── */}
+      {activeTab === "juridique" && (
+        <div className="rounded-xl p-6 space-y-4" style={cardStyle}>
+          <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+            <FontAwesomeIcon icon={faFileInvoice} className="text-blue-400 w-4 h-4" />
+            Identite juridique & facturation
+          </h2>
+          <p className="text-xs text-gray-500">
+            Ces informations apparaitront sur vos contrats et factures.
+          </p>
 
-        {loadingSub ? (
-          <div className="flex items-center gap-3 py-4 text-gray-500">
-            <FontAwesomeIcon
-              icon={faSpinner}
-              className="animate-spin text-sm"
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-2">
+              Raison sociale
+            </label>
+            <input
+              type="text"
+              value={form.raisonSociale || ""}
+              onChange={(e) => update("raisonSociale", e.target.value)}
+              className={inputClass}
+              style={inputStyle}
+              placeholder="Ex: BYS Formations SARL"
             />
-            <span className="text-sm">Chargement...</span>
           </div>
-        ) : subscription?.plan ? (
-          <div className="space-y-4">
-            {/* Plan info */}
-            <div
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{
-                background: "rgba(59,130,246,0.08)",
-                border: "1px solid rgba(59,130,246,0.15)",
-              }}
-            >
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  Plan {subscription.plan.nom}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {subscription.plan.prix}&euro;/mois &middot; Commission{" "}
-                  {subscription.plan.commissionRate}%
-                </p>
-              </div>
-              <div className="text-right">
-                <span
-                  className={`text-xs font-semibold ${
-                    STATUS_LABELS[subscription.status || ""]?.color ||
-                    "text-gray-400"
-                  }`}
-                >
-                  {STATUS_LABELS[subscription.status || ""]?.label ||
-                    subscription.status ||
-                    "Inconnu"}
-                </span>
-              </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-2">
+                SIRET
+              </label>
+              <input
+                type="text"
+                value={form.siret || ""}
+                onChange={(e) => update("siret", e.target.value)}
+                className={inputClass}
+                style={inputStyle}
+                placeholder="14 chiffres"
+              />
+              {siretError && (
+                <p className="text-[11px] text-red-400 mt-1">{siretError}</p>
+              )}
             </div>
-
-            {/* Billing date */}
-            {subscription.currentPeriodEnd && (
-              <div className="flex items-center gap-3 text-sm text-gray-400">
-                <FontAwesomeIcon
-                  icon={faCalendarDays}
-                  className="w-3.5 h-3.5"
-                />
-                <span>
-                  {subscription.cancelAtPeriodEnd
-                    ? "Fin de l'abonnement le "
-                    : "Prochain renouvellement le "}
-                  {new Date(
-                    subscription.currentPeriodEnd
-                  ).toLocaleDateString("fr-FR", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
-            )}
-
-            {subscription.cancelAtPeriodEnd && (
-              <div
-                className="flex items-start gap-3 p-4 rounded-lg"
-                style={{
-                  background: "rgba(251,146,60,0.1)",
-                  border: "1px solid rgba(251,146,60,0.2)",
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={faCircleExclamation}
-                  className="text-orange-400 w-4 h-4 mt-0.5"
-                />
-                <p className="text-xs text-orange-300">
-                  Votre abonnement est programmé pour être annulé. Il restera
-                  actif jusqu&apos;à la fin de la période en cours.
-                </p>
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex flex-wrap gap-3 pt-2">
-              <button
-                onClick={handleOpenPortal}
-                disabled={openingPortal}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
-              >
-                {openingPortal ? (
-                  <FontAwesomeIcon
-                    icon={faSpinner}
-                    className="animate-spin w-3.5 h-3.5"
-                  />
-                ) : (
-                  <FontAwesomeIcon
-                    icon={faArrowUpRightFromSquare}
-                    className="w-3 h-3"
-                  />
-                )}
-                Gérer mon abonnement
-              </button>
-
-              <Link
-                href="/tarifs-partenaires"
-                className="bg-transparent border text-gray-300 hover:text-white hover:border-gray-500 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                style={{ borderColor: "rgba(255,255,255,0.15)" }}
-              >
-                Changer de plan
-              </Link>
-
-              {!subscription.cancelAtPeriodEnd && (
-                <button
-                  onClick={handleCancelSubscription}
-                  disabled={cancelling}
-                  className="text-red-400 hover:text-red-300 px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2"
-                >
-                  {cancelling ? (
-                    <FontAwesomeIcon
-                      icon={faSpinner}
-                      className="animate-spin w-3 h-3"
-                    />
-                  ) : (
-                    <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
-                  )}
-                  Annuler
-                </button>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-2">
+                Code APE / NAF
+              </label>
+              <input
+                type="text"
+                value={form.ape || ""}
+                onChange={(e) => update("ape", e.target.value.toUpperCase())}
+                className={inputClass}
+                style={inputStyle}
+                placeholder="Ex: 8559A"
+              />
+              {apeError && (
+                <p className="text-[11px] text-red-400 mt-1">{apeError}</p>
               )}
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            <div
-              className="flex items-start gap-3 p-4 rounded-lg"
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.07)",
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faCircleExclamation}
-                className="text-gray-500 w-5 h-5 mt-0.5"
-              />
-              <div>
-                <p className="text-sm font-semibold text-gray-300">
-                  Aucun abonnement actif
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Souscrivez un abonnement pour référencer votre centre sur la
-                  marketplace et bénéficier de commissions réduites.
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/tarifs-partenaires"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
-            >
-              <FontAwesomeIcon icon={faCrown} className="w-3.5 h-3.5" />
-              Voir les plans
-            </Link>
-          </div>
-        )}
-      </div>
 
-      {/* Stripe Connect */}
-      <div
-        className="rounded-xl p-6"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faCreditCard}
-            className="text-blue-400 w-4 h-4"
-          />
-          Paiements Stripe Connect
-        </h2>
-
-        {form.stripeOnboardingDone ? (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-green-400/10 border border-green-400/20">
-            <FontAwesomeIcon
-              icon={faCircleCheck}
-              className="text-green-400 w-5 h-5"
-            />
-            <div>
-              <p className="text-sm font-semibold text-green-400">
-                Compte Stripe connecté
-              </p>
-              <p className="text-xs text-gray-500">
-                Vous recevez automatiquement les paiements de chaque
-                réservation (hors commission).
-              </p>
-            </div>
-          </div>
-        ) : (
           <div>
-            <div
-              className="flex items-start gap-3 p-4 rounded-lg mb-4"
-              style={{
-                background: "rgba(251,146,60,0.1)",
-                border: "1px solid rgba(251,146,60,0.2)",
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faCircleExclamation}
-                className="text-orange-400 w-5 h-5 mt-0.5"
-              />
+            <label className="block text-xs font-medium text-gray-500 mb-2">
+              Numero de TVA intracommunautaire
+            </label>
+            <input
+              type="text"
+              value={form.tva || ""}
+              onChange={(e) => update("tva", e.target.value.toUpperCase())}
+              className={inputClass}
+              style={inputStyle}
+              placeholder="Ex: FR12345678901"
+            />
+            {tvaError && (
+              <p className="text-[11px] text-red-400 mt-1">{tvaError}</p>
+            )}
+          </div>
+
+          <div className="pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 mt-3">
+              Coordonnees bancaires
+            </h3>
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <p className="text-sm font-semibold text-orange-400">
-                  Compte Stripe non connecté
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Sans compte Stripe Connect, vous ne pouvez pas recevoir les
-                  paiements. Connectez votre compte pour recevoir les paiements
-                  de chaque réservation.
-                </p>
+                <label className="block text-xs font-medium text-gray-500 mb-2">
+                  IBAN
+                </label>
+                <input
+                  type="text"
+                  value={form.iban || ""}
+                  onChange={(e) => update("iban", e.target.value.toUpperCase())}
+                  className={inputClass}
+                  style={inputStyle}
+                  placeholder="FR76 1234 5678 9012 3456 7890 123"
+                />
+                {ibanError && (
+                  <p className="text-[11px] text-red-400 mt-1">{ibanError}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-2">
+                  BIC / SWIFT
+                </label>
+                <input
+                  type="text"
+                  value={form.bic || ""}
+                  onChange={(e) => update("bic", e.target.value.toUpperCase())}
+                  className={inputClass}
+                  style={inputStyle}
+                  placeholder="Ex: BNPAFRPPXXX"
+                />
+                {bicError && (
+                  <p className="text-[11px] text-red-400 mt-1">{bicError}</p>
+                )}
               </div>
             </div>
-            <button
-              onClick={handleStripeConnect}
-              disabled={connectingStripe}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB: MENTIONS & CGV ───────────────────────────── */}
+      {activeTab === "mentions" && (
+        <div className="space-y-6">
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
+              <FontAwesomeIcon icon={faGavel} className="text-blue-400 w-4 h-4" />
+              Mentions legales
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Apparaitront en pied de contrat. Renseignez votre forme juridique,
+              capital, RCS, etc.
+            </p>
+            <textarea
+              value={form.mentionsLegales || ""}
+              onChange={(e) => update("mentionsLegales", e.target.value)}
+              rows={12}
+              className={inputClass}
+              style={inputStyle}
+              placeholder="SARL au capital de XX EUR, RCS Paris XXX XXX XXX, ..."
+            />
+          </div>
+
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
+              <FontAwesomeIcon icon={faGavel} className="text-blue-400 w-4 h-4" />
+              Conditions generales de vente
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Les CGV seront annexees au contrat et a la facture envoyes au
+              stagiaire.
+            </p>
+            <textarea
+              value={form.cgv || ""}
+              onChange={(e) => update("cgv", e.target.value)}
+              rows={14}
+              className={inputClass}
+              style={inputStyle}
+              placeholder="Article 1 - Objet&#10;Article 2 - Tarifs..."
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB: RESPONSABLE & SIGNATURE ──────────────────── */}
+      {activeTab === "responsable" && (
+        <div className="rounded-xl p-6 space-y-6" style={cardStyle}>
+          <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
+            <FontAwesomeIcon icon={faUserTie} className="text-blue-400 w-4 h-4" />
+            Responsable & signature
+          </h2>
+          <p className="text-xs text-gray-500">
+            Le nom et la signature qui apparaitront en bas des contrats emis par
+            votre centre.
+          </p>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-2">
+              Nom du responsable
+            </label>
+            <input
+              type="text"
+              value={form.nomResponsable || ""}
+              onChange={(e) => update("nomResponsable", e.target.value)}
+              className={inputClass}
+              style={inputStyle}
+              placeholder="Ex: Jean Dupont"
+            />
+          </div>
+
+          <ImageUploadField
+            kind="signature"
+            currentUrl={form.signatureUrl}
+            onUploaded={(url) => update("signatureUrl", url)}
+            label="Signature scannee"
+            hint="PNG transparent recommande, max 800x300px"
+            previewClassName="h-40"
+          />
+        </div>
+      )}
+
+      {/* ─── TAB: STRIPE CONNECT ───────────────────────────── */}
+      {activeTab === "stripe" && (
+        <div className="space-y-6">
+          {/* Abonnement */}
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+              <FontAwesomeIcon icon={faCrown} className="text-blue-400 w-4 h-4" />
+              Abonnement
+            </h2>
+
+            {loadingSub ? (
+              <div className="flex items-center gap-3 py-4 text-gray-500">
+                <FontAwesomeIcon icon={faSpinner} className="animate-spin text-sm" />
+                <span className="text-sm">Chargement...</span>
+              </div>
+            ) : subscription?.plan ? (
+              <div className="space-y-4">
+                <div
+                  className="flex items-center justify-between p-4 rounded-lg"
+                  style={{
+                    background: "rgba(59,130,246,0.08)",
+                    border: "1px solid rgba(59,130,246,0.15)",
+                  }}
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      Plan {subscription.plan.nom}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {subscription.plan.prix}&euro;/mois &middot; Commission{" "}
+                      {subscription.plan.commissionRate}%
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span
+                      className={`text-xs font-semibold ${
+                        STATUS_LABELS[subscription.status || ""]?.color ||
+                        "text-gray-400"
+                      }`}
+                    >
+                      {STATUS_LABELS[subscription.status || ""]?.label ||
+                        subscription.status ||
+                        "Inconnu"}
+                    </span>
+                  </div>
+                </div>
+
+                {subscription.currentPeriodEnd && (
+                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                    <FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5" />
+                    <span>
+                      {subscription.cancelAtPeriodEnd
+                        ? "Fin de l'abonnement le "
+                        : "Prochain renouvellement le "}
+                      {new Date(subscription.currentPeriodEnd).toLocaleDateString(
+                        "fr-FR",
+                        { day: "numeric", month: "long", year: "numeric" }
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {subscription.cancelAtPeriodEnd && (
+                  <div
+                    className="flex items-start gap-3 p-4 rounded-lg"
+                    style={{
+                      background: "rgba(239,68,68,0.08)",
+                      border: "1px solid rgba(239,68,68,0.2)",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCircleExclamation}
+                      className="text-red-400 w-4 h-4 mt-0.5"
+                    />
+                    <p className="text-xs text-red-300">
+                      Votre abonnement est programme pour etre annule. Il restera
+                      actif jusqu&apos;a la fin de la periode en cours.
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <button
+                    onClick={handleOpenPortal}
+                    disabled={openingPortal}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+                  >
+                    {openingPortal ? (
+                      <FontAwesomeIcon
+                        icon={faSpinner}
+                        className="animate-spin w-3.5 h-3.5"
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faArrowUpRightFromSquare}
+                        className="w-3 h-3"
+                      />
+                    )}
+                    Gerer mon abonnement
+                  </button>
+
+                  <Link
+                    href="/tarifs-partenaires"
+                    className="bg-transparent border text-gray-300 hover:text-white hover:border-gray-500 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                    style={{ borderColor: "rgba(255,255,255,0.15)" }}
+                  >
+                    Changer de plan
+                  </Link>
+
+                  {!subscription.cancelAtPeriodEnd && (
+                    <button
+                      onClick={handleCancelSubscription}
+                      disabled={cancelling}
+                      className="text-red-400 hover:text-red-300 px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2"
+                    >
+                      {cancelling ? (
+                        <FontAwesomeIcon
+                          icon={faSpinner}
+                          className="animate-spin w-3 h-3"
+                        />
+                      ) : (
+                        <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
+                      )}
+                      Annuler
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div
+                  className="flex items-start gap-3 p-4 rounded-lg"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faCircleExclamation}
+                    className="text-gray-500 w-5 h-5 mt-0.5"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-300">
+                      Aucun abonnement actif
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Souscrivez un abonnement pour referencer votre centre sur
+                      la marketplace et beneficier de commissions reduites.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/tarifs-partenaires"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                >
+                  <FontAwesomeIcon icon={faCrown} className="w-3.5 h-3.5" />
+                  Voir les plans
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Stripe Connect */}
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+              <FontAwesomeIcon icon={faCreditCard} className="text-blue-400 w-4 h-4" />
+              Paiements Stripe Connect
+            </h2>
+
+            {form.stripeOnboardingDone ? (
+              <div
+                className="flex items-center gap-3 p-4 rounded-lg"
+                style={{
+                  background: "rgba(59,130,246,0.08)",
+                  border: "1px solid rgba(59,130,246,0.2)",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faCircleCheck}
+                  className="text-blue-400 w-5 h-5"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-blue-400">
+                    Compte Stripe connecte
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Vous recevez automatiquement les paiements de chaque
+                    reservation (hors commission).
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div
+                  className="flex items-start gap-3 p-4 rounded-lg mb-4"
+                  style={{
+                    background: "rgba(239,68,68,0.08)",
+                    border: "1px solid rgba(239,68,68,0.2)",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faCircleExclamation}
+                    className="text-red-400 w-5 h-5 mt-0.5"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-red-400">
+                      Compte Stripe non connecte
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Sans compte Stripe Connect, vous ne pouvez pas recevoir
+                      les paiements. Connectez votre compte pour recevoir les
+                      paiements de chaque reservation.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleStripeConnect}
+                  disabled={connectingStripe}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+                >
+                  {connectingStripe && (
+                    <FontAwesomeIcon
+                      icon={faSpinner}
+                      className="animate-spin w-3.5 h-3.5"
+                    />
+                  )}
+                  {connectingStripe ? "Redirection..." : "Connecter Stripe"}
+                </button>
+              </div>
+            )}
+
+            <div
+              className="mt-4 pt-4 border-t text-xs text-gray-600"
+              style={{ borderColor: "rgba(255,255,255,0.07)" }}
             >
-              {connectingStripe && (
+              Commission appliquee :{" "}
+              <span className="text-gray-300 font-medium">
+                {form.commissionRateOverride !== null &&
+                form.commissionRateOverride !== undefined
+                  ? `${form.commissionRateOverride}% (override centre)`
+                  : subscription?.plan
+                  ? `${subscription.plan.commissionRate}% (plan)`
+                  : "COMMISSION_RATE global"}
+              </span>{" "}
+              &middot; Versements sous 2 jours ouvres
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── SAVE BUTTON (sauf onglet Stripe) ──────────────── */}
+      {activeTab !== "stripe" && (
+        <div className="flex items-center gap-4 pt-2">
+          <button
+            onClick={handleSave}
+            disabled={
+              saving ||
+              !!ibanError ||
+              !!bicError ||
+              !!siretError ||
+              !!tvaError ||
+              !!apeError
+            }
+            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+          >
+            {saving ? (
+              <>
                 <FontAwesomeIcon
                   icon={faSpinner}
                   className="animate-spin w-3.5 h-3.5"
                 />
-              )}
-              {connectingStripe ? "Redirection..." : "Connecter Stripe ->"}
-            </button>
-          </div>
-        )}
-
-        <div
-          className="mt-4 pt-4 border-t text-xs text-gray-600"
-          style={{ borderColor: "rgba(255,255,255,0.07)" }}
-        >
-          Commission BYS Formation :{" "}
-          <span className="text-gray-400 font-medium">
-            {subscription?.plan
-              ? `${subscription.plan.commissionRate}%`
-              : "10%"}
-          </span>{" "}
-          par réservation · Versements sous 2 jours ouvrés
+                Sauvegarde...
+              </>
+            ) : saved ? (
+              <>
+                <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
+                Sauvegarde !
+              </>
+            ) : (
+              "Sauvegarder"
+            )}
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

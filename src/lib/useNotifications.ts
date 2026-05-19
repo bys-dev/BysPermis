@@ -18,12 +18,33 @@ interface UseNotificationsReturn {
   refresh: () => Promise<void>;
 }
 
-export function useNotifications(interval = 30000): UseNotificationsReturn {
+interface UseNotificationsOptions {
+  /** Polling interval in ms (defaults to 30s). */
+  interval?: number;
+  /**
+   * Whether to actually fetch. Pass `false` for anonymous visitors to avoid
+   * sending an authenticated request the API would reject — this keeps the
+   * hook cheap on public pages.
+   */
+  enabled?: boolean;
+}
+
+export function useNotifications(
+  optionsOrInterval: UseNotificationsOptions | number = {},
+): UseNotificationsReturn {
+  const options: UseNotificationsOptions =
+    typeof optionsOrInterval === "number"
+      ? { interval: optionsOrInterval }
+      : optionsOrInterval;
+  const interval = options.interval ?? 30000;
+  const enabled = options.enabled ?? true;
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchNotifications = useCallback(async () => {
+    if (!enabled) return;
     try {
       const res = await fetch("/api/notifications");
       if (!res.ok) return;
@@ -35,7 +56,7 @@ export function useNotifications(interval = 30000): UseNotificationsReturn {
     } catch {
       // Silently fail — notifications are non-critical
     }
-  }, []);
+  }, [enabled]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {
@@ -68,6 +89,7 @@ export function useNotifications(interval = 30000): UseNotificationsReturn {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     // Initial fetch
     fetchNotifications();
 
@@ -104,7 +126,7 @@ export function useNotifications(interval = 30000): UseNotificationsReturn {
       stopPolling();
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [fetchNotifications, interval]);
+  }, [enabled, fetchNotifications, interval]);
 
   return {
     unreadCount,

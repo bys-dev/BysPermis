@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebookF, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
@@ -11,20 +12,19 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 mb-10 sm:mb-12">
           {/* Brand */}
           <div className="col-span-1 lg:col-span-2">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-10 h-10 bg-brand-accent rounded-lg flex items-center justify-center">
-                <span className="text-white font-display font-bold text-lg">
-                  BYS
-                </span>
-              </div>
-              <span className="font-display font-semibold text-xl text-white">
-                BYS Formation
-              </span>
+            <div className="mb-6">
+              <Image
+                src="/transparent-logo.svg"
+                alt="BYS Formation"
+                width={200}
+                height={50}
+                className="h-12 w-auto brightness-0 invert"
+              />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
-              Le groupe BYS Formation est votre partenaire de confiance pour les
-              stages de récupération de points permis et les formations
-              professionnelles liées à la mobilité. Agréé Ministère de
+              BYS Formation Permis est la marketplace de référence pour les stages
+              agréés de récupération de points du permis de conduire. Tous nos
+              centres partenaires sont agréés par le Ministère de
               l&apos;Intérieur.
             </p>
 
@@ -70,42 +70,42 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/formations/recuperation-de-points"
-                  className="hover:text-white transition-colors"
-                >
-                  Récupération de points
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/formations/permis-b-accelere"
-                  className="hover:text-white transition-colors"
-                >
-                  Permis B accéléré
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/formations/fimo-fco"
-                  className="hover:text-white transition-colors"
-                >
-                  FIMO / FCO
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/formations/sensibilisation-securite-routiere"
-                  className="hover:text-white transition-colors"
-                >
-                  Sensibilisation sécurité routière
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/recherche"
                   className="hover:text-white transition-colors"
                 >
-                  Toutes les formations
+                  Trouver un stage
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/paris"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Paris
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/lyon"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Lyon
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/marseille"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Marseille
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/comment-ca-marche"
+                  className="hover:text-white transition-colors"
+                >
+                  Comment ça marche
                 </Link>
               </li>
             </ul>
@@ -198,8 +198,8 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="text-xs sm:text-sm text-gray-500 text-center lg:text-left">
-              © 2026 BYS Formation — SAS — SIRET : 987 512 381 00011 — Bât. 7,
-              9 Chaussée Jules César, 95520 Osny
+              © 2026 BYS Formation Permis — édité par BYS Formation SAS —
+              SIRET : 987 512 381 00011 — Bât. 7, 9 Chaussée Jules César, 95520 Osny
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-sm">
               <Link

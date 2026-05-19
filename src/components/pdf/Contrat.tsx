@@ -3,6 +3,7 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 
@@ -12,13 +13,21 @@ export interface ContratData {
   dateEmission: string;
   organisme: {
     nom: string;
+    raisonSociale?: string;
     siret?: string;
+    tva?: string;
+    ape?: string;
     adresse: string;
     codePostal: string;
     ville: string;
     email?: string;
     telephone?: string;
     numDeclarationActivite?: string;
+    logoUrl?: string;
+    signatureUrl?: string;
+    nomResponsable?: string;
+    mentionsLegales?: string;
+    cgv?: string;
   };
   stagiaire: {
     civilite?: string;
@@ -88,8 +97,25 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   logoText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 12 },
+  logoImage: { width: 40, height: 40, objectFit: "contain" },
+  signatureImage: { width: 110, height: 50, objectFit: "contain", marginBottom: 4 },
+  legalSection: {
+    marginTop: 12,
+    paddingTop: 10,
+    borderTop: `1px solid ${colors.border}`,
+  },
+  legalSectionTitle: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 8,
+    color: colors.gray,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  legalSectionText: { fontSize: 7, color: colors.gray, lineHeight: 1.5 },
   headerTitle: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 16, marginTop: 3 },
   headerSub: { color: "#9CA3AF", fontSize: 8, marginTop: 2 },
   contratBadge: {
@@ -257,8 +283,8 @@ export function Contrat({ data }: { data: ContratData }) {
 
   return (
     <Document
-      title={`Contrat de formation ${numeroContrat} — BYS Formation`}
-      author="BYS Formation"
+      title={`Contrat de formation ${numeroContrat} — ${organisme.nom}`}
+      author={organisme.nom}
       subject={`Contrat ${formation.titre} — ${stagiaire.prenom} ${stagiaire.nom}`}
     >
       <Page size="A4" style={styles.page}>
@@ -266,10 +292,16 @@ export function Contrat({ data }: { data: ContratData }) {
         <View style={styles.header}>
           <View>
             <View style={styles.logoBox}>
-              <Text style={styles.logoText}>BYS</Text>
+              {organisme.logoUrl ? (
+                <Image src={organisme.logoUrl} style={styles.logoImage} />
+              ) : (
+                <Text style={styles.logoText}>
+                  {(organisme.raisonSociale ?? organisme.nom).slice(0, 3).toUpperCase()}
+                </Text>
+              )}
             </View>
-            <Text style={styles.headerTitle}>BYS Formation</Text>
-            <Text style={styles.headerSub}>Plateforme de stages agrees Prefecture</Text>
+            <Text style={styles.headerTitle}>{organisme.raisonSociale ?? organisme.nom}</Text>
+            <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>
           </View>
           <View style={styles.contratBadge}>
             <Text style={styles.contratBadgeText}>CONTRAT</Text>
@@ -314,12 +346,24 @@ export function Contrat({ data }: { data: ContratData }) {
               <Text style={styles.cardTitle}>L&apos;organisme de formation</Text>
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Raison sociale</Text>
-                <Text style={styles.rowValue}>{organisme.nom}</Text>
+                <Text style={styles.rowValue}>{organisme.raisonSociale ?? organisme.nom}</Text>
               </View>
               {organisme.siret && (
                 <View style={styles.row}>
                   <Text style={styles.rowLabel}>SIRET</Text>
                   <Text style={styles.rowValue}>{organisme.siret}</Text>
+                </View>
+              )}
+              {organisme.tva && (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>N° TVA</Text>
+                  <Text style={styles.rowValue}>{organisme.tva}</Text>
+                </View>
+              )}
+              {organisme.ape && (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Code APE</Text>
+                  <Text style={styles.rowValue}>{organisme.ape}</Text>
                 </View>
               )}
               <View style={styles.row}>
@@ -509,9 +553,14 @@ export function Contrat({ data }: { data: ContratData }) {
           <View style={styles.signBlock}>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>Pour l&apos;organisme de formation</Text>
-              <Text style={styles.signSubtitle}>Cachet et signature</Text>
+              <Text style={styles.signSubtitle}>
+                {organisme.nomResponsable ? `Représenté par ${organisme.nomResponsable}` : "Cachet et signature"}
+              </Text>
+              {organisme.signatureUrl ? (
+                <Image src={organisme.signatureUrl} style={styles.signatureImage} />
+              ) : null}
               <View style={styles.signLine} />
-              <Text style={styles.signLabel}>Fait a {organisme.ville}, le {dateEmission}</Text>
+              <Text style={styles.signLabel}>Fait à {organisme.ville}, le {dateEmission}</Text>
             </View>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>Le stagiaire</Text>
@@ -520,19 +569,40 @@ export function Contrat({ data }: { data: ContratData }) {
               <Text style={styles.signLabel}>{stagiaire.prenom} {stagiaire.nom}</Text>
             </View>
           </View>
+
+          {/* ── Mentions légales / CGV ── */}
+          {organisme.mentionsLegales ? (
+            <View style={styles.legalSection}>
+              <Text style={styles.legalSectionTitle}>Mentions légales</Text>
+              <Text style={styles.legalSectionText}>{organisme.mentionsLegales}</Text>
+            </View>
+          ) : null}
+          {organisme.cgv ? (
+            <View style={styles.legalSection}>
+              <Text style={styles.legalSectionTitle}>Conditions générales de vente</Text>
+              <Text style={styles.legalSectionText}>{organisme.cgv}</Text>
+            </View>
+          ) : null}
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerBrand}>BYS Formation — bysforma95@gmail.com</Text>
-          <Text style={styles.footerText}>Bat. 7, 9 Chaussee Jules Cesar, 95520 Osny</Text>
-          <Text style={styles.footerText}>SIRET : 908 058 092 00028</Text>
+          <Text style={styles.footerBrand}>
+            {organisme.raisonSociale ?? organisme.nom}
+            {organisme.email ? ` — ${organisme.email}` : ""}
+          </Text>
+          <Text style={styles.footerText}>
+            {organisme.adresse}, {organisme.codePostal} {organisme.ville}
+          </Text>
+          <Text style={styles.footerText}>
+            {organisme.siret ? `SIRET : ${organisme.siret}` : ""}
+          </Text>
         </View>
         <View style={{ backgroundColor: colors.navy, paddingHorizontal: 40, paddingBottom: 8 }}>
           <Text style={styles.footerLegal}>
-            Contrat de formation professionnelle etabli conformement aux articles L.6353-1 et suivants du Code du travail.
-            {"\n"}BYS Formation — SIRET 908 058 092 00028 — Bat. 7, 9 Chaussee Jules Cesar, 95520 Osny
-            {"\n"}N. de contrat : {numeroContrat} — Genere le {dateEmission}
+            Contrat de formation professionnelle établi conformément aux articles L.6353-1 et suivants du Code du travail.
+            {"\n"}{organisme.raisonSociale ?? organisme.nom}{organisme.siret ? ` — SIRET ${organisme.siret}` : ""}{organisme.tva ? ` — TVA ${organisme.tva}` : ""}
+            {"\n"}N° de contrat : {numeroContrat} — Généré le {dateEmission}
           </Text>
         </View>
       </Page>

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { resend } from "@/lib/email";
 import { formatDate } from "@/lib/utils";
+import { renderConvocationPdf } from "@/lib/pdf-helpers";
 
 const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
 const CRON_SECRET = process.env.CRON_SECRET;
@@ -73,11 +74,29 @@ export async function GET(req: NextRequest) {
             variables
           );
 
+          // Joint la convocation PDF au rappel J-2 (best-effort).
+          const convocationPdf = await renderConvocationPdf(reservation.id).catch(
+            (err) => {
+              console.error(
+                `[CRON] Erreur rendu convocation PDF pour ${reservation.numero}:`,
+                err
+              );
+              return null;
+            }
+          );
+
           await resend.emails.send({
             from: FROM,
             to: reservation.email,
             subject,
             html,
+            ...(convocationPdf
+              ? {
+                  attachments: [
+                    { filename: convocationPdf.filename, content: convocationPdf.buffer },
+                  ],
+                }
+              : {}),
           });
 
           // Mark as notified
