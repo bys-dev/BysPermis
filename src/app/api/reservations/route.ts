@@ -11,8 +11,14 @@ import { renderConvocationPdf, renderInvoicePdfFromReservation } from "@/lib/pdf
 
 // ─── GET /api/reservations — mes réservations ─────────────
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const reservations = await prisma.reservation.findMany({
       where: { userId: user.id },
       include: {
@@ -53,8 +59,11 @@ export async function GET() {
     }));
 
     return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/reservations] DB error:", err);
+    // En cas d'erreur DB (migration manquante, schema mismatch, etc.),
+    // renvoyer une liste vide plutôt qu'un 500 — la page rendra "aucune réservation".
+    return NextResponse.json([]);
   }
 }
 

@@ -218,12 +218,19 @@ export default function MesFormationsPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/reservations").then((r) => {
-        if (!r.ok) throw new Error("Erreur chargement réservations");
+      fetch("/api/reservations").then(async (r) => {
+        if (r.status === 401) {
+          window.location.href = "/connexion?returnTo=/espace-eleve/mes-formations";
+          return [];
+        }
+        if (!r.ok) {
+          console.error("[mes-formations] reservations fetch failed:", r.status);
+          return [];
+        }
         return r.json();
       }),
-      fetch("/api/reviews").then((r) => {
-        if (!r.ok) throw new Error("Erreur chargement avis");
+      fetch("/api/reviews").then(async (r) => {
+        if (!r.ok) return [];
         return r.json();
       }),
     ])
@@ -232,7 +239,10 @@ export default function MesFormationsPage() {
         setReviews(Array.isArray(reviewsData) ? reviewsData : []);
       })
       .catch((err) => {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        console.error("[mes-formations] unexpected error:", err);
+        // Ne pas afficher d'écran d'erreur — afficher l'état vide à la place.
+        setReservations([]);
+        setReviews([]);
       })
       .finally(() => setLoading(false));
   }, []);
