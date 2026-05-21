@@ -46,10 +46,10 @@ export default function HeroSearchForm() {
             />
             <input
               type="text"
-              placeholder="Récupération de points, 48N..."
+              placeholder="Stage 48N, récup points…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 text-sm sm:text-base transition-all duration-200"
             />
           </div>
         </div>
@@ -64,10 +64,10 @@ export default function HeroSearchForm() {
             />
             <input
               type="text"
-              placeholder="Paris, 95000, Lyon..."
+              placeholder="Ville ou code postal"
               value={ville}
               onChange={(e) => setVille(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-400 text-sm sm:text-base transition-all duration-200"
             />
           </div>
         </div>

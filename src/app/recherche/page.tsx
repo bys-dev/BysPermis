@@ -485,8 +485,8 @@ function RechercheInner() {
           {/* Filters sidebar */}
           <aside
             className={`${
-              mobileFiltersOpen ? "fixed inset-0 z-50 bg-white p-6 overflow-y-auto" : "hidden"
-            } lg:block lg:static lg:bg-transparent lg:p-0 w-full lg:w-72 shrink-0`}
+              mobileFiltersOpen ? "fixed inset-0 z-50 bg-white p-4 sm:p-6 overflow-y-auto overflow-x-hidden" : "hidden"
+            } lg:block lg:static lg:bg-transparent lg:p-0 w-full lg:w-72 shrink-0 min-w-0`}
           >
             {/* Mobile close */}
             <div className="flex items-center justify-between mb-6 lg:hidden">
@@ -720,7 +720,7 @@ function RechercheInner() {
 
             {/* Active filters pills */}
             {hasActiveFilters && (
-              <div className="flex flex-wrap sm:flex-wrap gap-2 mb-6 overflow-x-auto pb-1 -mx-1 px-1">
+              <div className="flex flex-wrap gap-2 mb-6 pb-1 -mx-1 px-1 min-w-0">
                 {searchQuery && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
                     &laquo; {searchQuery} &raquo;
@@ -787,7 +787,7 @@ function RechercheInner() {
                 <div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : stages.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
                 {stages.map((stage) => (
                   <div
                     key={stage.id}
