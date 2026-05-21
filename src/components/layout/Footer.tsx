@@ -228,6 +228,28 @@ export default function Footer() {
               </Link>
             </div>
           </div>
+
+          {/* Signature prestataire — Magar Développement */}
+          <div className="mt-8 pt-6 border-t border-gray-800/50 flex flex-col items-center gap-2">
+            <a
+              href="https://magar-developpement.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity"
+              aria-label="Site développé par Magar Développement"
+            >
+              <span className="text-[11px] text-gray-500 uppercase tracking-wider">
+                Conçu et développé par
+              </span>
+              <Image
+                src="/magar-dev-logo.svg"
+                alt="Magar Développement"
+                width={120}
+                height={32}
+                className="h-7 w-auto"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
