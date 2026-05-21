@@ -6,9 +6,14 @@ import { getUserCentreId } from "@/lib/centre-utils";
 
 // GET /api/centre/completion — Get profile completion data for the current centre
 export async function GET() {
+  let user;
   try {
-    const user = await requireCentreStaff();
+    user = await requireCentreStaff();
+  } catch {
+    return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+  }
 
+  try {
     const centreId = await getUserCentreId(user.id, user.role);
     if (!centreId) {
       return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
@@ -51,7 +56,8 @@ export async function GET() {
       hasFormations: centre.formations.length > 0,
       hasFormationsWithSessions: activeFormationsWithSessions > 0,
     });
-  } catch {
-    return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/centre/completion] DB error:", err);
+    return NextResponse.json(null);
   }
 }

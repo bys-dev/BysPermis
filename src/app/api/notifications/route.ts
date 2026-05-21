@@ -5,15 +5,22 @@ import { z } from "zod";
 
 // ─── GET /api/notifications — toutes les notifications de l'utilisateur ───
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const notifications = await prisma.notification.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(notifications);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/notifications] DB error:", err);
+    return NextResponse.json([]);
   }
 }
 

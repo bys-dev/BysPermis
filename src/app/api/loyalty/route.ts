@@ -5,9 +5,14 @@ import { z } from "zod";
 
 // ─── GET /api/loyalty — points, niveau, historique ───────
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
 
+  try {
     const dbUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id },
       select: { totalPoints: true, loyaltyLevel: true, referralCode: true },
@@ -44,8 +49,9 @@ export async function GET() {
       pointsToNextLevel,
       history,
     });
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/loyalty] DB error:", err);
+    return NextResponse.json(null);
   }
 }
 

@@ -5,8 +5,14 @@ import { requireAuth } from "@/lib/auth0";
 
 // GET /api/tickets — mes tickets
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const tickets = await prisma.ticket.findMany({
       where: { userId: user.id },
       include: {
@@ -18,8 +24,9 @@ export async function GET() {
       orderBy: { updatedAt: "desc" },
     });
     return NextResponse.json(tickets);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/tickets] DB error:", err);
+    return NextResponse.json([]);
   }
 }
 

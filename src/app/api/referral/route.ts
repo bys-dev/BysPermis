@@ -5,9 +5,14 @@ import { z } from "zod";
 
 // ─── GET /api/referral — infos parrainage de l'utilisateur ──
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
 
+  try {
     const dbUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id },
       select: { referralCode: true },
@@ -34,8 +39,9 @@ export async function GET() {
       totalReferralPoints,
       shareUrl: `https://bysformation.com/inscription?ref=${dbUser.referralCode}`,
     });
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/referral] DB error:", err);
+    return NextResponse.json(null);
   }
 }
 

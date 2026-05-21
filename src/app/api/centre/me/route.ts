@@ -26,8 +26,14 @@ const centreSelect = {
 
 // GET /api/centre/me
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const centreId = await getUserCentreId(user.id, user.role);
     if (!centreId) return NextResponse.json({ error: "Aucun centre" }, { status: 404 });
     const centre = await prisma.centre.findUnique({
@@ -36,8 +42,9 @@ export async function GET() {
     });
     if (!centre) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
     return NextResponse.json(centre);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/centre/me] DB error:", err);
+    return NextResponse.json(null);
   }
 }
 

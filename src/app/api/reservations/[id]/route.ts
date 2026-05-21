@@ -9,8 +9,14 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const { id } = await params;
 
     const reservation = await prisma.reservation.findUnique({
@@ -88,8 +94,9 @@ export async function GET(
     };
 
     return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/reservations/[id]] DB error:", err);
+    return NextResponse.json(null);
   }
 }
 

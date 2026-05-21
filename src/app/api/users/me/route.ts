@@ -40,8 +40,14 @@ async function deleteAuth0User(auth0Id: string): Promise<void> {
 
 // ─── GET /api/users/me — profil complet ─────────────────
 export async function GET() {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const profile = await prisma.user.findUnique({
       where: { id: user.id },
       select: {
@@ -68,8 +74,9 @@ export async function GET() {
       return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
     }
     return NextResponse.json(profile);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/users/me] DB error:", err);
+    return NextResponse.json(null);
   }
 }
 

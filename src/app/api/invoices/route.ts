@@ -4,8 +4,14 @@ import { requireAuth } from "@/lib/auth0";
 
 // GET /api/invoices — list invoices for current user (or all if admin)
 export async function GET(req: NextRequest) {
+  let user;
   try {
-    const user = await requireAuth();
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  try {
     const { searchParams } = new URL(req.url);
     const typeFilter = searchParams.get("type");
 
@@ -54,7 +60,8 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  } catch (err) {
+    console.error("[GET /api/invoices] DB error:", err);
+    return NextResponse.json([]);
   }
 }
