@@ -489,15 +489,25 @@ export default async function Home() {
         </section>
 
         {/* ═══ 2. KEY NUMBERS BAR ═══ */}
-        <section className="py-5 px-4 sm:px-8 bg-red-600">
+        <section className="py-6 px-4 sm:px-8 bg-red-600">
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-5 lg:gap-8">
               {keyStats.map((stat) => (
-                <div key={stat.label} className="flex items-center justify-center gap-3 text-white">
-                  <FontAwesomeIcon icon={stat.icon} className="text-white/80 text-lg" />
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-display font-bold">{stat.value}</span>
-                    <span className="text-sm text-red-100">{stat.label}</span>
+                <div
+                  key={stat.label}
+                  className="flex flex-col sm:flex-row items-center sm:justify-center text-center sm:text-left gap-1 sm:gap-3 text-white min-w-0"
+                >
+                  <FontAwesomeIcon
+                    icon={stat.icon}
+                    className="text-white/80 text-base sm:text-lg shrink-0"
+                  />
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5 min-w-0">
+                    <span className="text-xl sm:text-2xl font-display font-bold whitespace-nowrap leading-tight">
+                      {stat.value}
+                    </span>
+                    <span className="text-xs sm:text-sm text-red-100 leading-tight">
+                      {stat.label}
+                    </span>
                   </div>
                 </div>
               ))}
