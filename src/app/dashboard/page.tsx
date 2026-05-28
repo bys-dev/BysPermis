@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth0"
+import { getCurrentUser, getDashboardPathForRole } from "@/lib/auth0"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 
@@ -48,21 +48,5 @@ export default async function DashboardRedirectPage() {
     }
   }
 
-  const role = user.role
-
-  // Redirect to the appropriate dashboard based on role
-  if (role === "OWNER" || role === "ADMIN") {
-    redirect("/admin/dashboard")
-  }
-
-  if (role.startsWith("CENTRE_")) {
-    redirect("/espace-centre/dashboard")
-  }
-
-  if (["SUPPORT", "COMPTABLE", "COMMERCIAL"].includes(role)) {
-    redirect("/plateforme/dashboard")
-  }
-
-  // Default: ELEVE
-  redirect("/espace-eleve")
+  redirect(getDashboardPathForRole(user.role))
 }

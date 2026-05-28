@@ -8,6 +8,7 @@
 import "dotenv/config";
 
 const USER_ROLE: Record<string, string> = {
+  "bysandrys95@gmail.com": "OWNER",
   "sebastien@bys-formation.fr": "OWNER",
   "admin@bys-formation.fr": "ADMIN",
   "support@bys-formation.fr": "SUPPORT",
@@ -66,15 +67,26 @@ async function main() {
       continue;
     }
 
-    // 3. Assigner le rôle natif
+    // 3. Assigner le rôle natif + synchroniser app_metadata (lu par l'Action post-login)
     const res = await fetch(`https://${domain}/api/v2/roles/${rid}/users`, {
       method: "POST",
       headers: H,
       body: JSON.stringify({ users: [userId] }),
     });
-    if (res.ok || res.status === 204) {
-      console.log(`✅ ${email} → ${role}`);
+    const roleOk = res.ok || res.status === 204;
+
+    const metaRes = await fetch(`https://${domain}/api/v2/users/${encodeURIComponent(userId)}`, {
+      method: "PATCH",
+      headers: H,
+      body: JSON.stringify({ app_metadata: { role } }),
+    });
+    const metaOk = metaRes.ok;
+
+    if (roleOk && metaOk) {
+      console.log(`✅ ${email} → ${role} (natif + app_metadata)`);
       assigned++;
+    } else if (roleOk) {
+      console.log(`⚠️  ${email} → ${role} natif OK, app_metadata échec: ${metaRes.status}`);
     } else {
       console.log(`❌ ${email} → ${role} : ${res.status} ${await res.text()}`);
     }

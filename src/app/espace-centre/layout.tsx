@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EspaceCentreClientLayout from "./EspaceCentreClientLayout";
+import { CENTRE_SPACE_ROLES, requireSpaceAccess } from "@/lib/require-space-access";
 
 export const metadata: Metadata = {
   robots: {
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EspaceCentreLayout({ children }: { children: React.ReactNode }) {
+export default async function EspaceCentreLayout({ children }: { children: React.ReactNode }) {
+  await requireSpaceAccess(CENTRE_SPACE_ROLES, "/espace-centre/dashboard");
   return <EspaceCentreClientLayout>{children}</EspaceCentreClientLayout>;
 }

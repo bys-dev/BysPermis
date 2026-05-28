@@ -56,12 +56,14 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
 
   useEffect(() => {
     fetch("/api/admin/me")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && data.role) setUser(data);
-        else setUser({ prenom: "Admin", nom: "", role: "ADMIN" });
+      .then((r) => {
+        if (!r.ok) throw new Error("unauthorized");
+        return r.json();
       })
-      .catch(() => setUser({ prenom: "Admin", nom: "", role: "ADMIN" }));
+      .then((data) => {
+        if (data?.role) setUser(data);
+      })
+      .catch(() => setUser(null));
   }, []);
 
   const isOwner = user?.role === "OWNER";

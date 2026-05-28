@@ -1,27 +1,19 @@
 /**
- * Crée (ou met à jour) l'Action Auth0 "Add role to ID token" et la binde
- * au flow Post-Login, via la Management API.
+ * Crée / met à jour / déploie / binde l'Action Auth0 Post-Login BYS Permis.
  *
  * Pré-requis .env : AUTH0_DOMAIN, AUTH0_MANAGEMENT_CLIENT_ID, AUTH0_MANAGEMENT_CLIENT_SECRET
- * Le M2M doit avoir les scopes : read/create/update/delete:actions.
+ * (ou AUTH0_CLIENT_ID / AUTH0_CLIENT_SECRET si M2M sur la même app)
  *
  * Lancement : npx tsx scripts/setup-auth0-action.ts
  */
 
 import "dotenv/config";
-
-const ACTION_NAME = "Add role to ID token";
-const NAMESPACE = "https://byspermis.fr";
-
-const ACTION_CODE = `exports.onExecutePostLogin = async (event, api) => {
-  const namespace = '${NAMESPACE}';
-  // Source de vérité : Role natif Auth0 assigné à l'utilisateur.
-  // Fallback : app_metadata.role (legacy), puis ELEVE par défaut.
-  const nativeRole = event.authorization && event.authorization.roles && event.authorization.roles[0];
-  const role = nativeRole || (event.user.app_metadata && event.user.app_metadata.role) || 'ELEVE';
-  api.idToken.setCustomClaim(namespace + '/role', role);
-  api.accessToken.setCustomClaim(namespace + '/role', role);
-};`;
+import {
+  AUTH0_ACTION_NAME,
+  AUTH0_LEGACY_ACTION_NAME,
+  AUTH0_POST_LOGIN_ACTION_CODE,
+  AUTH0_ROLE_NAMESPACE,
+} from "./auth0-action-code";
 
 async function getToken(domain: string, id: string, secret: string): Promise<string> {
   const res = await fetch(`https://${domain}/oauth/token`, {
@@ -65,8 +57,8 @@ async function api(
 
 async function main() {
   const domain = process.env.AUTH0_DOMAIN!;
-  const clientId = process.env.AUTH0_MANAGEMENT_CLIENT_ID!;
-  const clientSecret = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET!;
+  const clientId = process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? process.env.AUTH0_CLIENT_ID!;
+  const clientSecret = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? process.env.AUTH0_CLIENT_SECRET!;
   if (!domain || !clientId || !clientSecret) {
     throw new Error("Variables AUTH0_* manquantes dans .env");
   }
@@ -75,28 +67,32 @@ async function main() {
   const token = await getToken(domain, clientId, clientSecret);
   console.log("✅ Token OK\n");
 
-  // 1. Chercher si l'action existe déjà
-  console.log("🔎 Recherche de l'action existante…");
-  const list = await api(domain, token, "GET", "/actions/actions?actionName=" + encodeURIComponent(ACTION_NAME));
+  console.log("🔎 Recherche de l'action…");
+  const list = await api(
+    domain,
+    token,
+    "GET",
+    "/actions/actions?actionName=" + encodeURIComponent(AUTH0_ACTION_NAME),
+  );
   const existing = (list.json as { actions?: Array<{ id: string; name: string }> })?.actions?.find(
-    (a) => a.name === ACTION_NAME,
+    (a) => a.name === AUTH0_ACTION_NAME,
   );
 
   let actionId: string;
 
   if (existing) {
     actionId = existing.id;
-    console.log(`   ↳ existe déjà (id: ${actionId}), mise à jour du code…`);
+    console.log(`   ↳ existe (id: ${actionId}), mise à jour…`);
     const upd = await api(domain, token, "PATCH", `/actions/actions/${actionId}`, {
-      code: ACTION_CODE,
+      code: AUTH0_POST_LOGIN_ACTION_CODE,
     });
     if (upd.status >= 400) throw new Error(`Update action: ${JSON.stringify(upd.json)}`);
   } else {
-    console.log("   ↳ création de l'action…");
+    console.log("   ↳ création…");
     const create = await api(domain, token, "POST", "/actions/actions", {
-      name: ACTION_NAME,
+      name: AUTH0_ACTION_NAME,
       supported_triggers: [{ id: "post-login", version: "v3" }],
-      code: ACTION_CODE,
+      code: AUTH0_POST_LOGIN_ACTION_CODE,
       runtime: "node18",
       dependencies: [],
     });
@@ -105,46 +101,49 @@ async function main() {
     console.log(`   ↳ créée (id: ${actionId})`);
   }
 
-  // 2. Déployer l'action
-  console.log("🚀 Déploiement de l'action…");
+  console.log("🚀 Déploiement…");
   const deploy = await api(domain, token, "POST", `/actions/actions/${actionId}/deploy`);
   if (deploy.status >= 400) throw new Error(`Deploy: ${JSON.stringify(deploy.json)}`);
   console.log("   ↳ déployée\n");
 
-  // 3. Récupérer les bindings actuels du flow post-login
-  console.log("🔗 Lecture des bindings post-login…");
+  console.log("🔗 Bindings post-login…");
   const bindings = await api(domain, token, "GET", "/actions/triggers/post-login/bindings");
   const current = (bindings.json as { bindings?: Array<{ action: { name: string; id: string } }> })?.bindings ?? [];
-  console.log(`   ↳ ${current.length} binding(s) actuel(s)`);
+  console.log(`   ↳ ${current.length} action(s) actuelle(s)`);
 
-  const alreadyBound = current.some((b) => b.action?.name === ACTION_NAME || b.action?.id === actionId);
-
-  if (alreadyBound) {
-    console.log("   ↳ action déjà dans le flow, rien à faire.\n");
-  } else {
-    console.log("   ↳ ajout de l'action au flow…");
-    // Reconstruire la liste en gardant les existantes + ajout de la nôtre
-    const newBindings = [
-      ...current.map((b) => ({
-        ref: { type: "action_id", value: b.action.id },
-        display_name: b.action.name,
-      })),
-      {
-        ref: { type: "action_name", value: ACTION_NAME },
-        display_name: ACTION_NAME,
-      },
-    ];
-    const patch = await api(domain, token, "PATCH", "/actions/triggers/post-login/bindings", {
-      bindings: newBindings,
-    });
-    if (patch.status >= 400) throw new Error(`Bind: ${JSON.stringify(patch.json)}`);
-    console.log("   ↳ bindée au flow Login\n");
+  const legacy = current.filter((b) => b.action?.name === AUTH0_LEGACY_ACTION_NAME);
+  if (legacy.length > 0) {
+    console.log(`   ⚠️  Retrait de l'action legacy "${AUTH0_LEGACY_ACTION_NAME}" (écrasait les rôles en ELEVE)`);
   }
 
+  const kept = current.filter(
+    (b) => b.action?.name !== AUTH0_LEGACY_ACTION_NAME && b.action?.id !== actionId,
+  );
+  const newBindings = [
+    ...kept.map((b) => ({
+      ref: { type: "action_id", value: b.action.id },
+      display_name: b.action.name,
+    })),
+    {
+      ref: { type: "action_id", value: actionId },
+      display_name: AUTH0_ACTION_NAME,
+    },
+  ];
+
+  const patch = await api(domain, token, "PATCH", "/actions/triggers/post-login/bindings", {
+    bindings: newBindings,
+  });
+  if (patch.status >= 400) throw new Error(`Bind: ${JSON.stringify(patch.json)}`);
+  console.log(`   ↳ flow Login : uniquement "${AUTH0_ACTION_NAME}".\n`);
+
   console.log("═══════════════════════════════════════════");
-  console.log("✅ Action post-login configurée et active.");
-  console.log("   Le rôle (app_metadata.role) est injecté dans");
-  console.log(`   le claim ${NAMESPACE}/role à chaque login.`);
+  console.log("✅ Trigger post-login configuré.");
+  console.log(`   Action : ${AUTH0_ACTION_NAME}`);
+  console.log(`   Claim  : ${AUTH0_ROLE_NAMESPACE}/role`);
+  console.log("   Source : app_metadata.role puis rôles natifs Auth0");
+  console.log("");
+  console.log("   Vérifiez : npx tsx scripts/verify-auth0-triggers.ts");
+  console.log("   Comptes  : npx tsx prisma/seed-auth0.ts");
   console.log("═══════════════════════════════════════════");
 }
 

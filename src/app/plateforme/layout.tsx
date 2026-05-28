@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PlateformeClientLayout from "./PlateformeClientLayout";
+import { PLATFORM_SPACE_ROLES, requireSpaceAccess } from "@/lib/require-space-access";
 
 export const metadata: Metadata = {
   robots: {
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PlateformeLayout({ children }: { children: React.ReactNode }) {
+export default async function PlateformeLayout({ children }: { children: React.ReactNode }) {
+  await requireSpaceAccess(PLATFORM_SPACE_ROLES, "/plateforme/dashboard");
   return <PlateformeClientLayout>{children}</PlateformeClientLayout>;
 }

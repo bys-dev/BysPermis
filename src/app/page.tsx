@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { TricoloreParticles } from "@/components/ui/TricoloreParticles";
 import { CentresProximite } from "@/components/marketplace/CentresProximite";
 import HeroSearchForm from "@/components/marketplace/HeroSearchForm";
 import HomeFaq from "@/components/marketplace/HomeFaq";
@@ -408,7 +407,7 @@ export default async function Home() {
       <Header />
       <main>
         {/* ═══ 1. HERO ═══ */}
-        <section className="relative bg-[#0A1628] pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 min-h-[520px] sm:min-h-[720px] flex items-center overflow-hidden">
+        <section className="relative bg-navy-900 pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 min-h-[520px] sm:min-h-[720px] flex items-center overflow-hidden">
           <div className="absolute inset-0 z-0" aria-hidden="true">
             <Image
               src="/hero-radar-permis.jpg"
@@ -416,70 +415,61 @@ export default async function Home() {
               fill
               priority
               sizes="100vw"
-              className="object-cover opacity-90 brightness-110"
+              className="object-cover scale-105 opacity-35"
             />
-            {/* Voile lisibilité texte à gauche, image quasi-claire à droite */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/45 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-navy-900/75" />
           </div>
 
-          <div
-            className="absolute inset-0 pointer-events-none z-[1]"
-            style={{
-              background:
-                "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.1) 0%, transparent 70%)",
-            }}
-          />
-
-          <TricoloreParticles />
           <div className="max-w-[1440px] mx-auto w-full relative z-10">
             <div className="flex flex-col items-center">
-              <div className="max-w-4xl mx-auto text-center flex-1">
-                <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6 sm:mb-8 backdrop-blur-sm max-w-full">
-                  <span className="inline-flex mr-2 rounded overflow-hidden shrink-0">
-                    <span className="w-1.5 h-4 bg-blue-500" />
-                    <span className="w-1.5 h-4 bg-white" />
-                    <span className="w-1.5 h-4 bg-red-500" />
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium text-gray-300 truncate">
-                    Agréé Ministère de l&apos;Intérieur — Stages agréés préfecture 🇫🇷
-                  </span>
+              <div className="max-w-4xl mx-auto text-center flex-1 w-full">
+                <div className="rounded-2xl bg-navy-900/95 border border-white/15 px-5 py-8 sm:px-10 sm:py-10 mb-6 sm:mb-8">
+                  <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-full mb-5 sm:mb-6 max-w-full">
+                    <span className="inline-flex mr-2 rounded overflow-hidden shrink-0">
+                      <span className="w-1.5 h-4 bg-blue-500" />
+                      <span className="w-1.5 h-4 bg-white" />
+                      <span className="w-1.5 h-4 bg-red-500" />
+                    </span>
+                    <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                      Agréé Ministère de l&apos;Intérieur — Stages agréés préfecture 🇫🇷
+                    </span>
+                  </div>
+
+                  <h1 className="font-display font-bold text-3xl sm:text-5xl lg:text-[3.25rem] text-white mb-5 leading-tight tracking-tight">
+                    Récupérez vos <span className="text-red-300">points</span> près de chez vous
+                    <br className="hidden sm:block" /> au meilleur prix
+                  </h1>
+
+                  <p className="text-base sm:text-lg text-white leading-relaxed max-w-3xl mx-auto">
+                    Stage agréé préfecture — Récupérez jusqu&apos;à 4 points en 2 jours.
+                    Convocation immédiate par email. Plus de 150 centres partenaires en France.
+                  </p>
                 </div>
-
-                <h1 className="font-display font-bold text-3xl sm:text-5xl lg:text-[3.5rem] text-white mb-6 leading-tight tracking-tight">
-                  Récupérez vos <span className="text-red-400">points</span> près de chez vous
-                  <br className="hidden sm:block" /> au meilleur prix
-                </h1>
-
-                <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto">
-                  Stage agréé préfecture — Récupérez jusqu&apos;à 4 points en 2 jours.
-                  Convocation immédiate par email. Plus de 150 centres partenaires en France.
-                </p>
 
                 <HeroSearchForm />
 
-                <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-300">
+                <div className="mt-8 rounded-xl bg-navy-900/90 border border-white/10 px-4 py-4 sm:px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-medium text-white">
                   <span className="flex items-center gap-2">
-                    <svg className="inline-block w-5 h-3.5 rounded-sm overflow-hidden" viewBox="0 0 30 20">
+                    <svg className="inline-block w-5 h-3.5 rounded-sm overflow-hidden shrink-0" viewBox="0 0 30 20">
                       <rect width="10" height="20" x="0" fill="#002395" />
                       <rect width="10" height="20" x="10" fill="#FFFFFF" />
                       <rect width="10" height="20" x="20" fill="#ED2939" />
                     </svg>
                     Agréé Préfecture
                   </span>
-                  <span className="hidden sm:inline text-gray-700">|</span>
+                  <span className="hidden sm:inline text-white/30">|</span>
                   <span className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faAward} className="text-blue-600/60" />
+                    <FontAwesomeIcon icon={faAward} className="text-blue-300 shrink-0" />
                     Certifié Qualiopi
                   </span>
-                  <span className="hidden sm:inline text-gray-700">|</span>
+                  <span className="hidden sm:inline text-white/30">|</span>
                   <span className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-blue-600/60" />
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-blue-300 shrink-0" />
                     +150 centres en France
                   </span>
-                  <span className="hidden sm:inline text-gray-700">|</span>
+                  <span className="hidden sm:inline text-white/30">|</span>
                   <span className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faEnvelopeOpenText} className="text-blue-600/60" />
+                    <FontAwesomeIcon icon={faEnvelopeOpenText} className="text-blue-300 shrink-0" />
                     Convocation immédiate
                   </span>
                 </div>

@@ -22,13 +22,11 @@ import {
   faBolt,
   faArrowRight,
   faLaptop,
-  faBuilding,
   faCircleNodes,
   faSort,
   faCoins,
   faArrowRotateLeft,
   faClock,
-  faGraduationCap,
 } from "@fortawesome/free-solid-svg-icons";
 
 // ─── TYPES ────────────────────────────────────────────────
@@ -82,11 +80,6 @@ const sortOptions = [
   { value: "date", label: "Date" },
 ];
 
-// Scope V1 : la réglementation impose le présentiel pour les stages récup points.
-const modaliteOptions = [
-  { value: "PRESENTIEL", label: "Présentiel", icon: faBuilding },
-];
-
 // ─── INNER COMPONENT (uses useSearchParams) ───────────────
 
 function RechercheInner() {
@@ -98,9 +91,6 @@ function RechercheInner() {
   const initialVille = searchParams.get("ville") ?? "";
   const initialDept = searchParams.get("dept") ?? "";
   const initialType = searchParams.get("type") ?? "Tous les types";
-  const initialModalite = searchParams.get("modalite") ?? "";
-  const initialQualiopi = searchParams.get("isQualiopi") === "true";
-  const initialCPF = searchParams.get("isCPF") === "true";
   const initialPrixMin = Number(searchParams.get("prixMin") ?? 0);
   const initialPrixMax = Number(searchParams.get("prixMax") ?? 5000);
   const initialTri = searchParams.get("tri") ?? "pertinence";
@@ -111,9 +101,6 @@ function RechercheInner() {
   const [searchVille, setSearchVille] = useState(initialVille);
   const [searchDept, setSearchDept] = useState(initialDept);
   const [selectedType, setSelectedType] = useState(initialType);
-  const [selectedModalite, setSelectedModalite] = useState(initialModalite);
-  const [qualiopiOnly, setQualiopiOnly] = useState(initialQualiopi);
-  const [cpfOnly, setCpfOnly] = useState(initialCPF);
   const [prixMin, setPrixMin] = useState(initialPrixMin);
   const [prixMax, setPrixMax] = useState(initialPrixMax);
   const [tri, setTri] = useState(initialTri);
@@ -124,9 +111,6 @@ function RechercheInner() {
     ville: initialVille,
     dept: initialDept,
     type: initialType,
-    modalite: initialModalite,
-    isQualiopi: initialQualiopi,
-    isCPF: initialCPF,
     prixMin: initialPrixMin,
     prixMax: initialPrixMax,
     tri: initialTri,
@@ -189,9 +173,6 @@ function RechercheInner() {
         ville: applied.ville,
         dept: applied.dept,
         type: applied.type,
-        modalite: applied.modalite,
-        isQualiopi: applied.isQualiopi ? "true" : "",
-        isCPF: applied.isCPF ? "true" : "",
         prixMin: applied.prixMin > 0 ? String(applied.prixMin) : "",
         prixMax: applied.prixMax < 5000 ? String(applied.prixMax) : "",
         tri: applied.tri,
@@ -216,9 +197,6 @@ function RechercheInner() {
       ville: searchVille,
       dept: searchDept,
       type: selectedType,
-      modalite: selectedModalite,
-      isQualiopi: qualiopiOnly,
-      isCPF: cpfOnly,
       prixMin,
       prixMax,
       tri,
@@ -237,9 +215,6 @@ function RechercheInner() {
       if (applied.ville.trim()) params.set("ville", applied.ville.trim());
       if (applied.dept.trim()) params.set("dept", applied.dept.trim());
       if (applied.type !== "Tous les types") params.set("type", applied.type);
-      if (applied.modalite) params.set("modalite", applied.modalite);
-      if (applied.isQualiopi) params.set("isQualiopi", "true");
-      if (applied.isCPF) params.set("isCPF", "true");
       if (applied.prixMin > 0) params.set("prixMin", String(applied.prixMin));
       if (applied.prixMax < 5000) params.set("prixMax", String(applied.prixMax));
       if (applied.tri && applied.tri !== "pertinence") params.set("tri", applied.tri);
@@ -325,9 +300,6 @@ function RechercheInner() {
 
   const hasActiveFilters =
     applied.type !== "Tous les types" ||
-    applied.modalite !== "" ||
-    applied.isQualiopi ||
-    applied.isCPF ||
     applied.prixMin > 0 ||
     applied.prixMax < 5000 ||
     applied.q.trim() !== "" ||
@@ -335,9 +307,6 @@ function RechercheInner() {
 
   const resetFilters = () => {
     setSelectedType("Tous les types");
-    setSelectedModalite("");
-    setQualiopiOnly(false);
-    setCpfOnly(false);
     setPrixMin(0);
     setPrixMax(5000);
     setSearchQuery("");
@@ -349,9 +318,6 @@ function RechercheInner() {
       ville: "",
       dept: "",
       type: "Tous les types",
-      modalite: "",
-      isQualiopi: false,
-      isCPF: false,
       prixMin: 0,
       prixMax: 5000,
       tri: "pertinence",
@@ -653,79 +619,6 @@ function RechercheInner() {
                 />
               </div>
 
-              {/* Modalité */}
-              <div>
-                <label className="label flex items-center gap-1.5">
-                  <FontAwesomeIcon icon={faGraduationCap} className="text-xs text-gray-400" />
-                  Modalité
-                </label>
-                <div className="space-y-2">
-                  {modaliteOptions.map((opt) => (
-                    <label
-                      key={opt.value}
-                      className="flex items-center gap-2 cursor-pointer text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedModalite === opt.value}
-                        onChange={(e) => {
-                          setSelectedModalite(e.target.checked ? opt.value : "");
-                          setCurrentPage(1);
-                        }}
-                        className="accent-brand-accent"
-                      />
-                      <FontAwesomeIcon icon={opt.icon} className="text-xs text-gray-400 w-4" />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Qualiopi toggle */}
-              <div>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      checked={qualiopiOnly}
-                      onChange={(e) => {
-                        setQualiopiOnly(e.target.checked);
-                        setCurrentPage(1);
-                      }}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-checked:bg-brand-accent rounded-full transition-colors" />
-                    <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform" />
-                  </div>
-                  <span className="text-sm font-medium flex items-center gap-1.5">
-                    <FontAwesomeIcon icon={faAward} className="text-xs text-gray-400" />
-                    Qualiopi uniquement
-                  </span>
-                </label>
-              </div>
-
-              {/* CPF toggle */}
-              <div>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      checked={cpfOnly}
-                      onChange={(e) => {
-                        setCpfOnly(e.target.checked);
-                        setCurrentPage(1);
-                      }}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-checked:bg-brand-accent rounded-full transition-colors" />
-                    <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform" />
-                  </div>
-                  <span className="text-sm font-medium flex items-center gap-1.5">
-                    <FontAwesomeIcon icon={faCoins} className="text-xs text-gray-400" />
-                    Éligible CPF
-                  </span>
-                </label>
-              </div>
             </div>
           </aside>
 
@@ -791,30 +684,6 @@ function RechercheInner() {
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
                     {selectedType}
                     <button onClick={() => { setSelectedType("Tous les types"); setCurrentPage(1); }} className="hover:text-blue-900">
-                      <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
-                    </button>
-                  </span>
-                )}
-                {selectedModalite && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                    {modaliteOptions.find((o) => o.value === selectedModalite)?.label}
-                    <button onClick={() => { setSelectedModalite(""); setCurrentPage(1); }} className="hover:text-blue-900">
-                      <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
-                    </button>
-                  </span>
-                )}
-                {qualiopiOnly && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                    Qualiopi
-                    <button onClick={() => { setQualiopiOnly(false); setCurrentPage(1); }} className="hover:text-blue-900">
-                      <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
-                    </button>
-                  </span>
-                )}
-                {cpfOnly && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                    CPF
-                    <button onClick={() => { setCpfOnly(false); setCurrentPage(1); }} className="hover:text-blue-900">
                       <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
                     </button>
                   </span>
