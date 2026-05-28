@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `${centre.nom} — Centre agréé préfecture à ${centre.ville} (${centre.codePostal}). Réservez votre stage en ligne.`;
 
     return {
-      title: `${centre.nom} | BYS Formation`,
+      title: `${centre.nom} | BYS Formation Permis`,
       description,
       alternates: { canonical: `/centres/${slug}` },
       openGraph: {
@@ -38,7 +38,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: `/centres/${slug}`,
         type: "website",
         locale: "fr_FR",
-        siteName: "BYS Formation",
+        siteName: "BYS Formation Permis",
+        images: [{ url: "/opengraph-image" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${centre.nom} — ${centre.ville}`,
+        description,
+        images: ["/opengraph-image"],
       },
     };
   } catch {

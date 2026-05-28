@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { requireAuth, PLATFORM_ROLES } from "@/lib/auth0";
+import { requireAuth, mapAuthError, PLATFORM_ROLES } from "@/lib/auth0";
 
 /**
  * Verify that a relationship exists between two users that justifies messaging.
@@ -152,7 +152,9 @@ export async function GET() {
     );
 
     return NextResponse.json(conversations);
-  } catch {
+  } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

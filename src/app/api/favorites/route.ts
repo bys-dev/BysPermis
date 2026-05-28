@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth0";
+import { requireAuth, mapAuthError } from "@/lib/auth0";
 
 // ─── GET /api/favorites — Liste des favoris de l'utilisateur ────
 export async function GET() {
@@ -42,7 +42,9 @@ export async function GET() {
     });
 
     return NextResponse.json(favorites);
-  } catch {
+  } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -86,6 +88,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(favorite, { status: 201 });
   } catch (error) {
+    const authRes = mapAuthError(error);
+    if (authRes) return authRes;
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Donnees invalides", details: error.issues },
@@ -118,7 +122,9 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -8,7 +8,7 @@
  */
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.bys-permis.fr";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
 const ORG_NAME = "BYS Formation";
 const ORG_LEGAL = "BYS Formation"; // À ajuster une fois la raison sociale exacte fournie par le client
@@ -271,6 +271,39 @@ export function serviceJsonLd(input: ServiceJsonLdInput = {}) {
           },
         }
       : {}),
+  };
+}
+
+// ─── Article (blog) ────────────────────────────────────────────────
+
+export interface ArticleJsonLdInput {
+  title: string;
+  slug: string;
+  description: string;
+  image?: string | null;
+  publishedAtISO: string;
+  authorName?: string;
+}
+
+export function articleJsonLd(input: ArticleJsonLdInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/blog/${input.slug}`,
+    },
+    headline: input.title,
+    description: input.description,
+    image: input.image ? [input.image] : undefined,
+    datePublished: input.publishedAtISO,
+    dateModified: input.publishedAtISO,
+    author: input.authorName
+      ? { "@type": "Person", name: input.authorName }
+      : { "@type": "Organization", name: ORG_NAME },
+    publisher: {
+      "@id": `${BASE_URL}/#organization`,
+    },
   };
 }
 

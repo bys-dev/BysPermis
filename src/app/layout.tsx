@@ -54,9 +54,14 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     siteName: "BYS Formation Permis",
     url: APP_URL,
+    images: [{ url: "/opengraph-image" }],
   },
   twitter: {
     card: "summary_large_image",
+    title: "BYS Formation Permis — Stages agréés de récupération de points",
+    description:
+      "Trouvez et réservez votre stage de récupération de points du permis de conduire. Centres agréés Ministère de l'Intérieur.",
+    images: ["/opengraph-image"],
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,

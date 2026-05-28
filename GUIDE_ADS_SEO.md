@@ -1,6 +1,6 @@
 # Guide Ads, SEO & Tracking — BYS Permis
 
-> Destinataire : Sébastien (BYS Formation) — questions techniques : Andrys (`slformation7@gmail.com`)
+> Destinataire : Sébastien (BYS Formation) — questions techniques : Andrys (`andrys.developper@gmail.com`)
 > Date : 2026-05-18 — V1 mise en place du tracking et du référencement
 
 Ce document décrit (1) ce qui est **déjà en place techniquement** dans le code, et (2) ce que **Sébastien doit fournir / configurer côté plateformes** (Google, Meta) pour que tout soit opérationnel.
@@ -164,4 +164,4 @@ Une fois les variables configurées et le site déployé :
 
 ---
 
-**Contact** : Andrys — `slformation7@gmail.com` pour la configuration technique côté code.
+**Contact** : Andrys — `andrys.developper@gmail.com` pour la configuration technique côté code.

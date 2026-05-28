@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCentreStaff } from "@/lib/auth0";
+import { requireCentreStaff, mapAuthError } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 
 // GET /api/centre/contrats — all reservations for this centre's formations (for contrat management)
@@ -48,6 +48,8 @@ export async function GET() {
       }))
     );
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     console.error("[GET /api/centre/contrats]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

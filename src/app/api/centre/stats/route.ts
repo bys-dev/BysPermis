@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCentreStaff } from "@/lib/auth0";
+import { requireCentreStaff, mapAuthError } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 
 const MONTH_LABELS: Record<string, string> = {
@@ -244,6 +244,8 @@ export async function GET() {
       })),
     });
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     console.error("[GET /api/centre/stats]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

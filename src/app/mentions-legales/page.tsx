@@ -84,10 +84,10 @@ export default function MentionsLegalesPage() {
                 <li>
                   <strong>Email :</strong>{" "}
                   <a
-                    href="mailto:slformation7@gmail.com"
+                    href="mailto:andrys.developper@gmail.com"
                     className="text-brand-accent hover:text-brand-accent-hover underline"
                   >
-                    slformation7@gmail.com
+                    andrys.developper@gmail.com
                   </a>
                 </li>
               </ul>

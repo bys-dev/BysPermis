@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description = formation.description.slice(0, 155);
 
     return {
-      title: `${formation.titre} | BYS Formation`,
+      title: `${formation.titre} | BYS Formation Permis`,
       description,
       keywords: [
         formation.titre,
@@ -50,13 +50,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: `/formations/${slug}`,
         type: "website",
         locale: "fr_FR",
-        siteName: "BYS Formation",
+        siteName: "BYS Formation Permis",
+        images: [{ url: "/opengraph-image" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${formation.titre} — ${formation.centre.ville}`,
+        description,
+        images: ["/opengraph-image"],
       },
     };
   } catch {
     return {
       title: "Formation",
-      description: "Détails de la formation sur BYS Formation.",
+      description: "Détails de la formation sur BYS Formation Permis.",
     };
   }
 }

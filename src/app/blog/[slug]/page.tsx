@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import JsonLd from "@/components/seo/JsonLd";
+import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -88,8 +90,30 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const article = await fetchArticle(slug);
   if (!article) notFound();
 
+  const publishedAtISO = (article.publishedAt ?? article.createdAt).toISOString();
+  const description = article.extrait.slice(0, 155);
+  const authorName = `${article.author?.prenom ?? ""} ${article.author?.nom ?? ""}`.trim() || undefined;
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <JsonLd
+        id={`ld-article-${article.slug}`}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Accueil", url: "/" },
+            { name: "Blog", url: "/blog" },
+            { name: article.titre, url: `/blog/${article.slug}` },
+          ]),
+          articleJsonLd({
+            title: article.titre,
+            slug: article.slug,
+            description,
+            image: article.image,
+            publishedAtISO,
+            authorName,
+          }),
+        ]}
+      />
       {article.image && (
         <div className="w-full h-64 sm:h-80 lg:h-96 bg-gray-200 relative">
           <Image
@@ -100,7 +124,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
         </div>
       )}
 

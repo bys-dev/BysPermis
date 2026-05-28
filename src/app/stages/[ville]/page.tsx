@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import JsonLd from "@/components/seo/JsonLd";
+import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/seo/jsonld";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
@@ -128,12 +130,22 @@ export default async function StagesVillePage({ params }: Props) {
     // DB might not be available
   }
 
+  const jsonLd = [
+    breadcrumbJsonLd([
+      { name: "Accueil", url: "/" },
+      { name: "Stages", url: "/recherche" },
+      { name: villeDecoded, url: `/stages/${ville}` },
+    ]),
+    serviceJsonLd({ city: villeDecoded }),
+  ];
+
   return (
     <>
+      <JsonLd id={`ld-stages-${ville}`} data={jsonLd} />
       <Header />
       <main className="min-h-screen bg-brand-bg">
         {/* Hero */}
-        <section className="bg-[#0A1628] text-white py-16">
+        <section className="bg-navy-900 text-white py-16">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
               <Link href="/" className="hover:text-white transition-colors">Accueil</Link>

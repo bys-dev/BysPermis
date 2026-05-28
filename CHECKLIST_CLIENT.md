@@ -1,6 +1,6 @@
 # Éléments à fournir par BYS Formation (Sébastien)
 
-> À transmettre à Andrys MAGAR — Email : `slformation7@gmail.com`
+> À transmettre à Andrys MAGAR — Email : `andrys.developper@gmail.com`
 > Délai souhaité : avant le **24 mai 2026** pour mise en ligne.
 
 Tout ce qui est marqué 🔴 est **bloquant** pour la mise en production.
@@ -47,7 +47,7 @@ Sébastien doit créer/activer le compte Stripe au nom de BYS Formation. Sans ç
 | 🔴 1 | Créer un compte Stripe sur https://dashboard.stripe.com |
 | 🔴 2 | Activer le mode **Live** (KYC : K-bis, pièce d'identité, RIB) |
 | 🔴 3 | Activer **Stripe Connect** → Express accounts (Settings → Connect → Get started) |
-| 🔴 4 | M'inviter en collaborateur (`Developer` role) sur `slformation7@gmail.com` |
+| 🔴 4 | M'inviter en collaborateur (`Developer` role) sur `andrys.developper@gmail.com` |
 | ⚪ 5 | Personnaliser le branding (logo, couleur primaire) |
 
 ---
@@ -163,4 +163,4 @@ Tout le reste peut suivre dans les semaines suivantes.
 
 ---
 
-**Contact** : Andrys MAGAR — `slformation7@gmail.com`
+**Contact** : Andrys MAGAR — `andrys.developper@gmail.com`

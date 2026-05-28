@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth0";
+import { requireAdmin, mapAuthError } from "@/lib/auth0";
 
 function csvEscape(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return "";
@@ -191,6 +191,8 @@ export async function GET(request: NextRequest) {
         );
     }
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     console.error("[GET /api/admin/exports]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

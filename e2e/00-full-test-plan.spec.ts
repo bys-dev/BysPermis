@@ -90,7 +90,7 @@ test.describe("1. Pages publiques", () => {
 
   test("Page Connexion", async ({ page }) => {
     await page.goto("/connexion");
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /connexion/i })).toBeVisible();
   });
 
   test("Page Inscription", async ({ page }) => {

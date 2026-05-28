@@ -1,4 +1,5 @@
 import { Auth0Client } from "@auth0/nextjs-auth0/server"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import type { User } from "@/generated/prisma/client"
 
@@ -248,4 +249,17 @@ export async function requireOwner(): Promise<User> {
 /** @deprecated Use requireCentreStaff or requireCentreManagement */
 export async function requireCentre(): Promise<User> {
   return requireCentreStaff()
+}
+
+/** Map auth errors thrown by requireAuth/requireRole to HTTP responses. */
+export function mapAuthError(err: unknown): NextResponse | null {
+  if (err instanceof Error) {
+    if (err.message === "Non authentifié") {
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
+    }
+    if (err.message === "Non autorisé") {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 })
+    }
+  }
+  return null
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCentreStaff, requireCentreManagement } from "@/lib/auth0";
+import { requireCentreStaff, requireCentreManagement, mapAuthError } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 import { slugify } from "@/lib/utils";
 import { z } from "zod";
@@ -50,6 +50,8 @@ export async function GET() {
       }))
     );
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     console.error("[GET /api/centre/formations]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
@@ -161,6 +163,8 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues[0]?.message ?? "Données invalides" }, { status: 400 });
     }
