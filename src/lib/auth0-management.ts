@@ -106,3 +106,31 @@ export async function fetchAuth0UserRole(auth0Id: string): Promise<AppRole | und
 
   return pickHighestRole([appMetadataRole, ...nativeRoles])
 }
+
+type SessionUser = Record<string, unknown>
+
+function roleFromTokenClaims(user: SessionUser): AppRole | undefined {
+  const ROLE_NAMESPACE = "https://byspermis.fr"
+  const ROLE_NAMESPACE_TYPO = "https://bypermis.fr"
+  const candidates = [
+    user.appRole,
+    user.role,
+    user[ROLE_NAMESPACE + "/role"],
+    user[ROLE_NAMESPACE_TYPO + "/role"],
+  ] as (string | undefined)[]
+  return pickHighestRole(candidates)
+}
+
+/**
+ * Rôle Auth0 = source de vérité.
+ * 1. Management API (app_metadata + rôles natifs) — prioritaire
+ * 2. Claims du token / session
+ */
+export async function resolveAuth0Role(
+  auth0Id: string,
+  sessionUser: SessionUser,
+): Promise<AppRole | undefined> {
+  const apiRole = await fetchAuth0UserRole(auth0Id)
+  if (apiRole) return apiRole
+  return roleFromTokenClaims(sessionUser)
+}

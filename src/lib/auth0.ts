@@ -1,11 +1,13 @@
 import { Auth0Client } from "@auth0/nextjs-auth0/server"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { fetchAuth0UserRole } from "@/lib/auth0-management"
+import { resolveAuth0Role } from "@/lib/auth0-management"
 import type { User } from "@/generated/prisma/client"
 
 // ─── Namespace for custom claims injected by Auth0 Post-Login Action ───
 const ROLE_NAMESPACE = "https://byspermis.fr"
+/** Ancienne typo parfois encore déployée dans l'Action Auth0 dashboard */
+const ROLE_NAMESPACE_TYPO = "https://bypermis.fr"
 
 /** All valid role values */
 const ALL_ROLES = [
@@ -64,6 +66,7 @@ function roleFromClaims(claims: Record<string, unknown> | null): AppRole | undef
   if (!claims) return undefined
   const raw =
     (claims[ROLE_NAMESPACE + "/role"] as string | undefined) ??
+    (claims[ROLE_NAMESPACE_TYPO + "/role"] as string | undefined) ??
     (claims["role"] as string | undefined)
   if (raw && ALL_ROLES.includes(raw as AppRole)) {
     return raw as AppRole
@@ -76,6 +79,7 @@ function roleFromSessionUser(user: Record<string, unknown>): AppRole | undefined
     user.appRole,
     user.role,
     user[ROLE_NAMESPACE + "/role"],
+    user[ROLE_NAMESPACE_TYPO + "/role"],
   ] as (string | undefined)[]
   for (const raw of candidates) {
     if (raw && ALL_ROLES.includes(raw as AppRole)) {
@@ -85,14 +89,19 @@ function roleFromSessionUser(user: Record<string, unknown>): AppRole | undefined
   return undefined
 }
 
-/**
- * URL du tableau de bord selon le rôle Prisma (source de vérité après login).
- */
 export function getDashboardPathForRole(role: string): string {
   if (role === "OWNER" || role === "ADMIN") return "/admin/dashboard"
   if (role.startsWith("CENTRE_")) return "/espace-centre/dashboard"
   if (["SUPPORT", "COMPTABLE", "COMMERCIAL"].includes(role)) return "/plateforme/dashboard"
   return "/espace-eleve"
+}
+
+async function syncDbRoleFromAuth0(userId: string, auth0Role: AppRole | undefined, currentRole: string) {
+  if (!auth0Role || auth0Role === currentRole) return null
+  return prisma.user.update({
+    where: { id: userId },
+    data: { role: auth0Role },
+  })
 }
 
 // ─── Auth0 Client v4 with beforeSessionSaved hook ───────────────────
@@ -135,9 +144,7 @@ export { ALL_ROLES, CENTRE_ROLES, CENTRE_MANAGEMENT_ROLES, CENTRE_FINANCE_ROLES,
 
 /**
  * Get current user from session.
- * Auto-creates user in DB on first login (upsert pattern).
- * Reads appRole from beforeSessionSaved hook, falls back to direct claims.
- * Returns null if not authenticated.
+ * Le rôle est lu depuis Auth0 (API Management + token) puis synchronisé en base.
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
@@ -147,15 +154,8 @@ export async function getCurrentUser(): Promise<User | null> {
     const auth0Id = session.user.sub as string
     const email = normalizeEmail(session.user.email as string | undefined)
 
-    // Rôle Auth0 explicite depuis le token (ELEVE = souvent le défaut de l'Action, pas fiable seul)
-    let tokenRole = roleFromSessionUser(session.user as Record<string, unknown>)
-
-    if (!tokenRole || tokenRole === "ELEVE") {
-      const auth0Role = await fetchAuth0UserRole(auth0Id)
-      if (auth0Role && (!tokenRole || ROLE_LEVELS[auth0Role] > ROLE_LEVELS[tokenRole])) {
-        tokenRole = auth0Role
-      }
-    }
+    // Source de vérité : Auth0 (app_metadata, rôles natifs, claims JWT)
+    const auth0Role = await resolveAuth0Role(auth0Id, session.user as Record<string, unknown>)
 
     let user = await prisma.user.findUnique({
       where: { auth0Id },
@@ -187,10 +187,13 @@ export async function getCurrentUser(): Promise<User | null> {
       if (existingByEmail) {
         user = await prisma.user.update({
           where: { id: existingByEmail.id },
-          data: { auth0Id },
+          data: {
+            auth0Id,
+            ...(auth0Role ? { role: auth0Role } : {}),
+          },
         })
       } else {
-        const validRole = tokenRole ?? "ELEVE"
+        const validRole = auth0Role ?? "ELEVE"
         const prenom = (session.user.given_name as string) ?? ""
         const referralCode = `BYS-${prenom.toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`
 
@@ -205,16 +208,9 @@ export async function getCurrentUser(): Promise<User | null> {
           },
         })
       }
-    } else if (tokenRole && tokenRole !== user.role) {
-      const tokenLevel = ROLE_LEVELS[tokenRole] ?? 0
-      const dbLevel = ROLE_LEVELS[user.role] ?? 0
-      // Promotion Auth0 → DB (OWNER natif Google, etc.)
-      if (tokenLevel > dbLevel) {
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { role: tokenRole },
-        })
-      }
+    } else {
+      const updated = await syncDbRoleFromAuth0(user.id, auth0Role, user.role)
+      if (updated) user = updated
     }
 
     // Sync emailVerified from Auth0 session

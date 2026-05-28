@@ -16,6 +16,7 @@
     "seed:auth0": "npx tsx prisma/seed-auth0.ts",
     "auth0:setup": "npx tsx scripts/setup-auth0-action.ts",
     "auth0:configure": "npx tsx scripts/configure-auth0.ts",
+    "auth0:repair-db": "npx tsx scripts/repair-db-roles.ts",
     "auth0:verify": "npx tsx scripts/verify-auth0-triggers.ts",
     "auth0:sync-metadata": "npx tsx scripts/sync-auth0-app-metadata.ts",
     "db:reset": "npx prisma db push --force-reset --accept-data-loss && npx tsx prisma/seed.ts && npx tsx prisma/seed-demo.ts && npx tsx prisma/seed-auth0.ts",
