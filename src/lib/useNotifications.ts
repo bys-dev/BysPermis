@@ -27,6 +27,11 @@ interface UseNotificationsOptions {
    * hook cheap on public pages.
    */
   enabled?: boolean;
+  /**
+   * If true, also fetch the full notifications list (used for dropdowns/pages).
+   * If false (default), polling only fetches the unread count.
+   */
+  includeList?: boolean;
 }
 
 export function useNotifications(
@@ -38,13 +43,27 @@ export function useNotifications(
       : optionsOrInterval;
   const interval = options.interval ?? 30000;
   const enabled = options.enabled ?? true;
+  const includeList = options.includeList ?? false;
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchUnreadCount = useCallback(async () => {
     if (!enabled) return;
+    try {
+      const res = await fetch("/api/notifications?only=unreadCount");
+      if (!res.ok) return;
+      const data = await res.json().catch(() => null);
+      const count = typeof data?.unreadCount === "number" ? data.unreadCount : null;
+      if (count !== null) setUnreadCount(count);
+    } catch {
+      // Silently fail — notifications are non-critical
+    }
+  }, [enabled]);
+
+  const fetchNotifications = useCallback(async () => {
+    if (!enabled || !includeList) return;
     try {
       const res = await fetch("/api/notifications");
       if (!res.ok) return;
@@ -56,7 +75,7 @@ export function useNotifications(
     } catch {
       // Silently fail — notifications are non-critical
     }
-  }, [enabled]);
+  }, [enabled, includeList]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {
@@ -90,13 +109,14 @@ export function useNotifications(
 
   useEffect(() => {
     if (!enabled) return;
-    // Initial fetch
+    // Initial: always fetch count, list only if requested
+    fetchUnreadCount();
     fetchNotifications();
 
     // Set up polling with Page Visibility API
     function startPolling() {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      intervalRef.current = setInterval(fetchNotifications, interval);
+      intervalRef.current = setInterval(fetchUnreadCount, interval);
     }
 
     function stopPolling() {
@@ -108,7 +128,8 @@ export function useNotifications(
 
     function handleVisibility() {
       if (document.visibilityState === "visible") {
-        fetchNotifications(); // Fetch immediately when tab becomes visible
+        fetchUnreadCount(); // Fetch immediately when tab becomes visible
+        fetchNotifications();
         startPolling();
       } else {
         stopPolling();
@@ -126,13 +147,15 @@ export function useNotifications(
       stopPolling();
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [enabled, fetchNotifications, interval]);
+  }, [enabled, fetchNotifications, fetchUnreadCount, interval]);
 
   return {
     unreadCount,
     notifications,
     markAsRead,
     markAllAsRead,
-    refresh: fetchNotifications,
+    refresh: async () => {
+      await Promise.all([fetchUnreadCount(), fetchNotifications()]);
+    },
   };
 }

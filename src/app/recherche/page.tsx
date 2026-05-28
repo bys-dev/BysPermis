@@ -104,7 +104,9 @@ function RechercheInner() {
   const initialPrixMin = Number(searchParams.get("prixMin") ?? 0);
   const initialPrixMax = Number(searchParams.get("prixMax") ?? 5000);
   const initialTri = searchParams.get("tri") ?? "pertinence";
+  const initialPage = Math.max(1, Number(searchParams.get("page") ?? 1) || 1);
 
+  // Draft (UI inputs)
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const [searchVille, setSearchVille] = useState(initialVille);
   const [searchDept, setSearchDept] = useState(initialDept);
@@ -115,7 +117,22 @@ function RechercheInner() {
   const [prixMin, setPrixMin] = useState(initialPrixMin);
   const [prixMax, setPrixMax] = useState(initialPrixMax);
   const [tri, setTri] = useState(initialTri);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  // Applied (actual query)
+  const [applied, setApplied] = useState(() => ({
+    q: initialQ,
+    ville: initialVille,
+    dept: initialDept,
+    type: initialType,
+    modalite: initialModalite,
+    isQualiopi: initialQualiopi,
+    isCPF: initialCPF,
+    prixMin: initialPrixMin,
+    prixMax: initialPrixMax,
+    tri: initialTri,
+  }));
+
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [stages, setStages] = useState<StageCard[]>([]);
@@ -163,21 +180,21 @@ function RechercheInner() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Sync URL params whenever filters change
+  // Sync URL params whenever applied query/page changes
   const updateURL = useCallback(
     (overrides?: Record<string, string>) => {
       const params = new URLSearchParams();
       const vals: Record<string, string> = {
-        q: searchQuery,
-        ville: searchVille,
-        dept: searchDept,
-        type: selectedType,
-        modalite: selectedModalite,
-        isQualiopi: qualiopiOnly ? "true" : "",
-        isCPF: cpfOnly ? "true" : "",
-        prixMin: prixMin > 0 ? String(prixMin) : "",
-        prixMax: prixMax < 5000 ? String(prixMax) : "",
-        tri,
+        q: applied.q,
+        ville: applied.ville,
+        dept: applied.dept,
+        type: applied.type,
+        modalite: applied.modalite,
+        isQualiopi: applied.isQualiopi ? "true" : "",
+        isCPF: applied.isCPF ? "true" : "",
+        prixMin: applied.prixMin > 0 ? String(applied.prixMin) : "",
+        prixMax: applied.prixMax < 5000 ? String(applied.prixMax) : "",
+        tri: applied.tri,
         page: String(currentPage),
         ...overrides,
       };
@@ -190,27 +207,44 @@ function RechercheInner() {
       if (currentPage > 1 && !overrides?.page) params.set("page", String(currentPage));
       router.replace(`/recherche?${params.toString()}`, { scroll: false });
     },
-    [searchQuery, searchVille, searchDept, selectedType, selectedModalite, qualiopiOnly, cpfOnly, prixMin, prixMax, tri, currentPage, router],
+    [applied, currentPage, router],
   );
 
-  // Fetch formations from API with debounce
+  function applyFilters() {
+    setApplied({
+      q: searchQuery,
+      ville: searchVille,
+      dept: searchDept,
+      type: selectedType,
+      modalite: selectedModalite,
+      isQualiopi: qualiopiOnly,
+      isCPF: cpfOnly,
+      prixMin,
+      prixMax,
+      tri,
+    });
+    setCurrentPage(1);
+  }
+
+  // Fetch formations from API (applied query only) + AbortController
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
       setLoading(true);
       const params = new URLSearchParams({ page: String(currentPage), perPage: String(perPage) });
 
-      if (searchQuery.trim()) params.set("q", searchQuery.trim());
-      if (searchVille.trim()) params.set("ville", searchVille.trim());
-      if (searchDept.trim()) params.set("dept", searchDept.trim());
-      if (selectedType !== "Tous les types") params.set("type", selectedType);
-      if (selectedModalite) params.set("modalite", selectedModalite);
-      if (qualiopiOnly) params.set("isQualiopi", "true");
-      if (cpfOnly) params.set("isCPF", "true");
-      if (prixMin > 0) params.set("prixMin", String(prixMin));
-      if (prixMax < 5000) params.set("prixMax", String(prixMax));
-      if (tri && tri !== "pertinence") params.set("tri", tri);
+      if (applied.q.trim()) params.set("q", applied.q.trim());
+      if (applied.ville.trim()) params.set("ville", applied.ville.trim());
+      if (applied.dept.trim()) params.set("dept", applied.dept.trim());
+      if (applied.type !== "Tous les types") params.set("type", applied.type);
+      if (applied.modalite) params.set("modalite", applied.modalite);
+      if (applied.isQualiopi) params.set("isQualiopi", "true");
+      if (applied.isCPF) params.set("isCPF", "true");
+      if (applied.prixMin > 0) params.set("prixMin", String(applied.prixMin));
+      if (applied.prixMax < 5000) params.set("prixMax", String(applied.prixMax));
+      if (applied.tri && applied.tri !== "pertinence") params.set("tri", applied.tri);
 
-      fetch(`/api/formations?${params}`)
+      fetch(`/api/formations?${params}`, { signal: controller.signal })
         .then((r) => r.json())
         .then((data) => {
           if (!data.formations) return;
@@ -249,7 +283,7 @@ function RechercheInner() {
             };
           });
           // BYS toujours en premier (only for "pertinence" sort)
-          if (tri === "pertinence" || !tri) {
+          if (applied.tri === "pertinence" || !applied.tri) {
             mapped.sort((a, b) => (a.isBYS && !b.isBYS ? -1 : !a.isBYS && b.isBYS ? 1 : 0));
           }
           setStages(mapped);
@@ -262,9 +296,12 @@ function RechercheInner() {
       // Update URL silently
       updateURL();
     }, 250);
-    return () => clearTimeout(timer);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, searchVille, searchDept, selectedType, selectedModalite, qualiopiOnly, cpfOnly, prixMin, prixMax, tri, currentPage]);
+  }, [applied, currentPage, updateURL]);
 
   // Auto-suggestions for search query
   useEffect(() => {
@@ -287,14 +324,14 @@ function RechercheInner() {
   }, [searchQuery]);
 
   const hasActiveFilters =
-    selectedType !== "Tous les types" ||
-    selectedModalite !== "" ||
-    qualiopiOnly ||
-    cpfOnly ||
-    prixMin > 0 ||
-    prixMax < 5000 ||
-    searchQuery.trim() !== "" ||
-    searchVille.trim() !== "";
+    applied.type !== "Tous les types" ||
+    applied.modalite !== "" ||
+    applied.isQualiopi ||
+    applied.isCPF ||
+    applied.prixMin > 0 ||
+    applied.prixMax < 5000 ||
+    applied.q.trim() !== "" ||
+    applied.ville.trim() !== "";
 
   const resetFilters = () => {
     setSelectedType("Tous les types");
@@ -307,6 +344,18 @@ function RechercheInner() {
     setSearchVille("");
     setTri("pertinence");
     setCurrentPage(1);
+    setApplied({
+      q: "",
+      ville: "",
+      dept: "",
+      type: "Tous les types",
+      modalite: "",
+      isQualiopi: false,
+      isCPF: false,
+      prixMin: 0,
+      prixMax: 5000,
+      tri: "pertinence",
+    });
   };
 
   // All stage types: combine static + dynamic from API categories
@@ -316,11 +365,11 @@ function RechercheInner() {
   const popularSearches = ["Stage 48N", "Stage 48SI", "Stage volontaire", "Stage Paris", "Stage Lyon", "Stage Marseille"];
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-brand-bg">
       <Header />
 
       {/* Hero */}
-      <section className="bg-[#0A1628] text-white py-16 px-4">
+      <section className="bg-navy-900 text-white py-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl mb-4">
             Trouvez votre stage près de chez vous
@@ -808,7 +857,7 @@ function RechercheInner() {
                         </span>
                       </div>
                     ) : (
-                      <div className="h-1 bg-gradient-to-r from-blue-600 via-white to-red-500 opacity-30" />
+                      <div className="h-1 bg-linear-to-r from-blue-600 via-white to-red-500 opacity-30" />
                     )}
 
                     <div className="p-5 flex flex-col flex-1">

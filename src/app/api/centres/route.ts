@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth0";
 import { geocodeAddress, haversineDistance } from "@/lib/geocoding";
+import { mapAuthError } from "@/lib/auth0";
 
 // GET /api/centres — liste publique des centres actifs
 export async function GET(req: NextRequest) {
@@ -96,6 +97,7 @@ export async function PATCH(req: NextRequest) {
 // POST /api/centres — créer un centre (avec geocoding automatique)
 export async function POST(req: NextRequest) {
   try {
+    await requireAdmin();
     const body = await req.json();
 
     // Geocode the address
@@ -121,6 +123,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(centre, { status: 201 });
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     console.error("[POST /api/centres]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
@@ -129,6 +133,7 @@ export async function POST(req: NextRequest) {
 // PUT /api/centres — mettre à jour un centre (avec re-geocoding si adresse change)
 export async function PUT(req: NextRequest) {
   try {
+    await requireAdmin();
     const body = await req.json();
     const { id, ...data } = body;
 
@@ -157,6 +162,8 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(centre);
   } catch (err) {
+    const authRes = mapAuthError(err);
+    if (authRes) return authRes;
     console.error("[PUT /api/centres]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

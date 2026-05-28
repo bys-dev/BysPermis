@@ -41,7 +41,7 @@ function NotificationsBell({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { unreadCount, notifications, markAsRead, markAllAsRead } =
-    useNotifications({ enabled: isAuthenticated });
+    useNotifications({ enabled: isAuthenticated, includeList: open });
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {

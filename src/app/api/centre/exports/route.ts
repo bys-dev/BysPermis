@@ -3,6 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { requireCentreManagement, mapAuthError } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 
+const DEFAULT_LIMIT = 1000;
+const MAX_LIMIT = 5000;
+
+function parseLimit(value: string | null): number {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return DEFAULT_LIMIT;
+  return Math.min(Math.floor(n), MAX_LIMIT);
+}
+
+function parseDate(value: string | null): Date | null {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function csvEscape(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return "";
   const str = String(value);
@@ -51,15 +66,29 @@ export async function GET(request: NextRequest) {
 
     const commissionRate = centre.subscriptionPlan?.commissionRate ?? 10;
     const type = request.nextUrl.searchParams.get("type");
+    const limit = parseLimit(request.nextUrl.searchParams.get("limit"));
+    const from = parseDate(request.nextUrl.searchParams.get("from"));
+    const to = parseDate(request.nextUrl.searchParams.get("to"));
+
+    if ((from && !to) || (!from && to)) {
+      return NextResponse.json({ error: "Paramètres invalides: from et to doivent être fournis ensemble" }, { status: 400 });
+    }
+    if (from && to && from > to) {
+      return NextResponse.json({ error: "Paramètres invalides: from doit être <= to" }, { status: 400 });
+    }
 
     switch (type) {
       case "reservations": {
+        if (!from || !to) {
+          return NextResponse.json({ error: "Paramètres requis: from et to (ISO date) pour l'export reservations" }, { status: 400 });
+        }
         const reservations = await prisma.reservation.findMany({
-          where: { session: { formation: { centreId } } },
+          where: { session: { formation: { centreId } }, createdAt: { gte: from, lte: to } },
           include: {
             session: { include: { formation: { select: { titre: true } } } },
           },
           orderBy: { createdAt: "desc" },
+          take: limit,
         });
 
         const header = "Date,Eleve,Email,Telephone,Formation,Session,Montant,Statut";
@@ -84,6 +113,7 @@ export async function GET(request: NextRequest) {
           where: { formation: { centreId } },
           include: { formation: { select: { titre: true } } },
           orderBy: { dateDebut: "desc" },
+          take: limit,
         });
 
         const header = "Formation,Date debut,Date fin,Places totales,Places restantes,Taux remplissage,Statut";
@@ -112,6 +142,7 @@ export async function GET(request: NextRequest) {
             sessions: { select: { id: true } },
             _count: { select: { sessions: true } },
           },
+          take: limit,
         });
 
         // Count reservations per formation
@@ -169,6 +200,7 @@ export async function GET(request: NextRequest) {
             status: { in: ["CONFIRMEE", "TERMINEE"] },
           },
           select: { montant: true, createdAt: true },
+          take: MAX_LIMIT,
         });
 
         const monthLabels: Record<string, string> = {

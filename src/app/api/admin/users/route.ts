@@ -5,6 +5,8 @@ import { requireAdmin, requireOwner } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
 
 const ALL_ROLES = ["ELEVE", "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE", "SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER"] as const;
+const DEFAULT_PAGE_SIZE = 25;
+const MAX_PAGE_SIZE = 100;
 
 // ─── GET /api/admin/users ────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -13,17 +15,27 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const role = searchParams.get("role");
     const search = searchParams.get("search");
+    const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1);
+    const pageSizeRaw = Number(searchParams.get("pageSize") ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
+    const pageSize = Math.min(Math.max(1, Math.floor(pageSizeRaw)), MAX_PAGE_SIZE);
+    const skip = (page - 1) * pageSize;
 
-    const users = await prisma.user.findMany({
+    const where = {
+      ...(role && role !== "tous" ? { role: role as (typeof ALL_ROLES)[number] } : {}),
+      ...(search ? {
+        OR: [
+          { prenom: { contains: search, mode: "insensitive" as const } },
+          { nom:    { contains: search, mode: "insensitive" as const } },
+          { email:  { contains: search, mode: "insensitive" as const } },
+        ],
+      } : {}),
+    };
+
+    const [total, users] = await Promise.all([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
       where: {
-        ...(role && role !== "tous" ? { role: role as (typeof ALL_ROLES)[number] } : {}),
-        ...(search ? {
-          OR: [
-            { prenom: { contains: search, mode: "insensitive" as const } },
-            { nom:    { contains: search, mode: "insensitive" as const } },
-            { email:  { contains: search, mode: "insensitive" as const } },
-          ],
-        } : {}),
+        ...where,
       },
       select: {
         id: true, prenom: true, nom: true, email: true, role: true,
@@ -31,10 +43,12 @@ export async function GET(req: NextRequest) {
         _count: { select: { reservations: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: 200,
-    });
+      skip,
+      take: pageSize,
+    }),
+    ]);
 
-    return NextResponse.json(users);
+    return NextResponse.json({ items: users, total, page, pageSize });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur serveur";
     if (message === "Non authentifié" || message === "Non autorisé") {

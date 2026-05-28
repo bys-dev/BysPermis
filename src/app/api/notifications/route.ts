@@ -4,7 +4,7 @@ import { requireAuth, requireRole, PLATFORM_ROLES } from "@/lib/auth0";
 import { z } from "zod";
 
 // ─── GET /api/notifications — toutes les notifications de l'utilisateur ───
-export async function GET() {
+export async function GET(req: NextRequest) {
   let user;
   try {
     user = await requireAuth();
@@ -13,6 +13,14 @@ export async function GET() {
   }
 
   try {
+    const only = req.nextUrl.searchParams.get("only");
+    if (only === "unreadCount") {
+      const unreadCount = await prisma.notification.count({
+        where: { userId: user.id, isRead: false },
+      });
+      return NextResponse.json({ unreadCount });
+    }
+
     const notifications = await prisma.notification.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
@@ -20,6 +28,8 @@ export async function GET() {
     return NextResponse.json(notifications);
   } catch (err) {
     console.error("[GET /api/notifications] DB error:", err);
+    const only = req.nextUrl.searchParams.get("only");
+    if (only === "unreadCount") return NextResponse.json({ unreadCount: 0 });
     return NextResponse.json([]);
   }
 }

@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, mapAuthError } from "@/lib/auth0";
 
+const DEFAULT_LIMIT = 1000;
+const MAX_LIMIT = 5000;
+
+function parseLimit(value: string | null): number {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return DEFAULT_LIMIT;
+  return Math.min(Math.floor(n), MAX_LIMIT);
+}
+
+function parseDate(value: string | null): Date | null {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function csvEscape(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return "";
   const str = String(value);
@@ -36,10 +51,24 @@ export async function GET(request: NextRequest) {
     await requireAdmin();
 
     const type = request.nextUrl.searchParams.get("type");
+    const limit = parseLimit(request.nextUrl.searchParams.get("limit"));
+    const from = parseDate(request.nextUrl.searchParams.get("from"));
+    const to = parseDate(request.nextUrl.searchParams.get("to"));
+
+    if ((from && !to) || (!from && to)) {
+      return NextResponse.json({ error: "Paramètres invalides: from et to doivent être fournis ensemble" }, { status: 400 });
+    }
+    if (from && to && from > to) {
+      return NextResponse.json({ error: "Paramètres invalides: from doit être <= to" }, { status: 400 });
+    }
 
     switch (type) {
       case "centres": {
+        if (!from || !to) {
+          return NextResponse.json({ error: "Paramètres requis: from et to (ISO date) pour l'export centres" }, { status: 400 });
+        }
         const centres = await prisma.centre.findMany({
+          where: { createdAt: { gte: from, lte: to } },
           include: {
             subscriptionPlan: { select: { nom: true } },
             formations: {
@@ -56,6 +85,7 @@ export async function GET(request: NextRequest) {
             },
           },
           orderBy: { createdAt: "desc" },
+          take: limit,
         });
 
         const header = "Nom,Ville,Email,Statut,Plan,Profil completion,Revenus total,Inscrit le";
@@ -85,8 +115,13 @@ export async function GET(request: NextRequest) {
       }
 
       case "users": {
+        if (!from || !to) {
+          return NextResponse.json({ error: "Paramètres requis: from et to (ISO date) pour l'export users" }, { status: 400 });
+        }
         const users = await prisma.user.findMany({
+          where: { createdAt: { gte: from, lte: to } },
           orderBy: { createdAt: "desc" },
+          take: limit,
         });
 
         const header = "Nom,Prenom,Email,Role,Bloque,Inscrit le";
@@ -105,7 +140,11 @@ export async function GET(request: NextRequest) {
       }
 
       case "reservations": {
+        if (!from || !to) {
+          return NextResponse.json({ error: "Paramètres requis: from et to (ISO date) pour l'export reservations" }, { status: 400 });
+        }
         const reservations = await prisma.reservation.findMany({
+          where: { createdAt: { gte: from, lte: to } },
           include: {
             session: {
               include: {
@@ -119,6 +158,7 @@ export async function GET(request: NextRequest) {
             },
           },
           orderBy: { createdAt: "desc" },
+          take: limit,
         });
 
         const header = "Date,Numero,Eleve,Email,Centre,Formation,Session,Montant,Statut";

@@ -39,6 +39,13 @@ interface User {
   _count: { reservations: number };
 }
 
+interface UsersResponse {
+  items: User[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 const roleMap: Record<Role, { label: string; cls: string; icon: typeof faUsers }> = {
   ELEVE:              { label: "Élève",        cls: "bg-blue-400/10 text-blue-400 border-blue-500/20",       icon: faUserGraduate },
   CENTRE_OWNER:       { label: "Propriétaire", cls: "bg-purple-400/10 text-purple-400 border-purple-500/20", icon: faBuilding     },
@@ -59,6 +66,9 @@ export default function AdminUtilisateursPage() {
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState<"tous" | "eleves" | "centres" | "plateforme">("tous");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
+  const [total, setTotal] = useState(0);
 
   // Create modal
   const [showCreate, setShowCreate] = useState(false);
@@ -82,11 +92,25 @@ export default function AdminUtilisateursPage() {
     setError(false);
     const params = new URLSearchParams();
     if (search) params.set("search", search);
+    params.set("page", String(page));
+    params.set("pageSize", String(pageSize));
 
     const res = await fetch(`/api/admin/users?${params}`).catch(() => null);
     if (!res?.ok) { setError(true); setUsers([]); return; }
     const data = await res.json();
-    setUsers(Array.isArray(data) ? data : []);
+    const payload = data as Partial<UsersResponse>;
+    if (Array.isArray(payload.items) && typeof payload.total === "number") {
+      setUsers(payload.items);
+      setTotal(payload.total);
+    } else {
+      setUsers([]);
+      setTotal(0);
+    }
+  }, [search, page]);
+
+  useEffect(() => {
+    // Reset to first page when searching
+    setPage(1);
   }, [search]);
 
   useEffect(() => {
@@ -151,11 +175,17 @@ export default function AdminUtilisateursPage() {
   }
 
   const counts = {
-    tous: users.length,
-    eleves:     users.filter((u) => u.role === "ELEVE").length,
-    centres:    users.filter((u) => CENTRE_ROLES.includes(u.role)).length,
+    tous: total,
+    eleves: users.filter((u) => u.role === "ELEVE").length,
+    centres: users.filter((u) => CENTRE_ROLES.includes(u.role)).length,
     plateforme: users.filter((u) => PLATFORM_ROLES.includes(u.role)).length,
   };
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const windowSize = 5;
+  const startPage = Math.max(1, page - Math.floor(windowSize / 2));
+  const endPage = Math.min(totalPages, startPage + windowSize - 1);
+  const pageWindow = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
   return (
     <div className="space-y-6">
@@ -207,7 +237,7 @@ export default function AdminUtilisateursPage() {
           placeholder="Rechercher par nom, prénom ou email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
+          className="w-full pl-9 pr-4 py-2.5 bg-navy-900 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
         />
       </div>
 
@@ -222,7 +252,7 @@ export default function AdminUtilisateursPage() {
 
       {/* Table */}
       {!error && (
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 overflow-hidden">
+        <div className="bg-navy-900 rounded-xl border border-white/8 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
               <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
@@ -250,7 +280,7 @@ export default function AdminUtilisateursPage() {
                       <tr key={u.id} className="hover:bg-white/3 transition-colors">
                         <td className="py-3.5 px-5">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center shrink-0">
                               <span className="text-white text-xs font-bold">{initials}</span>
                             </div>
                             <div>
@@ -300,7 +330,7 @@ export default function AdminUtilisateursPage() {
                                 <FontAwesomeIcon icon={faEllipsisVertical} className="text-xs" />
                               </button>
                               {openMenu === u.id && (
-                                <div className="absolute right-0 top-full mt-1 w-44 bg-[#0D1D3A] border border-white/10 rounded-lg shadow-xl z-10 py-1">
+                                <div className="absolute right-0 top-full mt-1 w-44 bg-navy-800 border border-white/10 rounded-lg shadow-xl z-10 py-1">
                                   {u.isBlocked ? (
                                     <button onClick={() => toggleBlock(u.id, u.isBlocked)} className="w-full text-left px-3 py-2 text-xs text-green-400 hover:bg-white/5 transition-colors">
                                       <FontAwesomeIcon icon={faCircleCheck} className="mr-2" />
@@ -333,6 +363,69 @@ export default function AdminUtilisateursPage() {
               </table>
             </div>
           )}
+
+          {/* Pagination */}
+          {!loading && totalPages > 1 && (
+            <div className="flex items-center justify-between px-5 py-4 border-t border-white/8">
+              <p className="text-xs text-gray-500">
+                Page {page} / {totalPages} — {total} résultat{total > 1 ? "s" : ""}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  className="px-2.5 py-1.5 rounded-lg text-xs border border-white/10 text-gray-400 hover:text-white disabled:opacity-40"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                >
+                  Précédent
+                </button>
+                {startPage > 1 && (
+                  <>
+                    <button
+                      className={`px-2.5 py-1.5 rounded-lg text-xs border ${
+                        page === 1 ? "border-white/20 text-white bg-white/10" : "border-white/10 text-gray-400 hover:text-white"
+                      }`}
+                      onClick={() => setPage(1)}
+                    >
+                      1
+                    </button>
+                    {startPage > 2 && <span className="px-1 text-gray-600 text-xs">…</span>}
+                  </>
+                )}
+                {pageWindow.map((p) => (
+                  <button
+                    key={p}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs border ${
+                      page === p ? "border-white/20 text-white bg-white/10" : "border-white/10 text-gray-400 hover:text-white"
+                    }`}
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
+                {endPage < totalPages && (
+                  <>
+                    {endPage < totalPages - 1 && <span className="px-1 text-gray-600 text-xs">…</span>}
+                    <button
+                      className={`px-2.5 py-1.5 rounded-lg text-xs border ${
+                        page === totalPages ? "border-white/20 text-white bg-white/10" : "border-white/10 text-gray-400 hover:text-white"
+                      }`}
+                      onClick={() => setPage(totalPages)}
+                    >
+                      {totalPages}
+                    </button>
+                  </>
+                )}
+                <button
+                  className="px-2.5 py-1.5 rounded-lg text-xs border border-white/10 text-gray-400 hover:text-white disabled:opacity-40"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                >
+                  Suivant
+                </button>
+              </div>
+            </div>
+          )}
+
           {!loading && filteredUsers.length === 0 && !error && (
             <div className="text-center py-12 text-gray-500">
               <FontAwesomeIcon icon={faUsers} className="text-2xl mb-2" />
@@ -345,7 +438,7 @@ export default function AdminUtilisateursPage() {
       {/* ─── Modal Créer utilisateur ─── */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowCreate(false)}>
-          <div className="bg-[#0D1D3A] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-navy-800 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-white/8">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <FontAwesomeIcon icon={faUserPlus} className="text-blue-400" />
@@ -369,7 +462,7 @@ export default function AdminUtilisateursPage() {
                   <input
                     type="text" required value={createForm.prenom}
                     onChange={(e) => setCreateForm({ ...createForm, prenom: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-3 py-2.5 bg-navy-900 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                     placeholder="Jean"
                   />
                 </div>
@@ -378,7 +471,7 @@ export default function AdminUtilisateursPage() {
                   <input
                     type="text" required value={createForm.nom}
                     onChange={(e) => setCreateForm({ ...createForm, nom: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-3 py-2.5 bg-navy-900 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                     placeholder="Dupont"
                   />
                 </div>
@@ -389,7 +482,7 @@ export default function AdminUtilisateursPage() {
                 <input
                   type="email" required value={createForm.email}
                   onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-3 py-2.5 bg-navy-900 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                   placeholder="jean@exemple.fr"
                 />
               </div>
@@ -399,7 +492,7 @@ export default function AdminUtilisateursPage() {
                 <select
                   value={createForm.role}
                   onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as Role })}
-                  className="w-full px-3 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-3 py-2.5 bg-navy-900 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500/50"
                 >
                   {ALL_ROLES.map((r) => (
                     <option key={r.value} value={r.value}>{r.label}</option>
@@ -414,7 +507,7 @@ export default function AdminUtilisateursPage() {
                 <input
                   type="text" value={createForm.password}
                   onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-3 py-2.5 bg-navy-900 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                   placeholder="Min. 8 caractères"
                   minLength={8}
                 />
@@ -442,7 +535,7 @@ export default function AdminUtilisateursPage() {
       {/* ─── Modal Supprimer utilisateur ─── */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setDeleteTarget(null)}>
-          <div className="bg-[#0D1D3A] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-navy-800 border border-white/10 rounded-2xl w-full max-w-md shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-4">
                 <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400 text-xl" />
