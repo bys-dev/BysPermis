@@ -28,10 +28,15 @@ exports.onExecutePostLogin = async (event, api) => {
   const nativeRole = nativeRoles.find(function (r) { return VALID_ROLES.indexOf(r) !== -1; });
 
   const rawRole = VALID_ROLES.indexOf(appRole) !== -1 ? appRole : nativeRole;
-  const role = VALID_ROLES.indexOf(rawRole) !== -1 ? rawRole : "ELEVE";
 
-  api.idToken.setCustomClaim(namespace + "/role", role);
-  api.accessToken.setCustomClaim(namespace + "/role", role);
-  api.idToken.setCustomClaim("role", role);
+  // Ne pas injecter ELEVE par défaut : sinon le token écrase les rôles OWNER/ADMIN en base.
+  // Les nouveaux comptes sans rôle sont gérés côté app (getCurrentUser → ELEVE).
+  if (VALID_ROLES.indexOf(rawRole) === -1) {
+    return;
+  }
+
+  api.idToken.setCustomClaim(namespace + "/role", rawRole);
+  api.accessToken.setCustomClaim(namespace + "/role", rawRole);
+  api.idToken.setCustomClaim("role", rawRole);
 };
 `;
