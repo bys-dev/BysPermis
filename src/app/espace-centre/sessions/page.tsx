@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarDays, faPlus, faUsers, faLocationDot, faClock,
-  faSpinner, faXmark, faBan, faPen, faTriangleExclamation,
+  faSpinner, faXmark, faBan, faPen, faTriangleExclamation, faFileLines,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
 
@@ -281,8 +281,22 @@ export default function SessionsCentrePage() {
                   </div>
 
                   {/* Actions */}
-                  {s.status === "ACTIVE" && (
-                    <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
+                    {s.reservationsCount > 0 && s.status !== "ANNULEE" && (
+                      <a
+                        href={`/api/centre/sessions/${s.id}/emargement`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                        style={{ background: "rgba(255,255,255,0.06)" }}
+                        title="Feuille d'émargement (PDF)"
+                      >
+                        <FontAwesomeIcon icon={faFileLines} className="w-3 h-3" />
+                        Émargement
+                      </a>
+                    )}
+                    {s.status === "ACTIVE" && (
+                      <>
                       <button
                         onClick={() => openEditModal(s)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition-colors"
@@ -317,8 +331,9 @@ export default function SessionsCentrePage() {
                           Annuler
                         </button>
                       )}
-                    </div>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             );

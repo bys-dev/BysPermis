@@ -254,7 +254,13 @@ export default function PaiementPage() {
       router.push(`/reserver/${sessionId}/donnees`);
       return;
     }
-    setStagiaire(JSON.parse(stored));
+    const parsed = JSON.parse(stored);
+    // Les attestations d'éligibilité doivent avoir été validées
+    if (!parsed.attestationPasStage12Mois || !parsed.attestationPermisValide) {
+      router.push(`/reserver/${sessionId}/eligibilite`);
+      return;
+    }
+    setStagiaire(parsed);
 
     // Créer le PaymentIntent
     createPaymentIntent();

@@ -100,11 +100,11 @@ export default function DonneesPage() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    // Stocker les données dans sessionStorage pour les récupérer à l'étape paiement
+    // Stocker les données dans sessionStorage pour les récupérer aux étapes suivantes
     sessionStorage.setItem(`reserver_${sessionId}`, JSON.stringify(form));
     // Simuler un court délai
     await new Promise((r) => setTimeout(r, 600));
-    router.push(`/reserver/${sessionId}/paiement`);
+    router.push(`/reserver/${sessionId}/eligibilite`);
   }
 
   const s = session;
@@ -257,7 +257,7 @@ export default function DonneesPage() {
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-4 rounded-xl text-base transition-all shadow-lg shadow-red-600/20"
               >
-                {loading ? "Enregistrement…" : <>Continuer vers le paiement <FontAwesomeIcon icon={faArrowRight} /></>}
+                {loading ? "Enregistrement…" : <>Continuer <FontAwesomeIcon icon={faArrowRight} /></>}
               </button>
             </div>
           </form>

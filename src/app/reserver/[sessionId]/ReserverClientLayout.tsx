@@ -8,6 +8,7 @@ import { faCheck, faShieldHalved, faLock } from "@fortawesome/free-solid-svg-ico
 
 const steps = [
   { label: "Informations", path: "donnees" },
+  { label: "Éligibilité", path: "eligibilite" },
   { label: "Paiement", path: "paiement" },
   { label: "Confirmation", path: "confirmation" },
 ];

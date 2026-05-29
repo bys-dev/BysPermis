@@ -84,6 +84,9 @@ const createSchema = z.object({
   codePostal: z.string().optional(),
   ville: z.string().optional(),
   numeroPermis: z.string().optional(),
+  casStage: z.number().int().min(1).max(4).optional(),
+  attestationPasStage12Mois: z.boolean().optional(),
+  attestationPermisValide: z.boolean().optional(),
   stripePaymentIntentId: z.string().min(1),
 });
 
@@ -154,6 +157,11 @@ export async function POST(req: NextRequest) {
           codePostal: data.codePostal,
           ville: data.ville,
           numeroPermis: data.numeroPermis,
+          casStage: data.casStage,
+          attestationPasStage12Mois: data.attestationPasStage12Mois ?? false,
+          attestationPermisValide: data.attestationPermisValide ?? false,
+          attestationLe:
+            data.attestationPasStage12Mois && data.attestationPermisValide ? new Date() : null,
         },
         include: { session: { include: { formation: { include: { centre: true } } } } },
       });

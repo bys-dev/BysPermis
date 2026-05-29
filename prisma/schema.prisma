@@ -338,6 +338,15 @@ model Reservation {
   codePostal        String?
   ville             String?
   numeroPermis      String?
+  // Cas du stage déclaré par le stagiaire (parmi les 4 cas réglementaires) :
+  // 1 = volontaire, 2 = probatoire (48N), 3 = alternative/composition pénale, 4 = peine complémentaire.
+  casStage          Int?
+  // Attestation d'éligibilité (document de vente — étape avant paiement)
+  // Aucune base nationale n'étant accessible, l'éligibilité repose sur une
+  // attestation sur l'honneur du stagiaire, conservée comme preuve.
+  attestationPasStage12Mois Boolean   @default(false) // n'a pas suivi de stage récup points < 12 mois avant la date de début
+  attestationPermisValide   Boolean   @default(false) // permis en cours de validité (même si solde de points nul ou négatif)
+  attestationLe             DateTime? // horodatage de l'attestation
   // Justificatifs uploadés par le stagiaire (URL Vercel Blob)
   lettre48NUrl      String?
   pieceIdentiteUrl  String?
