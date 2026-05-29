@@ -14,7 +14,6 @@ import {
   faBell,
   faCircleInfo,
   faFileLines,
-  faSpinner,
   faTriangleExclamation,
   faArrowRight,
   faClock,
@@ -23,6 +22,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 interface UserProfile {
@@ -171,18 +171,8 @@ export default function DashboardPage() {
         new Date(b.session.dateDebut).getTime()
     )[0] ?? null;
 
-  // ─── Loading ──────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement du tableau de bord...</span>
-      </div>
-    );
-  }
-
-  // ─── Error ────────────────────────────────────────────
-  if (error || !user) {
+  // ─── Error (hors chargement) ───────────────────────────
+  if (!loading && (error || !user)) {
     return (
       <div
         className="text-center py-16 rounded-xl border"
@@ -196,7 +186,7 @@ export default function DashboardPage() {
           className="text-3xl text-red-400 mb-3"
         />
         <p className="text-white font-medium mb-1">Erreur de chargement</p>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-gray-400 text-sm mb-6">
           {error || "Impossible de charger votre profil."}
         </p>
         <button
@@ -213,6 +203,19 @@ export default function DashboardPage() {
     ? daysUntil(nextReservation.session.dateDebut)
     : null;
 
+  if (loading) {
+    return (
+      <div className="relative min-h-[50vh]">
+        <PageHeaderSkeleton />
+        <KpiGridSkeleton cols={4} />
+        <div className="h-48 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        <LoadingOverlay show label="Chargement du tableau de bord..." />
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
   return (
     <div>
       {/* Welcome */}
@@ -220,7 +223,7 @@ export default function DashboardPage() {
         <h1 className="font-display font-bold text-2xl text-white mb-1">
           Bonjour, {user.prenom || user.nom} !
         </h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-400 text-sm">
           Bienvenue dans votre espace personnel
         </p>
       </div>
@@ -362,7 +365,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+            <p className="text-xs text-gray-400 mt-1">{s.label}</p>
           </div>
         ))}
       </div>
@@ -418,7 +421,7 @@ export default function DashboardPage() {
               </span>
               <FontAwesomeIcon
                 icon={faArrowRight}
-                className="w-3 h-3 ml-auto text-gray-600 group-hover:text-blue-400 transition-colors"
+                className="w-3 h-3 ml-auto text-gray-400 group-hover:text-blue-400 transition-colors"
               />
             </Link>
           ))}
@@ -449,9 +452,9 @@ export default function DashboardPage() {
           >
             <FontAwesomeIcon
               icon={faBell}
-              className="text-gray-700 text-2xl mb-2"
+              className="text-gray-400 text-2xl mb-2"
             />
-            <p className="text-gray-500 text-sm">Aucune notification</p>
+            <p className="text-gray-400 text-sm">Aucune notification</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -485,10 +488,10 @@ export default function DashboardPage() {
                         <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {n.contenu}
                     </p>
-                    <p className="text-xs text-gray-700 mt-1">
+                    <p className="text-xs text-gray-400 mt-1">
                       {timeAgo(n.createdAt)}
                     </p>
                   </div>

@@ -28,6 +28,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 interface ReservationDetail {
@@ -203,9 +204,10 @@ export default function ReservationDetailPage() {
   // ─── Loading ──────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement de la réservation...</span>
+      <div className="relative min-h-[50vh]">
+        <PageHeaderSkeleton />
+        <div className="h-80 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        <LoadingOverlay show label="Chargement de la réservation..." />
       </div>
     );
   }

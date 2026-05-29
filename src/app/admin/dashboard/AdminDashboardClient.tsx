@@ -262,7 +262,7 @@ export default function AdminDashboardClient({
             >
               <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5 text-blue-400" />
               <span className="hidden sm:inline">Exporter</span>
-              <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-500" />
+              <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-400" />
             </button>
             {exportOpen && (
               <div className="absolute right-0 top-full mt-2 w-72 rounded-xl shadow-xl z-50 overflow-hidden bg-navy-800 border border-white/10">
@@ -309,8 +309,8 @@ export default function AdminDashboardClient({
               )}
             </div>
             <p className="text-2xl font-bold text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
+            <p className="text-xs text-gray-400 mt-1">{k.label}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">{k.sub}</p>
           </div>
         ))}
       </div>
@@ -328,31 +328,31 @@ export default function AdminDashboardClient({
         </div>
         <div className="grid sm:grid-cols-2 gap-4 mb-4">
           <div className="rounded-lg bg-white/3 border border-white/5 p-4">
-            <p className="text-xs text-gray-500">Note moyenne BYS Permis</p>
+            <p className="text-xs text-gray-400">Note moyenne BYS Permis</p>
             <p className="text-2xl font-bold text-white mt-1 flex items-center gap-2">
               <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-lg" />
               {questionnaires.platformAverage != null ? `${questionnaires.platformAverage}/5` : "—"}
             </p>
           </div>
           <div className="rounded-lg bg-white/3 border border-white/5 p-4">
-            <p className="text-xs text-gray-500">Questionnaires reçus</p>
+            <p className="text-xs text-gray-400">Questionnaires reçus</p>
             <p className="text-2xl font-bold text-white mt-1">{questionnaires.platformCount}</p>
           </div>
         </div>
         {questionnaires.recentPlatform.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-4">Aucun retour plateforme pour le moment.</p>
+          <p className="text-sm text-gray-400 text-center py-4">Aucun retour plateforme pour le moment.</p>
         ) : (
           <div className="space-y-2">
             {questionnaires.recentPlatform.map((r) => (
               <div key={r.id} className="flex items-start justify-between gap-3 p-3 rounded-lg bg-white/3 border border-white/5">
                 <div className="min-w-0">
                   <p className="text-sm text-white font-medium truncate">{r.auteur}</p>
-                  <p className="text-xs text-gray-500 truncate">{r.formation} — {r.centre}</p>
+                  <p className="text-xs text-gray-400 truncate">{r.formation} — {r.centre}</p>
                   {r.commentaire && <p className="text-xs text-gray-400 mt-1 italic truncate">« {r.commentaire} »</p>}
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-yellow-400 font-semibold text-sm">{r.noteGlobale.toFixed(1)}/5</span>
-                  <p className="text-[10px] text-gray-600">{timeAgo(r.createdAt)}</p>
+                  <p className="text-[10px] text-gray-400">{timeAgo(r.createdAt)}</p>
                 </div>
               </div>
             ))}
@@ -365,14 +365,14 @@ export default function AdminDashboardClient({
           <div className="bg-navy-900 rounded-xl border border-white/8 p-5">
             <h2 className="text-white font-semibold text-sm mb-4">Centres en attente</h2>
             {stats.centresEnAttenteList.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 text-sm">Aucun centre en attente</div>
+              <div className="text-center py-8 text-gray-400 text-sm">Aucun centre en attente</div>
             ) : (
               <div className="space-y-3">
                 {stats.centresEnAttenteList.map((c) => (
                   <div key={c.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/3 border border-white/5">
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{c.nom}</p>
-                      <p className="text-gray-500 text-xs truncate">
+                      <p className="text-gray-400 text-xs truncate">
                         {c.ville} • {c.email ?? ""} • {formatDate(new Date(c.createdAt))}
                       </p>
                     </div>
@@ -409,7 +409,7 @@ export default function AdminDashboardClient({
           <div className="bg-navy-900 rounded-xl border border-white/8 p-5">
             <h2 className="text-white font-semibold text-sm mb-4">Réservations récentes</h2>
             {stats.reservationsRecentes.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 text-sm">Aucune réservation récente</div>
+              <div className="text-center py-8 text-gray-400 text-sm">Aucune réservation récente</div>
             ) : (
               <div className="space-y-3">
                 {stats.reservationsRecentes.map((r) => {
@@ -421,13 +421,13 @@ export default function AdminDashboardClient({
                           <span className="text-white font-medium">{r.eleve}</span> —{" "}
                           <span className="text-gray-400">{r.stage}</span>
                         </p>
-                        <p className="text-gray-600 text-xs mt-0.5">{timeAgo(r.createdAt)}</p>
+                        <p className="text-gray-400 text-xs mt-0.5">{timeAgo(r.createdAt)}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badge.cls}`}>
                           {badge.label}
                         </span>
-                        <p className="text-gray-500 text-xs mt-1">{formatPrice(r.montant)}</p>
+                        <p className="text-gray-400 text-xs mt-1">{formatPrice(r.montant)}</p>
                       </div>
                     </div>
                   );
@@ -459,7 +459,7 @@ export default function AdminDashboardClient({
           <div className="bg-navy-900 rounded-xl border border-white/8 p-5">
             <h2 className="text-white font-semibold text-sm mb-4">Activité</h2>
             {activityFeed.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 text-sm">Aucune activité</div>
+              <div className="text-center py-8 text-gray-400 text-sm">Aucune activité</div>
             ) : (
               <div className="space-y-3">
                 {activityFeed.map((it) => {
@@ -471,8 +471,8 @@ export default function AdminDashboardClient({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-xs font-semibold">{it.label}</p>
-                        <p className="text-gray-500 text-xs truncate">{it.detail}</p>
-                        <p className="text-gray-600 text-[11px] mt-0.5">{timeAgo(it.time)}</p>
+                        <p className="text-gray-400 text-xs truncate">{it.detail}</p>
+                        <p className="text-gray-400 text-[11px] mt-0.5">{timeAgo(it.time)}</p>
                       </div>
                     </div>
                   );

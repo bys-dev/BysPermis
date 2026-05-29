@@ -10,6 +10,7 @@ import {
   faPlus,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface CentreItem {
   id: string;
@@ -85,8 +86,11 @@ export default function CentreSwitcher({ userRole }: { userRole: string | null }
 
   if (loading) {
     return (
-      <div className="px-3 py-3">
-        <div className="h-12 rounded-lg animate-pulse" style={{ background: "rgba(255,255,255,0.05)" }} />
+      <div className="px-3 py-3 relative">
+        <div className="opacity-40 pointer-events-none select-none">
+          <div className="h-12 rounded-lg animate-pulse" style={{ background: "rgba(255,255,255,0.05)" }} />
+        </div>
+        <LoadingOverlay show label="Chargement..." />
       </div>
     );
   }

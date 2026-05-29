@@ -39,6 +39,8 @@ export async function GET() {
         status: s.status,
         stagiaires: s.reservations.map((r) => ({
           id: r.user.id,
+          reservationId: r.id,
+          numero: r.numero,
           nom: r.user.nom,
           prenom: r.user.prenom,
           present: false, // V2: read from emargement table

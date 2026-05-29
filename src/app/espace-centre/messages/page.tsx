@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faComments,
   faPaperPlane,
@@ -141,7 +142,11 @@ export default function CentreMessagesPage() {
   const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
 
   return (
-    <div>
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="flex items-center gap-3 mb-6">
         <h1 className="text-2xl font-bold text-white flex items-center gap-3">
           <FontAwesomeIcon icon={faComments} className="text-blue-400" />
@@ -153,6 +158,7 @@ export default function CentreMessagesPage() {
           </span>
         )}
       </div>
+      )}
 
       <div
         className="flex rounded-xl border overflow-hidden"
@@ -177,14 +183,7 @@ export default function CentreMessagesPage() {
             Stagiaires
           </div>
           <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="text-center py-10">
-                <FontAwesomeIcon
-                  icon={faSpinner}
-                  className="text-blue-400 animate-spin"
-                />
-              </div>
-            ) : conversations.length === 0 ? (
+            {!loading && conversations.length === 0 ? (
               <div className="text-center py-10 px-4">
                 <FontAwesomeIcon
                   icon={faInbox}
@@ -384,6 +383,8 @@ export default function CentreMessagesPage() {
           )}
         </div>
       </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des messages..." />
     </div>
   );
 }

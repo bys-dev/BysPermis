@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEuro,
-  faSpinner,
   faArrowUp,
   faArrowDown,
   faBuilding,
@@ -15,8 +14,10 @@ import {
   faFilter,
   faCheck,
   faClock,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -220,6 +221,8 @@ function RevenusTab() {
   }
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-8">
       {/* Export button */}
       <div className="flex justify-end">
@@ -267,10 +270,7 @@ function RevenusTab() {
       <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-6">Commissions mensuelles</h2>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-8 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : monthly.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 text-sm">Aucune donnee pour cette periode</p>
@@ -302,10 +302,7 @@ function RevenusTab() {
       <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-5">Revenus par centre</h2>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : centres.length === 0 ? (
           <div className="text-center py-6">
             <p className="text-gray-500 text-sm">Aucun revenu enregistre</p>
@@ -346,6 +343,9 @@ function RevenusTab() {
           </div>
         )}
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des revenus..." />
     </div>
   );
 }
@@ -437,6 +437,8 @@ function PaiementsCentresTab() {
   }
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -551,9 +553,10 @@ function PaiementsCentresTab() {
       {/* Table */}
       <div className="rounded-xl border border-white/8 bg-[#0A1628] overflow-hidden">
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-12 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
+          <div className="p-6 space-y-3 animate-pulse">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-10 rounded bg-white/5" />
+            ))}
           </div>
         ) : !data?.payments.length ? (
           <div className="text-center py-12">
@@ -561,6 +564,7 @@ function PaiementsCentresTab() {
             <p className="text-gray-500 text-sm">Aucun paiement trouve</p>
           </div>
         ) : (
+          <>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -614,7 +618,6 @@ function PaiementsCentresTab() {
               </tbody>
             </table>
           </div>
-        )}
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (
@@ -640,7 +643,12 @@ function PaiementsCentresTab() {
             </div>
           </div>
         )}
+          </>
+        )}
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des paiements centres..." />
     </div>
   );
 }

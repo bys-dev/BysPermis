@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartBar,
-  faSpinner,
   faCrown,
   faEuro,
   faUsers,
@@ -27,6 +26,7 @@ import {
   faArrowTrendUp,
   faArrowTrendDown,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import { formatPrice } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
@@ -955,16 +955,7 @@ export default function AdminAnalyticsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-lg" />
-        <span className="text-sm">Chargement des analytics...</span>
-      </div>
-    );
-  }
-
-  if (error || !data) {
+  if (!loading && (error || !data)) {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-white">Analytics</h1>
@@ -983,8 +974,11 @@ export default function AdminAnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="relative min-h-[50vh] space-y-6">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : data ? (
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
@@ -1003,7 +997,16 @@ export default function AdminAnalyticsPage() {
           <span className="text-yellow-400 text-xs font-medium">Donnees temps reel</span>
         </div>
       </div>
+      ) : null}
 
+      {loading ? (
+        <>
+          <div className="h-12 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+          <KpiGridSkeleton cols={4} />
+          <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        </>
+      ) : data ? (
+      <>
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-xl bg-[#0A1628] border border-white/8 overflow-x-auto">
         {tabs.map((tab) => (
@@ -1029,6 +1032,10 @@ export default function AdminAnalyticsPage() {
         {activeTab === "centres" && <TabCentres data={data} />}
         {activeTab === "performances" && <TabPerformances data={data} />}
       </div>
+      </>
+      ) : null}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des analytics..." />
     </div>
   );
 }

@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarCheck, faLocationDot, faClock, faFileLines,
   faCircleCheck, faCircleXmark, faCircleExclamation, faHourglassHalf,
-  faSpinner, faSearch, faTriangleExclamation, faChevronRight, faXmark,
+  faSearch, faTriangleExclamation, faChevronRight, faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay, { KpiGridSkeleton } from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 interface Reservation {
@@ -122,7 +123,9 @@ export default function ReservationsPage() {
         <p className="text-gray-500 text-sm">Retrouvez l&apos;historique de tous vos stages</p>
       </div>
 
-      {/* Stats — hidden during loading/error */}
+      <div className="relative min-h-[50vh]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {/* Stats */}
       {!loading && !error && reservations.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
@@ -139,7 +142,7 @@ export default function ReservationsPage() {
         </div>
       )}
 
-      {/* Filters & Search — hidden during loading/error */}
+      {/* Filters & Search */}
       {!loading && !error && reservations.length > 0 && (
         <div className="mb-6 space-y-3">
           {/* Status filter pills */}
@@ -189,12 +192,7 @@ export default function ReservationsPage() {
       )}
 
       {/* Loading */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement de vos réservations...</span>
-        </div>
-      ) : error ? (
+      {!loading && error ? (
         /* Error */
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
@@ -292,7 +290,6 @@ export default function ReservationsPage() {
         </div>
       )}
 
-      {/* CTA */}
       {!loading && !error && (
         <div className="mt-10 text-center rounded-xl p-8 border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
           <p className="text-gray-400 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
@@ -301,6 +298,20 @@ export default function ReservationsPage() {
           </Link>
         </div>
       )}
+        </div>
+        {loading && (
+          <>
+            <KpiGridSkeleton cols={4} />
+            <div className="h-12 rounded-lg bg-white/5 border border-white/5 animate-pulse mb-6" />
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-24 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+              ))}
+            </div>
+          </>
+        )}
+        <LoadingOverlay show={loading} label="Chargement de vos réservations..." />
+      </div>
     </div>
   );
 }

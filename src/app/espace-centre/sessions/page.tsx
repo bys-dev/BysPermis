@@ -7,6 +7,7 @@ import {
   faSpinner, faXmark, faBan, faPen, faTriangleExclamation, faFileLines,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface Session {
   id: string;
@@ -19,6 +20,8 @@ interface Session {
   placesTotal: number;
   placesRestantes: number;
   status: string;
+  formateurResponsable?: string | null;
+  horaires?: string | null;
   reservationsCount: number;
 }
 
@@ -48,6 +51,8 @@ export default function SessionsCentrePage() {
     dateDebut: "",
     dateFin: "",
     placesTotal: 10,
+    formateurResponsable: "",
+    horaires: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -89,7 +94,7 @@ export default function SessionsCentrePage() {
 
   function openCreateModal() {
     setEditingSession(null);
-    setFormData({ formationId: formations[0]?.id ?? "", dateDebut: "", dateFin: "", placesTotal: 10 });
+    setFormData({ formationId: formations[0]?.id ?? "", dateDebut: "", dateFin: "", placesTotal: 10, formateurResponsable: "", horaires: "" });
     setFormError(null);
     setShowModal(true);
   }
@@ -101,6 +106,8 @@ export default function SessionsCentrePage() {
       dateDebut: session.dateDebut.slice(0, 16),
       dateFin: session.dateFin.slice(0, 16),
       placesTotal: session.placesTotal,
+      formateurResponsable: session.formateurResponsable ?? "",
+      horaires: session.horaires ?? "",
     });
     setFormError(null);
     setShowModal(true);
@@ -122,6 +129,8 @@ export default function SessionsCentrePage() {
             dateDebut: formData.dateDebut,
             dateFin: formData.dateFin,
             placesTotal: formData.placesTotal,
+            formateurResponsable: formData.formateurResponsable,
+            horaires: formData.horaires,
           }),
         });
         const data = await res.json();
@@ -137,6 +146,8 @@ export default function SessionsCentrePage() {
             dateDebut: formData.dateDebut,
             dateFin: formData.dateFin,
             placesTotal: formData.placesTotal,
+            formateurResponsable: formData.formateurResponsable,
+            horaires: formData.horaires,
           }),
         });
         const data = await res.json();
@@ -171,7 +182,11 @@ export default function SessionsCentrePage() {
   const actives = sessions.filter((s) => s.status === "ACTIVE");
 
   return (
-    <div>
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Mes sessions</h1>
@@ -187,6 +202,7 @@ export default function SessionsCentrePage() {
           Nouvelle session
         </button>
       </div>
+      )}
 
       {/* Error state */}
       {error && (
@@ -194,14 +210,6 @@ export default function SessionsCentrePage() {
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
           <p className="text-sm text-red-400">{error}</p>
           <button onClick={loadSessions} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
-        </div>
-      )}
-
-      {/* Loading state */}
-      {loading && !error && (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
         </div>
       )}
 
@@ -419,6 +427,31 @@ export default function SessionsCentrePage() {
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Animateur responsable</label>
+                  <input
+                    type="text"
+                    value={formData.formateurResponsable}
+                    onChange={(e) => setFormData({ ...formData, formateurResponsable: e.target.value })}
+                    placeholder="Nom de l'expert / psychologue"
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Horaires</label>
+                  <input
+                    type="text"
+                    value={formData.horaires}
+                    onChange={(e) => setFormData({ ...formData, horaires: e.target.value })}
+                    placeholder="9h00 – 12h30 / 13h30 – 17h00"
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+                  />
+                </div>
+              </div>
+
               {formError && (
                 <div className="flex items-center gap-2 text-red-400 text-sm">
                   <FontAwesomeIcon icon={faTriangleExclamation} className="w-3.5 h-3.5" />
@@ -448,6 +481,8 @@ export default function SessionsCentrePage() {
           </div>
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des sessions..." />
     </div>
   );
 }

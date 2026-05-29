@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSpinner, faCheckCircle, faBuilding, faLaptop } from "@fortawesome/free-solid-svg-icons"
+import { faCheckCircle, faBuilding, faLaptop } from "@fortawesome/free-solid-svg-icons"
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay"
 import QuestionnaireForm, { type QuestionItem } from "@/components/reviews/QuestionnaireForm"
 
 type QuestionnaireData = {
@@ -47,15 +48,7 @@ export default function QuestionnaireReservationPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-2xl text-blue-400" />
-      </div>
-    )
-  }
-
-  if (!data) {
+  if (!loading && !data) {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
         <p className="text-gray-400 mb-4">Questionnaire indisponible.</p>
@@ -66,7 +59,7 @@ export default function QuestionnaireReservationPage() {
     )
   }
 
-  if (step === "done" || (data.completed.CENTRE && data.completed.PLATFORM)) {
+  if (!loading && data && (step === "done" || (data.completed.CENTRE && data.completed.PLATFORM))) {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
         <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-green-400 mb-4" />
@@ -85,7 +78,23 @@ export default function QuestionnaireReservationPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="relative min-h-[50vh] max-w-xl mx-auto">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <>
+          <PageHeaderSkeleton />
+          <div className="flex gap-2 mb-6">
+            <div className="flex-1 h-10 rounded-lg bg-white/5 animate-pulse" />
+            <div className="flex-1 h-10 rounded-lg bg-white/5 animate-pulse" />
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+            ))}
+          </div>
+        </>
+      ) : data ? (
+        <>
       <div className="flex gap-2 mb-6">
         <StepBadge
           label="Centre"
@@ -126,6 +135,10 @@ export default function QuestionnaireReservationPage() {
           onSuccess={() => refreshAfterSubmit("PLATFORM")}
         />
       )}
+        </>
+      ) : null}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement du questionnaire..." />
     </div>
   )
 }

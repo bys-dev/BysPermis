@@ -9,6 +9,7 @@ import {
   faInbox,
   faCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface Conversation {
   partnerId: string;
@@ -157,13 +158,19 @@ export default function EleveMessagesPage() {
           >
             Conversations
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto relative min-h-[120px]">
+            <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
             {loading ? (
-              <div className="text-center py-10">
-                <FontAwesomeIcon
-                  icon={faSpinner}
-                  className="text-blue-400 animate-spin"
-                />
+              <div className="p-4 space-y-3 animate-pulse">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-white/5 shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 w-32 bg-white/5 rounded" />
+                      <div className="h-2 w-full bg-white/5 rounded" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : conversations.length === 0 ? (
               <div className="text-center py-10 px-4">
@@ -211,6 +218,8 @@ export default function EleveMessagesPage() {
                 </button>
               ))
             )}
+            </div>
+            <LoadingOverlay show={loading} label="Chargement des conversations..." />
           </div>
         </div>
 
@@ -254,13 +263,18 @@ export default function EleveMessagesPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 relative min-h-[120px]">
+                <div className={loadingMessages ? "opacity-40 pointer-events-none select-none" : ""}>
                 {loadingMessages ? (
-                  <div className="text-center py-10">
-                    <FontAwesomeIcon
-                      icon={faSpinner}
-                      className="text-blue-400 animate-spin"
-                    />
+                  <div className="space-y-3 animate-pulse">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+                      >
+                        <div className="h-12 w-48 rounded-2xl bg-white/5" />
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   messages.map((msg) => {
@@ -309,6 +323,8 @@ export default function EleveMessagesPage() {
                     );
                   })
                 )}
+                </div>
+                <LoadingOverlay show={loadingMessages} label="Chargement des messages..." />
                 <div ref={chatEndRef} />
               </div>
 

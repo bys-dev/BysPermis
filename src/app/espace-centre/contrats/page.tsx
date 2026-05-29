@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faFileContract,
   faSpinner,
@@ -127,22 +128,20 @@ export default function CentreContratsPage() {
   const totalTerminees = reservations.filter((r) => r.status === "TERMINEE").length;
 
   return (
-    <div>
-      {/* Header */}
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Contrats de formation</h1>
         <p className="text-gray-500 text-sm">
           Gerez et telechargez les contrats de formation de vos stagiaires
         </p>
       </div>
+      )}
 
-      {/* Loading */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
-        </div>
-      ) : error ? (
+      {!loading && error ? (
         <div
           className="text-center py-16 rounded-xl border"
           style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}
@@ -157,7 +156,7 @@ export default function CentreContratsPage() {
             Reessayer
           </button>
         </div>
-      ) : (
+      ) : !loading ? (
         <>
           {/* Stats */}
           {reservations.length > 0 && (
@@ -465,7 +464,9 @@ export default function CentreContratsPage() {
             </>
           )}
         </>
-      )}
+      ) : null}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des contrats..." />
     </div>
   );
 }

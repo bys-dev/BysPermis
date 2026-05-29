@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreStaff } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
-import { sendQuestionnaireEmail } from "@/lib/email";
+import { sendQuestionnaireEmail, sendDocumentEmail } from "@/lib/email";
+import { renderIndividualEmargementPdf } from "@/lib/pdf-helpers";
 import { z } from "zod";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "https://bys-permis.vercel.app";
@@ -104,6 +105,39 @@ export async function POST(
         },
         data: { questionnaireEnvoye: true },
       });
+
+      // Feuille d'émargement individuelle : générée et envoyée par PDF à chaque stagiaire présent
+      await Promise.allSettled(
+        terminatedReservations.map(async (r) => {
+          // Évite les doublons si l'émargement est revalidé
+          const already = await prisma.document.findFirst({
+            where: { reservationId: r.id, kind: "EMARGEMENT" },
+          });
+          if (already) return;
+          const pdf = await renderIndividualEmargementPdf(r.id);
+          await prisma.document.create({
+            data: {
+              kind: "EMARGEMENT",
+              direction: "CENTRE_VERS_ELEVE",
+              nom: "Feuille d'émargement",
+              mimeType: "application/pdf",
+              status: "ENVOYE",
+              reservationId: r.id,
+              centreId,
+              uploadedById: user.id,
+            },
+          });
+          await sendDocumentEmail({
+            to: r.email,
+            prenom: r.prenom,
+            sujet: `Feuille d'émargement — ${r.session.formation.titre}`,
+            intro: `Votre présence au stage « ${r.session.formation.titre} » a été validée. Vous trouverez ci-joint votre feuille d'émargement individuelle.`,
+            ctaUrl: `${APP_URL}/espace-eleve/documents`,
+            ctaLabel: "Voir mes documents",
+            attachments: [{ filename: pdf.filename, content: pdf.buffer }],
+          });
+        }),
+      );
     }
 
     return NextResponse.json({

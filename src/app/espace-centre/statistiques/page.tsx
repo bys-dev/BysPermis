@@ -12,6 +12,7 @@ import {
   faArrowTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice } from "@/lib/utils";
+import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 // ─── TYPES ──────────────────────────────────────────────
 
@@ -99,46 +100,30 @@ export default function StatistiquesPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement des statistiques...</span>
-      </div>
-    );
-  }
+  const maxMonthlyRevenue = stats
+    ? Math.max(...stats.monthlyRevenue.map((m) => m.revenue), 1)
+    : 1;
+  const maxFormationRes = stats
+    ? Math.max(...(stats.topFormations.map((f) => f.reservations) || [1]), 1)
+    : 1;
+  const totalStatus = stats
+    ? stats.statusBreakdown.confirmees +
+      stats.statusBreakdown.enAttente +
+      stats.statusBreakdown.annulees +
+      stats.statusBreakdown.terminees || 1
+    : 1;
 
-  if (error || !stats) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
-        <p className="text-sm text-red-400">{error ?? "Erreur inconnue"}</p>
-        <button
-          onClick={() => { setLoading(true); setError(null); location.reload(); }}
-          className="text-xs text-blue-400 hover:text-blue-300 underline"
-        >
-          Reessayer
-        </button>
-      </div>
-    );
-  }
-
-  const maxMonthlyRevenue = Math.max(...stats.monthlyRevenue.map((m) => m.revenue), 1);
-  const maxFormationRes = Math.max(...(stats.topFormations.map((f) => f.reservations) || [1]), 1);
-  const totalStatus =
-    stats.statusBreakdown.confirmees +
-    stats.statusBreakdown.enAttente +
-    stats.statusBreakdown.annulees +
-    stats.statusBreakdown.terminees || 1;
-
-  const statusItems = [
+  const statusItems = stats
+    ? [
     { label: "Confirmees", value: stats.statusBreakdown.confirmees, color: "bg-green-500" },
     { label: "En attente", value: stats.statusBreakdown.enAttente, color: "bg-yellow-500" },
     { label: "Annulees", value: stats.statusBreakdown.annulees, color: "bg-red-500" },
     { label: "Terminees", value: stats.statusBreakdown.terminees, color: "bg-gray-500" },
-  ];
+  ]
+    : [];
 
-  const kpis = [
+  const kpis = stats
+    ? [
     {
       label: "Revenus du mois",
       value: formatPrice(stats.revenusNets),
@@ -167,11 +152,15 @@ export default function StatistiquesPage() {
       color: "text-yellow-400",
       bg: "bg-yellow-400/10",
     },
-  ];
+  ]
+    : [];
 
   return (
-    <div>
-      {/* Header */}
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-xl sm:text-2xl text-white mb-1">
           Statistiques
@@ -180,7 +169,21 @@ export default function StatistiquesPage() {
           Analyses detaillees de votre activite
         </p>
       </div>
+      )}
 
+      {!loading && (error || !stats) ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-500">
+          <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
+          <p className="text-sm text-red-400">{error ?? "Erreur inconnue"}</p>
+          <button
+            onClick={() => { setLoading(true); setError(null); location.reload(); }}
+            className="text-xs text-blue-400 hover:text-blue-300 underline"
+          >
+            Reessayer
+          </button>
+        </div>
+      ) : stats ? (
+        <>
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         {kpis.map((k) => (
@@ -441,6 +444,18 @@ export default function StatistiquesPage() {
           )}
         </div>
       </div>
+        </>
+      ) : loading ? (
+        <>
+          <KpiGridSkeleton />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8">
+            <div className="h-56 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+            <div className="h-56 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+          </div>
+        </>
+      ) : null}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des statistiques..." />
     </div>
   );
 }

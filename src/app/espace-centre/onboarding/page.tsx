@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faBuilding,
   faPhone,
@@ -458,18 +459,7 @@ export default function OnboardingPage() {
     setRequestingValidation(false);
   }
 
-  // ─── Loading ────────────────────────────────────────────
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement...</span>
-      </div>
-    );
-  }
-
-  if (!centre) {
+  if (!loading && !centre) {
     return (
       <div className="text-center py-24 text-gray-500">
         <p>Impossible de charger les informations du centre.</p>
@@ -477,16 +467,25 @@ export default function OnboardingPage() {
     );
   }
 
-  const percentage = completion?.percentage ?? 0;
-  const descriptionLength = centre.description?.trim().length ?? 0;
-  const presentationLength = centre.presentationHtml
+  const percentage = centre ? (completion?.percentage ?? 0) : 0;
+  const descriptionLength = centre?.description?.trim().length ?? 0;
+  const presentationLength = centre?.presentationHtml
     ? centre.presentationHtml.replace(/<[^>]*>/g, "").trim().length
     : 0;
 
   // ─── RENDER ─────────────────────────────────────────────
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="max-w-4xl mx-auto space-y-8">
+      {loading ? (
+        <>
+          <PageHeaderSkeleton />
+          <div className="h-96 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        </>
+      ) : centre ? (
+        <>
       {/* Confetti animation when reaching 100% */}
       {showConfetti && <ConfettiCanvas />}
 
@@ -1404,6 +1403,11 @@ export default function OnboardingPage() {
           Passer pour le moment et completer plus tard
         </Link>
       </div>
+        </>
+      ) : null}
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement de l'onboarding..." />
     </div>
   );
 }

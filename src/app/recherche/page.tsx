@@ -28,6 +28,7 @@ import {
   faArrowRotateLeft,
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -700,9 +701,13 @@ function RechercheInner() {
             )}
 
             {/* Cards grid */}
+            <div className="relative min-h-[300px]">
+              <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
             {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 animate-pulse">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-72 rounded-xl bg-gray-100 border border-brand-border" />
+                ))}
               </div>
             ) : stages.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
@@ -860,6 +865,10 @@ function RechercheInner() {
                 </div>
               </div>
             )}
+
+              </div>
+              <LoadingOverlay show={loading} label="Chargement des résultats..." />
+            </div>
 
             {/* Pagination */}
             {totalPages > 1 && (

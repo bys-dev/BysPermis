@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faSpinner,
   faPlus,
@@ -147,18 +148,12 @@ export default function DisponibilitesPage() {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 15);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-        <span className="text-sm">Chargement des disponibilites...</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="relative min-h-[50vh] space-y-6">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Disponibilites</h1>
@@ -177,6 +172,7 @@ export default function DisponibilitesPage() {
           Ajouter
         </button>
       </div>
+      )}
 
       {/* Message */}
       {message && (
@@ -354,6 +350,8 @@ export default function DisponibilitesPage() {
           </div>
         )}
       </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des disponibilités..." />
     </div>
   );
 }

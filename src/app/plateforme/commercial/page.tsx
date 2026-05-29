@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBuilding,
-  faSpinner,
   faCircle,
   faChartLine,
   faCheckCircle,
@@ -14,6 +13,7 @@ import {
   faPercent,
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface Centre {
   id: string;
@@ -106,6 +106,8 @@ export default function PlateformeCommercialPage() {
   ];
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -151,10 +153,7 @@ export default function PlateformeCommercialPage() {
       <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-5">Tous les centres</h2>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-8 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : centres.length === 0 ? (
           <div className="text-center py-8">
             <FontAwesomeIcon icon={faBuilding} className="text-gray-600 text-3xl mb-3" />
@@ -218,10 +217,7 @@ export default function PlateformeCommercialPage() {
           </span>
         </div>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-32 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : prospects.length === 0 ? (
           <div className="text-center py-6">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-400 text-2xl mb-2" />
@@ -267,6 +263,9 @@ export default function PlateformeCommercialPage() {
           </div>
         )}
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement de l'espace commercial..." />
     </div>
   );
 }

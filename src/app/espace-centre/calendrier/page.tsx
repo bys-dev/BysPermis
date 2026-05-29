@@ -14,6 +14,7 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { Calendar, CalendarEvent } from "@/components/ui/Calendar";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import { formatDate, formatPrice } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────
@@ -120,8 +121,11 @@ export default function CalendrierPage() {
   );
 
   return (
-    <div>
-      {/* Header */}
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">
@@ -142,6 +146,7 @@ export default function CalendrierPage() {
           </a>
         )}
       </div>
+      )}
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -156,13 +161,7 @@ export default function CalendrierPage() {
         ))}
       </div>
 
-      {/* Loading */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement du calendrier...</span>
-        </div>
-      ) : error ? (
+      {!loading && error ? (
         <div
           className="text-center py-16 rounded-xl border"
           style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}
@@ -177,7 +176,7 @@ export default function CalendrierPage() {
             Réessayer
           </button>
         </div>
-      ) : (
+      ) : !loading ? (
         <>
           {/* Calendar */}
           <div
@@ -210,7 +209,7 @@ export default function CalendrierPage() {
             ))}
           </div>
         </>
-      )}
+      ) : null}
 
       {/* Session Detail Popup */}
       {selectedSession && (
@@ -353,6 +352,8 @@ export default function CalendrierPage() {
           </div>
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement du calendrier..." />
     </div>
   );
 }

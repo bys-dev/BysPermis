@@ -265,6 +265,55 @@ export async function sendQuestionnaireEmail(params: {
 }
 
 /**
+ * Envoi générique d'un (ou plusieurs) document(s) à l'élève — utilisé pour
+ * l'envoi manuel par le centre, l'envoi automatique à la confirmation, la
+ * feuille d'émargement individuelle et le bon d'accord.
+ */
+export async function sendDocumentEmail(params: {
+  to: string;
+  prenom?: string;
+  sujet: string;
+  intro: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+  attachments?: { filename: string; content: Buffer }[];
+}): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY absent — document non envoyé à", params.to);
+    return;
+  }
+  const cta = params.ctaUrl
+    ? `<p style="text-align:center;margin:24px 0">
+         <a href="${params.ctaUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">${params.ctaLabel ?? "Voir le document"}</a>
+       </p>`
+    : "";
+
+  await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: params.sujet,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">${params.sujet}</h1>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
+    <p>${params.intro}</p>
+    ${cta}
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
+      Vous pouvez aussi retrouver vos documents depuis votre espace élève → <strong>Mes documents</strong>.<br/>
+      Cordialement,<br/>L'équipe BYS Formation Permis
+    </p>
+  </div>
+</div>`,
+    ...(params.attachments && params.attachments.length > 0
+      ? { attachments: params.attachments }
+      : {}),
+  });
+}
+
+/**
  * Send centre rejection email when admin rejects the centre.
  */
 export async function sendCentreRejectionEmail(params: {

@@ -14,14 +14,20 @@ export async function GET(req: NextRequest) {
     await requireAdmin();
     const { searchParams } = req.nextUrl;
     const role = searchParams.get("role");
+    const rolesParam = searchParams.get("roles");
     const search = searchParams.get("search");
+    const withCounts = searchParams.get("withCounts") === "1";
+
+    const rolesList = rolesParam
+      ? rolesParam.split(",").map((r) => r.trim()).filter((r): r is (typeof ALL_ROLES)[number] => (ALL_ROLES as readonly string[]).includes(r))
+      : null;
     const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1);
     const pageSizeRaw = Number(searchParams.get("pageSize") ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
     const pageSize = Math.min(Math.max(1, Math.floor(pageSizeRaw)), MAX_PAGE_SIZE);
     const skip = (page - 1) * pageSize;
 
     const where = {
-      ...(role && role !== "tous" ? { role: role as (typeof ALL_ROLES)[number] } : {}),
+      ...(rolesList && rolesList.length ? { role: { in: rolesList } } : role && role !== "tous" ? { role: role as (typeof ALL_ROLES)[number] } : {}),
       ...(search ? {
         OR: [
           { prenom: { contains: search, mode: "insensitive" as const } },
@@ -48,7 +54,14 @@ export async function GET(req: NextRequest) {
     }),
     ]);
 
-    return NextResponse.json({ items: users, total, page, pageSize });
+    let counts: Record<string, number> | undefined;
+    if (withCounts) {
+      const grouped = await prisma.user.groupBy({ by: ["role"], _count: { _all: true } });
+      counts = Object.fromEntries(ALL_ROLES.map((r) => [r, 0]));
+      for (const g of grouped) counts[g.role] = g._count._all;
+    }
+
+    return NextResponse.json({ items: users, total, page, pageSize, ...(counts ? { counts } : {}) });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur serveur";
     if (message === "Non authentifié" || message === "Non autorisé") {

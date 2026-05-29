@@ -7,6 +7,7 @@ import {
   faPen, faCheck, faSpinner, faTriangleExclamation,
   faCity, faHashtag,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface Profile {
   id: string;
@@ -125,9 +126,14 @@ export default function ProfilPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement de votre profil...</span>
+      <div className="relative min-h-[50vh]">
+        <PageHeaderSkeleton />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-14 rounded-lg bg-white/5 border border-white/5" />
+          ))}
+        </div>
+        <LoadingOverlay show label="Chargement de votre profil..." />
       </div>
     );
   }

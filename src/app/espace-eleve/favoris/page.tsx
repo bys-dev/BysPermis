@@ -13,6 +13,7 @@ import {
   faArrowRight,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface FavoriteItem {
   id: string;
@@ -88,12 +89,13 @@ export default function FavorisPage() {
         Retrouvez les formations que vous avez mises en favori.
       </p>
 
+      <div className="relative min-h-[50vh]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="text-center py-20">
-          <FontAwesomeIcon
-            icon={faSpinner}
-            className="text-blue-400 text-xl animate-spin"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-pulse">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-48 rounded-xl bg-white/5 border border-white/5" />
+          ))}
         </div>
       ) : favorites.length === 0 ? (
         <div className="text-center py-20 rounded-xl border" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.07)" }}>
@@ -256,6 +258,9 @@ export default function FavorisPage() {
           })}
         </div>
       )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement de vos favoris..." />
+      </div>
     </div>
   );
 }

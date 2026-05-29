@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarDays, faEuroSign, faChartPie, faGraduationCap,
-  faArrowTrendUp, faCircleCheck, faSpinner, faTriangleExclamation,
+  faArrowTrendUp, faCircleCheck, faTriangleExclamation,
   faFileExport, faChevronDown,
   faImage, faArrowRight,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface Stats {
   reservationsCeMois: number;
@@ -87,18 +88,9 @@ export default function DashboardCentrePage() {
       .catch(() => null);
   }, []);
 
-  if (loading) {
+  if (!loading && (error || !stats)) {
     return (
-      <div className="flex items-center justify-center py-20 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement du tableau de bord...</span>
-      </div>
-    );
-  }
-
-  if (error || !stats) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-500">
+      <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
         <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
         <p className="text-sm text-red-400">{error ?? "Erreur inconnue"}</p>
         <button
@@ -111,7 +103,8 @@ export default function DashboardCentrePage() {
     );
   }
 
-  const kpis = [
+  const kpis = stats
+    ? [
     {
       label: "Réservations ce mois",
       value: String(stats.reservationsCeMois),
@@ -144,12 +137,14 @@ export default function DashboardCentrePage() {
       color: "text-yellow-400",
       bg: "bg-yellow-400/10",
     },
-  ];
+  ]
+    : [];
 
   return (
-    <div>
+    <div className="relative min-h-[60vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {/* Bandeau logo manquant */}
-      {hasLogo === false && (
+      {stats && hasLogo === false && (
         <div className="mb-6 rounded-xl p-4 flex items-center gap-4 border border-yellow-500/30 bg-yellow-500/5">
           <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0">
             <FontAwesomeIcon icon={faImage} className="text-yellow-400" />
@@ -177,7 +172,7 @@ export default function DashboardCentrePage() {
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-xl sm:text-2xl text-white mb-1">Tableau de bord</h1>
-          <p className="text-gray-500 text-sm">Bienvenue sur votre espace partenaire BYS Formation</p>
+          <p className="text-gray-400 text-sm">Bienvenue sur votre espace partenaire BYS Formation</p>
         </div>
 
         {/* Export dropdown */}
@@ -189,7 +184,7 @@ export default function DashboardCentrePage() {
           >
             <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5 text-blue-400" />
             Exporter
-            <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-500" />
+            <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-400" />
           </button>
           {exportOpen && (
             <div
@@ -214,6 +209,8 @@ export default function DashboardCentrePage() {
       </div>
 
       {/* KPIs */}
+      {stats && (
+        <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         {kpis.map((k) => (
           <div key={k.label} className="rounded-xl p-3 sm:p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
@@ -221,11 +218,11 @@ export default function DashboardCentrePage() {
               <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center ${k.bg}`}>
                 <FontAwesomeIcon icon={k.icon} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${k.color}`} />
               </div>
-              <FontAwesomeIcon icon={faArrowTrendUp} className="text-gray-700 w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <FontAwesomeIcon icon={faArrowTrendUp} className="text-gray-400 w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
             <p className="font-bold text-lg sm:text-2xl text-white">{k.value}</p>
-            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[10px] sm:text-xs text-gray-700 mt-0.5 hidden sm:block">{k.delta}</p>
+            <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{k.label}</p>
+            <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 hidden sm:block">{k.delta}</p>
           </div>
         ))}
       </div>
@@ -244,17 +241,17 @@ export default function DashboardCentrePage() {
           </div>
           <div className="p-4 sm:p-6 grid sm:grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-gray-500">Note moyenne</p>
+              <p className="text-xs text-gray-400">Note moyenne</p>
               <p className="text-xl font-bold text-white mt-1">
                 {stats.questionnaires.averageRating > 0 ? `${stats.questionnaires.averageRating}/5` : "—"}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Réponses reçues</p>
+              <p className="text-xs text-gray-400">Réponses reçues</p>
               <p className="text-xl font-bold text-white mt-1">{stats.questionnaires.totalResponses}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">En attente de réponse</p>
+              <p className="text-xs text-gray-400">En attente de réponse</p>
               <p className="text-xl font-bold text-yellow-400 mt-1">{stats.questionnaires.pendingCount}</p>
             </div>
           </div>
@@ -264,7 +261,7 @@ export default function DashboardCentrePage() {
                 <div key={r.id} className="flex justify-between gap-3 text-sm py-2 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                   <div className="min-w-0">
                     <span className="text-white font-medium">{r.auteur}</span>
-                    <span className="text-gray-500 text-xs block truncate">{r.formation}</span>
+                    <span className="text-gray-400 text-xs block truncate">{r.formation}</span>
                   </div>
                   <span className="text-yellow-400 font-semibold shrink-0">{r.noteGlobale.toFixed(1)}/5</span>
                 </div>
@@ -284,7 +281,7 @@ export default function DashboardCentrePage() {
         </div>
 
         {stats.reservationsRecentes.length === 0 ? (
-          <div className="text-center py-10 text-gray-500">
+          <div className="text-center py-10 text-gray-400">
             <p className="text-sm">Aucune réservation pour le moment.</p>
           </div>
         ) : (
@@ -299,11 +296,11 @@ export default function DashboardCentrePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">{r.eleve}</p>
-                    <p className="text-xs text-gray-500 truncate">{r.formation}</p>
+                    <p className="text-xs text-gray-400 truncate">{r.formation}</p>
                   </div>
                   <div className="text-right shrink-0">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${badge.color} ${badge.bg}`}>{badge.label}</span>
-                    <p className="text-xs text-gray-600 mt-1">{formatDate(new Date(r.date))}</p>
+                    <p className="text-xs text-gray-400 mt-1">{formatDate(new Date(r.date))}</p>
                   </div>
                 </div>
               );
@@ -326,6 +323,16 @@ export default function DashboardCentrePage() {
           </Link>
         ))}
       </div>
+        </>
+      )}
+      </div>
+      {loading && !stats && (
+        <>
+          <KpiGridSkeleton />
+          <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse mt-8" />
+        </>
+      )}
+      <LoadingOverlay show={loading} label="Chargement du tableau de bord..." />
     </div>
   );
 }

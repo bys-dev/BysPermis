@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChartLine, faSpinner, faArrowUp, faArrowDown, faEuro,
+  faChartLine, faArrowUp, faArrowDown, faEuro,
   faClipboardList, faBuilding, faTrophy, faMedal,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import { formatPrice } from "@/lib/utils";
 
 interface MonthlyData {
@@ -82,22 +83,7 @@ export default function AdminStatistiquesPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Statistiques</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Analyses et rapports de la plateforme</p>
-        </div>
-        <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-lg" />
-          <span className="text-sm">Chargement des statistiques...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !stats) {
+  if (!loading && (error || !stats)) {
     return (
       <div className="space-y-6">
         <div>
@@ -112,18 +98,26 @@ export default function AdminStatistiquesPage() {
     );
   }
 
-  const monthlyData = stats.monthlyData ?? [];
+  const monthlyData = stats?.monthlyData ?? [];
   const maxRevenue = Math.max(...monthlyData.map((d) => d.revenue), 1);
   const maxReservations = Math.max(...monthlyData.map((d) => d.reservations), 1);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="relative min-h-[50vh] space-y-6">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div>
         <h1 className="text-2xl font-bold text-white">Statistiques</h1>
         <p className="text-gray-400 text-sm mt-0.5">Analyses et rapports de la plateforme</p>
       </div>
+      )}
 
+      {loading ? (
+        <KpiGridSkeleton cols={4} />
+      ) : stats ? (
+      <>
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="bg-[#0A1628] rounded-xl border border-green-500/20 p-5">
@@ -322,6 +316,23 @@ export default function AdminStatistiquesPage() {
           )}
         </div>
       </div>
+      </>
+      ) : null}
+
+      {loading && (
+        <>
+          <div className="grid lg:grid-cols-2 gap-6 animate-pulse">
+            <div className="h-64 rounded-xl bg-white/5 border border-white/5" />
+            <div className="h-64 rounded-xl bg-white/5 border border-white/5" />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6 animate-pulse">
+            <div className="h-48 rounded-xl bg-white/5 border border-white/5" />
+            <div className="h-48 rounded-xl bg-white/5 border border-white/5" />
+          </div>
+        </>
+      )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des statistiques..." />
     </div>
   );
 }

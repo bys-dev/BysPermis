@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faBuilding,
   faLocationDot,
@@ -259,24 +260,32 @@ export default function ParametresCentrePage() {
     setCancelling(false);
   }
 
-  if (loading || !form) {
+  if (!loading && !form) {
     return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement...</span>
+      <div className="text-center py-24 text-gray-500">
+        <p>Impossible de charger les paramètres du centre.</p>
       </div>
     );
   }
 
   // Validation errors live
-  const ibanError = validateField("iban", form.iban || "");
-  const bicError = validateField("bic", form.bic || "");
-  const siretError = validateField("siret", form.siret || "");
-  const tvaError = validateField("tva", form.tva || "");
-  const apeError = validateField("ape", form.ape || "");
+  const ibanError = form ? validateField("iban", form.iban || "") : undefined;
+  const bicError = form ? validateField("bic", form.bic || "") : undefined;
+  const siretError = form ? validateField("siret", form.siret || "") : undefined;
+  const tvaError = form ? validateField("tva", form.tva || "") : undefined;
+  const apeError = form ? validateField("ape", form.ape || "") : undefined;
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="max-w-3xl space-y-6">
+      {loading ? (
+        <>
+          <PageHeaderSkeleton />
+          <div className="h-96 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        </>
+      ) : form ? (
+        <>
       {/* Header */}
       <div>
         <h1 className="font-display font-bold text-2xl text-white mb-1">
@@ -913,6 +922,11 @@ export default function ParametresCentrePage() {
           </button>
         </div>
       )}
+        </>
+      ) : null}
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des paramètres..." />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 const RichTextEditor = dynamic(
   () => import("@/components/ui/RichTextEditor").then((m) => m.RichTextEditor),
@@ -179,23 +180,19 @@ export default function EmailTemplatesPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-400">Chargement des templates...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header */}
+    <div className="relative min-h-[50vh] max-w-7xl mx-auto">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Templates d&apos;emails</h1>
         <p className="text-gray-400 mt-1">
           Personnalisez les emails envoyés automatiquement par la plateforme
         </p>
       </div>
+      )}
 
       <div className="flex gap-6 flex-col lg:flex-row">
         {/* Sidebar: template list */}
@@ -342,6 +339,8 @@ export default function EmailTemplatesPage() {
           )}
         </div>
       </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des templates..." />
     </div>
   );
 }

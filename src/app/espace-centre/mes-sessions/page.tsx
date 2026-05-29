@@ -14,6 +14,7 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface Stagiaire {
   id: string;
@@ -200,13 +201,18 @@ export default function MesSessionsPage() {
 
   // Sessions list
   return (
-    <div>
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes sessions</h1>
         <p className="text-gray-500 text-sm">
           {loading ? "Chargement..." : `${sessions.filter((s) => s.status === "ACTIVE").length} session(s) à venir`}
         </p>
       </div>
+      )}
 
       {/* Error state */}
       {error && (
@@ -214,14 +220,6 @@ export default function MesSessionsPage() {
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
           <p className="text-sm text-red-400">{error}</p>
           <button onClick={loadSessions} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
-        </div>
-      )}
-
-      {/* Loading state */}
-      {loading && !error && (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
         </div>
       )}
 
@@ -287,6 +285,8 @@ export default function MesSessionsPage() {
           })}
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des sessions..." />
     </div>
   );
 }

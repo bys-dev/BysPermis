@@ -6,6 +6,8 @@ import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { prisma } from "@/lib/prisma";
 import { Convocation } from "@/components/pdf/Convocation";
 import { Facture } from "@/components/pdf/Facture";
+import { EmargementIndividuel } from "@/components/pdf/EmargementIndividuel";
+import { BonAccord } from "@/components/pdf/BonAccord";
 import { formatDate } from "@/lib/utils";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
@@ -190,4 +192,99 @@ export async function renderInvoicePdfFromReservation(reservationId: string): Pr
   );
 
   return { buffer, filename: `facture-${invoice.numero}.pdf`, invoiceNumero: invoice.numero };
+}
+
+/**
+ * Rend la feuille d'émargement individuelle d'une réservation (PDF Buffer).
+ * Reprend date, n° agrément, lieu, dates, horaires et formateur responsable.
+ */
+export async function renderIndividualEmargementPdf(reservationIdOrNumero: string): Promise<{
+  buffer: Buffer;
+  filename: string;
+}> {
+  const reservation = await prisma.reservation.findFirst({
+    where: { OR: [{ id: reservationIdOrNumero }, { numero: reservationIdOrNumero }] },
+    include: { session: { include: { formation: { include: { centre: true } } } } },
+  });
+  if (!reservation) throw new Error(`Réservation introuvable: ${reservationIdOrNumero}`);
+
+  const { session } = reservation;
+  const centre = session.formation.centre;
+
+  const data = {
+    reservationNumero: reservation.numero,
+    dateEmission: formatDate(reservation.createdAt),
+    stagiaire: {
+      civilite: reservation.civilite ?? undefined,
+      nom: reservation.nom,
+      prenom: reservation.prenom,
+      numeroPermis: reservation.numeroPermis ?? undefined,
+    },
+    formationTitre: session.formation.titre,
+    jour1: formatDate(session.dateDebut),
+    jour2: formatDate(session.dateFin),
+    horaires: session.horaires ?? "9h00 – 12h30 / 13h30 – 17h00",
+    formateurResponsable: session.formateurResponsable ?? undefined,
+    centre: {
+      nom: centre.nom,
+      raisonSociale: centre.raisonSociale ?? undefined,
+      adresse: centre.adresse,
+      codePostal: centre.codePostal,
+      ville: centre.ville,
+      numAgrement: centre.agrementNumber ?? undefined,
+      logoUrl: logoOrDefault(centre.logo),
+      signatureUrl: toAbsolute(centre.signatureUrl),
+    },
+  };
+
+  const buffer = await renderToBuffer(
+    createElement(EmargementIndividuel, { data }) as ReactElement<DocumentProps, string | JSXElementConstructor<unknown>>
+  );
+
+  return { buffer, filename: `emargement-${reservation.numero}.pdf` };
+}
+
+/**
+ * Rend le PDF probant d'un bon d'accord accepté (avec horodatage + IP).
+ */
+export async function renderBonAccordPdf(documentId: string): Promise<{
+  buffer: Buffer;
+  filename: string;
+}> {
+  const doc = await prisma.document.findUnique({
+    where: { id: documentId },
+    include: { reservation: { include: { session: { include: { formation: { include: { centre: true } } } } } } },
+  });
+  if (!doc) throw new Error(`Document introuvable: ${documentId}`);
+
+  const reservation = doc.reservation;
+  const centre = reservation.session.formation.centre;
+
+  const data = {
+    titre: doc.nom,
+    contenu: doc.contenu ?? "",
+    reservationNumero: reservation.numero,
+    stagiaire: { prenom: reservation.prenom, nom: reservation.nom },
+    acceptation: {
+      nom: doc.acceptedNom ?? `${reservation.prenom} ${reservation.nom}`,
+      dateHeure: doc.acceptedAt
+        ? doc.acceptedAt.toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" })
+        : "—",
+      ip: doc.acceptedIp ?? "inconnue",
+    },
+    centre: {
+      nom: centre.nom,
+      raisonSociale: centre.raisonSociale ?? undefined,
+      adresse: centre.adresse,
+      codePostal: centre.codePostal,
+      ville: centre.ville,
+      logoUrl: logoOrDefault(centre.logo),
+    },
+  };
+
+  const buffer = await renderToBuffer(
+    createElement(BonAccord, { data }) as ReactElement<DocumentProps, string | JSXElementConstructor<unknown>>
+  );
+
+  return { buffer, filename: `bon-accord-${reservation.numero}.pdf` };
 }

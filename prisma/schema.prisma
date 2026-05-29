@@ -96,6 +96,30 @@ enum QuestionnaireType {
   PLATFORM
 }
 
+// ─── DOCUMENTS (échange centre ↔ élève) ──────────────────
+
+enum DocumentDirection {
+  CENTRE_VERS_ELEVE
+  ELEVE_VERS_CENTRE
+}
+
+enum DocumentKind {
+  PERMIS // photo du permis (élève)
+  PIECE_IDENTITE // CNI / passeport (élève)
+  LETTRE_48N // lettre 48N (élève)
+  EMARGEMENT // feuille d'émargement individuelle (généré par le centre)
+  BON_ACCORD // bon d'accord à valeur probante (à cocher par l'élève)
+  REGLEMENT // règlement intérieur / programme (centre → élève)
+  AUTRE
+}
+
+enum DocumentStatus {
+  ENVOYE
+  LU
+  ACCEPTE
+  REFUSE
+}
+
 // ─── USERS ───────────────────────────────────────────────
 
 model User {
@@ -132,6 +156,7 @@ model User {
   notifications    Notification[]
   reviews                  Review[]
   questionnaireResponses   QuestionnaireResponse[]
+  uploadedDocuments        Document[]              @relation("UploadedDocuments")
   invoices                 Invoice[]
   articles         Article[]
   messagesSent     Message[]       @relation("messagesSent")
@@ -215,6 +240,8 @@ model Centre {
   subscriptionPlan       SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
   questionnaireQuestions QuestionnaireQuestion[]
   questionnaireResponses QuestionnaireResponse[]
+  documents              Document[]
+  documentTemplates      CentreDocumentTemplate[]
 
   @@map("centres")
 }
@@ -318,6 +345,9 @@ model Session {
   placesTotal     Int
   placesRestantes Int
   status          SessionStatus @default(ACTIVE)
+  // Animateur responsable (texte libre) et horaires — utilisés sur la feuille d'émargement
+  formateurResponsable String?
+  horaires             String? // ex "9h00 – 12h30 / 13h30 – 17h00"
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -374,8 +404,68 @@ model Reservation {
   messages  Message[]
   questionnaireResponses QuestionnaireResponse[]
   review                 Review?
+  documents              Document[]
 
   @@map("reservations")
+}
+
+// ─── DOCUMENTS ───────────────────────────────────────────
+
+model Document {
+  id          String            @id @default(cuid())
+  kind        DocumentKind
+  direction   DocumentDirection
+  nom         String
+  description String?
+  blobUrl     String? // URL du fichier (Vercel Blob ou /uploads en dev) ; null si bon d'accord texte non encore généré
+  contenu     String? // texte (bon d'accord / règlement sans fichier) — sert à générer le PDF probant
+  mimeType    String?
+  taille      Int? // octets
+  status      DocumentStatus @default(ENVOYE)
+  // Acceptation à valeur probante (bon d'accord)
+  requiresAck Boolean   @default(false)
+  acceptedAt  DateTime?
+  acceptedNom String?
+  acceptedIp  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  centreId      String?
+  centre        Centre?     @relation(fields: [centreId], references: [id])
+  uploadedById  String?
+  uploadedBy    User?       @relation("UploadedDocuments", fields: [uploadedById], references: [id])
+  templateId    String?
+  template      CentreDocumentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([reservationId])
+  @@index([centreId])
+  @@index([reservationId, direction])
+  @@map("documents")
+}
+
+model CentreDocumentTemplate {
+  id          String       @id @default(cuid())
+  nom         String
+  description String?
+  blobUrl     String? // fichier joint (ex règlement.pdf)
+  contenu     String? // texte inline (bon d'accord sans fichier)
+  kind        DocumentKind @default(AUTRE)
+  requiresAck Boolean      @default(false) // doit être accepté (bon d'accord)
+  autoSend    Boolean      @default(true) // envoyé automatiquement à la confirmation de réservation
+  actif       Boolean      @default(true)
+  ordre       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  centreId  String
+  centre    Centre     @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  documents Document[]
+
+  @@index([centreId])
+  @@map("centre_document_templates")
 }
 
 // ─── FACTURES ────────────────────────────────────────────

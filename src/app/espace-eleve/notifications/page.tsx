@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell, faCalendarCheck, faFileLines, faCircleInfo,
-  faSpinner, faTriangleExclamation,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface Notification {
   id: string;
@@ -147,11 +148,13 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {/* Loading */}
+      <div className="relative min-h-[50vh]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement des notifications...</span>
+        <div className="space-y-3 animate-pulse">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-20 rounded-xl bg-white/5 border border-white/5" />
+          ))}
         </div>
       ) : error ? (
         /* Error */
@@ -211,6 +214,9 @@ export default function NotificationsPage() {
           ))}
         </div>
       )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement des notifications..." />
+      </div>
     </div>
   );
 }

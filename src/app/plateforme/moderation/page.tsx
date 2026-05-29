@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShieldHalved,
-  faSpinner,
   faBuilding,
   faCalendarXmark,
   faClock,
@@ -12,7 +11,9 @@ import {
   faBan,
   faCircle,
   faExclamationTriangle,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface CentreEnAttente {
   id: string;
@@ -97,6 +98,8 @@ export default function PlateformeModerationPage() {
   const totalFlags = centresEnAttente.length + formationsSansSession.length;
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -157,10 +160,7 @@ export default function PlateformeModerationPage() {
           </span>
         </div>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-4 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-32 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : centresEnAttente.length === 0 ? (
           <div className="text-center py-6">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-400 text-2xl mb-2" />
@@ -230,10 +230,7 @@ export default function PlateformeModerationPage() {
           </span>
         </div>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-4 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-32 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : formationsSansSession.length === 0 ? (
           <div className="text-center py-6">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-400 text-2xl mb-2" />
@@ -268,6 +265,9 @@ export default function PlateformeModerationPage() {
           </div>
         )}
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement de la modération..." />
     </div>
   );
 }

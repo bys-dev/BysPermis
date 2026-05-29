@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faBuilding,
   faSpinner,
@@ -235,18 +236,7 @@ export default function ProfilCentrePage() {
     setSaving(false);
   }
 
-  // ─── LOADING ────────────────────────────────────────────
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement...</span>
-      </div>
-    );
-  }
-
-  if (!form) {
+  if (!loading && !form) {
     return (
       <div className="text-center py-24 text-gray-500">
         <p>Impossible de charger le profil du centre.</p>
@@ -257,7 +247,16 @@ export default function ProfilCentrePage() {
   // ─── RENDER ─────────────────────────────────────────────
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="max-w-3xl space-y-6">
+      {loading ? (
+        <>
+          <PageHeaderSkeleton />
+          <div className="h-96 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        </>
+      ) : form ? (
+        <>
       {/* Header */}
       <div>
         <h1 className="font-display font-bold text-2xl text-white mb-1">
@@ -955,6 +954,11 @@ export default function ProfilCentrePage() {
           </a>
         )}
       </div>
+        </>
+      ) : null}
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement du profil..." />
     </div>
   );
 }

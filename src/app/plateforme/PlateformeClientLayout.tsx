@@ -19,9 +19,9 @@ import {
   faXmark,
   faArrowUpRightFromSquare,
   faRightFromBracket,
-  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface NavItem {
   href: string;
@@ -117,14 +117,16 @@ export default function PlateformeClientLayout({ children }: { children: React.R
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {loading ? (
-            <div className="flex items-center gap-2 px-3 py-4 text-gray-500 text-sm">
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-              <span>Chargement...</span>
-            </div>
-          ) : (
-            visibleItems.map((item) => {
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto relative">
+          <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+            {loading ? (
+              <div className="space-y-2 px-3 animate-pulse">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-10 rounded-lg bg-white/5" />
+                ))}
+              </div>
+            ) : (
+              visibleItems.map((item) => {
               const active = pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
@@ -143,7 +145,9 @@ export default function PlateformeClientLayout({ children }: { children: React.R
                 </Link>
               );
             })
-          )}
+            )}
+          </div>
+          <LoadingOverlay show={loading} label="Chargement de la navigation..." />
         </nav>
 
         {/* Footer sidebar */}

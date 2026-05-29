@@ -4,7 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
 import { calculateCommission, getCommissionRate } from "@/lib/utils";
-import { sendConfirmationEmail, sendCentreNotificationEmail, resend } from "@/lib/email";
+import { sendConfirmationEmail, sendCentreNotificationEmail, sendDocumentEmail, resend } from "@/lib/email";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { formatDate } from "@/lib/utils";
 import { renderConvocationPdf, renderInvoicePdfFromReservation } from "@/lib/pdf-helpers";
@@ -375,6 +375,50 @@ export async function POST(req: NextRequest) {
     } catch (emailErr) {
       console.error("[POST /api/reservations] Email error:", emailErr);
       // Ne pas faire échouer la réservation pour un email
+    }
+
+    // Envoi automatique des documents configurés par le centre (règlement, bon d'accord…)
+    try {
+      const templates = await prisma.centreDocumentTemplate.findMany({
+        where: { centreId: centre.id, actif: true, autoSend: true },
+        orderBy: { ordre: "asc" },
+      });
+      for (const t of templates) {
+        const exists = await prisma.document.findFirst({
+          where: { reservationId: result.reservation.id, templateId: t.id },
+        });
+        if (exists) continue;
+        await prisma.document.create({
+          data: {
+            kind: t.kind,
+            direction: "CENTRE_VERS_ELEVE",
+            nom: t.nom,
+            description: t.description,
+            blobUrl: t.blobUrl,
+            contenu: t.contenu,
+            requiresAck: t.requiresAck,
+            status: "ENVOYE",
+            reservationId: result.reservation.id,
+            centreId: centre.id,
+            templateId: t.id,
+          },
+        });
+      }
+      if (templates.length > 0) {
+        const needsAck = templates.some((t) => t.requiresAck);
+        await sendDocumentEmail({
+          to: data.email,
+          prenom: data.prenom,
+          sujet: `Documents de votre stage — ${centre.nom}`,
+          intro: needsAck
+            ? `Votre centre a mis à disposition des documents pour votre stage, dont un ou plusieurs à lire et accepter. Rendez-vous dans votre espace élève pour les consulter et valider le bon d'accord.`
+            : `Votre centre a mis à disposition des documents pour votre stage. Retrouvez-les dans votre espace élève.`,
+          ctaUrl: `${APP_URL}/espace-eleve/documents`,
+          ctaLabel: "Voir mes documents",
+        });
+      }
+    } catch (docErr) {
+      console.error("[POST /api/reservations] Auto-send documents error:", docErr);
     }
 
     return NextResponse.json(result.reservation, { status: 200 });

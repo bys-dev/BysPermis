@@ -34,6 +34,8 @@ export async function GET() {
         placesTotal: s.placesTotal,
         placesRestantes: s.placesRestantes,
         status: s.status,
+        formateurResponsable: s.formateurResponsable,
+        horaires: s.horaires,
         reservationsCount: s._count.reservations,
       }))
     );
@@ -56,6 +58,8 @@ const createSchema = z.object({
     .int()
     .min(6, "Capacité légale : 6 stagiaires minimum")
     .max(20, "Capacité légale : 20 stagiaires maximum"),
+  formateurResponsable: z.string().optional(),
+  horaires: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -99,6 +103,8 @@ export async function POST(req: NextRequest) {
         placesTotal: data.placesTotal,
         placesRestantes: data.placesTotal,
         status: "ACTIVE",
+        formateurResponsable: data.formateurResponsable || null,
+        horaires: data.horaires || null,
       },
       include: {
         formation: {
@@ -120,6 +126,8 @@ export async function POST(req: NextRequest) {
         placesTotal: session.placesTotal,
         placesRestantes: session.placesRestantes,
         status: session.status,
+        formateurResponsable: session.formateurResponsable,
+        horaires: session.horaires,
         reservationsCount: session._count.reservations,
       },
       { status: 201 }
@@ -140,6 +148,8 @@ const patchSchema = z.object({
   dateDebut: z.string().optional(),
   dateFin: z.string().optional(),
   placesTotal: z.number().int().min(6).max(20).optional(),
+  formateurResponsable: z.string().optional(),
+  horaires: z.string().optional(),
 });
 
 export async function PATCH(req: NextRequest) {
@@ -164,6 +174,8 @@ export async function PATCH(req: NextRequest) {
     if (data.status) updateData.status = data.status;
     if (data.dateDebut) updateData.dateDebut = new Date(data.dateDebut);
     if (data.dateFin) updateData.dateFin = new Date(data.dateFin);
+    if (data.formateurResponsable !== undefined) updateData.formateurResponsable = data.formateurResponsable || null;
+    if (data.horaires !== undefined) updateData.horaires = data.horaires || null;
     if (data.placesTotal !== undefined) {
       const currentOccupied = session.placesTotal - session.placesRestantes;
       if (data.placesTotal < currentOccupied) {
@@ -198,6 +210,8 @@ export async function PATCH(req: NextRequest) {
       placesTotal: updated.placesTotal,
       placesRestantes: updated.placesRestantes,
       status: updated.status,
+      formateurResponsable: updated.formateurResponsable,
+      horaires: updated.horaires,
       reservationsCount: updated._count.reservations,
     });
   } catch (err) {

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCreditCard,
-  faSpinner,
   faTriangleExclamation,
   faSearch,
   faFileLines,
@@ -14,6 +13,7 @@ import {
   faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay, { KpiGridSkeleton } from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -107,12 +107,13 @@ export default function PaiementsPage() {
         <p className="text-gray-500 text-sm">Retrouvez tous vos paiements et factures</p>
       </div>
 
-      {/* Loading */}
+      <div className="relative min-h-[50vh]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
-        </div>
+        <>
+          <KpiGridSkeleton cols={3} />
+          <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        </>
       ) : error ? (
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
@@ -322,6 +323,9 @@ export default function PaiementsPage() {
           )}
         </>
       )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement des paiements..." />
+      </div>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
   faBuilding,
   faCoins,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 type MonetisationModel = "COMMISSION" | "ABONNEMENT" | "HYBRIDE";
 
@@ -98,17 +99,12 @@ export default function AdminParametresPage() {
     setTimeout(() => setMessage(null), 5000);
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-        <span className="text-sm">Chargement des parametres...</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <div className="relative min-h-[50vh] space-y-6">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Parametres</h1>
@@ -121,6 +117,10 @@ export default function AdminParametresPage() {
           </span>
         )}
       </div>
+      )}
+
+      {!loading && (
+      <>
 
       {/* Message */}
       {message && (
@@ -310,6 +310,18 @@ export default function AdminParametresPage() {
           </div>
         </div>
       )}
+      </>
+      )}
+
+      {loading && (
+        <div className="grid md:grid-cols-2 gap-4 animate-pulse">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-36 rounded-xl bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des parametres..." />
     </div>
   );
 }

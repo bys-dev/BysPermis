@@ -20,6 +20,7 @@ import {
   faInfinity,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── TYPES ──────────────────────────────────────────────
 
@@ -295,31 +296,34 @@ export default function TarifsPartenairesPage() {
               </p>
             </div>
 
-            {loadingPlans ? (
-              <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-                <FontAwesomeIcon
-                  icon={faSpinner}
-                  className="animate-spin text-xl"
-                />
-                <span className="text-sm">Chargement des plans...</span>
+            <div className="relative min-h-[280px]">
+              <div className={loadingPlans ? "opacity-40 pointer-events-none select-none" : ""}>
+                {loadingPlans ? (
+                  <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start animate-pulse">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-[420px] rounded-2xl bg-gray-100 border border-gray-200" />
+                    ))}
+                  </div>
+                ) : plans.length > 0 ? (
+                  <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+                    {plans.map((plan) => (
+                      <PlanCard
+                        key={plan.id}
+                        plan={plan}
+                        isPopular={plan.id === popularPlanId}
+                        onSubscribe={handleSubscribe}
+                        subscribing={subscribing}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-500">
+                    Aucun plan disponible pour le moment.
+                  </p>
+                )}
               </div>
-            ) : plans.length > 0 ? (
-              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
-                {plans.map((plan) => (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    isPopular={plan.id === popularPlanId}
-                    onSubscribe={handleSubscribe}
-                    subscribing={subscribing}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-gray-500">
-                Aucun plan disponible pour le moment.
-              </p>
-            )}
+              <LoadingOverlay show={loadingPlans} label="Chargement des plans..." backdropOpacity={0.35} />
+            </div>
           </div>
         </section>
 

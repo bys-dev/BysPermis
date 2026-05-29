@@ -15,6 +15,7 @@ import {
   faTriangleExclamation,
   faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 const STEPS = [
   { label: "Informations", icon: faUser },
@@ -187,11 +188,21 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0A1628" }}>
-        <div className="flex items-center gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-          <span className="text-sm">Chargement...</span>
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative" style={{ background: "#0A1628" }}>
+        <div className="w-full max-w-lg opacity-40 pointer-events-none select-none">
+          <div className="text-center mb-8 animate-pulse">
+            <div className="w-12 h-12 bg-white/10 rounded-xl mx-auto mb-4" />
+            <div className="h-8 w-64 bg-white/10 rounded-lg mx-auto mb-2" />
+            <div className="h-4 w-48 bg-white/5 rounded mx-auto" />
+          </div>
+          <div className="flex items-center gap-2 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex-1 h-1.5 rounded-full bg-white/10" />
+            ))}
+          </div>
+          <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
         </div>
+        <LoadingOverlay show label="Chargement..." />
       </div>
     );
   }

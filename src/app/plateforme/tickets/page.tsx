@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHeadset,
-  faSpinner,
   faFilter,
   faEnvelope,
   faEnvelopeOpen,
@@ -16,7 +15,9 @@ import {
   faXmarkCircle,
   faUser,
   faUserShield,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface TicketMessage {
   id: string;
@@ -136,6 +137,8 @@ export default function PlateformeTicketsPage() {
   });
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -199,9 +202,10 @@ export default function PlateformeTicketsPage() {
         {/* Liste des tickets */}
         <div className="lg:col-span-2 space-y-2">
           {loading ? (
-            <div className="flex items-center gap-2 text-gray-500 text-sm py-8 justify-center">
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-              <span>Chargement...</span>
+            <div className="space-y-2 animate-pulse">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-24 rounded-xl bg-white/5 border border-white/5" />
+              ))}
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-8">
@@ -404,6 +408,9 @@ export default function PlateformeTicketsPage() {
           )}
         </div>
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des tickets..." />
     </div>
   );
 }

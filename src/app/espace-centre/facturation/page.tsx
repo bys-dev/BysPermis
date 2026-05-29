@@ -20,6 +20,7 @@ import {
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice, formatDate } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface Payment {
   id: string;
@@ -319,22 +320,18 @@ function OverviewTab({
       )}
 
       {/* Recent payments */}
-      <div className="rounded-xl p-5 border border-white/8 bg-[#0A1628]">
+      <div className="relative min-h-[120px] rounded-xl p-5 border border-white/8 bg-[#0A1628]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
           <FontAwesomeIcon icon={faReceipt} className="text-blue-400 w-4 h-4" />
           Derniers paiements
         </h3>
-        {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-6 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
-        ) : !data?.payments.length ? (
+        {!loading && !data?.payments.length ? (
           <div className="text-center py-8">
             <FontAwesomeIcon icon={faReceipt} className="text-gray-700 text-2xl mb-3" />
             <p className="text-gray-500 text-sm">Aucun paiement enregistre</p>
           </div>
-        ) : (
+        ) : data?.payments.length ? (
           <div className="space-y-2">
             {data.payments.slice(0, 5).map((p) => (
               <div key={p.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/3 transition-colors" style={{ background: "rgba(255,255,255,0.02)" }}>
@@ -356,7 +353,16 @@ function OverviewTab({
               </div>
             ))}
           </div>
+        ) : null}
+        {loading && (
+          <div className="space-y-2 animate-pulse">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-14 rounded-lg bg-white/5" />
+            ))}
+          </div>
         )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement des paiements..." />
       </div>
     </div>
   );
@@ -420,18 +426,14 @@ function HistoryTab({
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-white/8 bg-[#0A1628] overflow-hidden">
-        {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-12 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
-        ) : !data?.payments.length ? (
+      <div className="relative min-h-[200px] rounded-xl border border-white/8 bg-[#0A1628] overflow-hidden">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+        {!loading && !data?.payments.length ? (
           <div className="text-center py-12">
             <FontAwesomeIcon icon={faReceipt} className="text-gray-700 text-2xl mb-3" />
             <p className="text-gray-500 text-sm">Aucun paiement trouve</p>
           </div>
-        ) : (
+        ) : data?.payments.length ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -464,7 +466,16 @@ function HistoryTab({
               </tbody>
             </table>
           </div>
+        ) : null}
+        {loading && (
+          <div className="p-4 space-y-2 animate-pulse">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-10 rounded bg-white/5" />
+            ))}
+          </div>
         )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement de l'historique..." />
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (
@@ -511,16 +522,7 @@ function SubscriptionTab({
   onOpenPortal: () => void;
   onCancel: () => void;
 }) {
-  if (loadingSub) {
-    return (
-      <div className="flex items-center gap-2 text-gray-500 text-sm py-12 justify-center">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-        <span>Chargement...</span>
-      </div>
-    );
-  }
-
-  if (!subscription?.plan) {
+  if (!loadingSub && !subscription?.plan) {
     return (
       <div className="rounded-xl p-6 border border-white/8 bg-[#0A1628]">
         <div className="text-center py-8">
@@ -542,6 +544,11 @@ function SubscriptionTab({
   }
 
   return (
+    <div className="relative min-h-[200px]">
+      <div className={loadingSub ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loadingSub ? (
+        <div className="h-48 rounded-xl bg-white/5 border border-white/8 animate-pulse" />
+      ) : subscription?.plan ? (
     <div className="space-y-6">
       {/* Plan details */}
       <div className="rounded-xl p-6 border border-white/8 bg-[#0A1628]">
@@ -635,6 +642,10 @@ function SubscriptionTab({
           )}
         </div>
       </div>
+    </div>
+      ) : null}
+      </div>
+      <LoadingOverlay show={loadingSub} label="Chargement de l'abonnement..." />
     </div>
   );
 }

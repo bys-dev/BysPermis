@@ -21,6 +21,7 @@ import {
   faPaintBrush,
   faEnvelope,
   faComments,
+  faFileLines,
   faFileInvoiceDollar,
   faFileContract,
   faXmark,
@@ -29,6 +30,7 @@ import {
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import CentreSwitcher from "@/components/ui/CentreSwitcher";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 type CentreRole = "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE";
@@ -112,6 +114,12 @@ const allNavItems: NavItem[] = [
     label: "Profil centre",
     icon: faPaintBrush,
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/documents",
+    label: "Documents",
+    icon: faFileLines,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE"],
   },
   {
     href: "/espace-centre/emails",
@@ -220,18 +228,8 @@ export default function EspaceCentreClientLayout({ children }: { children: React
   const navItems = getNavItems(role);
   const showCompletionBanner = completionPct !== null && completionPct < 100 && !bannerDismissed;
 
-  // Show a loading state while checking if redirect is needed
-  // to avoid page flashing before redirect
-  if (!redirectChecked && !pathname.startsWith("/espace-centre/onboarding")) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0A1628" }}>
-        <div className="flex items-center gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faRocket} className="animate-pulse text-blue-400" />
-          <span className="text-sm">Chargement de votre espace...</span>
-        </div>
-      </div>
-    );
-  }
+  // Afficher le layout + overlay pendant la vérification onboarding (évite le flash blanc)
+  const checkingRedirect = !redirectChecked && !pathname.startsWith("/espace-centre/onboarding");
 
   return (
     <div className="min-h-screen flex" style={{ background: "#0A1628" }}>
@@ -376,7 +374,10 @@ export default function EspaceCentreClientLayout({ children }: { children: React
           </div>
         )}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">{children}</main>
+        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+          {children}
+          <LoadingOverlay show={checkingRedirect} label="Chargement de votre espace..." />
+        </main>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   faCircleXmark, faGlobe, faKey, faCreditCard, faDatabase,
   faServer, faDownload, faShieldHalved, faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface AdminUser {
   role: "ADMIN" | "OWNER";
@@ -86,25 +87,7 @@ export default function AdminConfigurationPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <FontAwesomeIcon icon={faScrewdriverWrench} className="text-yellow-400 text-xl" />
-            <h1 className="text-2xl font-bold text-white">Configuration avancee</h1>
-          </div>
-          <p className="text-gray-400 text-sm">Parametres avances reserves au Owner de la plateforme.</p>
-        </div>
-        <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-lg" />
-          <span className="text-sm">Chargement...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isOwner) {
+  if (!loading && !isOwner) {
     return (
       <div className="space-y-6">
         <div>
@@ -129,8 +112,11 @@ export default function AdminConfigurationPage() {
   const resendStatus = true; // If loaded means API works
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="relative min-h-[50vh] space-y-6">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div>
         <div className="flex items-center gap-3 mb-1">
           <FontAwesomeIcon icon={faScrewdriverWrench} className="text-yellow-400 text-xl" />
@@ -144,6 +130,10 @@ export default function AdminConfigurationPage() {
           Parametres avances, integrations et outils systeme.
         </p>
       </div>
+      )}
+
+      {!loading && (
+      <>
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400 text-sm flex items-center gap-2">
@@ -305,6 +295,18 @@ export default function AdminConfigurationPage() {
           </div>
         </div>
       </div>
+      </>
+      )}
+
+      {loading && (
+        <div className="space-y-4 animate-pulse">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-40 rounded-xl bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement de la configuration..." />
     </div>
   );
 }

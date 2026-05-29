@@ -11,6 +11,7 @@ import {
   faHashtag, faSignature, faRoad, faMapPin, faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 type Statut = "ACTIF" | "EN_ATTENTE" | "SUSPENDU";
 
@@ -726,11 +727,13 @@ export default function AdminCentresPage() {
       )}
 
       {/* Table */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 overflow-hidden">
+      <div className="relative min-h-[280px] bg-[#0A1628] rounded-xl border border-white/8 overflow-hidden">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         {loading ? (
-          <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span className="text-sm">Chargement...</span>
+          <div className="animate-pulse divide-y divide-white/5 p-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-12 bg-white/5 rounded-lg my-2" />
+            ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
@@ -1041,6 +1044,8 @@ export default function AdminCentresPage() {
             </table>
           </div>
         )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement des centres..." />
       </div>
 
       {/* Modals */}

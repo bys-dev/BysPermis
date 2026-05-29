@@ -9,6 +9,7 @@ import {
   faUserPlus, faTrash, faTriangleExclamation, faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 type Role = "ELEVE" | "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE" | "SUPPORT" | "COMPTABLE" | "COMMERCIAL" | "ADMIN" | "OWNER";
 
@@ -69,6 +70,7 @@ export default function AdminUtilisateursPage() {
   const [page, setPage] = useState(1);
   const pageSize = 25;
   const [total, setTotal] = useState(0);
+  const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
 
   // Create modal
   const [showCreate, setShowCreate] = useState(false);
@@ -80,38 +82,44 @@ export default function AdminUtilisateursPage() {
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const filteredUsers = users.filter((u) => {
-    if (filterRole === "tous") return true;
-    if (filterRole === "eleves") return u.role === "ELEVE";
-    if (filterRole === "centres") return CENTRE_ROLES.includes(u.role);
-    if (filterRole === "plateforme") return PLATFORM_ROLES.includes(u.role);
-    return true;
-  });
+  // Server-side filtering — `users` already holds the right page for the active filter
+  const filteredUsers = users;
+
+  const ROLE_GROUPS: Record<string, Role[]> = {
+    eleves: ["ELEVE"],
+    centres: CENTRE_ROLES,
+    plateforme: PLATFORM_ROLES,
+  };
 
   const fetchUsers = useCallback(async () => {
     setError(false);
     const params = new URLSearchParams();
     if (search) params.set("search", search);
+    if (filterRole !== "tous" && ROLE_GROUPS[filterRole]) {
+      params.set("roles", ROLE_GROUPS[filterRole].join(","));
+    }
     params.set("page", String(page));
     params.set("pageSize", String(pageSize));
+    params.set("withCounts", "1");
 
     const res = await fetch(`/api/admin/users?${params}`).catch(() => null);
     if (!res?.ok) { setError(true); setUsers([]); return; }
     const data = await res.json();
-    const payload = data as Partial<UsersResponse>;
+    const payload = data as Partial<UsersResponse> & { counts?: Record<string, number> };
     if (Array.isArray(payload.items) && typeof payload.total === "number") {
       setUsers(payload.items);
       setTotal(payload.total);
+      if (payload.counts) setRoleCounts(payload.counts);
     } else {
       setUsers([]);
       setTotal(0);
     }
-  }, [search, page]);
+  }, [search, page, filterRole]);
 
   useEffect(() => {
-    // Reset to first page when searching
+    // Reset to first page when searching or changing filter
     setPage(1);
-  }, [search]);
+  }, [search, filterRole]);
 
   useEffect(() => {
     setLoading(true);
@@ -174,11 +182,12 @@ export default function AdminUtilisateursPage() {
     setDeleting(false);
   }
 
+  const sumRoles = (roles: Role[]) => roles.reduce((s, r) => s + (roleCounts[r] ?? 0), 0);
   const counts = {
-    tous: total,
-    eleves: users.filter((u) => u.role === "ELEVE").length,
-    centres: users.filter((u) => CENTRE_ROLES.includes(u.role)).length,
-    plateforme: users.filter((u) => PLATFORM_ROLES.includes(u.role)).length,
+    tous: Object.values(roleCounts).reduce((s, n) => s + n, 0),
+    eleves: roleCounts["ELEVE"] ?? 0,
+    centres: sumRoles(CENTRE_ROLES),
+    plateforme: sumRoles(PLATFORM_ROLES),
   };
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -252,11 +261,13 @@ export default function AdminUtilisateursPage() {
 
       {/* Table */}
       {!error && (
-        <div className="bg-navy-900 rounded-xl border border-white/8 overflow-hidden">
+        <div className="relative min-h-[280px] bg-navy-900 rounded-xl border border-white/8 overflow-hidden">
+          <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
           {loading ? (
-            <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-              <span className="text-sm">Chargement…</span>
+            <div className="animate-pulse divide-y divide-white/5 p-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-12 bg-white/5 rounded-lg my-2" />
+              ))}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -363,6 +374,8 @@ export default function AdminUtilisateursPage() {
               </table>
             </div>
           )}
+          </div>
+          <LoadingOverlay show={loading} label="Chargement des utilisateurs..." />
 
           {/* Pagination */}
           {!loading && totalPages > 1 && (

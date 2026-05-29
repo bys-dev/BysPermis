@@ -16,6 +16,7 @@ import {
   faTag, faCheck, faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── Stripe publishable key ───────────────────────────────
 const stripePromise = loadStripe(
@@ -291,54 +292,63 @@ export default function PaiementPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-7">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display font-bold text-lg text-gray-900">Paiement sécurisé</h2>
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <FontAwesomeIcon icon={faLock} className="text-green-500" />
-              SSL 256-bit · Stripe
-            </div>
-          </div>
-
-          {/* Logos CB */}
-          <div className="flex items-center gap-2 mb-6 pb-6 border-b border-gray-100">
-            {["VISA", "MC", "CB", "AMEX"].map((brand) => (
-              <div key={brand} className="px-2.5 py-1 border border-gray-200 rounded text-[10px] font-bold text-gray-500 bg-gray-50">
-                {brand}
+        <div className="relative bg-white rounded-2xl border border-gray-200 shadow-sm p-7 min-h-[280px]">
+          <div className={!loadError && !clientSecret ? "opacity-40 pointer-events-none select-none" : ""}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display font-bold text-lg text-gray-900">Paiement sécurisé</h2>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <FontAwesomeIcon icon={faLock} className="text-green-500" />
+                SSL 256-bit · Stripe
               </div>
-            ))}
-          </div>
+            </div>
 
-          {loadError ? (
-            <div className="text-center py-8">
-              <p className="text-red-600 text-sm mb-4">{loadError}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            {/* Logos CB */}
+            <div className="flex items-center gap-2 mb-6 pb-6 border-b border-gray-100">
+              {["VISA", "MC", "CB", "AMEX"].map((brand) => (
+                <div key={brand} className="px-2.5 py-1 border border-gray-200 rounded text-[10px] font-bold text-gray-500 bg-gray-50">
+                  {brand}
+                </div>
+              ))}
+            </div>
+
+            {loadError ? (
+              <div className="text-center py-8">
+                <p className="text-red-600 text-sm mb-4">{loadError}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Réessayer
+                </button>
+              </div>
+            ) : clientSecret ? (
+              <Elements
+                stripe={stripePromise}
+                options={{
+                  clientSecret,
+                  appearance: {
+                    theme: "stripe",
+                    variables: { colorPrimary: "#2563EB", borderRadius: "12px" },
+                  },
+                  locale: "fr",
+                }}
               >
-                Réessayer
-              </button>
-            </div>
-          ) : clientSecret ? (
-            <Elements
-              stripe={stripePromise}
-              options={{
-                clientSecret,
-                appearance: {
-                  theme: "stripe",
-                  variables: { colorPrimary: "#2563EB", borderRadius: "12px" },
-                },
-                locale: "fr",
-              }}
-            >
-              <CheckoutForm sessionId={sessionId} prix={displayPrice} promoCode={promoCode} />
-            </Elements>
-          ) : (
-            <div className="flex items-center justify-center py-12 gap-3 text-gray-400">
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-              <span className="text-sm">Initialisation du paiement…</span>
-            </div>
-          )}
+                <CheckoutForm sessionId={sessionId} prix={displayPrice} promoCode={promoCode} />
+              </Elements>
+            ) : (
+              <div className="space-y-4 animate-pulse py-4">
+                <div className="h-10 rounded-lg bg-gray-100" />
+                <div className="h-10 rounded-lg bg-gray-100" />
+                <div className="h-24 rounded-lg bg-gray-100" />
+                <div className="h-12 rounded-xl bg-gray-200" />
+              </div>
+            )}
+          </div>
+          <LoadingOverlay
+            show={!loadError && !clientSecret}
+            label="Initialisation du paiement…"
+            backdropOpacity={0.35}
+          />
         </div>
       </div>
 

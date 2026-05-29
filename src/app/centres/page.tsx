@@ -38,6 +38,7 @@ import {
   faCrosshairs,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -281,13 +282,13 @@ function CentresInner() {
           </p>
         </div>
 
+        <div className="relative min-h-[400px]">
+          <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         {loading ? (
-          <div className="text-center py-20">
-            <FontAwesomeIcon
-              icon={faSpinner}
-              className="text-4xl text-brand-accent mb-4 animate-spin"
-            />
-            <p className="text-gray-500">Chargement des centres…</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 animate-pulse">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-64 rounded-xl bg-gray-100 border border-brand-border" />
+            ))}
           </div>
         ) : centres.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -401,6 +402,9 @@ function CentresInner() {
             </p>
           </div>
         )}
+          </div>
+          <LoadingOverlay show={loading} label="Chargement des centres…" />
+        </div>
       </section>
 
       {/* Carte interactive des centres */}

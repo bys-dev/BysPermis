@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFolderOpen,
-  faSpinner,
   faTriangleExclamation,
   faSearch,
   faFileLines,
@@ -19,6 +18,8 @@ import {
   faArrowUpWideShort,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
+import EleveDocumentExchange from "@/components/documents/EleveDocumentExchange";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -222,12 +223,17 @@ export default function DocumentsPage() {
         </p>
       </div>
 
-      {/* Loading */}
+      <div className="relative min-h-[50vh]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 animate-pulse">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-20 rounded-xl bg-white/5 border border-white/5" />
+            ))}
+          </div>
+          <div className="h-96 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        </>
       ) : error ? (
         <div
           className="text-center py-16 rounded-xl border"
@@ -245,6 +251,9 @@ export default function DocumentsPage() {
         </div>
       ) : (
         <>
+          {/* Échange de documents bidirectionnel avec le centre */}
+          <EleveDocumentExchange reservations={reservations} />
+
           {/* Stats cards */}
           {reservations.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -505,6 +514,9 @@ export default function DocumentsPage() {
           )}
         </>
       )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement des documents..." />
+      </div>
     </div>
   );
 }

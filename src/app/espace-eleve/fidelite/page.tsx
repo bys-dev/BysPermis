@@ -20,6 +20,7 @@ import {
   faTicket,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
+import LoadingOverlay, { PageHeaderSkeleton, KpiGridSkeleton } from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -161,9 +162,11 @@ export default function FidelitePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-        <span className="text-sm">Chargement...</span>
+      <div className="relative min-h-[50vh]">
+        <PageHeaderSkeleton />
+        <KpiGridSkeleton cols={3} />
+        <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+        <LoadingOverlay show label="Chargement du programme fidélité..." />
       </div>
     );
   }

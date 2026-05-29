@@ -26,6 +26,7 @@ import {
   faXmark,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface Article {
   id: string;
@@ -371,12 +372,14 @@ export default function AdminBlogPage() {
       )}
 
       {/* Articles table */}
+      <div className="relative min-h-[280px]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="text-center py-20">
-          <FontAwesomeIcon
-            icon={faSpinner}
-            className="text-red-400 text-xl animate-spin"
-          />
+        <div className="rounded-xl border border-white/8 overflow-hidden animate-pulse">
+          <div className="h-10 bg-white/5 border-b border-white/5" />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 border-b border-white/5 bg-white/[0.02]" />
+          ))}
         </div>
       ) : articles.length === 0 ? (
         <div className="text-center py-20 bg-white/3 rounded-xl border border-white/8">
@@ -479,6 +482,9 @@ export default function AdminBlogPage() {
           </table>
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des articles..." />
+      </div>
     </div>
   );
 }

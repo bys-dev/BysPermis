@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBuilding,
-  faSpinner,
   faSearch,
   faCircle,
   faEuro,
@@ -12,6 +11,7 @@ import {
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface Centre {
   id: string;
@@ -80,6 +80,8 @@ export default function PlateformeCentresPage() {
   const actifs = centres.filter((c) => c.statut === "ACTIF").length;
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -149,10 +151,7 @@ export default function PlateformeCentresPage() {
       {/* Tableau */}
       <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-8 justify-center">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
-          </div>
+          <div className="h-64 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : filtered.length === 0 ? (
           <div className="text-center py-8">
             <FontAwesomeIcon icon={faBuilding} className="text-gray-600 text-3xl mb-3" />
@@ -203,6 +202,9 @@ export default function PlateformeCentresPage() {
           </div>
         )}
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des centres..." />
     </div>
   );
 }

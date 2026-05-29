@@ -1,32 +1,14 @@
-import Image from "next/image";
+import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-[#0A1628] flex items-center justify-center">
-      <div className="text-center">
-        {/* Logo animé */}
-        <div className="mb-6 animate-pulse inline-block">
-          <Image
-            src="/transparent-logo.svg"
-            alt="BYS Formation"
-            width={180}
-            height={56}
-            priority
-            className="h-14 w-auto brightness-0 invert"
-          />
-        </div>
-
-        {/* Barre tricolore animée */}
-        <div className="flex justify-center mb-6">
-          <div className="flex rounded overflow-hidden gap-1">
-            <div className="w-8 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: "0ms" }} />
-            <div className="w-8 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: "150ms" }} />
-            <div className="w-8 h-1.5 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: "300ms" }} />
-          </div>
-        </div>
-
-        <p className="text-gray-400 text-sm">Chargement en cours...</p>
+    <div className="relative min-h-screen bg-[#0A1628]">
+      <div className="p-6 sm:p-8 max-w-7xl mx-auto opacity-30 pointer-events-none">
+        <PageHeaderSkeleton />
+        <KpiGridSkeleton />
+        <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse" />
       </div>
+      <LoadingOverlay show fullScreen label="Chargement en cours..." />
     </div>
   );
 }

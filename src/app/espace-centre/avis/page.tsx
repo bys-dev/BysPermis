@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSpinner, faSave, faStar } from "@fortawesome/free-solid-svg-icons"
+import { faSave, faStar, faSpinner } from "@fortawesome/free-solid-svg-icons"
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay"
 import HalfStarRating from "@/components/reviews/HalfStarRating"
 import { formatDate } from "@/lib/utils"
 
@@ -70,22 +71,22 @@ export default function CentreAvisPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-2xl text-blue-400" />
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
+    <div className="relative min-h-[50vh] max-w-4xl mx-auto">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
+      <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white">Avis & questionnaires</h1>
         <p className="text-sm text-gray-400 mt-1">
           Personnalisez les 5 questions envoyées à vos stagiaires après chaque formation.
         </p>
       </div>
+      )}
+
+      {!loading && (
+    <div className="space-y-8">
 
       <div className="grid sm:grid-cols-2 gap-4">
         <StatCard label="Note moyenne centre" value={averageRating != null ? `${averageRating}/5` : "—"} />
@@ -165,6 +166,10 @@ export default function CentreAvisPage() {
           </div>
         )}
       </section>
+    </div>
+      )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des avis..." />
     </div>
   )
 }

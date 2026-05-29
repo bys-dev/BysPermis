@@ -71,7 +71,8 @@ const updateQuestionsSchema = z.object({
         libelle: z.string().min(5).max(300),
       }),
     )
-    .length(5),
+    .min(1)
+    .max(10),
 })
 
 /** PUT /api/centre/questionnaires — personnaliser les 5 questions centre */
@@ -107,7 +108,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ questions: updated })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "5 questions requises (5 à 300 caractères)." }, { status: 400 })
+      return NextResponse.json({ error: "1 à 10 questions, chacune de 5 à 300 caractères." }, { status: 400 })
     }
     const message = err instanceof Error ? err.message : "Erreur serveur"
     if (message === "Non authentifié" || message === "Non autorisé") {

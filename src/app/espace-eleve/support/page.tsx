@@ -12,6 +12,7 @@ import {
   faChevronLeft,
   faCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -171,11 +172,16 @@ export default function SupportPage() {
         </button>
       </div>
 
-      {/* Loading */}
+      <div className="relative min-h-[50vh]">
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
+        <div className="flex flex-col lg:flex-row gap-6 animate-pulse" style={{ minHeight: "500px" }}>
+          <div className="w-full lg:w-[360px] shrink-0 space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-20 rounded-xl bg-white/5 border border-white/5" />
+            ))}
+          </div>
+          <div className="flex-1 h-96 rounded-xl bg-white/5 border border-white/5" />
         </div>
       ) : error ? (
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
@@ -391,6 +397,9 @@ export default function SupportPage() {
           </div>
         </div>
       )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement du support..." />
+      </div>
     </div>
   );
 }

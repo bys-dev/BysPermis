@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faUsers,
   faPlus,
@@ -114,13 +115,18 @@ export default function EquipePage() {
   }
 
   return (
-    <div>
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Équipe</h1>
         <p className="text-gray-500 text-sm">
           Gérez les membres de votre centre de formation
         </p>
       </div>
+      )}
 
       {/* Invite form — only for CENTRE_OWNER */}
       {isOwner && (
@@ -195,12 +201,7 @@ export default function EquipePage() {
           </span>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-12 gap-3 text-gray-500">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span className="text-sm">Chargement…</span>
-          </div>
-        ) : membres.length === 0 ? (
+        {!loading && membres.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <FontAwesomeIcon icon={faUsers} className="text-2xl mb-3" />
             <p className="font-medium text-white mb-1">Aucun membre</p>
@@ -277,6 +278,8 @@ export default function EquipePage() {
           </div>
         )}
       </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement de l'équipe..." />
     </div>
   );
 }

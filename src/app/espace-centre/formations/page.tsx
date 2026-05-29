@@ -7,6 +7,7 @@ import {
   faEuroSign, faClock, faAward, faSpinner, faTrash,
   faXmark, faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface Formation {
   id: string;
@@ -202,7 +203,11 @@ export default function FormationsCentrePage() {
   const actives = formations.filter((f) => f.isActive).length;
 
   return (
-    <div>
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Mes formations</h1>
@@ -218,6 +223,7 @@ export default function FormationsCentrePage() {
           Nouvelle formation
         </button>
       </div>
+      )}
 
       {/* Error state */}
       {error && (
@@ -225,14 +231,6 @@ export default function FormationsCentrePage() {
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
           <p className="text-sm text-red-400">{error}</p>
           <button onClick={loadFormations} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
-        </div>
-      )}
-
-      {/* Loading state */}
-      {loading && !error && (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement...</span>
         </div>
       )}
 
@@ -565,6 +563,8 @@ export default function FormationsCentrePage() {
           </div>
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des formations..." />
     </div>
   );
 }

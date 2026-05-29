@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
 import {
   faTag,
   faPlus,
@@ -127,8 +128,11 @@ export default function CentrePromoPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="relative min-h-[50vh] space-y-6">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
+      {loading ? (
+        <PageHeaderSkeleton />
+      ) : (
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Codes promo</h1>
@@ -142,6 +146,7 @@ export default function CentrePromoPage() {
           {showForm ? "Annuler" : "Créer un code promo"}
         </button>
       </div>
+      )}
 
       {error && (
         <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
@@ -264,12 +269,7 @@ export default function CentrePromoPage() {
       )}
 
       {/* Promo list */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl mr-3" />
-          Chargement...
-        </div>
-      ) : promos.length === 0 ? (
+      {!loading && promos.length === 0 ? (
         <div className="text-center py-20">
           <FontAwesomeIcon icon={faTag} className="text-4xl text-gray-700 mb-4" />
           <p className="text-gray-500">Aucun code promo pour votre centre</p>
@@ -334,6 +334,8 @@ export default function CentrePromoPage() {
           ))}
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des codes promo..." />
     </div>
   );
 }

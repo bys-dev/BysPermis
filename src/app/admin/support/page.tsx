@@ -8,6 +8,7 @@ import {
   faEnvelope, faPaperPlane, faArrowLeft, faExclamationTriangle,
   faLockOpen, faLock, faRefresh,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 type TicketStatut = "OUVERT" | "EN_COURS" | "RESOLU" | "FERME";
 type TicketPriorite = "BASSE" | "NORMALE" | "HAUTE" | "URGENTE";
@@ -396,10 +397,13 @@ export default function AdminSupportPage() {
           </div>
 
           {/* Tickets list */}
+          <div className="relative min-h-[280px]">
+          <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
           {loading ? (
-            <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-              <span className="text-sm">Chargement des tickets...</span>
+            <div className="space-y-3 animate-pulse">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-20 rounded-xl bg-white/5 border border-white/5" />
+              ))}
             </div>
           ) : (
             <div className="space-y-3">
@@ -453,6 +457,9 @@ export default function AdminSupportPage() {
               )}
             </div>
           )}
+          </div>
+          <LoadingOverlay show={loading} label="Chargement des tickets..." />
+          </div>
         </>
       )}
     </div>

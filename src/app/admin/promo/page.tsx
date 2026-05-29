@@ -13,6 +13,7 @@ import {
   faEuroSign,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface PromoCode {
   id: string;
@@ -285,10 +286,14 @@ export default function AdminPromoPage() {
       )}
 
       {/* Promo list */}
+      <div className="relative min-h-[280px]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl mr-3" />
-          Chargement...
+        <div className="rounded-xl border border-white/10 overflow-hidden animate-pulse" style={{ background: "#0D1D3A" }}>
+          <div className="h-10 bg-white/5 border-b border-white/10" />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 border-b border-white/5" />
+          ))}
         </div>
       ) : promos.length === 0 ? (
         <div className="text-center py-20">
@@ -395,6 +400,9 @@ export default function AdminPromoPage() {
           </div>
         </div>
       )}
+      </div>
+      <LoadingOverlay show={loading} label="Chargement des codes promo..." />
+      </div>
     </div>
   );
 }

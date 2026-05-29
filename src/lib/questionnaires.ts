@@ -41,9 +41,20 @@ export async function getQuestionsForContext(
     const custom = await prisma.questionnaireQuestion.findMany({
       where: { type: "CENTRE", centreId, actif: true },
       orderBy: { ordre: "asc" },
-      take: 5,
+      take: 10,
     })
-    if (custom.length === 5) {
+    if (custom.length >= 1) {
+      return custom.map((q) => ({ id: q.id, libelle: q.libelle, ordre: q.ordre }))
+    }
+  }
+
+  if (type === "PLATFORM") {
+    const custom = await prisma.questionnaireQuestion.findMany({
+      where: { type: "PLATFORM", centreId: null, actif: true },
+      orderBy: { ordre: "asc" },
+      take: 10,
+    })
+    if (custom.length >= 1) {
       return custom.map((q) => ({ id: q.id, libelle: q.libelle, ordre: q.ordre }))
     }
   }
@@ -54,6 +65,22 @@ export async function getQuestionsForContext(
     libelle,
     ordre: index,
   }))
+}
+
+export async function ensurePlatformDefaultQuestions(): Promise<void> {
+  const count = await prisma.questionnaireQuestion.count({
+    where: { type: "PLATFORM", centreId: null },
+  })
+  if (count > 0) return
+
+  await prisma.questionnaireQuestion.createMany({
+    data: DEFAULT_PLATFORM_QUESTIONS.map((libelle, ordre) => ({
+      type: "PLATFORM" as const,
+      centreId: null,
+      libelle,
+      ordre,
+    })),
+  })
 }
 
 export async function ensureCentreDefaultQuestions(centreId: string): Promise<void> {

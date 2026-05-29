@@ -8,7 +8,6 @@ import {
   faCalendarCheck,
   faHeadset,
   faArrowUp,
-  faSpinner,
   faClock,
   faCheckCircle,
   faUser,
@@ -17,6 +16,7 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface DashboardStats {
   revenusPlateforme: number;
@@ -156,6 +156,8 @@ export default function PlateformeDashboardPage() {
   const recentActivity = s?.reservationsRecentes ?? [];
 
   return (
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -207,9 +209,10 @@ export default function PlateformeDashboardPage() {
       <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-4">Activite recente</h2>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span>Chargement...</span>
+          <div className="space-y-3 animate-pulse">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-16 rounded-lg bg-white/5 border border-white/5" />
+            ))}
           </div>
         ) : recentActivity.length === 0 ? (
           <div className="text-center py-6">
@@ -264,6 +267,9 @@ export default function PlateformeDashboardPage() {
           </div>
         )}
       </div>
+    </div>
+      </div>
+      <LoadingOverlay show={loading} label="Chargement du tableau de bord..." />
     </div>
   );
 }

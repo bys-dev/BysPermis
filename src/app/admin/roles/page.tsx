@@ -19,6 +19,7 @@ import {
   faChevronDown,
   faChevronUp,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 type Role =
   | "ELEVE"
@@ -171,18 +172,21 @@ export default function AdminRolesPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/users")
+    fetch("/api/admin/users?withCounts=1&pageSize=1")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setUsers(data);
-          const counts: Record<string, number> = {};
-          for (const role of ROLES) counts[role.role] = 0;
-          for (const u of data) {
+        const items = Array.isArray(data?.items) ? data.items : [];
+        setUsers(items);
+        const counts: Record<string, number> = {};
+        for (const role of ROLES) counts[role.role] = 0;
+        if (data?.counts && typeof data.counts === "object") {
+          for (const role of ROLES) counts[role.role] = data.counts[role.role] ?? 0;
+        } else {
+          for (const u of items) {
             if (counts[u.role] !== undefined) counts[u.role]++;
           }
-          setRoleCounts(counts as Record<Role, number>);
         }
+        setRoleCounts(counts as Record<Role, number>);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -198,10 +202,11 @@ export default function AdminRolesPage() {
     const res = await fetch(`/api/admin/users?search=${encodeURIComponent(searchEmail.trim())}`).catch(() => null);
     if (res?.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        const exact = data.find((u: UserData) => u.email.toLowerCase() === searchEmail.trim().toLowerCase());
-        setFoundUser(exact ?? data[0]);
-        setSelectedRole((exact ?? data[0]).role);
+      const items: UserData[] = Array.isArray(data?.items) ? data.items : [];
+      if (items.length > 0) {
+        const exact = items.find((u) => u.email.toLowerCase() === searchEmail.trim().toLowerCase());
+        setFoundUser(exact ?? items[0]);
+        setSelectedRole((exact ?? items[0]).role);
       } else {
         setMessage({ type: "error", text: "Aucun utilisateur trouve avec cet email." });
       }
@@ -372,13 +377,15 @@ export default function AdminRolesPage() {
       </div>
 
       {/* Roles list */}
-      <div>
+      <div className="relative min-h-[280px]">
         <h2 className="text-white font-semibold text-sm mb-4">Les 10 roles de la plateforme</h2>
 
+        <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         {loading ? (
-          <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-            <span className="text-sm">Chargement...</span>
+          <div className="space-y-3 animate-pulse">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-16 rounded-xl bg-white/5 border border-white/5" />
+            ))}
           </div>
         ) : (
           <div className="space-y-3">
@@ -429,6 +436,8 @@ export default function AdminRolesPage() {
             ))}
           </div>
         )}
+        </div>
+        <LoadingOverlay show={loading} label="Chargement des roles..." />
       </div>
     </div>
   );

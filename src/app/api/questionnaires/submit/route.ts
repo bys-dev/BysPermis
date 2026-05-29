@@ -16,7 +16,7 @@ const answerSchema = z.object({
 const submitSchema = z.object({
   type: z.enum(["CENTRE", "PLATFORM"]),
   reservationId: z.string().min(1),
-  answers: z.array(answerSchema).length(5),
+  answers: z.array(answerSchema).min(1).max(10),
   commentaire: z.string().max(1000).optional(),
 })
 

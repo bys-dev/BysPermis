@@ -22,6 +22,7 @@ import {
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -367,19 +368,14 @@ export default function MesFormationsPage() {
   }
 
   return (
-    <div>
+    <div className="relative min-h-[50vh]">
+      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes formations</h1>
         <p className="text-gray-500 text-sm">Suivez l&apos;avancement de vos formations</p>
       </div>
 
-      {/* Loading */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16 gap-3 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xl" />
-          <span className="text-sm">Chargement de vos formations...</span>
-        </div>
-      ) : error ? (
+      {!loading && error ? (
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
@@ -583,6 +579,22 @@ export default function MesFormationsPage() {
           )}
         </>
       )}
+
+      {loading && (
+        <div className="space-y-4 animate-pulse mt-6">
+          <div className="flex gap-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-9 w-28 rounded-lg bg-white/5" />
+            ))}
+          </div>
+          {[1, 2].map((i) => (
+            <div key={i} className="h-32 rounded-xl bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      )}
+      </div>
+
+      <LoadingOverlay show={loading} label="Chargement de vos formations..." />
 
       {/* Review Modal */}
       {reviewModal && (

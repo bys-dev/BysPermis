@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreManagement } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
-import { promises as fs } from "fs";
-import path from "path";
+import { uploadFile, HAS_BLOB } from "@/lib/storage";
 
 /**
  * POST /api/centre/upload — upload a centre image asset (logo, signature, banner).
@@ -11,11 +10,6 @@ import path from "path";
  * Body: multipart/form-data
  *   - file: File (image/png | image/jpeg | image/svg+xml | image/webp), max 2 MB
  *   - kind: "logo" | "signature" | "bannerImage"
- *
- * Storage strategy:
- *   - If `BLOB_READ_WRITE_TOKEN` env var is set → Vercel Blob (recommended in prod).
- *   - Otherwise → local filesystem at `public/uploads/centres/{centreId}/`.
- *     Local FS only works in dev or on a long-lived VM — Vercel serverless is read-only.
  */
 const MAX_BYTES = 2 * 1024 * 1024;
 const ALLOWED_MIME: Record<string, string> = {
@@ -26,34 +20,6 @@ const ALLOWED_MIME: Record<string, string> = {
 };
 const ALLOWED_KINDS = ["logo", "signature", "bannerImage"] as const;
 type UploadKind = (typeof ALLOWED_KINDS)[number];
-
-const HAS_BLOB = !!process.env.BLOB_READ_WRITE_TOKEN;
-
-async function uploadToBlob(
-  centreId: string,
-  filename: string,
-  contentType: string,
-  buffer: Buffer,
-): Promise<string> {
-  const { put } = await import("@vercel/blob");
-  const blob = await put(`centres/${centreId}/${filename}`, buffer, {
-    access: "public",
-    contentType,
-    addRandomSuffix: false,
-  });
-  return blob.url;
-}
-
-async function uploadToLocalFs(
-  centreId: string,
-  filename: string,
-  buffer: Buffer,
-): Promise<string> {
-  const dirAbs = path.join(process.cwd(), "public", "uploads", "centres", centreId);
-  await fs.mkdir(dirAbs, { recursive: true });
-  await fs.writeFile(path.join(dirAbs, filename), buffer);
-  return `/uploads/centres/${centreId}/${filename}`;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,9 +51,12 @@ export async function POST(req: NextRequest) {
     const timestamp = Date.now();
     const filename = `${kind}-${timestamp}.${ext}`;
 
-    const url = HAS_BLOB
-      ? await uploadToBlob(centreId, filename, file.type, buffer)
-      : await uploadToLocalFs(centreId, filename, buffer);
+    const { url } = await uploadFile({
+      pathPrefix: `centres/${centreId}`,
+      filename,
+      contentType: file.type,
+      buffer,
+    });
 
     const fieldMap: Record<UploadKind, "logo" | "signatureUrl" | "bannerImage"> = {
       logo: "logo",
