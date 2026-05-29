@@ -19,6 +19,7 @@ import {
   faArrowRight,
   faClock,
   faLocationDot,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
@@ -56,8 +57,19 @@ interface Notification {
   createdAt: string;
 }
 
+interface PendingQuestionnaire {
+  reservationId: string;
+  formationTitre: string;
+  centre: { nom: string; ville: string };
+  needsCentre: boolean;
+  needsPlatform: boolean;
+}
+
 function iconForNotif(titre: string) {
   const t = titre.toLowerCase();
+  if (t.includes("questionnaire") || t.includes("avis") || t.includes("satisfaction")) {
+    return { icon: faStar, color: "text-yellow-400", bg: "bg-yellow-400/10" };
+  }
   if (t.includes("réservation") || t.includes("confirmé")) {
     return { icon: faCalendarCheck, color: "text-green-400", bg: "bg-green-400/10" };
   }
@@ -94,16 +106,18 @@ export default function DashboardPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [pendingQuestionnaires, setPendingQuestionnaires] = useState<PendingQuestionnaire[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchAll() {
       try {
-        const [userRes, reservRes, notifRes] = await Promise.all([
+        const [userRes, reservRes, notifRes, pendingRes] = await Promise.all([
           fetch("/api/users/me"),
           fetch("/api/reservations"),
           fetch("/api/notifications"),
+          fetch("/api/questionnaires/pending"),
         ]);
 
         if (!userRes.ok) throw new Error("Impossible de charger votre profil");
@@ -119,6 +133,11 @@ export default function DashboardPage() {
         if (notifRes.ok) {
           const notifData = await notifRes.json();
           setNotifications(Array.isArray(notifData) ? notifData.slice(0, 3) : []);
+        }
+
+        if (pendingRes.ok) {
+          const pendingData = await pendingRes.json();
+          setPendingQuestionnaires(Array.isArray(pendingData) ? pendingData : []);
         }
       } catch (err) {
         setError(
@@ -205,6 +224,39 @@ export default function DashboardPage() {
           Bienvenue dans votre espace personnel
         </p>
       </div>
+
+      {/* Questionnaires en attente */}
+      {pendingQuestionnaires.length > 0 && (
+        <div
+          className="mb-8 rounded-xl p-5 border border-yellow-500/30"
+          style={{ background: "rgba(234,179,8,0.08)" }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-start gap-3 flex-1">
+              <div className="w-10 h-10 rounded-lg bg-yellow-500/15 flex items-center justify-center shrink-0">
+                <FontAwesomeIcon icon={faStar} className="text-yellow-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-yellow-200 text-sm">
+                  {pendingQuestionnaires.length === 1
+                    ? "1 questionnaire à compléter"
+                    : `${pendingQuestionnaires.length} questionnaires à compléter`}
+                </p>
+                <p className="text-xs text-yellow-200/70 mt-0.5">
+                  5 questions sur le centre + 5 sur BYS Permis (notes 1 à 5, demi-étoiles possibles).
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/espace-eleve/avis/${pendingQuestionnaires[0].reservationId}`}
+              className="inline-flex items-center justify-center gap-2 bg-yellow-500 text-[#0A1628] px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-yellow-400 shrink-0"
+            >
+              Donner mon avis
+              <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Next session card */}
       {nextReservation && (

@@ -1,23 +1,11 @@
-const ALL_ROLES = [
-  "ELEVE",
-  "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE",
-  "SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER",
-] as const
-
-type AppRole = (typeof ALL_ROLES)[number]
-
-const ROLE_LEVELS: Record<string, number> = {
-  OWNER: 100,
-  ADMIN: 90,
-  COMPTABLE: 70,
-  COMMERCIAL: 70,
-  SUPPORT: 60,
-  CENTRE_OWNER: 50,
-  CENTRE_ADMIN: 40,
-  CENTRE_FORMATEUR: 30,
-  CENTRE_SECRETAIRE: 20,
-  ELEVE: 10,
-}
+import { roleForDemoEmail } from "@/lib/demo-account-roles"
+import {
+  ALL_ROLES,
+  ROLE_LEVELS,
+  ROLE_NAMESPACE,
+  ROLE_NAMESPACE_TYPO,
+  type AppRole,
+} from "@/lib/auth0-session"
 
 function pickHighestRole(candidates: (string | undefined)[]): AppRole | undefined {
   let best: AppRole | undefined
@@ -47,6 +35,18 @@ function getManagementConfig() {
 
 let cachedToken: { value: string; expiresAt: number } | null = null
 
+const AUTH0_FETCH_TIMEOUT_MS = 4_000
+
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), AUTH0_FETCH_TIMEOUT_MS)
+  try {
+    return await fetch(url, { ...init, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 async function getManagementToken(): Promise<string | null> {
   const cfg = getManagementConfig()
   if (!cfg) return null
@@ -55,24 +55,28 @@ async function getManagementToken(): Promise<string | null> {
     return cachedToken.value
   }
 
-  const res = await fetch(`https://${cfg.domain}/oauth/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      grant_type: "client_credentials",
-      client_id: cfg.clientId,
-      client_secret: cfg.clientSecret,
-      audience: `https://${cfg.domain}/api/v2/`,
-    }),
-  })
-  if (!res.ok) return null
+  try {
+    const res = await fetchWithTimeout(`https://${cfg.domain}/oauth/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        grant_type: "client_credentials",
+        client_id: cfg.clientId,
+        client_secret: cfg.clientSecret,
+        audience: `https://${cfg.domain}/api/v2/`,
+      }),
+    })
+    if (!res.ok) return null
 
-  const data = (await res.json()) as { access_token: string; expires_in?: number }
-  cachedToken = {
-    value: data.access_token,
-    expiresAt: Date.now() + (data.expires_in ?? 3600) * 1000,
+    const data = (await res.json()) as { access_token: string; expires_in?: number }
+    cachedToken = {
+      value: data.access_token,
+      expiresAt: Date.now() + (data.expires_in ?? 3600) * 1000,
+    }
+    return data.access_token
+  } catch {
+    return null
   }
-  return data.access_token
 }
 
 /**
@@ -87,31 +91,38 @@ export async function fetchAuth0UserRole(auth0Id: string): Promise<AppRole | und
   const headers = { Authorization: `Bearer ${token}` }
   const encodedId = encodeURIComponent(auth0Id)
 
-  const [userRes, rolesRes] = await Promise.all([
-    fetch(`https://${cfg.domain}/api/v2/users/${encodedId}?fields=app_metadata`, { headers }),
-    fetch(`https://${cfg.domain}/api/v2/users/${encodedId}/roles`, { headers }),
-  ])
+  try {
+    const [userRes, rolesRes] = await Promise.all([
+      fetchWithTimeout(`https://${cfg.domain}/api/v2/users/${encodedId}?fields=app_metadata`, { headers }),
+      fetchWithTimeout(`https://${cfg.domain}/api/v2/users/${encodedId}/roles`, { headers }),
+    ])
 
-  let appMetadataRole: string | undefined
-  if (userRes.ok) {
-    const user = (await userRes.json()) as { app_metadata?: { role?: string } }
-    appMetadataRole = user.app_metadata?.role
+    let appMetadataRole: string | undefined
+    if (userRes.ok) {
+      const user = (await userRes.json()) as { app_metadata?: { role?: string } }
+      appMetadataRole = user.app_metadata?.role
+    }
+
+    let nativeRoles: string[] = []
+    if (rolesRes.ok) {
+      const roles = (await rolesRes.json()) as Array<{ name: string }>
+      nativeRoles = roles.map((r) => r.name)
+    }
+
+    return pickHighestRole([appMetadataRole, ...nativeRoles])
+  } catch {
+    return undefined
   }
-
-  let nativeRoles: string[] = []
-  if (rolesRes.ok) {
-    const roles = (await rolesRes.json()) as Array<{ name: string }>
-    nativeRoles = roles.map((r) => r.name)
-  }
-
-  return pickHighestRole([appMetadataRole, ...nativeRoles])
 }
 
 type SessionUser = Record<string, unknown>
 
 function roleFromTokenClaims(user: SessionUser): AppRole | undefined {
-  const ROLE_NAMESPACE = "https://byspermis.fr"
-  const ROLE_NAMESPACE_TYPO = "https://bypermis.fr"
+  const fromArray =
+    pickHighestRoleFromList(user[ROLE_NAMESPACE + "/roles"]) ??
+    pickHighestRoleFromList(user[ROLE_NAMESPACE_TYPO + "/roles"])
+  if (fromArray) return fromArray
+
   const candidates = [
     user.appRole,
     user.role,
@@ -121,16 +132,27 @@ function roleFromTokenClaims(user: SessionUser): AppRole | undefined {
   return pickHighestRole(candidates)
 }
 
+function pickHighestRoleFromList(value: unknown): AppRole | undefined {
+  if (!Array.isArray(value)) return undefined
+  return pickHighestRole(value as string[])
+}
+
 /**
  * Rôle Auth0 = source de vérité.
- * 1. Management API (app_metadata + rôles natifs) — prioritaire
- * 2. Claims du token / session
+ * 1. Claims session / token (rapide, pas d'appel réseau)
+ * 2. Comptes démo recette
+ * 3. Management API (avec timeout — Auth0 peut répondre lentement)
  */
 export async function resolveAuth0Role(
   auth0Id: string,
   sessionUser: SessionUser,
+  email?: string | null,
 ): Promise<AppRole | undefined> {
-  const apiRole = await fetchAuth0UserRole(auth0Id)
-  if (apiRole) return apiRole
-  return roleFromTokenClaims(sessionUser)
+  const fromSession = roleFromTokenClaims(sessionUser)
+  if (fromSession) return fromSession
+
+  const demoRole = roleForDemoEmail(email ?? (sessionUser.email as string | undefined))
+  if (demoRole) return demoRole
+
+  return fetchAuth0UserRole(auth0Id)
 }

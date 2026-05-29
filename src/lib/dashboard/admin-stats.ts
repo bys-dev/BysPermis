@@ -24,6 +24,8 @@ export async function getAdminStatsForDashboard() {
     recentTickets,
     montantsRes,
     montantsMoisDernier,
+    platformQuestionnaireAgg,
+    platformQuestionnaireRecent,
   ] = await Promise.all([
     prisma.reservation.count({
       where: { createdAt: { gte: startOfMonth }, status: { in: ["CONFIRMEE", "TERMINEE"] } },
@@ -63,8 +65,12 @@ export async function getAdminStatsForDashboard() {
       where: { createdAt: { gte: sixMonthsAgo }, status: { in: ["CONFIRMEE", "TERMINEE"] } },
       select: { montant: true, createdAt: true },
     }),
+    // Limité aux 6 derniers mois — évite de charger toutes les réservations (timeout Vercel)
     prisma.reservation.findMany({
-      where: { status: { in: ["CONFIRMEE", "TERMINEE"] } },
+      where: {
+        createdAt: { gte: sixMonthsAgo },
+        status: { in: ["CONFIRMEE", "TERMINEE"] },
+      },
       select: {
         montant: true,
         session: {
@@ -79,6 +85,7 @@ export async function getAdminStatsForDashboard() {
           },
         },
       },
+      take: 2000,
     }),
     prisma.centre.findMany({
       select: { id: true, nom: true, ville: true, createdAt: true, statut: true },
@@ -97,6 +104,30 @@ export async function getAdminStatsForDashboard() {
     prisma.reservation.findMany({
       where: { createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }, status: { in: ["CONFIRMEE", "TERMINEE"] } },
       select: { montant: true },
+    }),
+    prisma.questionnaireResponse.aggregate({
+      where: { type: "PLATFORM" },
+      _avg: { noteGlobale: true },
+      _count: true,
+    }),
+    prisma.questionnaireResponse.findMany({
+      where: { type: "PLATFORM" },
+      include: {
+        user: { select: { prenom: true, nom: true } },
+        reservation: {
+          include: {
+            session: {
+              include: {
+                formation: {
+                  select: { titre: true, centre: { select: { nom: true } } },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
     }),
   ]);
 
@@ -129,24 +160,28 @@ export async function getAdminStatsForDashboard() {
   const centreMap = new Map<string, { nom: string; ville: string; reservationCount: number; revenue: number }>();
 
   for (const r of allReservationsWithFormation) {
-    const fId = r.session.formation.id;
+    const formation = r.session?.formation;
+    const centre = formation?.centre;
+    if (!formation || !centre) continue;
+
+    const fId = formation.id;
     const existingF = formationMap.get(fId);
     if (existingF) {
       existingF.reservationCount++;
       existingF.revenue += r.montant;
     } else {
-      formationMap.set(fId, { titre: r.session.formation.titre, reservationCount: 1, revenue: r.montant });
+      formationMap.set(fId, { titre: formation.titre, reservationCount: 1, revenue: r.montant });
     }
 
-    const cId = r.session.formation.centre.id;
+    const cId = centre.id;
     const existingC = centreMap.get(cId);
     if (existingC) {
       existingC.reservationCount++;
       existingC.revenue += r.montant;
     } else {
       centreMap.set(cId, {
-        nom: r.session.formation.centre.nom,
-        ville: r.session.formation.centre.ville,
+        nom: centre.nom,
+        ville: centre.ville,
         reservationCount: 1,
         revenue: r.montant,
       });
@@ -183,11 +218,12 @@ export async function getAdminStatsForDashboard() {
 
   const activityItems: ActivityItem[] = [];
   for (const r of reservationsRecentes.slice(0, 3)) {
+    const centreNom = r.session?.formation?.centre?.nom ?? "Centre inconnu";
     activityItems.push({
       id: `res-${r.numero}`,
       type: "reservation",
       label: "Nouvelle reservation",
-      detail: `${r.user.prenom} ${r.user.nom} — ${r.session.formation.centre.nom}`,
+      detail: `${r.user.prenom} ${r.user.nom} — ${centreNom}`,
       time: r.createdAt.toISOString(),
     });
   }
@@ -223,8 +259,8 @@ export async function getAdminStatsForDashboard() {
     reservationsRecentes: reservationsRecentes.map((r) => ({
       id: r.numero,
       eleve: `${r.user.prenom} ${r.user.nom}`,
-      centre: r.session.formation.centre.nom,
-      stage: r.session.formation.titre,
+      centre: r.session?.formation?.centre?.nom ?? "—",
+      stage: r.session?.formation?.titre ?? "—",
       montant: r.montant,
       status: String(r.status),
       createdAt: r.createdAt.toISOString(),
@@ -238,6 +274,21 @@ export async function getAdminStatsForDashboard() {
     topCentres,
     growth: { revenue: revenueGrowth, reservations: reservationsGrowth },
     activityFeed: activityItems.slice(0, 10),
+    questionnaires: {
+      platformAverage: platformQuestionnaireAgg._avg.noteGlobale
+        ? Math.round(platformQuestionnaireAgg._avg.noteGlobale * 10) / 10
+        : null,
+      platformCount: platformQuestionnaireAgg._count,
+      recentPlatform: platformQuestionnaireRecent.map((r) => ({
+        id: r.id,
+        noteGlobale: r.noteGlobale,
+        commentaire: r.commentaire,
+        auteur: `${r.user.prenom} ${r.user.nom}`,
+        formation: r.reservation.session.formation.titre,
+        centre: r.reservation.session.formation.centre.nom,
+        createdAt: r.createdAt.toISOString(),
+      })),
+    },
   };
 }
 

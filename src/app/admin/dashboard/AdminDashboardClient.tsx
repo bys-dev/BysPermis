@@ -24,6 +24,8 @@ import {
   faTicket,
   faFileExport,
   faChevronDown,
+  faStar,
+  faLaptop,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatPrice, formatDate } from "@/lib/utils";
 
@@ -59,6 +61,19 @@ interface AdminStats {
     detail: string;
     time: string;
   }[];
+  questionnaires?: {
+    platformAverage: number | null;
+    platformCount: number;
+    recentPlatform: {
+      id: string;
+      noteGlobale: number;
+      commentaire: string | null;
+      auteur: string;
+      formation: string;
+      centre: string;
+      createdAt: string;
+    }[];
+  };
 }
 
 interface AdminUser {
@@ -199,6 +214,7 @@ export default function AdminDashboardClient({
     { label: "Gerer les centres", href: "/admin/centres", icon: faBuilding, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/20" },
     { label: "Voir les utilisateurs", href: "/admin/utilisateurs", icon: faUsers, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/20" },
     { label: "Support", href: "/admin/support", icon: faHeadset, color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-500/20" },
+    { label: "Avis plateforme", href: "/admin/avis", icon: faStar, color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
     { label: "Statistiques", href: "/admin/statistiques", icon: faChartLine, color: "text-green-400", bg: "bg-green-400/10", border: "border-green-500/20" },
     ...(isOwner
       ? [
@@ -210,6 +226,11 @@ export default function AdminDashboardClient({
   ];
 
   const activityFeed = stats.activityFeed ?? [];
+  const questionnaires = stats.questionnaires ?? {
+    platformAverage: null,
+    platformCount: 0,
+    recentPlatform: [],
+  };
 
   return (
     <div className="space-y-8">
@@ -292,6 +313,51 @@ export default function AdminDashboardClient({
             <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
           </div>
         ))}
+      </div>
+
+      {/* Avis plateforme BYS Permis */}
+      <div className="bg-navy-900 rounded-xl border border-yellow-500/20 p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2">
+            <FontAwesomeIcon icon={faLaptop} className="text-yellow-400" />
+            <h2 className="text-white font-semibold text-sm">Satisfaction plateforme</h2>
+          </div>
+          <Link href="/admin/avis" className="text-xs text-blue-400 hover:text-blue-300">
+            Voir tous les avis →
+          </Link>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4 mb-4">
+          <div className="rounded-lg bg-white/3 border border-white/5 p-4">
+            <p className="text-xs text-gray-500">Note moyenne BYS Permis</p>
+            <p className="text-2xl font-bold text-white mt-1 flex items-center gap-2">
+              <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-lg" />
+              {questionnaires.platformAverage != null ? `${questionnaires.platformAverage}/5` : "—"}
+            </p>
+          </div>
+          <div className="rounded-lg bg-white/3 border border-white/5 p-4">
+            <p className="text-xs text-gray-500">Questionnaires reçus</p>
+            <p className="text-2xl font-bold text-white mt-1">{questionnaires.platformCount}</p>
+          </div>
+        </div>
+        {questionnaires.recentPlatform.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-4">Aucun retour plateforme pour le moment.</p>
+        ) : (
+          <div className="space-y-2">
+            {questionnaires.recentPlatform.map((r) => (
+              <div key={r.id} className="flex items-start justify-between gap-3 p-3 rounded-lg bg-white/3 border border-white/5">
+                <div className="min-w-0">
+                  <p className="text-sm text-white font-medium truncate">{r.auteur}</p>
+                  <p className="text-xs text-gray-500 truncate">{r.formation} — {r.centre}</p>
+                  {r.commentaire && <p className="text-xs text-gray-400 mt-1 italic truncate">« {r.commentaire} »</p>}
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-yellow-400 font-semibold text-sm">{r.noteGlobale.toFixed(1)}/5</span>
+                  <p className="text-[10px] text-gray-600">{timeAgo(r.createdAt)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

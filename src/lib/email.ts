@@ -216,6 +216,55 @@ export async function sendCentreActivationEmail(params: {
 }
 
 /**
+ * Email post-stage : invitation à remplir le questionnaire satisfaction (centre + plateforme).
+ */
+export async function sendQuestionnaireEmail(params: {
+  to: string;
+  prenom: string;
+  formationTitle: string;
+  centreName: string;
+  questionnaireUrl: string;
+}): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY absent — questionnaire non envoyé à", params.to);
+    return;
+  }
+
+  await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `Votre avis compte — ${params.formationTitle}`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">Questionnaire satisfaction</h1>
+    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">${params.formationTitle}</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour ${params.prenom},</p>
+    <p>Merci d'avoir suivi votre formation <strong>${params.formationTitle}</strong> chez <strong>${params.centreName}</strong>.</p>
+    <p>Votre retour nous aide à améliorer la qualité des centres partenaires et de la plateforme BYS Permis.</p>
+    <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">2 questionnaires rapides :</p>
+      <ul style="margin:0;padding-left:20px;color:#0C4A6E;font-size:13px;line-height:1.8">
+        <li><strong>5 questions</strong> sur votre centre de formation</li>
+        <li><strong>5 questions</strong> sur BYS Permis (réservation, site, suivi)</li>
+      </ul>
+      <p style="margin:8px 0 0;color:#64748B;font-size:12px">Notes de 1 à 5 — demi-étoiles possibles.</p>
+    </div>
+    <p style="text-align:center;margin:24px 0">
+      <a href="${params.questionnaireUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Donner mon avis</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
+      Vous pouvez aussi répondre depuis votre espace élève → <strong>Mes avis</strong>.<br/>
+      Cordialement,<br/>L'équipe BYS Formation Permis
+    </p>
+  </div>
+</div>`,
+  });
+}
+
+/**
  * Send centre rejection email when admin rejects the centre.
  */
 export async function sendCentreRejectionEmail(params: {

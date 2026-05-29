@@ -1,34 +1,15 @@
-import { Auth0Client } from "@auth0/nextjs-auth0/server"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { resolveAuth0Role } from "@/lib/auth0-management"
+import { auth0 } from "@/lib/auth0-client"
+import {
+  ALL_ROLES,
+  ROLE_LEVELS,
+  type AppRole,
+} from "@/lib/auth0-session"
 import type { User } from "@/generated/prisma/client"
 
-// ─── Namespace for custom claims injected by Auth0 Post-Login Action ───
-const ROLE_NAMESPACE = "https://byspermis.fr"
-/** Ancienne typo parfois encore déployée dans l'Action Auth0 dashboard */
-const ROLE_NAMESPACE_TYPO = "https://bypermis.fr"
-
-/** All valid role values */
-const ALL_ROLES = [
-  "ELEVE",
-  "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE",
-  "SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER",
-] as const
-
-// ─── Role hierarchy levels (higher = more privileged) ────────────────
-const ROLE_LEVELS: Record<string, number> = {
-  OWNER: 100,
-  ADMIN: 90,
-  COMPTABLE: 70,
-  COMMERCIAL: 70,
-  SUPPORT: 60,
-  CENTRE_OWNER: 50,
-  CENTRE_ADMIN: 40,
-  CENTRE_FORMATEUR: 30,
-  CENTRE_SECRETAIRE: 20,
-  ELEVE: 10,
-}
+export { auth0 }
 
 /**
  * Check if `userRole` meets or exceeds `requiredRole` in the hierarchy.
@@ -38,55 +19,8 @@ export function hasRole(userRole: string, requiredRole: string): boolean {
   return (ROLE_LEVELS[userRole] ?? 0) >= (ROLE_LEVELS[requiredRole] ?? 0)
 }
 
-type AppRole = (typeof ALL_ROLES)[number]
-
 function normalizeEmail(email: string | undefined | null): string {
   return (email ?? "").trim().toLowerCase()
-}
-
-function parseIdTokenClaims(idToken: string | undefined): Record<string, unknown> | null {
-  if (!idToken) return null
-  try {
-    const base64Url = idToken.split(".")[1]
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    )
-    return JSON.parse(jsonPayload) as Record<string, unknown>
-  } catch {
-    return null
-  }
-}
-
-/** Rôle explicite depuis le JWT / claims Auth0 (jamais de défaut ELEVE ici). */
-function roleFromClaims(claims: Record<string, unknown> | null): AppRole | undefined {
-  if (!claims) return undefined
-  const raw =
-    (claims[ROLE_NAMESPACE + "/role"] as string | undefined) ??
-    (claims[ROLE_NAMESPACE_TYPO + "/role"] as string | undefined) ??
-    (claims["role"] as string | undefined)
-  if (raw && ALL_ROLES.includes(raw as AppRole)) {
-    return raw as AppRole
-  }
-  return undefined
-}
-
-function roleFromSessionUser(user: Record<string, unknown>): AppRole | undefined {
-  const candidates = [
-    user.appRole,
-    user.role,
-    user[ROLE_NAMESPACE + "/role"],
-    user[ROLE_NAMESPACE_TYPO + "/role"],
-  ] as (string | undefined)[]
-  for (const raw of candidates) {
-    if (raw && ALL_ROLES.includes(raw as AppRole)) {
-      return raw as AppRole
-    }
-  }
-  return undefined
 }
 
 export function getDashboardPathForRole(role: string): string {
@@ -98,27 +32,17 @@ export function getDashboardPathForRole(role: string): string {
 
 async function syncDbRoleFromAuth0(userId: string, auth0Role: AppRole | undefined, currentRole: string) {
   if (!auth0Role || auth0Role === currentRole) return null
+  const currentLevel = ROLE_LEVELS[currentRole] ?? 0
+  const newLevel = ROLE_LEVELS[auth0Role] ?? 0
+  // Ne pas rétrograder un compte staff depuis un claim token stale (ex. ELEVE fantôme).
+  if (newLevel < currentLevel && currentLevel > (ROLE_LEVELS.ELEVE ?? 0)) {
+    return null
+  }
   return prisma.user.update({
     where: { id: userId },
     data: { role: auth0Role },
   })
 }
-
-// ─── Auth0 Client v4 with beforeSessionSaved hook ───────────────────
-
-export const auth0 = new Auth0Client({
-  async beforeSessionSaved(session, idToken) {
-    const claims = parseIdTokenClaims(idToken ?? undefined)
-    const roleFromToken = roleFromClaims(claims) ?? roleFromSessionUser(session.user)
-
-    // Ne jamais forcer ELEVE ici : un défaut fausse la sync DB et envoie les admins vers l'espace élève.
-    if (roleFromToken) {
-      session.user.appRole = roleFromToken
-    }
-
-    return session
-  },
-})
 
 // ─── Role groups ─────────────────────────────────────────
 
@@ -155,7 +79,7 @@ export async function getCurrentUser(): Promise<User | null> {
     const email = normalizeEmail(session.user.email as string | undefined)
 
     // Source de vérité : Auth0 (app_metadata, rôles natifs, claims JWT)
-    const auth0Role = await resolveAuth0Role(auth0Id, session.user as Record<string, unknown>)
+    const auth0Role = await resolveAuth0Role(auth0Id, session.user as Record<string, unknown>, email)
 
     let user = await prisma.user.findUnique({
       where: { auth0Id },

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreStaff } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
+import { sendQuestionnaireEmail } from "@/lib/email";
 import { z } from "zod";
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "https://bys-permis.vercel.app";
 
 const emargementSchema = z.object({
   attendance: z.record(z.string(), z.boolean()),
@@ -55,20 +58,52 @@ export async function POST(
           status: "TERMINEE",
         },
         include: {
-          session: { include: { formation: true } },
+          session: {
+            include: {
+              formation: {
+                include: { centre: { select: { nom: true } } },
+              },
+            },
+          },
         },
       });
 
-      const notificationPromises = terminatedReservations.map((r) =>
+      const notificationPromises = terminatedReservations.flatMap((r) => [
         prisma.notification.create({
           data: {
             userId: r.userId,
             titre: "Attestation de formation disponible",
             contenu: `Votre attestation pour "${r.session.formation.titre}" est disponible. Rendez-vous dans vos formations pour la telecharger.`,
           },
-        })
-      );
+        }),
+        prisma.notification.create({
+          data: {
+            userId: r.userId,
+            titre: "Questionnaire satisfaction",
+            contenu: `Partagez votre avis sur ${r.session.formation.titre} : 5 questions sur le centre et 5 sur BYS Permis. Rendez-vous dans Mes avis.`,
+          },
+        }),
+      ]);
       await Promise.all(notificationPromises);
+
+      await Promise.allSettled(
+        terminatedReservations.map((r) =>
+          sendQuestionnaireEmail({
+            to: r.email,
+            prenom: r.prenom,
+            formationTitle: r.session.formation.titre,
+            centreName: r.session.formation.centre.nom,
+            questionnaireUrl: `${APP_URL}/espace-eleve/avis/${r.id}`,
+          }),
+        ),
+      );
+
+      await prisma.reservation.updateMany({
+        where: {
+          id: { in: terminatedReservations.map((r) => r.id) },
+        },
+        data: { questionnaireEnvoye: true },
+      });
     }
 
     return NextResponse.json({

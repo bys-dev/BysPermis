@@ -7,6 +7,7 @@ import {
   faArrowTrendUp, faCircleCheck, faSpinner, faTriangleExclamation,
   faFileExport, faChevronDown,
   faImage, faArrowRight,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
@@ -25,6 +26,19 @@ interface Stats {
     status: string;
     montant: number;
   }[];
+  questionnaires?: {
+    averageRating: number;
+    totalResponses: number;
+    pendingCount: number;
+    recent: {
+      id: string;
+      noteGlobale: number;
+      commentaire: string | null;
+      auteur: string;
+      formation: string | null;
+      createdAt: string;
+    }[];
+  };
 }
 
 const statusBadge: Record<string, { label: string; color: string; bg: string }> = {
@@ -216,6 +230,50 @@ export default function DashboardCentrePage() {
         ))}
       </div>
 
+      {/* Avis & questionnaires */}
+      {stats.questionnaires && (
+        <div className="mb-8 rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+            <h2 className="font-semibold text-white text-sm flex items-center gap-2">
+              <FontAwesomeIcon icon={faStar} className="text-yellow-400" />
+              Avis stagiaires
+            </h2>
+            <Link href="/espace-centre/avis" className="text-xs text-blue-400 hover:text-blue-300">
+              Gérer →
+            </Link>
+          </div>
+          <div className="p-4 sm:p-6 grid sm:grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs text-gray-500">Note moyenne</p>
+              <p className="text-xl font-bold text-white mt-1">
+                {stats.questionnaires.averageRating > 0 ? `${stats.questionnaires.averageRating}/5` : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Réponses reçues</p>
+              <p className="text-xl font-bold text-white mt-1">{stats.questionnaires.totalResponses}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">En attente de réponse</p>
+              <p className="text-xl font-bold text-yellow-400 mt-1">{stats.questionnaires.pendingCount}</p>
+            </div>
+          </div>
+          {stats.questionnaires.recent.length > 0 && (
+            <div className="px-4 sm:px-6 pb-4 space-y-2">
+              {stats.questionnaires.recent.slice(0, 3).map((r) => (
+                <div key={r.id} className="flex justify-between gap-3 text-sm py-2 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+                  <div className="min-w-0">
+                    <span className="text-white font-medium">{r.auteur}</span>
+                    <span className="text-gray-500 text-xs block truncate">{r.formation}</span>
+                  </div>
+                  <span className="text-yellow-400 font-semibold shrink-0">{r.noteGlobale.toFixed(1)}/5</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Réservations récentes */}
       <div className="rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
@@ -259,6 +317,7 @@ export default function DashboardCentrePage() {
         {[
           { label: "Ajouter une session",   href: "/espace-centre/sessions",   icon: faCalendarDays,  color: "text-blue-400"   },
           { label: "Créer une formation",   href: "/espace-centre/formations", icon: faGraduationCap, color: "text-purple-400" },
+          { label: "Avis & questionnaires", href: "/espace-centre/avis",       icon: faStar,          color: "text-yellow-400" },
           { label: "Voir les réservations", href: "/espace-centre/sessions",   icon: faCircleCheck,   color: "text-green-400"  },
         ].map((a) => (
           <Link key={a.label} href={a.href} className="flex items-center gap-3 p-4 rounded-xl transition-all hover:bg-white/[0.07]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>

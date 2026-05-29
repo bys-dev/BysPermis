@@ -179,16 +179,41 @@ export async function GET() {
       terminees: allStatuses.filter((r) => r.status === "TERMINEE").length,
     };
 
-    // ── Average rating ──
-    const reviews = await prisma.review.findMany({
-      where: { formation: { centreId } },
-      select: { note: true, commentaire: true, createdAt: true, user: { select: { prenom: true, nom: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-    });
-    const averageRating = reviews.length > 0
-      ? Math.round((reviews.reduce((sum, r) => sum + r.note, 0) / reviews.length) * 10) / 10
-      : 0;
+    // ── Average rating (questionnaires centre + reviews legacy) ──
+    const [reviews, questionnaireAgg, pendingQuestionnaires, recentQuestionnaires] = await Promise.all([
+      prisma.review.findMany({
+        where: { formation: { centreId } },
+        select: { note: true, commentaire: true, createdAt: true, user: { select: { prenom: true, nom: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      }),
+      prisma.questionnaireResponse.aggregate({
+        where: { centreId, type: "CENTRE" },
+        _avg: { noteGlobale: true },
+        _count: true,
+      }),
+      prisma.reservation.count({
+        where: {
+          status: "TERMINEE",
+          session: { formation: { centreId } },
+          NOT: { questionnaireResponses: { some: { type: "CENTRE" } } },
+        },
+      }),
+      prisma.questionnaireResponse.findMany({
+        where: { centreId, type: "CENTRE" },
+        include: {
+          user: { select: { prenom: true, nom: true } },
+          formation: { select: { titre: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+    ]);
+    const averageRating = questionnaireAgg._avg.noteGlobale
+      ? Math.round(questionnaireAgg._avg.noteGlobale * 10) / 10
+      : reviews.length > 0
+        ? Math.round((reviews.reduce((sum, r) => sum + r.note, 0) / reviews.length) * 10) / 10
+        : 0;
 
     // ── Session occupancy per active session ──
     const sessionsWithOccupancy = await prisma.session.findMany({
@@ -236,6 +261,19 @@ export async function GET() {
       statusBreakdown,
       averageRating,
       sessionOccupancy,
+      questionnaires: {
+        averageRating,
+        totalResponses: questionnaireAgg._count,
+        pendingCount: pendingQuestionnaires,
+        recent: recentQuestionnaires.map((r) => ({
+          id: r.id,
+          noteGlobale: r.noteGlobale,
+          commentaire: r.commentaire,
+          auteur: `${r.user.prenom} ${r.user.nom}`,
+          formation: r.formation?.titre ?? null,
+          createdAt: r.createdAt.toISOString(),
+        })),
+      },
       recentReviews: reviews.map((r) => ({
         note: r.note,
         commentaire: r.commentaire,

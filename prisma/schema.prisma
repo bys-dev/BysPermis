@@ -91,6 +91,11 @@ enum SubscriptionStatus {
   TRIALING
 }
 
+enum QuestionnaireType {
+  CENTRE
+  PLATFORM
+}
+
 // ─── USERS ───────────────────────────────────────────────
 
 model User {
@@ -125,8 +130,9 @@ model User {
   tickets          Ticket[]
   ticketMessages   TicketMessage[]
   notifications    Notification[]
-  reviews          Review[]
-  invoices         Invoice[]
+  reviews                  Review[]
+  questionnaireResponses   QuestionnaireResponse[]
+  invoices                 Invoice[]
   articles         Article[]
   messagesSent     Message[]       @relation("messagesSent")
   messagesReceived Message[]       @relation("messagesReceived")
@@ -204,9 +210,11 @@ model Centre {
   emailTemplates     EmailTemplate[]
   payments           CentrePayment[]
   invoices           Invoice[]
-  promoCodes         PromoCode[]
-  subscriptionPlanId String?
-  subscriptionPlan   SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
+  promoCodes             PromoCode[]
+  subscriptionPlanId     String?
+  subscriptionPlan       SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
+  questionnaireQuestions QuestionnaireQuestion[]
+  questionnaireResponses QuestionnaireResponse[]
 
   @@map("centres")
 }
@@ -282,6 +290,7 @@ model Formation {
   sessions    Session[]
   reviews     Review[]
   favorites   Favorite[]
+  questionnaireResponses QuestionnaireResponse[]
 
   @@map("formations")
 }
@@ -353,7 +362,8 @@ model Reservation {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  rappelEnvoye Boolean @default(false)
+  rappelEnvoye          Boolean @default(false)
+  questionnaireEnvoye   Boolean @default(false)
 
   // Relations
   userId    String
@@ -362,6 +372,8 @@ model Reservation {
   session   Session   @relation(fields: [sessionId], references: [id])
   invoice   Invoice?
   messages  Message[]
+  questionnaireResponses QuestionnaireResponse[]
+  review                 Review?
 
   @@map("reservations")
 }
@@ -429,18 +441,62 @@ model TicketMessage {
 
 model Review {
   id          String   @id @default(cuid())
-  note        Int // 1-5 stars
+  note        Int // 1-5 stars (moyenne arrondie du questionnaire)
+  notePrecise Float? // moyenne exacte (demi-étoiles)
   commentaire String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  formationId String
-  formation   Formation @relation(fields: [formationId], references: [id])
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  formationId   String
+  formation     Formation   @relation(fields: [formationId], references: [id])
+  reservationId String?     @unique
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
 
   @@unique([userId, formationId])
   @@map("reviews")
+}
+
+// ─── QUESTIONNAIRES SATISFACTION ─────────────────────────
+
+model QuestionnaireQuestion {
+  id        String            @id @default(cuid())
+  type      QuestionnaireType
+  ordre     Int               @default(0)
+  libelle   String
+  actif     Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  centreId String?
+  centre   Centre? @relation(fields: [centreId], references: [id], onDelete: Cascade)
+
+  @@index([centreId, type])
+  @@map("questionnaire_questions")
+}
+
+model QuestionnaireResponse {
+  id          String            @id @default(cuid())
+  type        QuestionnaireType
+  noteGlobale Float
+  reponses    Json // [{ questionId, libelle, note }]
+  commentaire String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  centreId      String?
+  centre        Centre?     @relation(fields: [centreId], references: [id])
+  formationId   String?
+  formation     Formation?  @relation(fields: [formationId], references: [id])
+
+  @@unique([userId, reservationId, type])
+  @@index([centreId, type])
+  @@map("questionnaire_responses")
 }
 
 // ─── FAQ ─────────────────────────────────────────────────

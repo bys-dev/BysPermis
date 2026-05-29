@@ -544,14 +544,14 @@ export default function MesFormationsPage() {
                           Attestation
                         </a>
                       )}
-                      {group.category === "terminee" && !group.review && (
-                        <button
-                          onClick={() => openReviewModal(group)}
+                      {group.category === "terminee" && group.reservations[0] && (
+                        <Link
+                          href={`/espace-eleve/avis/${group.reservations[0].id}`}
                           className="flex items-center gap-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-yellow-500/20 transition-colors"
                         >
                           <FontAwesomeIcon icon={faStarSolid} className="w-3 h-3" />
-                          Laisser un avis
-                        </button>
+                          {group.review ? "Voir / compléter avis" : "Questionnaire satisfaction"}
+                        </Link>
                       )}
                       <Link
                         href={`/formations/${group.formationSlug}`}

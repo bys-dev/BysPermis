@@ -25,6 +25,7 @@ const sidebarLinks = [
   { href: "/espace-eleve", label: "Accueil", icon: faHouse, exact: true },
   { href: "/espace-eleve/reservations", label: "Mes réservations", icon: faCalendarCheck },
   { href: "/espace-eleve/mes-formations", label: "Mes formations", icon: faGraduationCap },
+  { href: "/espace-eleve/avis", label: "Mes avis", icon: faStar },
   { href: "/espace-eleve/paiements", label: "Paiements", icon: faCreditCard },
   { href: "/espace-eleve/documents", label: "Documents", icon: faFolderOpen },
   { href: "/espace-eleve/profil", label: "Mon profil", icon: faUser },

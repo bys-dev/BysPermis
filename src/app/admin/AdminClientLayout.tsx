@@ -22,6 +22,7 @@ import {
   faTag,
   faNewspaper,
   faChartBar,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 
 type UserRole = "ADMIN" | "OWNER";
@@ -37,6 +38,7 @@ const baseNavItems = [
   { href: "/admin/centres", icon: faBuilding, label: "Centres" },
   { href: "/admin/utilisateurs", icon: faUsers, label: "Utilisateurs" },
   { href: "/admin/support", icon: faHeadset, label: "Support" },
+  { href: "/admin/avis", icon: faStar, label: "Avis plateforme" },
   { href: "/admin/statistiques", icon: faChartLine, label: "Statistiques" },
   { href: "/admin/promo", icon: faTag, label: "Codes promo" },
   { href: "/admin/blog", icon: faNewspaper, label: "Blog" },

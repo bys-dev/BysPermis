@@ -26,6 +26,7 @@ import {
   faXmark,
   faRocket,
   faTag,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import CentreSwitcher from "@/components/ui/CentreSwitcher";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -50,6 +51,12 @@ const allNavItems: NavItem[] = [
     href: "/espace-centre/statistiques",
     label: "Statistiques",
     icon: faChartLine,
+    roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
+  },
+  {
+    href: "/espace-centre/avis",
+    label: "Avis & questionnaires",
+    icon: faStar,
     roles: ["CENTRE_OWNER", "CENTRE_ADMIN"],
   },
   {

@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Auth0Client } from "@auth0/nextjs-auth0/server"
-
-// ─── Auth0 client for proxy layer (no Prisma import) ─────────
-const auth0 = new Auth0Client()
+import { auth0 } from "@/lib/auth0-client"
 
 // ─── Routes that require authentication ──────────────────────
 

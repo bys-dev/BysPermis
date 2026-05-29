@@ -14,7 +14,11 @@ export async function GET() {
     }
 
     const auth0Id = session.user.sub as string;
-    const auth0Role = await resolveAuth0Role(auth0Id, session.user as Record<string, unknown>);
+    const auth0Role = await resolveAuth0Role(
+      auth0Id,
+      session.user as Record<string, unknown>,
+      session.user.email as string | undefined,
+    );
 
     return NextResponse.json({
       id: user.id,
