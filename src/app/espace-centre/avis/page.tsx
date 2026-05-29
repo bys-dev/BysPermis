@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSave, faStar, faSpinner } from "@fortawesome/free-solid-svg-icons"
+import { faSave, faStar, faSpinner, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons"
 import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay"
 import HalfStarRating from "@/components/reviews/HalfStarRating"
 import { formatDate } from "@/lib/utils"
@@ -48,6 +48,11 @@ export default function CentreAvisPage() {
   }, [])
 
   async function saveQuestions() {
+    const cleaned = draft.map((q) => q.trim()).filter(Boolean)
+    if (cleaned.length < 1) {
+      setMessage("Au moins une question est requise.")
+      return
+    }
     setSaving(true)
     setMessage(null)
     try {
@@ -55,7 +60,7 @@ export default function CentreAvisPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          questions: draft.map((libelle) => ({ libelle })),
+          questions: cleaned.map((libelle) => ({ libelle })),
         }),
       })
       if (!res.ok) {
@@ -80,7 +85,7 @@ export default function CentreAvisPage() {
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white">Avis & questionnaires</h1>
         <p className="text-sm text-gray-400 mt-1">
-          Personnalisez les 5 questions envoyées à vos stagiaires après chaque formation.
+          Personnalisez les questions envoyées à vos stagiaires après chaque formation (1 à 10).
         </p>
       </div>
       )}
@@ -97,10 +102,13 @@ export default function CentreAvisPage() {
         className="rounded-xl border p-6 space-y-4"
         style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <h2 className="font-semibold text-white">Vos 5 questions (centre)</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-white">Vos questions (centre)</h2>
+          <span className="text-xs text-gray-500">{draft.length}/10</span>
+        </div>
         {draft.map((libelle, i) => (
-          <div key={i}>
-            <label className="text-xs text-gray-500 mb-1 block">Question {i + 1}</label>
+          <div key={i} className="flex items-start gap-2">
+            <span className="text-xs text-gray-500 mt-2.5 w-5 shrink-0">{i + 1}.</span>
             <input
               value={libelle}
               onChange={(e) => {
@@ -109,21 +117,41 @@ export default function CentreAvisPage() {
                 setDraft(next)
               }}
               maxLength={300}
-              className="w-full px-3 py-2 rounded-lg text-sm text-white border focus:outline-none focus:border-blue-500"
+              className="flex-1 px-3 py-2 rounded-lg text-sm text-white border focus:outline-none focus:border-blue-500"
               style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.1)" }}
             />
+            <button
+              type="button"
+              onClick={() => setDraft(draft.filter((_, idx) => idx !== i))}
+              disabled={draft.length <= 1}
+              title="Supprimer"
+              className="mt-1 p-2 text-gray-500 hover:text-red-400 disabled:opacity-30 disabled:hover:text-gray-500"
+            >
+              <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" />
+            </button>
           </div>
         ))}
+        <div className="flex items-center gap-3 pt-1">
+          <button
+            type="button"
+            onClick={() => setDraft([...draft, ""])}
+            disabled={draft.length >= 10}
+            className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 disabled:opacity-40"
+          >
+            <FontAwesomeIcon icon={faPlus} className="w-3 h-3" />
+            Ajouter une question
+          </button>
+          <button
+            type="button"
+            onClick={saveQuestions}
+            disabled={saving}
+            className="ml-auto inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
+          >
+            <FontAwesomeIcon icon={saving ? faSpinner : faSave} className={saving ? "animate-spin" : ""} />
+            Enregistrer les questions
+          </button>
+        </div>
         {message && <p className="text-xs text-blue-300">{message}</p>}
-        <button
-          type="button"
-          onClick={saveQuestions}
-          disabled={saving}
-          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
-        >
-          <FontAwesomeIcon icon={saving ? faSpinner : faSave} className={saving ? "animate-spin" : ""} />
-          Enregistrer les questions
-        </button>
       </section>
 
       <section>
