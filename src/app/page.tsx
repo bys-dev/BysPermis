@@ -35,6 +35,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { prisma } from "@/lib/prisma";
+import { TricoloreParticles } from "@/components/ui/TricoloreParticles";
 
 // ISR — la home se régénère toutes les heures
 export const revalidate = 3600;
@@ -415,15 +416,16 @@ export default async function Home() {
               fill
               priority
               sizes="100vw"
-              className="object-cover scale-105 opacity-35"
+              className="object-cover scale-105 opacity-75"
             />
-            <div className="absolute inset-0 bg-navy-900/75" />
+            <div className="absolute inset-0 bg-navy-900/40" />
           </div>
+          <TricoloreParticles />
 
           <div className="max-w-[1440px] mx-auto w-full relative z-10">
             <div className="flex flex-col items-center">
               <div className="max-w-4xl mx-auto text-center flex-1 w-full">
-                <div className="rounded-2xl bg-navy-900/95 border border-white/15 px-5 py-8 sm:px-10 sm:py-10 mb-6 sm:mb-8">
+                <div className="rounded-2xl bg-navy-900/55 backdrop-blur-md border border-white/15 px-5 py-8 sm:px-10 sm:py-10 mb-6 sm:mb-8 shadow-2xl">
                   <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-full mb-5 sm:mb-6 max-w-full">
                     <span className="inline-flex mr-2 rounded overflow-hidden shrink-0">
                       <span className="w-1.5 h-4 bg-blue-500" />
