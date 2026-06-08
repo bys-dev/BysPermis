@@ -9,20 +9,9 @@ import { Facture } from "@/components/pdf/Facture";
 import { EmargementIndividuel } from "@/components/pdf/EmargementIndividuel";
 import { BonAccord } from "@/components/pdf/BonAccord";
 import { formatDate } from "@/lib/utils";
+import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-
-// Logo BYS Formation utilisé en fallback quand un centre n'a pas (encore) le sien.
-const DEFAULT_LOGO_URL = `${APP_URL}/colored-logo.png`;
-
-function toAbsolute(u: string | null | undefined): string | undefined {
-  if (!u) return undefined;
-  return u.startsWith("http") ? u : `${APP_URL}${u}`;
-}
-
-function logoOrDefault(u: string | null | undefined): string {
-  return toAbsolute(u) ?? DEFAULT_LOGO_URL;
-}
 
 /**
  * Rend la convocation PDF d'une réservation comme Buffer Node.js prêt à être
@@ -78,8 +67,8 @@ export async function renderConvocationPdf(reservationIdOrNumero: string): Promi
       telephone: centre.telephone ?? undefined,
       email: centre.email ?? undefined,
       numAgrement: centre.agrementNumber ?? undefined,
-      logoUrl: logoOrDefault(centre.logo),
-      signatureUrl: toAbsolute(centre.signatureUrl),
+      logoUrl: resolveCentreLogoUrl(centre.logo),
+      signatureUrl: toAbsoluteUrl(centre.signatureUrl),
     },
   };
 
@@ -157,7 +146,7 @@ export async function renderInvoicePdfFromReservation(reservationId: string): Pr
       telephone: centre.telephone ?? undefined,
       iban: centre.iban ?? undefined,
       bic: centre.bic ?? undefined,
-      logoUrl: logoOrDefault(centre.logo),
+      logoUrl: resolveCentreLogoUrl(centre.logo),
       mentionsLegales: centre.mentionsLegales ?? undefined,
       cgv: centre.cgv ?? undefined,
     },
@@ -232,8 +221,8 @@ export async function renderIndividualEmargementPdf(reservationIdOrNumero: strin
       codePostal: centre.codePostal,
       ville: centre.ville,
       numAgrement: centre.agrementNumber ?? undefined,
-      logoUrl: logoOrDefault(centre.logo),
-      signatureUrl: toAbsolute(centre.signatureUrl),
+      logoUrl: resolveCentreLogoUrl(centre.logo),
+      signatureUrl: toAbsoluteUrl(centre.signatureUrl),
     },
   };
 
@@ -278,7 +267,7 @@ export async function renderBonAccordPdf(documentId: string): Promise<{
       adresse: centre.adresse,
       codePostal: centre.codePostal,
       ville: centre.ville,
-      logoUrl: logoOrDefault(centre.logo),
+      logoUrl: resolveCentreLogoUrl(centre.logo),
     },
   };
 

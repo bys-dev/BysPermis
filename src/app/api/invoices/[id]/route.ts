@@ -5,6 +5,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Facture } from "@/components/pdf/Facture";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
+import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
 
 export async function GET(
   _req: NextRequest,
@@ -69,11 +70,6 @@ export async function GET(
 
     // Use invoice.centre if attached, else fall back to centre via reservation
     const emetteurCentre = invoice.centre ?? invoice.reservation?.session.formation.centre ?? null;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-    const defaultLogo = `${appUrl}/colored-logo.png`;
-    const toAbsolute = (u: string | null) =>
-      u ? (u.startsWith("http") ? u : `${appUrl}${u}`) : undefined;
-    const logoOrDefault = (u: string | null) => toAbsolute(u) ?? defaultLogo;
 
     const emetteur = emetteurCentre
       ? {
@@ -89,7 +85,7 @@ export async function GET(
           telephone: emetteurCentre.telephone ?? undefined,
           iban: emetteurCentre.iban ?? undefined,
           bic: emetteurCentre.bic ?? undefined,
-          logoUrl: logoOrDefault(emetteurCentre.logo),
+          logoUrl: resolveCentreLogoUrl(emetteurCentre.logo),
           mentionsLegales: emetteurCentre.mentionsLegales ?? undefined,
           cgv: emetteurCentre.cgv ?? undefined,
         }

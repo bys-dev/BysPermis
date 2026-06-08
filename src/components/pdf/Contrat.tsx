@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
 } from "@react-pdf/renderer";
+import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
 
 // ─── Types ────────────────────────────────────────────────
 export interface ContratData {
@@ -291,15 +292,10 @@ export function Contrat({ data }: { data: ContratData }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <View style={styles.logoBox}>
-              {organisme.logoUrl ? (
-                <Image src={organisme.logoUrl} style={styles.logoImage} />
-              ) : (
-                <Text style={styles.logoText}>
-                  {(organisme.raisonSociale ?? organisme.nom).slice(0, 3).toUpperCase()}
-                </Text>
-              )}
-            </View>
+            <PdfCentreLogo
+              logoUrl={organisme.logoUrl}
+              displayName={organisme.raisonSociale ?? organisme.nom}
+            />
             <Text style={styles.headerTitle}>{organisme.raisonSociale ?? organisme.nom}</Text>
             <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>
           </View>

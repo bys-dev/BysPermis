@@ -6,13 +6,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Emargement } from "@/components/pdf/Emargement";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-
-function logoUrl(logo: string | null): string {
-  if (!logo) return `${APP_URL}/colored-logo.png`;
-  return logo.startsWith("http") ? logo : `${APP_URL}${logo}`;
-}
+import { resolveCentreLogoUrl } from "@/lib/pdf-branding";
 
 // GET /api/centre/sessions/[id]/emargement — feuille d'émargement PDF
 export async function GET(
@@ -64,7 +58,7 @@ export async function GET(
         codePostal: centre.codePostal,
         ville: centre.ville,
         numAgrement: centre.agrementNumber ?? undefined,
-        logoUrl: logoUrl(centre.logo),
+        logoUrl: resolveCentreLogoUrl(centre.logo),
       },
       stagiaires,
       lignesVierges,

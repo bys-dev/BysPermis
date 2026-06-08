@@ -731,7 +731,7 @@ export default function ProfilCentrePage() {
               currentUrl={form.logo}
               onUploaded={(url) => updateField("logo", url)}
               label="Logo (affiche en haut de la fiche publique et sur les contrats)"
-              hint="PNG transparent recommande, format carre, max 1MB"
+              hint="PNG ou JPEG recommandé (carre, max 1 MB) — affiché sur convocations et documents PDF"
               previewClassName="h-32"
             />
           </div>

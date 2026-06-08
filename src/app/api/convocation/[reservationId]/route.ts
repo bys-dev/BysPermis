@@ -5,6 +5,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Convocation } from "@/components/pdf/Convocation";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
+import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
 
 export async function GET(
   _req: NextRequest,
@@ -78,14 +79,8 @@ export async function GET(
         ville: centre.ville,
         telephone: centre.telephone ?? undefined,
         email: centre.email ?? undefined,
-        logoUrl: (() => {
-          const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-          if (!centre.logo) return `${base}/colored-logo.png`;
-          return centre.logo.startsWith("http") ? centre.logo : `${base}${centre.logo}`;
-        })(),
-        signatureUrl: centre.signatureUrl
-          ? (centre.signatureUrl.startsWith("http") ? centre.signatureUrl : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}${centre.signatureUrl}`)
-          : undefined,
+        logoUrl: resolveCentreLogoUrl(centre.logo),
+        signatureUrl: toAbsoluteUrl(centre.signatureUrl),
       },
     };
 

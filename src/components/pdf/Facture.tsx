@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
 } from "@react-pdf/renderer";
+import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
 
 // ─── Types ────────────────────────────────────────────────
 export interface FactureData {
@@ -280,13 +281,7 @@ export function Facture({ data }: { data: FactureData }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <View style={styles.logoBox}>
-              {emetteur.logoUrl ? (
-                <Image src={emetteur.logoUrl} style={styles.logoImage} />
-              ) : (
-                <Text style={styles.logoText}>{emetteurDisplay.slice(0, 3).toUpperCase()}</Text>
-              )}
-            </View>
+            <PdfCentreLogo logoUrl={emetteur.logoUrl} displayName={emetteurDisplay} />
             <Text style={styles.headerTitle}>{emetteurDisplay}</Text>
             <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>
           </View>

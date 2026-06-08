@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
 } from "@react-pdf/renderer";
+import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
 
 // ─── Types ────────────────────────────────────────────────
 export interface EmargementStagiaire {
@@ -133,13 +134,7 @@ export function Emargement({ data }: { data: EmargementData }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <View style={styles.logoBox}>
-              {centre.logoUrl ? (
-                <Image src={centre.logoUrl} style={styles.logoImage} />
-              ) : (
-                <Text style={styles.logoText}>{centreDisplay.slice(0, 3).toUpperCase()}</Text>
-              )}
-            </View>
+            <PdfCentreLogo logoUrl={centre.logoUrl} displayName={centreDisplay} />
             <View>
               <Text style={styles.headerTitle}>{centreDisplay}</Text>
               <Text style={styles.headerSub}>Stage de sensibilisation à la sécurité routière</Text>

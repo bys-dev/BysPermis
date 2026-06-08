@@ -5,6 +5,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Attestation } from "@/components/pdf/Attestation";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
+import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
 
 export async function GET(
   _req: NextRequest,
@@ -82,12 +83,8 @@ export async function GET(
         ville: centre.ville,
         telephone: centre.telephone ?? undefined,
         email: centre.email ?? undefined,
-        logoUrl: centre.logo
-          ? (centre.logo.startsWith("http") ? centre.logo : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}${centre.logo}`)
-          : undefined,
-        signatureUrl: centre.signatureUrl
-          ? (centre.signatureUrl.startsWith("http") ? centre.signatureUrl : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}${centre.signatureUrl}`)
-          : undefined,
+        logoUrl: resolveCentreLogoUrl(centre.logo),
+        signatureUrl: toAbsoluteUrl(centre.signatureUrl),
         nomResponsable: centre.nomResponsable ?? undefined,
       },
       verificationUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}/verification/${numeroAttestation}`,

@@ -5,6 +5,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Contrat } from "@/components/pdf/Contrat";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
+import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
 
 export async function GET(
   _req: NextRequest,
@@ -73,10 +74,6 @@ export async function GET(
     const year = new Date().getFullYear();
     const numeroContrat = `BYS-CTR-${year}-${reservation.numero}`;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-    const toAbsolute = (u: string | null) =>
-      u ? (u.startsWith("http") ? u : `${appUrl}${u}`) : undefined;
-
     const data = {
       numeroContrat,
       dateEmission: formatDate(reservation.createdAt),
@@ -91,8 +88,8 @@ export async function GET(
         ville: centre.ville,
         email: centre.email ?? undefined,
         telephone: centre.telephone ?? undefined,
-        logoUrl: toAbsolute(centre.logo),
-        signatureUrl: toAbsolute(centre.signatureUrl),
+        logoUrl: resolveCentreLogoUrl(centre.logo),
+        signatureUrl: toAbsoluteUrl(centre.signatureUrl),
         nomResponsable: centre.nomResponsable ?? undefined,
         mentionsLegales: centre.mentionsLegales ?? undefined,
         cgv: centre.cgv ?? undefined,
