@@ -30,6 +30,7 @@ import {
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
 import { ImageUploadField } from "@/components/centre/ImageUploadField";
+import { dispatchCentreThemePreview, notifyCentreThemeSaved } from "@/contexts/CentreThemeContext";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -149,6 +150,24 @@ export default function ProfilCentrePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Propager couleurs / logo / bannière vers le layout espace-centre en direct
+  useEffect(() => {
+    if (!form) return;
+    dispatchCentreThemePreview({
+      nom: form.nom,
+      logo: form.logo,
+      bannerImage: form.bannerImage,
+      couleurPrimaire: form.couleurPrimaire,
+      couleurSecondaire: form.couleurSecondaire,
+    });
+  }, [
+    form?.nom,
+    form?.logo,
+    form?.bannerImage,
+    form?.couleurPrimaire,
+    form?.couleurSecondaire,
+  ]);
+
   function updateField<K extends keyof CentreProfile>(
     key: K,
     value: CentreProfile[K]
@@ -229,6 +248,7 @@ export default function ProfilCentrePage() {
         },
       });
       setSaved(true);
+      notifyCentreThemeSaved();
       setTimeout(() => setSaved(false), 2500);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur lors de la sauvegarde");

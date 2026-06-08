@@ -347,41 +347,129 @@ interface ReviewsData {
   count: number;
 }
 
+interface ApiFormationResponse {
+  id: string;
+  titre: string;
+  slug: string;
+  description: string;
+  objectifs?: string | null;
+  programme?: string | null;
+  prerequis?: string | null;
+  publicCible?: string | null;
+  duree: string;
+  prix: number;
+  modalite: string;
+  lieu?: string | null;
+  isQualiopi: boolean;
+  isCPF: boolean;
+  stageType?: string;
+  pointsRecovered?: number;
+  centre?: { nom: string; ville: string };
+  sessions?: LiveSession[];
+}
+
+const MODALITE_LABELS: Record<string, string> = {
+  PRESENTIEL: "Presentiel",
+  DISTANCIEL: "Distanciel",
+  MIXTE: "Mixte",
+};
+
+const DEFAULT_DOCUMENTS = [
+  "Permis de conduire (original)",
+  "Piece d'identite en cours de validite",
+  "Lettre 48N (si stage obligatoire)",
+  "Attestation d'assurance du vehicule",
+];
+
+function parseProgramme(programme?: string | null): ProgrammeJour[] {
+  if (!programme?.trim()) return [];
+
+  const parts = programme.split(/(?=Jour\s*\d+\s*:)/i).map((s) => s.trim()).filter(Boolean);
+  if (parts.length === 0) {
+    return [{
+      titre: "Programme",
+      modules: programme.split(/[.;]/).map((s) => s.trim()).filter(Boolean),
+    }];
+  }
+
+  return parts.map((part) => {
+    const colonIdx = part.indexOf(":");
+    const titre = colonIdx >= 0 ? part.slice(0, colonIdx).trim() : part.trim();
+    const content = colonIdx >= 0 ? part.slice(colonIdx + 1).trim() : "";
+    const modules = content.split(/[.;]/).map((s) => s.trim()).filter(Boolean);
+    return { titre, modules: modules.length > 0 ? modules : [content].filter(Boolean) };
+  });
+}
+
+function mapApiToFormationData(data: ApiFormationResponse): FormationData {
+  const badges: { label: string; variant: string }[] = [];
+  if (data.isQualiopi) badges.push({ label: "Qualiopi", variant: "qualiopi" });
+  if (data.isCPF) badges.push({ label: "Eligible CPF", variant: "cpf" });
+  if (data.pointsRecovered) badges.push({ label: `+${data.pointsRecovered} points`, variant: "success" });
+  if (badges.length === 0) badges.push({ label: "Agree Prefecture", variant: "qualiopi" });
+
+  const infosPratiques = [
+    data.lieu,
+    data.prerequis,
+    data.publicCible,
+    data.centre ? `Centre : ${data.centre.nom} — ${data.centre.ville}` : null,
+  ].filter((info): info is string => Boolean(info));
+
+  return {
+    title: data.titre,
+    subtitle: data.objectifs || `Formation dispensee par ${data.centre?.nom ?? "un centre agree"}`,
+    description: data.description,
+    longDescription: data.objectifs || data.description,
+    duree: data.duree,
+    prix: `${data.prix} \u20ac`,
+    prixNum: data.prix,
+    modalite: MODALITE_LABELS[data.modalite] ?? data.modalite,
+    pointsRecuperes: data.pointsRecovered ? `Jusqu'a ${data.pointsRecovered} points` : null,
+    badges,
+    sessions: [],
+    programme: parseProgramme(data.programme),
+    infosPratiques: infosPratiques.length > 0 ? infosPratiques : ["Stage agree par la prefecture"],
+    documentsApporter: DEFAULT_DOCUMENTS,
+    horaires: "9h00 - 12h30 / 13h30 - 17h00",
+    testimonials: [],
+    relatedFormations: [],
+    icon: faShieldHalved,
+    metaKeywords: [data.titre, data.centre?.ville ?? "", "stage recuperation de points"].filter(Boolean),
+    eligibleCPF: data.isCPF,
+    obligatoire: data.stageType === "OBLIGATOIRE",
+  };
+}
+
 export default function FormationDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
   const [openProgramme, setOpenProgramme] = useState<number | null>(0);
   const [liveSessions, setLiveSessions] = useState<LiveSession[] | null>(null);
+  const [apiFormation, setApiFormation] = useState<FormationData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [apiNotFound, setApiNotFound] = useState(false);
   const [reviewsData, setReviewsData] = useState<ReviewsData | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    setApiNotFound(false);
+    setApiFormation(null);
+    setLiveSessions(null);
+    setReviewsData(null);
     fetch(`/api/formations/slug/${slug}`)
-      .then((r) => {
-        if (r.status === 404) {
-          setApiNotFound(true);
-          return null;
-        }
-        return r.json();
-      })
-      .then((data) => {
-        if (data?.sessions?.length > 0) setLiveSessions(data.sessions);
-        if (data?.id) {
-          // Fetch reviews for this formation
-          fetch(`/api/formations/${data.id}/reviews`)
-            .then((r) => (r.ok ? r.json() : null))
-            .then((rd) => { if (rd) setReviewsData(rd); })
-            .catch(() => null);
-        }
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: ApiFormationResponse | null) => {
+        if (!data?.id) return;
+        setApiFormation(mapApiToFormationData(data));
+        if (data.sessions?.length) setLiveSessions(data.sessions);
+        fetch(`/api/formations/${data.id}/reviews`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((rd) => { if (rd) setReviewsData(rd); })
+          .catch(() => null);
       })
       .catch(() => null)
       .finally(() => setLoading(false));
   }, [slug]);
 
-  const formation = formationsData[slug];
+  const formation = formationsData[slug] ?? apiFormation;
 
   // Show loading state while API is being fetched (only when no mock data either)
   if (loading && !formation) {
@@ -399,8 +487,8 @@ export default function FormationDetailPage() {
     );
   }
 
-  // 404-like state: no mock data AND (API returned 404 or finished loading)
-  if (!formation && (apiNotFound || !loading)) {
+  // 404-like state: aucune donnee mock ni API
+  if (!loading && !formation) {
     return (
       <>
         <Header />
@@ -726,6 +814,7 @@ export default function FormationDetailPage() {
               </section>
 
               {/* Testimonials */}
+              {formation.testimonials.length > 0 && (
               <section className="bg-white rounded-xl border border-brand-border p-6 sm:p-8 mb-8">
                 <h2 className="font-display text-2xl font-bold text-brand-text mb-6">
                   Avis de nos stagiaires
@@ -758,6 +847,7 @@ export default function FormationDetailPage() {
                   ))}
                 </div>
               </section>
+              )}
 
               {/* Dynamic Reviews from DB */}
               {reviewsData && reviewsData.count > 0 && (
@@ -806,6 +896,7 @@ export default function FormationDetailPage() {
               )}
 
               {/* Related Formations */}
+              {formation.relatedFormations.length > 0 && (
               <section>
                 <h2 className="font-display text-2xl font-bold text-brand-text mb-6">
                   Formations associees
@@ -831,6 +922,7 @@ export default function FormationDetailPage() {
                   ))}
                 </div>
               </section>
+              )}
             </div>
 
             {/* ─── SIDEBAR ─── */}

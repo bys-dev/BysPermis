@@ -342,3 +342,39 @@ body {
 .dark-layout :focus-visible {
   outline-color: var(--color-gold-500);
 }
+
+/* ─── Thème personnalisé par centre (espace-centre) ─── */
+.centre-themed {
+  --centre-primary: #3b82f6;
+  --centre-secondary: #1e40af;
+}
+
+.centre-themed .text-blue-400,
+.centre-themed .text-blue-300,
+.centre-themed .hover\:text-blue-300:hover,
+.centre-themed .hover\:text-blue-400:hover,
+.centre-themed .group-hover\:text-blue-400:hover {
+  color: var(--centre-primary);
+}
+
+.centre-themed .bg-blue-400\/10 {
+  background-color: color-mix(in srgb, var(--centre-primary) 12%, transparent);
+}
+
+.centre-themed .bg-blue-600,
+.centre-themed .hover\:bg-blue-700:hover {
+  background-color: var(--centre-primary);
+}
+
+.centre-themed .border-blue-500\/20,
+.centre-themed .border-blue-500\/30 {
+  border-color: color-mix(in srgb, var(--centre-primary) 28%, transparent);
+}
+
+.centre-themed .bg-blue-600\/15 {
+  background-color: color-mix(in srgb, var(--centre-primary) 14%, transparent);
+}
+
+.centre-themed .focus\:border-blue-500:focus {
+  border-color: var(--centre-primary);
+}

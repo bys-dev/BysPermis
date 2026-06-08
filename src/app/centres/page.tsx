@@ -128,6 +128,11 @@ function CentresInner() {
           url.searchParams.set("ville", searchVille);
         }
         const res = await fetch(url.toString());
+        if (!res.ok) {
+          setCentres([]);
+          setTotal(0);
+          return;
+        }
         type ApiFormation = { titre: string; isQualiopi: boolean };
         type ApiCentre = {
           id: string;
@@ -142,8 +147,13 @@ function CentresInner() {
           _count?: { formations?: number };
           distance?: number | null;
         };
-        const data: ApiCentre[] = await res.json();
-        const mapped: Centre[] = data.map((c) => ({
+        const data: unknown = await res.json();
+        if (!Array.isArray(data)) {
+          setCentres([]);
+          setTotal(0);
+          return;
+        }
+        const mapped: Centre[] = data.map((c: ApiCentre) => ({
           id: c.id,
           nom: c.nom,
           slug: c.slug,

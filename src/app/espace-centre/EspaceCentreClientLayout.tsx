@@ -28,9 +28,12 @@ import {
   faRocket,
   faTag,
   faStar,
+  faBuilding,
 } from "@fortawesome/free-solid-svg-icons";
 import CentreSwitcher from "@/components/ui/CentreSwitcher";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import { CentreThemeProvider, useCentreTheme } from "@/contexts/CentreThemeContext";
+import { centreThemeCssVars } from "@/lib/centre-theme";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 type CentreRole = "CENTRE_OWNER" | "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE";
@@ -160,24 +163,34 @@ const allNavItems: NavItem[] = [
 ];
 
 function getNavItems(role: CentreRole | null): NavItem[] {
-  if (!role) return allNavItems; // fallback: show all while loading
+  if (!role) return allNavItems;
   return allNavItems.filter((item) => item.roles.includes(role));
 }
 
-const roleBadgeLabels: Record<CentreRole, string> = {
-  CENTRE_OWNER: "Propriétaire",
-  CENTRE_ADMIN: "Administrateur",
-  CENTRE_FORMATEUR: "Formateur",
-  CENTRE_SECRETAIRE: "Secrétariat",
-};
+function isNavActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
-export default function EspaceCentreClientLayout({ children }: { children: React.ReactNode }) {
+function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const theme = useCentreTheme();
   const [role, setRole] = useState<CentreRole | null>(null);
   const [completionPct, setCompletionPct] = useState<number | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [redirectChecked, setRedirectChecked] = useState(false);
+
+  const cssVars = centreThemeCssVars({
+    couleurPrimaire: theme.primary,
+    couleurSecondaire: theme.secondary,
+    logo: theme.logo,
+    bannerImage: theme.bannerImage,
+    nom: theme.nom,
+  });
+
+  const sidebarBg = `linear-gradient(180deg, rgba(${theme.secondaryRgb}, 0.28) 0%, #0A1628 55%)`;
+  const panelBg = `linear-gradient(135deg, rgba(${theme.secondaryRgb}, 0.22) 0%, #0D1D3A 100%)`;
+  const borderColor = `rgba(${theme.primaryRgb}, 0.18)`;
 
   useEffect(() => {
     fetch("/api/users/me")
@@ -186,13 +199,11 @@ export default function EspaceCentreClientLayout({ children }: { children: React
         if (data?.role && data.role.startsWith("CENTRE_")) {
           setRole(data.role as CentreRole);
         } else {
-          // Platform admins viewing centre space — show everything
           setRole("CENTRE_OWNER");
         }
       })
       .catch(() => setRole("CENTRE_OWNER"));
 
-    // Fetch completion percentage
     fetch("/api/centre/completion")
       .then((r) => r.json())
       .then((data) => {
@@ -203,11 +214,9 @@ export default function EspaceCentreClientLayout({ children }: { children: React
       .catch(() => null);
   }, []);
 
-  // ─── Force onboarding redirect for incomplete centres ────
   useEffect(() => {
     if (completionPct === null || role === null) return;
 
-    // Only force redirect for CENTRE_OWNER with incomplete profile
     const isOnboardingPage = pathname.startsWith("/espace-centre/onboarding");
     const isCentreOwner = role === "CENTRE_OWNER";
 
@@ -218,7 +227,6 @@ export default function EspaceCentreClientLayout({ children }: { children: React
     }
   }, [completionPct, role, pathname, router]);
 
-  // Also mark redirect as checked when on onboarding page
   useEffect(() => {
     if (pathname.startsWith("/espace-centre/onboarding")) {
       setRedirectChecked(true);
@@ -227,46 +235,98 @@ export default function EspaceCentreClientLayout({ children }: { children: React
 
   const navItems = getNavItems(role);
   const showCompletionBanner = completionPct !== null && completionPct < 100 && !bannerDismissed;
-
-  // Afficher le layout + overlay pendant la vérification onboarding (évite le flash blanc)
   const checkingRedirect = !redirectChecked && !pathname.startsWith("/espace-centre/onboarding");
 
+  function navLinkClass(href: string, compact = false) {
+    const active = isNavActive(pathname, href);
+    const base = compact
+      ? "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors"
+      : "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group";
+
+    if (active) {
+      return `${base} text-white`;
+    }
+    return `${base} text-gray-400 hover:text-white hover:bg-white/5`;
+  }
+
+  function navLinkStyle(href: string, compact = false) {
+    const active = isNavActive(pathname, href);
+    if (!active) {
+      return compact ? { background: "rgba(255,255,255,0.05)" } : undefined;
+    }
+    return {
+      background: `rgba(${theme.primaryRgb}, 0.15)`,
+      border: `1px solid rgba(${theme.primaryRgb}, 0.28)`,
+      color: theme.primary,
+      boxShadow: `0 0 0 1px rgba(${theme.primaryRgb}, 0.08)`,
+    };
+  }
+
   return (
-    <div className="min-h-screen flex" style={{ background: "#0A1628" }}>
-      {/* Sidebar */}
+    <div
+      className="centre-themed min-h-screen flex"
+      style={{
+        ...cssVars,
+        background: `linear-gradient(160deg, rgba(${theme.secondaryRgb}, 0.12) 0%, #0A1628 45%)`,
+      }}
+    >
       <aside
         className="hidden lg:flex flex-col w-64 shrink-0 border-r"
-        style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}
+        style={{ background: sidebarBg, borderColor: "rgba(255,255,255,0.07)" }}
       >
-        {/* Logo */}
-        <div className="px-6 py-6 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <Link href="/" className="flex items-center gap-3" aria-label="BYS Formation — accueil">
-            <Image
-              src="/transparent-logo.svg"
-              alt="BYS Formation"
-              width={160}
-              height={36}
-              className="h-9 w-auto brightness-0 invert"
-            />
+        <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+          <Link href="/espace-centre/dashboard" className="flex items-center gap-3 min-w-0">
+            {theme.logo ? (
+              <div
+                className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border flex items-center justify-center"
+                style={{
+                  borderColor: `rgba(${theme.primaryRgb}, 0.35)`,
+                  background: `rgba(${theme.primaryRgb}, 0.12)`,
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={theme.logo} alt="" className="w-full h-full object-contain p-1" />
+              </div>
+            ) : (
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{
+                  background: `rgba(${theme.primaryRgb}, 0.18)`,
+                  color: theme.primary,
+                }}
+              >
+                <FontAwesomeIcon icon={faBuilding} className="text-sm" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white truncate leading-tight">
+                {theme.nom || "Mon centre"}
+              </p>
+              <p className="text-[10px] text-gray-500 mt-0.5">Espace centre · BYS Permis</p>
+            </div>
           </Link>
         </div>
 
-        {/* Centre switcher */}
         <div className="border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <CentreSwitcher userRole={role} />
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-4 py-6 space-y-1">
           {navItems.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all group"
+              className={navLinkClass(link.href)}
+              style={navLinkStyle(link.href)}
             >
               <FontAwesomeIcon
                 icon={link.icon}
-                className="w-4 h-4 group-hover:text-blue-400 transition-colors"
+                className="w-4 h-4 transition-colors"
+                style={{
+                  color: isNavActive(pathname, link.href)
+                    ? theme.primary
+                    : undefined,
+                }}
               />
               {link.label}
               <FontAwesomeIcon
@@ -277,11 +337,17 @@ export default function EspaceCentreClientLayout({ children }: { children: React
           ))}
         </nav>
 
-        {/* Bottom */}
         <div className="px-4 pb-6 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <Link
             href="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-blue-400 transition-colors mb-2"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 transition-colors mb-2 hover:text-white"
+            style={{ color: undefined }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = theme.primary;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "";
+            }}
           >
             ← Voir le site
           </Link>
@@ -295,39 +361,53 @@ export default function EspaceCentreClientLayout({ children }: { children: React
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar mobile */}
         <div
           className="lg:hidden flex items-center justify-between px-4 py-4 border-b"
-          style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}
+          style={{ background: panelBg, borderColor: "rgba(255,255,255,0.07)" }}
         >
-          <Link href="/" className="flex items-center gap-2" aria-label="BYS Formation — accueil">
-            <Image
-              src="/transparent-logo.svg"
-              alt="BYS Formation"
-              width={120}
-              height={32}
-              className="h-8 w-auto brightness-0 invert"
-            />
-            <span className="font-semibold text-white text-sm">Espace Centre</span>
+          <Link href="/espace-centre/dashboard" className="flex items-center gap-2 min-w-0">
+            {theme.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={theme.logo} alt="" className="w-8 h-8 rounded-lg object-contain border border-white/10" />
+            ) : (
+              <Image
+                src="/transparent-logo.svg"
+                alt="BYS Formation"
+                width={120}
+                height={32}
+                className="h-8 w-auto brightness-0 invert"
+              />
+            )}
+            <span className="font-semibold text-white text-sm truncate">
+              {theme.nom || "Espace Centre"}
+            </span>
           </Link>
           <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
             <FontAwesomeIcon icon={faArrowRightFromBracket} />
           </Link>
         </div>
 
-        {/* Mobile nav */}
+        {theme.bannerImage && (
+          <div
+            className="hidden sm:block h-20 lg:h-24 bg-cover bg-center border-b shrink-0"
+            style={{
+              backgroundImage: `linear-gradient(rgba(10,22,40,0.55), rgba(10,22,40,0.85)), url(${theme.bannerImage})`,
+              borderColor: "rgba(255,255,255,0.07)",
+            }}
+          />
+        )}
+
         <div
           className="lg:hidden flex gap-1 px-4 py-3 border-b overflow-x-auto"
-          style={{ borderColor: "rgba(255,255,255,0.07)", background: "#0D1D3A" }}
+          style={{ borderColor: "rgba(255,255,255,0.07)", background: panelBg }}
         >
           {navItems.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white whitespace-nowrap transition-colors"
-              style={{ background: "rgba(255,255,255,0.05)" }}
+              className={navLinkClass(link.href, true)}
+              style={navLinkStyle(link.href, true)}
             >
               <FontAwesomeIcon icon={link.icon} className="w-3 h-3" />
               {link.label}
@@ -335,32 +415,42 @@ export default function EspaceCentreClientLayout({ children }: { children: React
           ))}
         </div>
 
-        {/* Completion banner */}
         {showCompletionBanner && (
           <div
             className="flex items-center gap-3 px-6 py-3 text-sm border-b"
             style={{
-              background: "linear-gradient(90deg, rgba(59,130,246,0.12), rgba(251,146,60,0.08))",
-              borderColor: "rgba(59,130,246,0.2)",
+              background: `linear-gradient(90deg, rgba(${theme.primaryRgb}, 0.14), rgba(${theme.secondaryRgb}, 0.1))`,
+              borderColor,
             }}
           >
-            <FontAwesomeIcon icon={faRocket} className="text-blue-400 w-4 h-4 shrink-0" />
+            <FontAwesomeIcon
+              icon={faRocket}
+              className="w-4 h-4 shrink-0"
+              style={{ color: theme.primary }}
+            />
             <div className="flex-1 flex items-center gap-3">
               <span className="text-gray-300">
                 Completez votre profil (
-                <span className="text-blue-400 font-semibold">{completionPct}%</span>) pour etre visible sur la
-                marketplace
+                <span className="font-semibold" style={{ color: theme.primary }}>
+                  {completionPct}%
+                </span>
+                ) pour etre visible sur la marketplace
               </span>
               <div className="hidden sm:block w-24 h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-blue-500 transition-all duration-700"
-                  style={{ width: `${completionPct}%` }}
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${completionPct}%`, background: theme.primary }}
                 />
               </div>
             </div>
             <Link
               href="/espace-centre/onboarding"
-              className="shrink-0 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors px-3 py-1 rounded-lg bg-blue-600/15 border border-blue-500/20"
+              className="shrink-0 text-xs font-semibold transition-colors px-3 py-1 rounded-lg"
+              style={{
+                color: theme.primary,
+                background: `rgba(${theme.primaryRgb}, 0.12)`,
+                border: `1px solid rgba(${theme.primaryRgb}, 0.25)`,
+              }}
             >
               Completer
             </Link>
@@ -383,3 +473,10 @@ export default function EspaceCentreClientLayout({ children }: { children: React
   );
 }
 
+export default function EspaceCentreClientLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <CentreThemeProvider>
+      <EspaceCentreLayoutInner>{children}</EspaceCentreLayoutInner>
+    </CentreThemeProvider>
+  );
+}
