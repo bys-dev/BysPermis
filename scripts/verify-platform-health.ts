@@ -119,6 +119,7 @@ async function main() {
     where: { email: "contact@bys-formation.fr" },
     select: {
       id: true,
+      email: true,
       role: true,
       centres: { take: 1, select: { nom: true } },
     },
