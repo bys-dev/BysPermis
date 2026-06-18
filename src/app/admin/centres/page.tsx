@@ -653,9 +653,9 @@ export default function AdminCentresPage() {
     SUSPENDU:   centres.filter((c) => c.statut === "SUSPENDU").length,
   };
 
-  // Centres ready to validate (EN_ATTENTE + 100% completion)
+  // Centres en attente de validation admin
   const readyToValidateCount = centres.filter(
-    (c) => c.statut === "EN_ATTENTE" && c.profilCompletionPct >= 100
+    (c) => c.statut === "EN_ATTENTE"
   ).length;
 
   return (
@@ -759,8 +759,7 @@ export default function AdminCentresPage() {
                 {filtered.map((c) => {
                   const st = statusMap[c.statut];
                   const isExpanded = expandedId === c.id;
-                  const isReadyToValidate =
-                    c.statut === "EN_ATTENTE" && c.profilCompletionPct >= 100;
+                  const isReadyToValidate = c.statut === "EN_ATTENTE";
                   return (
                     <tr key={c.id} className="group">
                       <td colSpan={8} className="p-0">

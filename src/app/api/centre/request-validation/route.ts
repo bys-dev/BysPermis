@@ -28,13 +28,6 @@ export async function POST() {
       );
     }
 
-    if (centre.profilCompletionPct < 100) {
-      return NextResponse.json(
-        { error: "Votre profil doit etre complet a 100% pour demander la validation." },
-        { status: 400 }
-      );
-    }
-
     if (centre.statut === "ACTIF" && centre.isActive) {
       return NextResponse.json(
         { error: "Votre centre est deja actif." },
@@ -53,7 +46,7 @@ export async function POST() {
       await prisma.notification.createMany({
         data: admins.map((admin) => ({
           titre: "Demande de validation centre",
-          contenu: `Le centre "${centre.nom}" (${centre.ville || "ville non renseignee"}) a termine son profil (100%) et demande a etre active sur la marketplace.`,
+          contenu: `Le centre "${centre.nom}" (${centre.ville || "ville non renseignee"}) demande a etre active sur la marketplace (profil ${centre.profilCompletionPct}% complete).`,
           userId: admin.id,
         })),
       });

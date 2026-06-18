@@ -17,6 +17,39 @@ interface GeoApiResponse {
   features: GeoApiFeature[];
 }
 
+interface GeoApiReverseFeature {
+  geometry: {
+    coordinates: [number, number];
+  };
+  properties: {
+    city?: string;
+    town?: string;
+    village?: string;
+    municipality?: string;
+    postcode?: string;
+    label?: string;
+  };
+}
+
+interface GeoApiReverseResponse {
+  features: GeoApiReverseFeature[];
+}
+
+export interface ReverseGeocodeResult {
+  lat: number;
+  lng: number;
+  city: string;
+  postcode: string | null;
+  dept: string | null;
+}
+
+function deptFromPostcode(postcode: string | undefined): string | null {
+  if (!postcode || !/^\d{5}$/.test(postcode)) return null;
+  return postcode.startsWith("97") || postcode.startsWith("98")
+    ? postcode.slice(0, 3)
+    : postcode.slice(0, 2);
+}
+
 /**
  * Geocode a French address using api-adresse.data.gouv.fr (free, no API key)
  * Returns { lat, lng } or null if not found
@@ -38,6 +71,44 @@ export async function geocodeAddress(
     return { lat, lng };
   } catch (err) {
     console.error("[geocodeAddress] Erreur:", err);
+    return null;
+  }
+}
+
+/**
+ * Reverse geocode GPS coordinates using api-adresse.data.gouv.fr (France)
+ */
+export async function reverseGeocodeCoords(
+  lat: number,
+  lng: number,
+): Promise<ReverseGeocodeResult | null> {
+  try {
+    const url = `https://api-adresse.data.gouv.fr/reverse/?lon=${lng}&lat=${lat}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+
+    const data: GeoApiReverseResponse = await res.json();
+    if (!data.features?.length) return null;
+
+    const props = data.features[0].properties;
+    const city =
+      props.city ||
+      props.town ||
+      props.village ||
+      props.municipality ||
+      props.label?.split(",")[0]?.trim() ||
+      "Votre ville";
+
+    const postcode = props.postcode ?? null;
+    return {
+      lat,
+      lng,
+      city,
+      postcode,
+      dept: deptFromPostcode(postcode ?? undefined),
+    };
+  } catch (err) {
+    console.error("[reverseGeocodeCoords] Erreur:", err);
     return null;
   }
 }

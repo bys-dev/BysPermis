@@ -6,19 +6,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-
-// Leaflet doit être chargé côté client uniquement (utilise `window`).
-const CentresMap = dynamic(
-  () => import("@/components/marketplace/CentresMap"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-[500px] w-full rounded-xl border border-brand-border bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center">
-        <span className="text-gray-400 text-sm">Chargement de la carte…</span>
-      </div>
-    ),
-  }
-);
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -39,6 +26,25 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import { CentresMapBoundary } from "@/components/marketplace/CentresMapBoundary";
+import {
+  dispatchGeoUpdated,
+  readGeoFromStorage,
+  saveGeoToStorage,
+  type GeoLocationDetail,
+} from "@/lib/geo-client";
+
+const CentresMap = dynamic(
+  () => import("@/components/marketplace/CentresMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[500px] w-full rounded-xl border border-brand-border bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center">
+        <span className="text-gray-400 text-sm">Chargement de la carte…</span>
+      </div>
+    ),
+  },
+);
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -75,7 +81,7 @@ function CentresInner() {
   const villeParam = searchParams.get("ville") ?? "";
   const [searchVille, setSearchVille] = useState(villeParam);
   const [centres, setCentres] = useState<Centre[]>(MOCK_CENTRES);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
@@ -91,17 +97,39 @@ function CentresInner() {
     setGeoLoading(true);
     setGeoError(null);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLat(position.coords.latitude);
-        setUserLng(position.coords.longitude);
-        setSearchVille("");
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch(
+            `/api/geolocation/reverse?lat=${latitude}&lng=${longitude}`,
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const geo: GeoLocationDetail = {
+              city: data.city || "Votre ville",
+              dept: data.dept ?? null,
+              lat: latitude,
+              lng: longitude,
+              rayon: geoRayon,
+            };
+            saveGeoToStorage(geo);
+            dispatchGeoUpdated(geo);
+            setSearchVille(geo.city);
+          } else {
+            setSearchVille("");
+          }
+        } catch {
+          setSearchVille("");
+        }
+        setUserLat(latitude);
+        setUserLng(longitude);
         setGeoLoading(false);
       },
       () => {
         setGeoError("Impossible d'obtenir votre position. Vérifiez les permissions.");
         setGeoLoading(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
     );
   };
 
@@ -112,7 +140,18 @@ function CentresInner() {
   };
 
   useEffect(() => {
-    if (villeParam) setSearchVille(villeParam);
+    if (villeParam) {
+      setSearchVille(villeParam);
+      clearGeolocation();
+      return;
+    }
+    const saved = readGeoFromStorage();
+    if (saved) {
+      setSearchVille(saved.city);
+      setUserLat(saved.lat);
+      setUserLng(saved.lng);
+      setGeoRayon(saved.rayon ?? 25);
+    }
   }, [villeParam]);
 
   useEffect(() => {
@@ -163,9 +202,15 @@ function CentresInner() {
           latitude: c.latitude ?? null,
           longitude: c.longitude ?? null,
           isQualiopi: c.formations?.some((f) => f.isQualiopi) ?? false,
-          isBYS: c.nom.toLowerCase().includes("bys"),
+          isBYS: (c.nom ?? "").toLowerCase().includes("bys"),
           nombreFormations: c._count?.formations ?? 0,
-          specialites: [...new Set(c.formations?.map((f) => f.titre.split(" ").slice(0, 3).join(" ")) ?? [])].slice(0, 4),
+          specialites: [
+            ...new Set(
+              c.formations?.map((f) =>
+                (f.titre ?? "Formation").split(" ").slice(0, 3).join(" "),
+              ) ?? [],
+            ),
+          ].slice(0, 4),
           distance: c.distance ?? null,
         }));
         // When not using geo, BYS toujours en premier
@@ -432,20 +477,24 @@ function CentresInner() {
             </p>
           </div>
         </div>
-        <CentresMap
-          centres={centres
-            .filter((c) => c.latitude != null && c.longitude != null)
-            .map((c) => ({
-              id: c.id,
-              nom: c.nom,
-              slug: c.slug,
-              ville: c.ville,
-              adresse: c.adresse,
-              latitude: c.latitude as number,
-              longitude: c.longitude as number,
-              isBYS: c.isBYS,
-            }))}
-        />
+        <CentresMapBoundary>
+          {!loading && (
+            <CentresMap
+              centres={centres
+                .filter((c) => c.latitude != null && c.longitude != null)
+                .map((c) => ({
+                  id: c.id,
+                  nom: c.nom,
+                  slug: c.slug,
+                  ville: c.ville,
+                  adresse: c.adresse,
+                  latitude: c.latitude as number,
+                  longitude: c.longitude as number,
+                  isBYS: c.isBYS,
+                }))}
+            />
+          )}
+        </CentresMapBoundary>
       </section>
 
       {/* CTA for centres */}

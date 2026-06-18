@@ -3,10 +3,10 @@ import {
   Page,
   Text,
   View,
-  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
+import { PdfCentreSeal } from "@/components/pdf/PdfCentreSeal";
 
 // ─── Types ────────────────────────────────────────────────
 export interface EmargementIndividuelData {
@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
   signBlock: { flexDirection: "row", gap: 20, marginTop: 4 },
   signBox: { flex: 1, border: `1px solid ${colors.border}`, borderRadius: 8, padding: 14 },
   signTitle: { fontFamily: "Helvetica-Bold", fontSize: 8, color: colors.gray, marginBottom: 28 },
-  signImage: { width: 110, height: 46, objectFit: "contain", marginBottom: 4 },
   signLine: { borderBottom: `1px solid ${colors.border}` },
   signLabel: { color: colors.gray, fontSize: 7, marginTop: 4 },
 
@@ -208,7 +207,7 @@ export function EmargementIndividuel({ data }: { data: EmargementIndividuelData 
             </View>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>Animateur / cachet du centre</Text>
-              {centre.signatureUrl ? <Image src={centre.signatureUrl} style={styles.signImage} /> : null}
+              <PdfCentreSeal sealUrl={centre.signatureUrl} />
               <View style={styles.signLine} />
               <Text style={styles.signLabel}>{formateurResponsable ?? centreDisplay}</Text>
             </View>

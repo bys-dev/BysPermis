@@ -29,7 +29,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.auth0.com https://*.vercel-insights.com",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.auth0.com",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://api.stripe.com https://*.auth0.com https://*.vercel-insights.com",
+    "connect-src 'self' https://api.stripe.com https://*.auth0.com https://*.vercel-insights.com https://*.tile.openstreetmap.org https://nominatim.openstreetmap.org https://api-adresse.data.gouv.fr",
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self' data: https://fonts.gstatic.com",
     "object-src 'none'",

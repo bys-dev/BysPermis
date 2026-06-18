@@ -6,7 +6,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Emargement } from "@/components/pdf/Emargement";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
-import { resolveCentreLogoUrl } from "@/lib/pdf-branding";
+import { resolveCentreLogoUrl, resolveCentreSealUrl } from "@/lib/pdf-branding";
 
 // GET /api/centre/sessions/[id]/emargement — feuille d'émargement PDF
 export async function GET(
@@ -59,6 +59,8 @@ export async function GET(
         ville: centre.ville,
         numAgrement: centre.agrementNumber ?? undefined,
         logoUrl: resolveCentreLogoUrl(centre.logo),
+        signatureUrl: resolveCentreSealUrl(centre.signatureUrl),
+        nomResponsable: centre.nomResponsable ?? undefined,
       },
       stagiaires,
       lignesVierges,

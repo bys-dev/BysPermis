@@ -20,6 +20,20 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
+/** Libellé places restantes pour l'affichage public */
+export function formatPlacesDisponibles(places: number): string {
+  if (places <= 0) return "Complet";
+  return `${places} place${places > 1 ? "s" : ""} disponible${places > 1 ? "s" : ""}`;
+}
+
+/** Couleur selon le niveau de remplissage */
+export function getPlacesToneClass(places: number): string {
+  if (places <= 0) return "text-gray-400";
+  if (places <= 3) return "text-red-600 font-semibold";
+  if (places <= 6) return "text-amber-600 font-medium";
+  return "text-emerald-600";
+}
+
 /**
  * Format date in French
  * - 'long' (default): "10 avril 2026"

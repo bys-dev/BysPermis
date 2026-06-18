@@ -3,10 +3,10 @@ import {
   Page,
   Text,
   View,
-  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
+import { PdfCentreSeal } from "@/components/pdf/PdfCentreSeal";
 
 // ─── Types ────────────────────────────────────────────────
 export interface ContratData {
@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
   },
   logoText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 12 },
   logoImage: { width: 40, height: 40, objectFit: "contain" },
-  signatureImage: { width: 110, height: 50, objectFit: "contain", marginBottom: 4 },
   legalSection: {
     marginTop: 12,
     paddingTop: 10,
@@ -552,9 +551,7 @@ export function Contrat({ data }: { data: ContratData }) {
               <Text style={styles.signSubtitle}>
                 {organisme.nomResponsable ? `Représenté par ${organisme.nomResponsable}` : "Cachet et signature"}
               </Text>
-              {organisme.signatureUrl ? (
-                <Image src={organisme.signatureUrl} style={styles.signatureImage} />
-              ) : null}
+              <PdfCentreSeal sealUrl={organisme.signatureUrl} />
               <View style={styles.signLine} />
               <Text style={styles.signLabel}>Fait à {organisme.ville}, le {dateEmission}</Text>
             </View>

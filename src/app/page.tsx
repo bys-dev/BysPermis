@@ -335,6 +335,10 @@ async function fetchLiveFormations(): Promise<LiveFormation[]> {
         isActive: true,
         modalite: "PRESENTIEL",
         centre: { isActive: true, statut: "ACTIF" },
+        // On n'affiche que les formations avec au moins une session à venir réservable.
+        sessions: {
+          some: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
+        },
         // Scope V1 : uniquement les stages de récupération de points (Ministère de l'Intérieur).
         OR: [
           { categorie: { nom: { contains: "récup", mode: "insensitive" } } },
@@ -349,7 +353,7 @@ async function fetchLiveFormations(): Promise<LiveFormation[]> {
         categorie: { select: { nom: true } },
         centre: { select: { nom: true, ville: true, logo: true } },
         sessions: {
-          where: { status: "ACTIVE", dateDebut: { gte: new Date() } },
+          where: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
           orderBy: { dateDebut: "asc" },
           take: 1,
           select: { placesRestantes: true },
@@ -416,9 +420,9 @@ export default async function Home() {
               fill
               priority
               sizes="100vw"
-              className="object-cover scale-105 opacity-75"
+              className="object-cover scale-105 opacity-95"
             />
-            <div className="absolute inset-0 bg-navy-900/40" />
+            <div className="absolute inset-0 bg-navy-900/20" />
           </div>
           <TricoloreParticles />
 

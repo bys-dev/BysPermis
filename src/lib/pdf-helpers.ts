@@ -9,7 +9,7 @@ import { Facture } from "@/components/pdf/Facture";
 import { EmargementIndividuel } from "@/components/pdf/EmargementIndividuel";
 import { BonAccord } from "@/components/pdf/BonAccord";
 import { formatDate } from "@/lib/utils";
-import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
+import { resolveCentreLogoUrl, resolveCentreSealUrl } from "@/lib/pdf-branding";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
@@ -68,7 +68,7 @@ export async function renderConvocationPdf(reservationIdOrNumero: string): Promi
       email: centre.email ?? undefined,
       numAgrement: centre.agrementNumber ?? undefined,
       logoUrl: resolveCentreLogoUrl(centre.logo),
-      signatureUrl: toAbsoluteUrl(centre.signatureUrl),
+      signatureUrl: resolveCentreSealUrl(centre.signatureUrl),
     },
   };
 
@@ -222,7 +222,7 @@ export async function renderIndividualEmargementPdf(reservationIdOrNumero: strin
       ville: centre.ville,
       numAgrement: centre.agrementNumber ?? undefined,
       logoUrl: resolveCentreLogoUrl(centre.logo),
-      signatureUrl: toAbsoluteUrl(centre.signatureUrl),
+      signatureUrl: resolveCentreSealUrl(centre.signatureUrl),
     },
   };
 

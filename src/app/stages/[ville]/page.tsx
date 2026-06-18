@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/seo/jsonld";
+import { formatPlacesDisponibles, getPlacesToneClass } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
@@ -15,6 +16,7 @@ import {
   faMagnifyingGlass,
   faClock,
   faEuroSign,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
@@ -114,11 +116,15 @@ export default async function StagesVillePage({ params }: Props) {
           statut: "ACTIF",
           ville: { equals: villeDecoded, mode: "insensitive" },
         },
+        // On n'affiche que les formations avec au moins une session à venir réservable.
+        sessions: {
+          some: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
+        },
       },
       include: {
         centre: { select: { nom: true, ville: true, slug: true } },
         sessions: {
-          where: { status: "ACTIVE", dateDebut: { gte: new Date() } },
+          where: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
           orderBy: { dateDebut: "asc" },
           take: 3,
           select: { id: true, dateDebut: true, dateFin: true, placesRestantes: true },
@@ -252,11 +258,10 @@ export default async function StagesVillePage({ params }: Props) {
                               >
                                 <FontAwesomeIcon icon={faCalendarDays} className="text-[10px]" />
                                 {new Date(sess.dateDebut).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
-                                {sess.placesRestantes <= 3 && (
-                                  <span className="text-red-500 font-semibold">
-                                    {sess.placesRestantes} place{sess.placesRestantes > 1 ? "s" : ""}
-                                  </span>
-                                )}
+                                <span className={`inline-flex items-center gap-1 ${getPlacesToneClass(sess.placesRestantes)}`}>
+                                  <FontAwesomeIcon icon={faUsers} className="text-[9px]" />
+                                  {formatPlacesDisponibles(sess.placesRestantes)}
+                                </span>
                               </Link>
                             ))}
                           </div>

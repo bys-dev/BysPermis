@@ -5,7 +5,7 @@ import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { Contrat } from "@/components/pdf/Contrat";
 import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { formatDate } from "@/lib/utils";
-import { resolveCentreLogoUrl, toAbsoluteUrl } from "@/lib/pdf-branding";
+import { resolveCentreLogoUrl, resolveCentreSealUrl } from "@/lib/pdf-branding";
 
 export async function GET(
   _req: NextRequest,
@@ -89,7 +89,7 @@ export async function GET(
         email: centre.email ?? undefined,
         telephone: centre.telephone ?? undefined,
         logoUrl: resolveCentreLogoUrl(centre.logo),
-        signatureUrl: toAbsoluteUrl(centre.signatureUrl),
+        signatureUrl: resolveCentreSealUrl(centre.signatureUrl),
         nomResponsable: centre.nomResponsable ?? undefined,
         mentionsLegales: centre.mentionsLegales ?? undefined,
         cgv: centre.cgv ?? undefined,

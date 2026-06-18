@@ -3,10 +3,10 @@ import {
   Page,
   Text,
   View,
-  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
+import { PdfCentreSeal } from "@/components/pdf/PdfCentreSeal";
 
 // ─── Types ────────────────────────────────────────────────
 export interface EmargementStagiaire {
@@ -29,6 +29,8 @@ export interface EmargementData {
     ville: string;
     numAgrement?: string;
     logoUrl?: string;
+    signatureUrl?: string;
+    nomResponsable?: string;
   };
   stagiaires: EmargementStagiaire[];
   /** Nombre de lignes vierges supplémentaires (capacité non réservée). */
@@ -112,11 +114,13 @@ const styles = StyleSheet.create({
 
   // ── Footer signatures ──
   formateurBlock: { marginTop: 20, flexDirection: "row", gap: 24 },
+  centreSignBlock: { marginTop: 16 },
   signBox: { flex: 1, borderRadius: 8, border: `1px solid ${colors.border}`, padding: 12 },
   signRole: { fontFamily: "Helvetica-Bold", fontSize: 9, color: colors.navy, marginBottom: 8 },
   signNameLabel: { fontSize: 8, color: colors.gray, marginBottom: 20 },
   signTitle: { fontSize: 7, color: colors.gray, marginBottom: 4 },
   signLine: { borderBottom: `1px solid ${colors.border}` },
+  signLabel: { fontSize: 8, color: colors.gray, marginTop: 6 },
 
   legal: { marginTop: 16, fontSize: 7, color: colors.gray, lineHeight: 1.4 },
 });
@@ -255,6 +259,18 @@ export function Emargement({ data }: { data: EmargementData }) {
               <Text style={styles.signNameLabel}>Nom :</Text>
               <Text style={styles.signTitle}>Signature</Text>
               <View style={styles.signLine} />
+            </View>
+          </View>
+
+          {/* Cachet du centre */}
+          <View style={styles.centreSignBlock}>
+            <View style={styles.signBox}>
+              <Text style={styles.signRole}>Cachet & signature du centre</Text>
+              <PdfCentreSeal sealUrl={centre.signatureUrl} />
+              <View style={styles.signLine} />
+              <Text style={styles.signLabel}>
+                {centre.nomResponsable ? `${centre.nomResponsable} — ${centreDisplay}` : centreDisplay}
+              </Text>
             </View>
           </View>
 

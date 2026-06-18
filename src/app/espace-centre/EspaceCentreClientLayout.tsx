@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartBar,
@@ -31,7 +31,6 @@ import {
   faBuilding,
 } from "@fortawesome/free-solid-svg-icons";
 import CentreSwitcher from "@/components/ui/CentreSwitcher";
-import LoadingOverlay from "@/components/ui/LoadingOverlay";
 import { CentreThemeProvider, useCentreTheme } from "@/contexts/CentreThemeContext";
 import { centreThemeCssVars } from "@/lib/centre-theme";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -173,12 +172,10 @@ function isNavActive(pathname: string, href: string) {
 
 function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const theme = useCentreTheme();
   const [role, setRole] = useState<CentreRole | null>(null);
   const [completionPct, setCompletionPct] = useState<number | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [redirectChecked, setRedirectChecked] = useState(false);
 
   const cssVars = centreThemeCssVars({
     couleurPrimaire: theme.primary,
@@ -214,28 +211,8 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
       .catch(() => null);
   }, []);
 
-  useEffect(() => {
-    if (completionPct === null || role === null) return;
-
-    const isOnboardingPage = pathname.startsWith("/espace-centre/onboarding");
-    const isCentreOwner = role === "CENTRE_OWNER";
-
-    if (isCentreOwner && completionPct < 100 && !isOnboardingPage) {
-      router.push("/espace-centre/onboarding");
-    } else {
-      setRedirectChecked(true);
-    }
-  }, [completionPct, role, pathname, router]);
-
-  useEffect(() => {
-    if (pathname.startsWith("/espace-centre/onboarding")) {
-      setRedirectChecked(true);
-    }
-  }, [pathname]);
-
   const navItems = getNavItems(role);
   const showCompletionBanner = completionPct !== null && completionPct < 100 && !bannerDismissed;
-  const checkingRedirect = !redirectChecked && !pathname.startsWith("/espace-centre/onboarding");
 
   function navLinkClass(href: string, compact = false) {
     const active = isNavActive(pathname, href);
@@ -430,11 +407,11 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
             />
             <div className="flex-1 flex items-center gap-3">
               <span className="text-gray-300">
-                Completez votre profil (
+                Ameliorez votre profil (
                 <span className="font-semibold" style={{ color: theme.primary }}>
                   {completionPct}%
                 </span>
-                ) pour etre visible sur la marketplace
+                ) pour optimiser votre visibilite
               </span>
               <div className="hidden sm:block w-24 h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
@@ -466,7 +443,6 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
 
         <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {children}
-          <LoadingOverlay show={checkingRedirect} label="Chargement de votre espace..." />
         </main>
       </div>
     </div>

@@ -29,6 +29,11 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import {
+  GEO_UPDATED_EVENT,
+  readGeoFromStorage,
+  type GeoLocationDetail,
+} from "@/lib/geo-client";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -49,6 +54,7 @@ interface StageCard {
   duree: string;
   isBYS?: boolean;
   slug: string;
+  distance?: number | null;
 }
 
 interface Suggestion {
@@ -74,6 +80,13 @@ function getDeptFromCity(city: string): string | null {
   return cityToDept[key] ?? null;
 }
 
+const rayonOptions = [
+  { value: 10, label: "10 km" },
+  { value: 25, label: "25 km" },
+  { value: 50, label: "50 km" },
+  { value: 100, label: "100 km" },
+];
+
 const sortOptions = [
   { value: "pertinence", label: "Pertinence" },
   { value: "prix_asc", label: "Prix croissant" },
@@ -95,6 +108,9 @@ function RechercheInner() {
   const initialPrixMin = Number(searchParams.get("prixMin") ?? 0);
   const initialPrixMax = Number(searchParams.get("prixMax") ?? 5000);
   const initialTri = searchParams.get("tri") ?? "pertinence";
+  const initialRayon = Number(searchParams.get("rayon") ?? 25) || 25;
+  const initialLat = searchParams.get("lat") ?? "";
+  const initialLng = searchParams.get("lng") ?? "";
   const initialPage = Math.max(1, Number(searchParams.get("page") ?? 1) || 1);
 
   // Draft (UI inputs)
@@ -105,6 +121,9 @@ function RechercheInner() {
   const [prixMin, setPrixMin] = useState(initialPrixMin);
   const [prixMax, setPrixMax] = useState(initialPrixMax);
   const [tri, setTri] = useState(initialTri);
+  const [rayon, setRayon] = useState(initialRayon);
+  const [geoLat, setGeoLat] = useState(initialLat);
+  const [geoLng, setGeoLng] = useState(initialLng);
 
   // Applied (actual query)
   const [applied, setApplied] = useState(() => ({
@@ -115,6 +134,9 @@ function RechercheInner() {
     prixMin: initialPrixMin,
     prixMax: initialPrixMax,
     tri: initialTri,
+    rayon: initialRayon,
+    lat: initialLat,
+    lng: initialLng,
   }));
 
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -135,6 +157,100 @@ function RechercheInner() {
   const [categories, setCategories] = useState<CategorieOption[]>([]);
 
   const perPage = 6;
+  const skipDebounceRef = useRef(false);
+
+  const applyGeoToFilters = useCallback((geo: GeoLocationDetail) => {
+    skipDebounceRef.current = true;
+    const r = geo.rayon ?? 25;
+    setSearchVille(geo.city);
+    setSearchDept(geo.dept ?? "");
+    setGeoLat(String(geo.lat));
+    setGeoLng(String(geo.lng));
+    setRayon(r);
+    setDetectedCity(geo.city);
+    if (geo.dept) setDetectedDept(geo.dept);
+    setApplied((prev) => ({
+      ...prev,
+      ville: geo.city,
+      dept: geo.dept ?? "",
+      rayon: r,
+      lat: String(geo.lat),
+      lng: String(geo.lng),
+    }));
+    setCurrentPage(1);
+  }, []);
+
+  // Sync depuis l'URL (ex. clic « Ma position » dans le header)
+  useEffect(() => {
+    const lat = searchParams.get("lat") ?? "";
+    const lng = searchParams.get("lng") ?? "";
+    const ville = searchParams.get("ville") ?? "";
+    const dept = searchParams.get("dept") ?? "";
+    const rayonParam = Number(searchParams.get("rayon") ?? 25) || 25;
+
+    setSearchQuery(searchParams.get("q") ?? "");
+    setSelectedType(searchParams.get("type") ?? "Tous les types");
+    setPrixMin(Number(searchParams.get("prixMin") ?? 0));
+    setPrixMax(Number(searchParams.get("prixMax") ?? 5000));
+    setTri(searchParams.get("tri") ?? "pertinence");
+    setCurrentPage(Math.max(1, Number(searchParams.get("page") ?? 1) || 1));
+
+    if (lat && lng) {
+      const parsedLat = parseFloat(lat);
+      const parsedLng = parseFloat(lng);
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+        skipDebounceRef.current = true;
+        const city = ville || readGeoFromStorage()?.city || "";
+        setSearchVille(city);
+        setSearchDept(dept);
+        setGeoLat(lat);
+        setGeoLng(lng);
+        setRayon(rayonParam);
+        setApplied({
+          q: searchParams.get("q") ?? "",
+          ville: city,
+          dept,
+          type: searchParams.get("type") ?? "Tous les types",
+          prixMin: Number(searchParams.get("prixMin") ?? 0),
+          prixMax: Number(searchParams.get("prixMax") ?? 5000),
+          tri: searchParams.get("tri") ?? "pertinence",
+          rayon: rayonParam,
+          lat,
+          lng,
+        });
+        return;
+      }
+    }
+
+    setSearchVille(ville);
+    setSearchDept(dept);
+    setGeoLat("");
+    setGeoLng("");
+    setRayon(rayonParam);
+    setApplied({
+      q: searchParams.get("q") ?? "",
+      ville,
+      dept,
+      type: searchParams.get("type") ?? "Tous les types",
+      prixMin: Number(searchParams.get("prixMin") ?? 0),
+      prixMax: Number(searchParams.get("prixMax") ?? 5000),
+      tri: searchParams.get("tri") ?? "pertinence",
+      rayon: rayonParam,
+      lat: "",
+      lng: "",
+    });
+  }, [searchParams]);
+
+  // Écoute le clic « Ma position » (même page /recherche déjà ouverte)
+  useEffect(() => {
+    function onGeoUpdated(e: Event) {
+      const detail = (e as CustomEvent<GeoLocationDetail>).detail;
+      if (!detail) return;
+      applyGeoToFilters(detail);
+    }
+    window.addEventListener(GEO_UPDATED_EVENT, onGeoUpdated);
+    return () => window.removeEventListener(GEO_UPDATED_EVENT, onGeoUpdated);
+  }, [applyGeoToFilters]);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -177,13 +293,17 @@ function RechercheInner() {
         prixMin: applied.prixMin > 0 ? String(applied.prixMin) : "",
         prixMax: applied.prixMax < 5000 ? String(applied.prixMax) : "",
         tri: applied.tri,
+        rayon: applied.lat && applied.lng ? String(applied.rayon) : applied.ville.trim() ? String(applied.rayon) : "",
+        lat: applied.lat,
+        lng: applied.lng,
         page: String(currentPage),
         ...overrides,
       };
       for (const [k, v] of Object.entries(vals)) {
-        if (v && v !== "Tous les types" && v !== "pertinence" && v !== "1") {
-          params.set(k, v);
-        }
+        if (!v || v === "Tous les types" || v === "pertinence" || v === "1") continue;
+        const geoActive = Boolean(vals.lat && vals.lng);
+        if (k === "rayon" && v === "25" && !geoActive && !vals.ville.trim()) continue;
+        params.set(k, v);
       }
       // Keep page if > 1
       if (currentPage > 1 && !overrides?.page) params.set("page", String(currentPage));
@@ -193,6 +313,7 @@ function RechercheInner() {
   );
 
   function applyFilters() {
+    skipDebounceRef.current = true;
     setApplied({
       q: searchQuery,
       ville: searchVille,
@@ -201,9 +322,40 @@ function RechercheInner() {
       prixMin,
       prixMax,
       tri,
+      rayon,
+      lat: geoLat,
+      lng: geoLng,
     });
     setCurrentPage(1);
   }
+
+  // Appliquer automatiquement les filtres après modification (debounce)
+  const filtersFirstRender = useRef(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (skipDebounceRef.current) {
+        skipDebounceRef.current = false;
+        return;
+      }
+      if (!filtersFirstRender.current) {
+        setCurrentPage(1);
+      }
+      filtersFirstRender.current = false;
+      setApplied({
+        q: searchQuery,
+        ville: searchVille,
+        dept: searchDept,
+        type: selectedType,
+        prixMin,
+        prixMax,
+        tri,
+        rayon,
+        lat: geoLat,
+        lng: geoLng,
+      });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchVille, searchDept, selectedType, prixMin, prixMax, tri, rayon, geoLat, geoLng]);
 
   // Fetch formations from API (applied query only) + AbortController
   useEffect(() => {
@@ -213,7 +365,14 @@ function RechercheInner() {
       const params = new URLSearchParams({ page: String(currentPage), perPage: String(perPage) });
 
       if (applied.q.trim()) params.set("q", applied.q.trim());
-      if (applied.ville.trim()) params.set("ville", applied.ville.trim());
+      if (applied.lat.trim() && applied.lng.trim()) {
+        params.set("lat", applied.lat.trim());
+        params.set("lng", applied.lng.trim());
+        params.set("rayon", String(applied.rayon));
+      } else if (applied.ville.trim()) {
+        params.set("ville", applied.ville.trim());
+        params.set("rayon", String(applied.rayon));
+      }
       if (applied.dept.trim()) params.set("dept", applied.dept.trim());
       if (applied.type !== "Tous les types") params.set("type", applied.type);
       if (applied.prixMin > 0) params.set("prixMin", String(applied.prixMin));
@@ -230,6 +389,7 @@ function RechercheInner() {
             categorie?: { nom: string } | null;
             centre: { nom: string; ville: string };
             sessions: { id: string; dateDebut: string; dateFin: string; placesRestantes: number }[];
+            distance?: number | null;
           }) => {
             const firstSession = f.sessions[0] ?? null;
             const ville = f.centre.ville ?? "";
@@ -256,6 +416,7 @@ function RechercheInner() {
               duree: f.duree ?? "",
               isBYS: f.centre.nom.toLowerCase().includes("bys"),
               slug: f.slug,
+              distance: f.distance ?? null,
             };
           });
           // BYS toujours en premier (only for "pertinence" sort)
@@ -304,7 +465,14 @@ function RechercheInner() {
     applied.prixMin > 0 ||
     applied.prixMax < 5000 ||
     applied.q.trim() !== "" ||
-    applied.ville.trim() !== "";
+    applied.ville.trim() !== "" ||
+    Boolean(applied.lat && applied.lng) ||
+    (applied.ville.trim() !== "" && applied.rayon !== 25);
+
+  const hasGeoFilter = Boolean(applied.lat && applied.lng);
+  const locationLabel = hasGeoFilter
+    ? applied.ville.trim() || "Ma position"
+    : applied.ville.trim();
 
   const resetFilters = () => {
     setSelectedType("Tous les types");
@@ -312,6 +480,9 @@ function RechercheInner() {
     setPrixMax(5000);
     setSearchQuery("");
     setSearchVille("");
+    setGeoLat("");
+    setGeoLng("");
+    setRayon(25);
     setTri("pertinence");
     setCurrentPage(1);
     setApplied({
@@ -322,6 +493,9 @@ function RechercheInner() {
       prixMin: 0,
       prixMax: 5000,
       tri: "pertinence",
+      rayon: 25,
+      lat: "",
+      lng: "",
     });
   };
 
@@ -404,6 +578,8 @@ function RechercheInner() {
                           key={v}
                           onClick={() => {
                             setSearchVille(v);
+                            setGeoLat("");
+                            setGeoLng("");
                             setShowSuggestions(false);
                             setCurrentPage(1);
                           }}
@@ -425,6 +601,8 @@ function RechercheInner() {
                 value={searchVille}
                 onChange={(e) => {
                   setSearchVille(e.target.value);
+                  setGeoLat("");
+                  setGeoLng("");
                   setCurrentPage(1);
                 }}
                 className="w-full px-4 py-3.5 pl-10 rounded-lg bg-white text-brand-text"
@@ -435,7 +613,7 @@ function RechercheInner() {
               />
             </div>
             <button
-              onClick={() => setCurrentPage(1)}
+              onClick={applyFilters}
               className="btn-primary px-8 py-3.5 rounded-lg flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -446,7 +624,7 @@ function RechercheInner() {
       </section>
 
       {/* Geoloc banner */}
-      {detectedCity && !searchVille && (
+      {detectedCity && !searchVille && !geoLat && (
         <div className="bg-blue-600/10 border-b border-blue-500/20 px-4 py-3">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
             <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-300 flex-wrap">
@@ -463,9 +641,14 @@ function RechercheInner() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => {
-                  setSearchVille(detectedCity);
+                  const geo = readGeoFromStorage();
+                  if (geo) {
+                    applyGeoToFilters(geo);
+                    return;
+                  }
+                  setSearchVille(detectedCity ?? "");
                   if (detectedDept) setSearchDept(detectedDept);
-                  setCurrentPage(1);
+                  applyFilters();
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors"
               >
@@ -607,6 +790,11 @@ function RechercheInner() {
                 <label className="label flex items-center gap-1.5">
                   <FontAwesomeIcon icon={faLocationDot} className="text-xs text-gray-400" />
                   Ville / Département
+                  {geoLat && geoLng && (
+                    <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                      GPS
+                    </span>
+                  )}
                 </label>
                 <input
                   type="text"
@@ -614,11 +802,54 @@ function RechercheInner() {
                   value={searchVille}
                   onChange={(e) => {
                     setSearchVille(e.target.value);
+                    setGeoLat("");
+                    setGeoLng("");
                     setCurrentPage(1);
                   }}
                   className="input"
                 />
               </div>
+
+              {/* Rayon autour de la ville */}
+              {(searchVille.trim() || (geoLat && geoLng)) && (
+                <div>
+                  <label className="label flex items-center gap-1.5">
+                    <FontAwesomeIcon icon={faLocationDot} className="text-xs text-gray-400" />
+                    Rayon de recherche
+                  </label>
+                  <select
+                    value={rayon}
+                    onChange={(e) => {
+                      setRayon(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="input text-sm"
+                  >
+                    {rayonOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    {geoLat && geoLng
+                      ? `Stages dans un rayon de ${rayon} km autour de votre position.`
+                      : `Stages dans un rayon de ${rayon} km autour de ${searchVille}.`}
+                  </p>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  applyFilters();
+                  setMobileFiltersOpen(false);
+                }}
+                className="w-full btn-primary py-3 rounded-lg flex items-center justify-center gap-2 font-semibold"
+              >
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+                Actualiser la recherche
+              </button>
 
             </div>
           </aside>
@@ -637,6 +868,20 @@ function RechercheInner() {
                     {searchQuery && (
                       <span className="text-gray-400 ml-1">
                         pour &laquo; {searchQuery} &raquo;
+                      </span>
+                    )}
+                    {applied.ville.trim() && (
+                      <span className="text-gray-400 ml-1">
+                        {applied.lat && applied.lng ? (
+                          <>
+                            autour de votre position
+                            {applied.ville ? ` (${applied.ville})` : ""} ({applied.rayon} km)
+                          </>
+                        ) : (
+                          <>
+                            autour de <span className="font-medium text-brand-text">{applied.ville}</span> ({applied.rayon} km)
+                          </>
+                        )}
                       </span>
                     )}
                   </>
@@ -664,34 +909,51 @@ function RechercheInner() {
             {/* Active filters pills */}
             {hasActiveFilters && (
               <div className="flex flex-wrap gap-2 mb-6 pb-1 -mx-1 px-1 min-w-0">
-                {searchQuery && (
+                {applied.q && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                    &laquo; {searchQuery} &raquo;
+                    &laquo; {applied.q} &raquo;
                     <button onClick={() => { setSearchQuery(""); setCurrentPage(1); }} className="hover:text-blue-900">
                       <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
                     </button>
                   </span>
                 )}
-                {searchVille && (
+                {(applied.ville.trim() || hasGeoFilter) && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
                     <FontAwesomeIcon icon={faLocationDot} className="text-[10px]" />
-                    {searchVille}
-                    <button onClick={() => { setSearchVille(""); setCurrentPage(1); }} className="hover:text-blue-900">
+                    {hasGeoFilter ? `Ma position · ${locationLabel}` : locationLabel} ({applied.rayon} km)
+                    <button
+                      onClick={() => {
+                        skipDebounceRef.current = true;
+                        setSearchVille("");
+                        setGeoLat("");
+                        setGeoLng("");
+                        setRayon(25);
+                        setCurrentPage(1);
+                        setApplied((prev) => ({
+                          ...prev,
+                          ville: "",
+                          lat: "",
+                          lng: "",
+                          rayon: 25,
+                        }));
+                      }}
+                      className="hover:text-blue-900"
+                    >
                       <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
                     </button>
                   </span>
                 )}
-                {selectedType !== "Tous les types" && (
+                {applied.type !== "Tous les types" && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                    {selectedType}
+                    {applied.type}
                     <button onClick={() => { setSelectedType("Tous les types"); setCurrentPage(1); }} className="hover:text-blue-900">
                       <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
                     </button>
                   </span>
                 )}
-                {(prixMin > 0 || prixMax < 5000) && (
+                {(applied.prixMin > 0 || applied.prixMax < 5000) && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                    {prixMin}&euro; — {prixMax}&euro;
+                    {applied.prixMin}&euro; — {applied.prixMax}&euro;
                     <button onClick={() => { setPrixMin(0); setPrixMax(5000); setCurrentPage(1); }} className="hover:text-blue-900">
                       <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
                     </button>
@@ -775,6 +1037,9 @@ function RechercheInner() {
                         <div className="flex items-center gap-2">
                           <FontAwesomeIcon icon={faLocationDot} className="w-4 text-gray-400" />
                           {stage.ville}{stage.departement ? ` (${stage.departement})` : ""}
+                          {stage.distance != null && (
+                            <span className="text-blue-600 font-medium">· {stage.distance} km</span>
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <FontAwesomeIcon icon={faCalendarDays} className="w-4 text-gray-400" />

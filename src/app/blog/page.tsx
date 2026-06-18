@@ -163,7 +163,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
-                          {article.author?.prenom ?? ""} {article.author?.nom ?? ""}
+                          BYS Formation
                         </span>
                         <span className="flex items-center gap-1">
                           <FontAwesomeIcon icon={faCalendar} className="w-3 h-3" />

@@ -3,8 +3,25 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireCentre } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
-import { haversineDistance } from "@/lib/geocoding";
+import { geocodeAddress, haversineDistance } from "@/lib/geocoding";
 import { getUserCentreId } from "@/lib/centre-utils";
+
+function isVilleFilterClause(clause: unknown): boolean {
+  if (!clause || typeof clause !== "object" || !("OR" in clause)) return false;
+  const or = (clause as { OR: unknown[] }).OR;
+  return or.some((item) => {
+    if (!item || typeof item !== "object") return false;
+    if ("lieu" in item) return true;
+    const centre = (item as { centre?: { ville?: unknown } }).centre;
+    return Boolean(centre && "ville" in centre);
+  });
+}
+
+function stripVilleFilter(where: Record<string, unknown>) {
+  if (!where.AND) return;
+  where.AND = (where.AND as unknown[]).filter((c) => !isVilleFilterClause(c));
+  if ((where.AND as unknown[]).length === 0) delete where.AND;
+}
 
 // ─── GET /api/formations ──────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -16,7 +33,7 @@ export async function GET(req: NextRequest) {
     const perPage = Math.min(50, Number(searchParams.get("perPage") ?? 12));
     const lat = searchParams.get("lat");
     const lng = searchParams.get("lng");
-    const rayon = Number(searchParams.get("rayon") ?? 50);
+    const rayon = Number(searchParams.get("rayon") ?? 25);
 
     // ── Mine (centre connecté) ─────────────────────────────
     const mine = searchParams.get("mine");
@@ -62,6 +79,15 @@ export async function GET(req: NextRequest) {
       ],
     };
 
+    // Une formation n'est listée que si elle a au moins une session à venir
+    // avec des places disponibles (sinon rien à réserver → on ne l'affiche pas).
+    const now = new Date();
+    const availableSessionFilter = {
+      status: "ACTIVE" as const,
+      dateDebut: { gte: now },
+      placesRestantes: { gt: 0 },
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
       isActive: true,
@@ -70,6 +96,7 @@ export async function GET(req: NextRequest) {
         statut: "ACTIF",
         isActive: true,
       },
+      sessions: { some: availableSessionFilter },
       AND: [scopeRecupPoints],
     };
 
@@ -152,58 +179,65 @@ export async function GET(req: NextRequest) {
       latitude: true, longitude: true,
     };
 
-    // ── Proximity search ──────────────────────────────────
+    // ── Proximity search (lat/lng explicites ou ville géocodée) ──
+    let userLat: number | null = null;
+    let userLng: number | null = null;
+
     if (lat && lng) {
-      const userLat = parseFloat(lat);
-      const userLng = parseFloat(lng);
-
-      if (!isNaN(userLat) && !isNaN(userLng)) {
-        // Remove ville filter when doing geo search
-        if (where.AND) {
-          where.AND = (where.AND as unknown[]).filter(
-            (c: unknown) => !(c && typeof c === "object" && "OR" in c)
-          );
-          if ((where.AND as unknown[]).length === 0) delete where.AND;
-        }
-        delete where.lieu;
-
-        const allFormations = await prisma.formation.findMany({
-          where,
-          include: {
-            centre: { select: centreSelect },
-            categorie: { select: { nom: true } },
-            sessions: {
-              where: { status: "ACTIVE", dateDebut: { gte: new Date() } },
-              orderBy: { dateDebut: "asc" },
-              take: 1,
-            },
-          },
-          orderBy,
-        });
-
-        const withDistance = allFormations
-          .filter((f) => f.centre.latitude !== null && f.centre.longitude !== null)
-          .map((f) => ({
-            ...f,
-            distance:
-              Math.round(
-                haversineDistance(userLat, userLng, f.centre.latitude!, f.centre.longitude!) * 10
-              ) / 10,
-          }))
-          .filter((f) => f.distance <= rayon)
-          .sort((a, b) => a.distance - b.distance);
-
-        const total = withDistance.length;
-        const paginated = withDistance.slice((page - 1) * perPage, page * perPage);
-
-        return NextResponse.json({
-          formations: paginated,
-          total,
-          page,
-          perPage,
-          totalPages: Math.ceil(total / perPage),
-        });
+      const parsedLat = parseFloat(lat);
+      const parsedLng = parseFloat(lng);
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+        userLat = parsedLat;
+        userLng = parsedLng;
+        stripVilleFilter(where);
       }
+    } else if (ville && ville.trim()) {
+      const coords = await geocodeAddress(ville.trim());
+      if (coords) {
+        userLat = coords.lat;
+        userLng = coords.lng;
+        stripVilleFilter(where);
+      }
+    }
+
+    if (userLat !== null && userLng !== null) {
+      const allFormations = await prisma.formation.findMany({
+        where,
+        include: {
+          centre: { select: centreSelect },
+          categorie: { select: { nom: true } },
+          sessions: {
+            where: availableSessionFilter,
+            orderBy: { dateDebut: "asc" },
+            take: 1,
+          },
+        },
+        orderBy,
+      });
+
+      const withDistance = allFormations
+        .filter((f) => f.centre.latitude !== null && f.centre.longitude !== null)
+        .map((f) => ({
+          ...f,
+          distance:
+            Math.round(
+              haversineDistance(userLat!, userLng!, f.centre.latitude!, f.centre.longitude!) * 10
+            ) / 10,
+        }))
+        .filter((f) => f.distance <= rayon)
+        .sort((a, b) => a.distance - b.distance);
+
+      const total = withDistance.length;
+      const paginated = withDistance.slice((page - 1) * perPage, page * perPage);
+
+      return NextResponse.json({
+        formations: paginated,
+        total,
+        page,
+        perPage,
+        totalPages: Math.ceil(total / perPage),
+        geo: { lat: userLat, lng: userLng, rayon },
+      });
     }
 
     // ── Standard query ────────────────────────────────────
@@ -214,7 +248,7 @@ export async function GET(req: NextRequest) {
           centre: { select: centreSelect },
           categorie: { select: { nom: true } },
           sessions: {
-            where: { status: "ACTIVE", dateDebut: { gte: new Date() } },
+            where: availableSessionFilter,
             orderBy: { dateDebut: "asc" },
             take: 1,
           },

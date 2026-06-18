@@ -2,9 +2,29 @@
 
 > À transmettre à Andrys MAGAR — Email : `andrys.developper@gmail.com`
 > Délai souhaité : avant le **24 mai 2026** pour mise en ligne.
+>
+> **Liste complète par thème** : voir aussi [`DEMANDES_CLIENT_COMPLET.md`](./DEMANDES_CLIENT_COMPLET.md)
 
 Tout ce qui est marqué 🔴 est **bloquant** pour la mise en production.
 Le reste peut arriver après la mise en ligne.
+
+---
+
+## 0. Coordonnées publiques (page Contact & site) 🔴
+
+> **À faire côté dev** : remplacer les valeurs provisoires dès réception des infos client.
+
+| Élément | Valeur actuelle (provisoire) | À confirmer par le client |
+|---------|------------------------------|---------------------------|
+| 🔴 Email contact public | `bysforma95@gmail.com` | Email pro officiel (ex. `contact@bys-permis.fr`) |
+| 🔴 Téléphone | `01 34 25 XX XX` (masqué) | Numéro complet affichable + indicatif |
+| 🔴 Adresse courte (hero contact) | « Osny (95) — Val-d'Oise » | Formulation validée ou adresse complète |
+| 🔴 Adresse postale complète | Bât. 7, 9 Chaussée Jules César, 95520 Osny | Confirmer ou corriger |
+| 🔴 Horaires d'ouverture | Lun – Ven : 9h – 18h | Horaires réels + jours fériés / fermetures |
+| 🔴 Délai de réponse affiché | « Sous 24h ouvrées » | Engagement réel (24h, 48h, autre) |
+| 🔴 Destinataire formulaire contact | API `/api/contact` | Vers quelle(s) boîte(s) mail ? Copie support ? |
+| ⚪ Numéro WhatsApp / rappel | Non affiché | Souhaité ou non |
+| ⚪ Réseaux sociaux officiels | Partiels selon les centres | URLs Facebook, Instagram, LinkedIn **BYS** (pas seulement centres) |
 
 ---
 

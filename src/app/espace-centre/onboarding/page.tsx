@@ -48,6 +48,7 @@ interface CentreData {
   certifications: string[];
   stripeOnboardingDone: boolean;
   subscriptionStatus: string | null;
+  statut: string;
 }
 
 interface Step {
@@ -259,6 +260,7 @@ export default function OnboardingPage() {
             certifications: data.certifications ?? [],
             stripeOnboardingDone: data.stripeOnboardingDone ?? false,
             subscriptionStatus: data.subscriptionStatus ?? null,
+            statut: data.statut ?? "EN_ATTENTE",
           });
         }
       }
@@ -369,7 +371,9 @@ export default function OnboardingPage() {
   }
 
   async function handleSaveAndNext() {
-    await handleSave();
+    if (centre && ["informations", "contact", "presentation"].includes(currentStep)) {
+      await handleSave();
+    }
     goNext();
   }
 
@@ -499,8 +503,8 @@ export default function OnboardingPage() {
           Completez votre profil
         </h1>
         <p className="text-gray-400 text-sm max-w-lg mx-auto">
-          Remplissez toutes les informations pour que votre centre soit visible
-          sur la marketplace BYS Formation.
+          Renseignez les informations de votre centre a votre rythme. Un profil
+          complet ameliore votre visibilite sur la marketplace BYS Formation.
         </p>
       </div>
 
@@ -537,11 +541,18 @@ export default function OnboardingPage() {
           />
         </div>
         {percentage >= 100 ? (
+          <p className="text-green-400 text-xs mt-3 flex items-center gap-2">
+            <FontAwesomeIcon icon={faCircleCheck} className="w-3.5 h-3.5" />
+            Votre profil est complet !
+          </p>
+        ) : (
+          <p className="text-gray-500 text-xs mt-3">
+            Profil a {percentage}% — vous pouvez completer plus tard depuis votre
+            espace centre.
+          </p>
+        )}
+        {centre.statut !== "ACTIF" && (
           <div className="mt-3 space-y-3">
-            <p className="text-green-400 text-xs flex items-center gap-2">
-              <FontAwesomeIcon icon={faCircleCheck} className="w-3.5 h-3.5" />
-              Votre profil est complet !
-            </p>
             {!validationRequested ? (
               <button
                 onClick={handleRequestValidation}
@@ -556,7 +567,7 @@ export default function OnboardingPage() {
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faPaperPlane} className="w-3.5 h-3.5" />
-                    Demander la validation par l'equipe BYS
+                    Demander la validation par l&apos;equipe BYS
                   </>
                 )}
               </button>
@@ -569,11 +580,6 @@ export default function OnboardingPage() {
               </div>
             )}
           </div>
-        ) : (
-          <p className="text-gray-500 text-xs mt-3">
-            Votre centre sera visible sur la marketplace quand votre profil
-            atteindra 100% et que notre equipe l'aura valide.
-          </p>
         )}
       </div>
 
@@ -1359,7 +1365,7 @@ export default function OnboardingPage() {
                     ["informations", "contact", "presentation"].includes(
                       currentStep
                     )
-                      ? handleSaveAndNextWithValidation
+                      ? handleSaveAndNext
                       : goNext
                   }
                   disabled={saving}
@@ -1368,21 +1374,13 @@ export default function OnboardingPage() {
                   Suivant
                   <FontAwesomeIcon icon={faChevronRight} className="w-3 h-3" />
                 </button>
-              ) : percentage >= 100 ? (
+              ) : (
                 <button
                   onClick={() => router.push("/espace-centre/dashboard")}
                   className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
                 >
                   <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
-                  Terminer et acceder au dashboard
-                </button>
-              ) : (
-                <button
-                  onClick={() => router.push("/espace-centre/dashboard")}
-                  className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
-                >
-                  <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
-                  Terminer
+                  Acceder au dashboard
                 </button>
               )}
             </div>
@@ -1393,8 +1391,8 @@ export default function OnboardingPage() {
       {/* Bottom message */}
       <div className="text-center pb-4">
         <p className="text-gray-600 text-xs">
-          Votre centre sera visible sur la marketplace quand votre profil
-          atteindra 100%.
+          La completion du profil est recommandee mais non obligatoire. Votre
+          centre sera visible apres validation par l&apos;equipe BYS.
         </p>
         <Link
           href="/espace-centre/dashboard"

@@ -30,6 +30,13 @@ export function resolveCentreLogoUrl(logo: string | null | undefined): string | 
   return absolute;
 }
 
+/** URL absolue du cachet / signature numérique centre pour les PDF, ou undefined. */
+export function resolveCentreSealUrl(seal: string | null | undefined): string | undefined {
+  const absolute = toAbsoluteUrl(seal);
+  if (!absolute || !isPdfSafeImageUrl(absolute)) return undefined;
+  return absolute;
+}
+
 /** Initiales pour l'en-tête quand le centre n'a pas de logo compatible PDF. */
 export function centreInitials(displayName: string): string {
   const cleaned = displayName.replace(/^TEST\s*[—-]\s*/i, "").trim();

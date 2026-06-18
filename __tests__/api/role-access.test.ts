@@ -160,7 +160,7 @@ describe("Sans authentification → 401", () => {
 
   it("GET /api/notifications → 401", async () => {
     const { GET } = await import("@/app/api/notifications/route");
-    const res = await GET();
+    const res = await GET(makeReq("/api/notifications"));
     expect(res.status).toBe(401);
   });
 
@@ -196,7 +196,7 @@ describe("Rôle ELEVE", () => {
     const { GET } = await import("@/app/api/notifications/route");
     prismaMock.notification.findMany.mockResolvedValue([]);
 
-    const res = await GET();
+    const res = await GET(makeReq("/api/notifications"));
     expect(res.status).toBe(200);
   });
 

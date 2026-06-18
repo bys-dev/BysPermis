@@ -606,11 +606,11 @@ export default function ParametresCentrePage() {
         <div className="rounded-xl p-6 space-y-6" style={cardStyle}>
           <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
             <FontAwesomeIcon icon={faUserTie} className="text-blue-400 w-4 h-4" />
-            Responsable & signature
+            Responsable & cachet numérique
           </h2>
           <p className="text-xs text-gray-500">
-            Le nom et la signature qui apparaitront en bas des contrats emis par
-            votre centre.
+            Le nom et le cachet qui apparaitront en bas des contrats et documents
+            emis par votre centre.
           </p>
 
           <div>
@@ -631,8 +631,9 @@ export default function ParametresCentrePage() {
             kind="signature"
             currentUrl={form.signatureUrl}
             onUploaded={(url) => update("signatureUrl", url)}
-            label="Signature scannee"
-            hint="PNG transparent recommande, max 800x300px"
+            label="Cachet numérique"
+            hint="PNG transparent recommandé, max 800x300px — affiché sur convocations et documents PDF"
+            accept="image/png,image/jpeg,image/webp"
             previewClassName="h-40"
           />
         </div>

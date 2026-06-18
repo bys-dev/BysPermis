@@ -16,6 +16,12 @@ import {
   faBell,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNotifications } from "@/lib/useNotifications";
+import {
+  dispatchGeoUpdated,
+  saveGeoToStorage,
+  clearGeoStorage,
+  type GeoLocationDetail,
+} from "@/lib/geo-client";
 
 const navLinks = [
   { label: "Stages", href: "/recherche" },
@@ -135,6 +141,7 @@ export default function HeaderInteractive() {
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
   const [city, setCity] = useState<string | null>(null);
   const [dept, setDept] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [geoOpen, setGeoOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const geoRef = useRef<HTMLDivElement>(null);
@@ -155,6 +162,13 @@ export default function HeaderInteractive() {
     if (saved) setCity(saved);
     const savedDept = localStorage.getItem("bys_dept");
     if (savedDept) setDept(savedDept);
+    const savedLat = localStorage.getItem("bys_lat");
+    const savedLng = localStorage.getItem("bys_lng");
+    if (savedLat && savedLng) {
+      const lat = parseFloat(savedLat);
+      const lng = parseFloat(savedLng);
+      if (!isNaN(lat) && !isNaN(lng)) setCoords({ lat, lng });
+    }
 
     fetch("/api/users/me")
       .then((r) => {
@@ -176,31 +190,33 @@ export default function HeaderInteractive() {
         try {
           const { latitude, longitude } = pos.coords;
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`,
+            `/api/geolocation/reverse?lat=${latitude}&lng=${longitude}`,
           );
+          if (!res.ok) throw new Error("reverse geocode failed");
           const data = await res.json();
-          const cityName =
-            data.address?.city ||
-            data.address?.town ||
-            data.address?.village ||
-            data.address?.municipality ||
-            "Votre ville";
-          // Département FR métropolitaine : 2 premiers chiffres du code postal.
-          // DOM-TOM (97x, 98x) : on garde les 3 premiers chiffres.
-          const postcode: string | undefined = data.address?.postcode;
-          let deptCode: string | null = null;
-          if (postcode && /^\d{5}$/.test(postcode)) {
-            deptCode = postcode.startsWith("97") || postcode.startsWith("98")
-              ? postcode.slice(0, 3)
-              : postcode.slice(0, 2);
-          }
+          const cityName = data.city || "Votre ville";
+          const deptCode: string | null = data.dept ?? null;
+
           setCity(cityName);
           setDept(deptCode);
-          localStorage.setItem("bys_city", cityName);
-          if (deptCode) localStorage.setItem("bys_dept", deptCode);
-          else localStorage.removeItem("bys_dept");
+          setCoords({ lat: latitude, lng: longitude });
+          const geo: GeoLocationDetail = {
+            city: cityName,
+            dept: deptCode,
+            lat: latitude,
+            lng: longitude,
+            rayon: 25,
+          };
+          saveGeoToStorage(geo);
+          dispatchGeoUpdated(geo);
           setGeoStatus("success");
-          const params = new URLSearchParams({ ville: cityName });
+
+          const params = new URLSearchParams({
+            lat: String(latitude),
+            lng: String(longitude),
+            rayon: "25",
+            ville: cityName,
+          });
           if (deptCode) params.set("dept", deptCode);
           router.push(`/recherche?${params.toString()}`);
         } catch {
@@ -211,17 +227,32 @@ export default function HeaderInteractive() {
         if (err.code === 1) setGeoStatus("denied");
         else setGeoStatus("error");
       },
-      { timeout: 8000 },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
     );
   }
 
   function clearLocation() {
     setCity(null);
     setDept(null);
+    setCoords(null);
     setGeoStatus("idle");
-    localStorage.removeItem("bys_city");
-    localStorage.removeItem("bys_dept");
+    clearGeoStorage();
     setGeoOpen(false);
+  }
+
+  function rechercheGeoHref() {
+    if (coords) {
+      const params = new URLSearchParams({
+        lat: String(coords.lat),
+        lng: String(coords.lng),
+        rayon: "25",
+        ville: city ?? "",
+      });
+      if (dept) params.set("dept", dept);
+      return `/recherche?${params.toString()}`;
+    }
+    if (city) return `/recherche?ville=${encodeURIComponent(city)}&rayon=25`;
+    return "/recherche";
   }
 
   return (
@@ -270,7 +301,7 @@ export default function HeaderInteractive() {
                 </p>
               </div>
               <Link
-                href={`/recherche?ville=${encodeURIComponent(city)}`}
+                href={rechercheGeoHref()}
                 onClick={() => setGeoOpen(false)}
                 className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
               >
@@ -299,6 +330,21 @@ export default function HeaderInteractive() {
               <p className="text-xs text-red-600 font-medium mb-1">Accès refusé</p>
               <p className="text-xs text-gray-500">
                 Autorisez la géolocalisation dans les paramètres de votre navigateur.
+              </p>
+              <button
+                onClick={() => setGeoStatus("idle")}
+                className="text-xs text-blue-600 mt-2 hover:underline"
+              >
+                Fermer
+              </button>
+            </div>
+          )}
+
+          {geoStatus === "error" && (
+            <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-xl border border-red-100 p-4 z-50">
+              <p className="text-xs text-red-600 font-medium mb-1">Géolocalisation impossible</p>
+              <p className="text-xs text-gray-500">
+                Vérifiez que la localisation est activée, puis réessayez. Sinon, saisissez votre ville dans la recherche.
               </p>
               <button
                 onClick={() => setGeoStatus("idle")}

@@ -16,9 +16,12 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
-// ─── Mock Auth0 ───────────────────────────────────────────
-jest.mock("@/lib/auth0", () => ({
-  requireCentre: jest.fn(),
+jest.mock("@/lib/geocoding", () => ({
+  haversineDistance: jest.fn((lat1: number, lon1: number, lat2: number, lon2: number) => {
+    if (lat2 === 48.8566 && lon2 === 2.3522) return 5;
+    return 100;
+  }),
+  geocodeAddress: jest.fn().mockResolvedValue(null),
 }));
 
 import { prisma } from "@/lib/prisma";

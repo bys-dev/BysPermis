@@ -32,6 +32,7 @@ import {
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { formatPlacesDisponibles, getPlacesToneClass } from "@/lib/utils";
 
 // ─── TYPES ────────────────────────────────────────────────
 
@@ -523,6 +524,32 @@ export default function FormationDetailPage() {
     );
   }
 
+  const sessionsForDisplay = liveSessions?.length
+    ? liveSessions
+        .filter((s) => s.placesRestantes > 0)
+        .map((s) => ({
+          id: s.id,
+          sessionId: s.id,
+          date: `${new Date(s.dateDebut).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} — ${new Date(s.dateFin).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`,
+          ville: s.ville,
+          centre: s.centre,
+          placesRestantes: s.placesRestantes,
+          prix: s.prix,
+        }))
+    : formation.sessions
+        .filter((s) => s.placesRestantes > 0)
+        .map((s, i) => ({
+          id: String(i),
+          sessionId: `mock_${i}`,
+          date: s.date,
+          ville: s.ville,
+          centre: s.centre,
+          placesRestantes: s.placesRestantes,
+          prix: s.prix,
+        }));
+
+  const nextBookableSession = sessionsForDisplay[0] ?? null;
+
   return (
     <>
       <Header />
@@ -690,7 +717,7 @@ export default function FormationDetailPage() {
                     Prochaines sessions
                   </h2>
                   <span className="text-sm text-gray-500">
-                    {(liveSessions ?? formation.sessions).length} sessions disponibles
+                    {sessionsForDisplay.length} session{sessionsForDisplay.length > 1 ? "s" : ""} avec places disponibles
                   </span>
                 </div>
 
@@ -702,24 +729,15 @@ export default function FormationDetailPage() {
                         <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Date</th>
                         <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Ville</th>
                         <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Centre</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Places</th>
+                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Places dispo</th>
                         <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Prix</th>
-                        <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3"></th>
+                        <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3">
+                          <span className="sr-only">Action</span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(liveSessions
-                        ? liveSessions.map((s) => ({
-                            id: s.id,
-                            date: `${new Date(s.dateDebut).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} — ${new Date(s.dateFin).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`,
-                            ville: s.ville,
-                            centre: s.centre,
-                            placesRestantes: s.placesRestantes,
-                            prix: s.prix,
-                            sessionId: s.id,
-                          }))
-                        : formation.sessions.map((s, i) => ({ ...s, id: String(i), sessionId: `mock_${i}` }))
-                      ).map((session) => (
+                      {sessionsForDisplay.map((session) => (
                         <tr key={session.id} className="border-b border-brand-border last:border-0 hover:bg-gray-50 transition-colors">
                           <td className="py-4 pr-4">
                             <div className="flex items-center gap-2">
@@ -736,16 +754,10 @@ export default function FormationDetailPage() {
                           <td className="py-4 pr-4 text-gray-600 text-sm">{session.centre}</td>
                           <td className="py-4 pr-4">
                             <span
-                              className={`inline-flex items-center gap-1.5 text-sm font-medium ${
-                                session.placesRestantes <= 3
-                                  ? "text-red-600"
-                                  : session.placesRestantes <= 6
-                                  ? "text-amber-600"
-                                  : "text-emerald-600"
-                              }`}
+                              className={`inline-flex items-center gap-1.5 text-sm ${getPlacesToneClass(session.placesRestantes)}`}
                             >
                               <FontAwesomeIcon icon={faUsers} className="text-xs" />
-                              {session.placesRestantes} places
+                              {formatPlacesDisponibles(session.placesRestantes)}
                             </span>
                           </td>
                           <td className="py-4 pr-4">
@@ -768,15 +780,12 @@ export default function FormationDetailPage() {
 
                 {/* Mobile cards */}
                 <div className="md:hidden space-y-4">
-                  {(liveSessions
-                    ? liveSessions.map((s) => ({
-                        id: s.id,
-                        date: `${new Date(s.dateDebut).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })} — ${new Date(s.dateFin).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}`,
-                        ville: s.ville, centre: s.centre,
-                        placesRestantes: s.placesRestantes, prix: s.prix, sessionId: s.id,
-                      }))
-                    : formation.sessions.map((s, i) => ({ ...s, id: String(i), sessionId: `mock_${i}` }))
-                  ).map((session) => (
+                  {sessionsForDisplay.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-6">
+                      Aucune session avec places disponibles pour le moment.
+                    </p>
+                  ) : (
+                  sessionsForDisplay.map((session) => (
                     <div key={session.id} className="border border-brand-border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
@@ -790,16 +799,8 @@ export default function FormationDetailPage() {
                         {session.ville} - {session.centre}
                       </div>
                       <div className="flex items-center justify-between mt-3">
-                        <span
-                          className={`text-sm font-medium ${
-                            session.placesRestantes <= 3
-                              ? "text-red-600"
-                              : session.placesRestantes <= 6
-                              ? "text-amber-600"
-                              : "text-emerald-600"
-                          }`}
-                        >
-                          {session.placesRestantes} places restantes
+                        <span className={`text-sm ${getPlacesToneClass(session.placesRestantes)}`}>
+                          {formatPlacesDisponibles(session.placesRestantes)}
                         </span>
                         <Link
                           href={`/reserver/${session.sessionId}/donnees`}
@@ -809,8 +810,14 @@ export default function FormationDetailPage() {
                         </Link>
                       </div>
                     </div>
-                  ))}
+                  ))
+                  )}
                 </div>
+                {sessionsForDisplay.length === 0 && (
+                  <p className="hidden md:block text-sm text-gray-500 text-center py-6">
+                    Aucune session avec places disponibles pour le moment.
+                  </p>
+                )}
               </section>
 
               {/* Testimonials */}
@@ -942,8 +949,19 @@ export default function FormationDetailPage() {
                     )}
                   </div>
 
+                  {nextBookableSession && (
+                    <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm">
+                      <p className="text-gray-500 mb-1">Prochaine session</p>
+                      <p className="font-semibold text-brand-text leading-snug">{nextBookableSession.date}</p>
+                      <p className={`mt-1 inline-flex items-center gap-1.5 ${getPlacesToneClass(nextBookableSession.placesRestantes)}`}>
+                        <FontAwesomeIcon icon={faUsers} className="text-xs" />
+                        {formatPlacesDisponibles(nextBookableSession.placesRestantes)}
+                      </p>
+                    </div>
+                  )}
+
                   <Link
-                    href={liveSessions?.[0] ? `/reserver/${liveSessions[0].id}/donnees` : `/recherche?q=${encodeURIComponent(formation.title)}`}
+                    href={nextBookableSession ? `/reserver/${nextBookableSession.sessionId}/donnees` : `/recherche?q=${encodeURIComponent(formation.title)}`}
                     className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3.5 rounded-lg font-semibold text-base hover:bg-red-700 transition-colors mb-3"
                   >
                     Réserver ce stage

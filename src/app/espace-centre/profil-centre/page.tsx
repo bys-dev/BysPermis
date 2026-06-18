@@ -22,6 +22,7 @@ import {
   faAward,
   faToolbox,
   faImage,
+  faStamp,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebook,
@@ -53,6 +54,8 @@ interface CentreProfile {
   email: string | null;
   siteWeb: string | null;
   logo: string | null;
+  signatureUrl: string | null;
+  nomResponsable: string | null;
   bannerImage: string | null;
   couleurPrimaire: string | null;
   couleurSecondaire: string | null;
@@ -229,6 +232,7 @@ export default function ProfilCentrePage() {
           equipements: form.equipements || [],
           certifications: form.certifications || [],
           reseauxSociaux: form.reseauxSociaux || null,
+          nomResponsable: form.nomResponsable || null,
         }),
       });
       if (!res.ok) {
@@ -732,6 +736,40 @@ export default function ProfilCentrePage() {
               onUploaded={(url) => updateField("logo", url)}
               label="Logo (affiche en haut de la fiche publique et sur les contrats)"
               hint="PNG ou JPEG recommandé (carre, max 1 MB) — affiché sur convocations et documents PDF"
+              previewClassName="h-32"
+            />
+          </div>
+
+          {/* Cachet numérique */}
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+              <FontAwesomeIcon icon={faStamp} className="text-blue-400 w-4 h-4" />
+              Cachet numérique
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Votre cachet apparaît sur les convocations, attestations, contrats et feuilles
+              d&apos;émargement lorsqu&apos;il est disponible.
+            </p>
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-gray-500 mb-2">
+                Nom du responsable (optionnel)
+              </label>
+              <input
+                type="text"
+                value={form.nomResponsable || ""}
+                onChange={(e) => updateField("nomResponsable", e.target.value || null)}
+                className={inputClass}
+                style={inputStyle}
+                placeholder="Ex: Jean Dupont"
+              />
+            </div>
+            <ImageUploadField
+              kind="signature"
+              currentUrl={form.signatureUrl}
+              onUploaded={(url) => updateField("signatureUrl", url)}
+              label="Image du cachet / signature"
+              hint="PNG transparent recommandé (max 800×300 px) — affiché sur les documents PDF"
+              accept="image/png,image/jpeg,image/webp"
               previewClassName="h-32"
             />
           </div>

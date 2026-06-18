@@ -19,6 +19,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ slu
           where: {
             status: "ACTIVE",
             dateDebut: { gte: new Date() },
+            placesRestantes: { gt: 0 },
           },
           include: {
             formation: {

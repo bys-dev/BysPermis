@@ -116,7 +116,7 @@ export async function PATCH(req: NextRequest) {
       ...updated,
       _activeFormationsWithSessions: activeFormationsWithSessions,
     });
-    const newIsActive = percentage >= 100 && centre.statut === "ACTIF";
+    const newIsActive = centre.statut === "ACTIF";
     await prisma.centre.update({
       where: { id: centre.id },
       data: { profilCompletionPct: percentage, isActive: newIsActive },
@@ -154,6 +154,7 @@ const profileSchema = z.object({
     linkedin: z.string().url().optional().or(z.literal("")),
     youtube: z.string().url().optional().or(z.literal("")),
   }).optional().nullable(),
+  nomResponsable: z.string().max(200).optional().nullable(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -201,7 +202,7 @@ export async function PUT(req: NextRequest) {
       ...updated,
       _activeFormationsWithSessions: activeFormationsWithSessions,
     });
-    const newIsActive = percentage >= 100 && centre.statut === "ACTIF";
+    const newIsActive = centre.statut === "ACTIF";
     await prisma.centre.update({
       where: { id: centre.id },
       data: { profilCompletionPct: percentage, isActive: newIsActive },

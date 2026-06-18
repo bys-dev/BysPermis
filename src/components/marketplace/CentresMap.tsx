@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -17,7 +17,6 @@ export interface MapCentre {
   isBYS?: boolean;
 }
 
-// Fix Leaflet default icon paths sous Next.js (le bundler casse les chemins).
 function fixLeafletIcons() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delete ((L.Icon.Default.prototype as unknown) as { _getIconUrl?: unknown })._getIconUrl;
@@ -28,9 +27,20 @@ function fixLeafletIcons() {
   });
 }
 
+function MapPlaceholder() {
+  return (
+    <div className="h-[360px] sm:h-[480px] lg:h-[560px] w-full rounded-xl border border-brand-border bg-gradient-to-b from-blue-50 to-indigo-50 flex items-center justify-center">
+      <span className="text-gray-400 text-sm">Chargement de la carte…</span>
+    </div>
+  );
+}
+
 export default function CentresMap({ centres }: { centres: MapCentre[] }) {
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     fixLeafletIcons();
+    setMounted(true);
   }, []);
 
   const bysIcon = useMemo(
@@ -44,19 +54,30 @@ export default function CentresMap({ centres }: { centres: MapCentre[] }) {
     [],
   );
 
-  // Centre par défaut sur la France si pas de centres géolocalisés.
-  const geolocated = centres.filter(
-    (c) => Number.isFinite(c.latitude) && Number.isFinite(c.longitude)
+  const geolocated = useMemo(
+    () =>
+      centres.filter(
+        (c) => Number.isFinite(c.latitude) && Number.isFinite(c.longitude),
+      ),
+    [centres],
   );
+
   const defaultCenter: [number, number] = geolocated.length
     ? [geolocated[0].latitude, geolocated[0].longitude]
     : [46.6, 2.4];
 
+  const mapKey = geolocated.map((c) => c.id).join("-") || "france";
+
+  if (!mounted) {
+    return <MapPlaceholder />;
+  }
+
   return (
     <div className="h-[360px] sm:h-[480px] lg:h-[560px] w-full rounded-xl overflow-hidden border border-brand-border">
       <MapContainer
+        key={mapKey}
         center={defaultCenter}
-        zoom={geolocated.length ? 6 : 5}
+        zoom={geolocated.length > 1 ? 6 : geolocated.length === 1 ? 10 : 5}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >

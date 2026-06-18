@@ -92,7 +92,6 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
   const publishedAtISO = (article.publishedAt ?? article.createdAt).toISOString();
   const description = article.extrait.slice(0, 155);
-  const authorName = `${article.author?.prenom ?? ""} ${article.author?.nom ?? ""}`.trim() || undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -110,7 +109,6 @@ export default async function BlogArticlePage({ params }: PageProps) {
             description,
             image: article.image,
             publishedAtISO,
-            authorName,
           }),
         ]}
       />
@@ -150,7 +148,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-200">
           <span className="flex items-center gap-1.5">
             <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" />
-            {article.author?.prenom ?? ""} {article.author?.nom ?? ""}
+            BYS Formation
           </span>
           <span className="flex items-center gap-1.5">
             <FontAwesomeIcon icon={faCalendar} className="w-3.5 h-3.5" />

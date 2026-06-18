@@ -3,10 +3,10 @@ import {
   Page,
   Text,
   View,
-  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 import { PdfCentreLogo } from "@/components/pdf/PdfCentreLogo";
+import { PdfCentreSeal } from "@/components/pdf/PdfCentreSeal";
 
 // ─── Types ────────────────────────────────────────────────
 export interface AttestationData {
@@ -90,7 +90,6 @@ const styles = StyleSheet.create({
   },
   logoText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 13 },
   logoImage: { width: 44, height: 44, objectFit: "contain" },
-  signatureImage: { width: 110, height: 50, objectFit: "contain", marginBottom: 4 },
   headerTitle: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 18, marginTop: 4 },
   headerSub: { color: "#9CA3AF", fontSize: 9, marginTop: 2 },
   attestBadge: {
@@ -434,9 +433,7 @@ export function Attestation({ data }: { data: AttestationData }) {
             </View>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>Cachet & signature du centre</Text>
-              {centre.signatureUrl ? (
-                <Image src={centre.signatureUrl} style={styles.signatureImage} />
-              ) : null}
+              <PdfCentreSeal sealUrl={centre.signatureUrl} />
               <View style={styles.signLine} />
               <Text style={styles.signLabel}>{centreDisplay}</Text>
             </View>

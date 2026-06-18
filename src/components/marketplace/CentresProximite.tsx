@@ -98,16 +98,22 @@ export function CentresProximite() {
       async (pos) => {
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=fr`
+            `/api/geolocation/reverse?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`,
           );
+          if (!res.ok) throw new Error("reverse geocode failed");
           const data = await res.json();
-          const cityName = data.address?.city || data.address?.town || data.address?.village || "Votre ville";
+          const cityName = data.city || "Votre ville";
           localStorage.setItem("bys_city", cityName);
+          localStorage.setItem("bys_lat", String(pos.coords.latitude));
+          localStorage.setItem("bys_lng", String(pos.coords.longitude));
+          if (data.dept) localStorage.setItem("bys_dept", data.dept);
           applyCity(cityName);
-        } catch { setGeoStatus("error"); }
+        } catch {
+          setGeoStatus("error");
+        }
       },
       (err) => { setGeoStatus(err.code === 1 ? "denied" : "error"); },
-      { timeout: 8000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
     );
   }
 

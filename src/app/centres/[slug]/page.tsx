@@ -28,7 +28,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { sanitizeHtml } from "@/lib/utils";
+import { sanitizeHtml, formatPlacesDisponibles, getPlacesToneClass } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -147,6 +147,7 @@ export default async function CentreDetailPage({
             where: {
               status: "ACTIVE",
               dateDebut: { gte: new Date() },
+              placesRestantes: { gt: 0 },
             },
             orderBy: { dateDebut: "asc" },
           },
@@ -412,6 +413,7 @@ export default async function CentreDetailPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {centre.formations.map((f) => {
               const next = getNextSession(f.sessions);
+              const totalPlaces = f.sessions.reduce((sum, s) => sum + s.placesRestantes, 0);
               return (
                 <div key={f.id} className="bg-white border border-brand-border rounded-2xl p-6 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
@@ -442,7 +444,9 @@ export default async function CentreDetailPage({
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700">
                       <FontAwesomeIcon icon={faUsers} className="text-[10px]" />
-                      {f.sessions.length} session{f.sessions.length > 1 ? "s" : ""}
+                      {totalPlaces > 0
+                        ? `${totalPlaces} place${totalPlaces > 1 ? "s" : ""} dispo`
+                        : `${f.sessions.length} session${f.sessions.length > 1 ? "s" : ""}`}
                     </span>
                     {f.isQualiopi && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-100">
@@ -461,10 +465,15 @@ export default async function CentreDetailPage({
                   <div className="mt-5 flex items-center justify-between gap-3">
                     <div className="text-xs text-gray-500">
                       {next ? (
-                        <span className="inline-flex items-center gap-2">
-                          <FontAwesomeIcon icon={faCalendarDays} className="text-gray-400" />
-                          Prochaine session: {formatDate(next.dateDebut)} —{" "}
-                          {formatDate(next.dateFin)}
+                        <span className="inline-flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="inline-flex items-center gap-2">
+                            <FontAwesomeIcon icon={faCalendarDays} className="text-gray-400" />
+                            Prochaine session : {formatDate(next.dateDebut)} — {formatDate(next.dateFin)}
+                          </span>
+                          <span className={`inline-flex items-center gap-1.5 ${getPlacesToneClass(next.placesRestantes)}`}>
+                            <FontAwesomeIcon icon={faUsers} className="text-[10px]" />
+                            {formatPlacesDisponibles(next.placesRestantes)}
+                          </span>
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-2">
