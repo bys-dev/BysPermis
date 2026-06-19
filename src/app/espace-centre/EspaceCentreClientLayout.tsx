@@ -251,14 +251,20 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
         className="hidden lg:flex flex-col w-64 shrink-0 border-r"
         style={{ background: sidebarBg, borderColor: "rgba(255,255,255,0.07)" }}
       >
-        <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+        <div
+          className="px-5 py-4 border-b"
+          style={{
+            borderColor: "rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.04)",
+          }}
+        >
           <Link href="/espace-centre/dashboard" className="flex items-center gap-3 min-w-0">
             {theme.logo ? (
               <div
-                className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border flex items-center justify-center"
+                className="w-11 h-11 rounded-xl overflow-hidden shrink-0 border flex items-center justify-center"
                 style={{
-                  borderColor: `rgba(${theme.primaryRgb}, 0.35)`,
-                  background: `rgba(${theme.primaryRgb}, 0.12)`,
+                  borderColor: `rgba(${theme.primaryRgb}, 0.4)`,
+                  background: `rgba(${theme.primaryRgb}, 0.15)`,
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -266,20 +272,21 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
               </div>
             ) : (
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
                 style={{
-                  background: `rgba(${theme.primaryRgb}, 0.18)`,
+                  background: `rgba(${theme.primaryRgb}, 0.2)`,
+                  borderColor: `rgba(${theme.primaryRgb}, 0.35)`,
                   color: theme.primary,
                 }}
               >
-                <FontAwesomeIcon icon={faBuilding} className="text-sm" />
+                <FontAwesomeIcon icon={faBuilding} className="text-base" />
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate leading-tight">
-                {theme.nom || "Mon centre"}
+              <p className="text-[15px] font-bold text-white leading-tight tracking-tight">
+                Espace centre
               </p>
-              <p className="text-[10px] text-gray-500 mt-0.5">Espace centre · BYS Permis</p>
+              <p className="text-xs text-gray-300 mt-1 font-medium">BYS Formation · Permis</p>
             </div>
           </Link>
         </div>
@@ -356,8 +363,8 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
                 className="h-8 w-auto brightness-0 invert"
               />
             )}
-            <span className="font-semibold text-white text-sm truncate">
-              {theme.nom || "Espace Centre"}
+            <span className="font-bold text-white text-sm truncate max-w-[50vw]">
+              {theme.nom || "Espace centre"}
             </span>
           </Link>
           <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">

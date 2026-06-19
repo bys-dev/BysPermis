@@ -99,14 +99,20 @@ export default function CentreSwitcher({ userRole }: { userRole: string | null }
   if (centres.length <= 1 && userRole !== "CENTRE_OWNER") {
     if (!activeCentre) return null;
     return (
-      <div className="px-3 py-3">
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: "rgba(255,255,255,0.05)" }}>
-          <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center shrink-0">
-            <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-xs" />
+      <div className="px-4 py-3">
+        <p className="px-1 mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+          Centre actif
+        </p>
+        <div
+          className="flex items-start gap-3 px-3 py-3 rounded-xl border"
+          style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" }}
+        >
+          <div className="w-9 h-9 rounded-lg bg-blue-500/25 flex items-center justify-center shrink-0 mt-0.5">
+            <FontAwesomeIcon icon={faBuilding} className="text-blue-300 text-sm" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white truncate">{activeCentre.nom}</p>
-            <p className="text-[11px] text-gray-500 truncate">{activeCentre.ville}</p>
+            <p className="text-sm font-semibold text-white leading-snug line-clamp-2">{activeCentre.nom}</p>
+            <p className="text-xs text-gray-300 mt-1">{activeCentre.ville}</p>
           </div>
         </div>
       </div>
@@ -115,27 +121,33 @@ export default function CentreSwitcher({ userRole }: { userRole: string | null }
 
   return (
     <>
-      <div className="px-3 py-3 relative" ref={dropdownRef}>
+      <div className="px-4 py-3 relative" ref={dropdownRef}>
+        <p className="px-1 mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+          Centre actif
+        </p>
         {/* Trigger button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all hover:bg-white/[0.08]"
-          style={{ background: isOpen ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.05)" }}
+          className="w-full flex items-start gap-3 px-3 py-3 rounded-xl transition-all hover:bg-white/[0.1] border"
+          style={{
+            background: isOpen ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)",
+            borderColor: isOpen ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.12)",
+          }}
         >
-          <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center shrink-0">
-            <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-xs" />
+          <div className="w-9 h-9 rounded-lg bg-blue-500/25 flex items-center justify-center shrink-0 mt-0.5">
+            <FontAwesomeIcon icon={faBuilding} className="text-blue-300 text-sm" />
           </div>
           <div className="min-w-0 flex-1 text-left">
-            <p className="text-sm font-semibold text-white truncate">
+            <p className="text-sm font-semibold text-white leading-snug line-clamp-2">
               {activeCentre?.nom ?? "Aucun centre"}
             </p>
-            <p className="text-[11px] text-gray-500 truncate">
-              {activeCentre?.ville ?? ""}
+            <p className="text-xs text-gray-300 mt-1">
+              {activeCentre?.ville ?? "Ville non renseignée"}
             </p>
           </div>
           <FontAwesomeIcon
             icon={faChevronDown}
-            className={`w-3 h-3 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            className={`w-3.5 h-3.5 text-gray-300 shrink-0 mt-1 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           />
         </button>
 
