@@ -20,6 +20,8 @@
     "auth0:verify": "npx tsx scripts/verify-auth0-triggers.ts",
     "auth0:sync-metadata": "npx tsx scripts/sync-auth0-app-metadata.ts",
     "db:reset": "npx prisma db push --force-reset --accept-data-loss && npx tsx prisma/seed.ts && npx tsx prisma/seed-demo.ts && npx tsx prisma/seed-auth0.ts",
+    "seed:recette": "npx tsx scripts/seed-recette-juin-2026.ts",
+    "verify:recette": "npx tsx scripts/verify-recette-documents.ts",
     "db:migrate:dev": "npx prisma migrate dev",
     "db:migrate:deploy": "npx prisma migrate deploy",
     "db:migrate:status": "npx prisma migrate status",

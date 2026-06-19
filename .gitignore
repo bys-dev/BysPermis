@@ -2,6 +2,8 @@
 
 # backups de purge prod (contiennent des données / emails — ne pas committer)
 scripts/backup-purge-*.json
+/recette-output-juin-2026/
+RECETTE_JUIN_2026_RESULT.md
 
 # dependencies
 /node_modules
