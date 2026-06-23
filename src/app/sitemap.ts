@@ -16,6 +16,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/politique-de-confidentialite`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE_URL}/comment-ca-marche`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/tarifs-partenaires`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE_URL}/centres`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
   ];
 
   // Dynamic: formations
@@ -70,5 +72,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB might not be available during build
   }
 
-  return [...staticPages, ...formationPages, ...centrePages, ...villePages];
+  // Dynamic: blog articles
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const articles = await prisma.article.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+    blogPages = articles.map((a) => ({
+      url: `${BASE_URL}/blog/${a.slug}`,
+      lastModified: a.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // DB might not be available during build
+  }
+
+  return [...staticPages, ...formationPages, ...centrePages, ...villePages, ...blogPages];
 }

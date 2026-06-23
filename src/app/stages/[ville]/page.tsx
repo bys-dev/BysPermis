@@ -4,7 +4,9 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import JsonLd from "@/components/seo/JsonLd";
-import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/seo/jsonld";
+import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/seo/jsonld";
+import { pageMetadata, stageCityBreadcrumb } from "@/lib/seo";
+import { STAGE_CITY_FAQ } from "@/lib/seo-content";
 import { formatPlacesDisponibles, getPlacesToneClass } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -57,26 +59,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { ville } = await params;
   const villeDecoded = capitalize(decodeURIComponent(ville));
 
-  return {
-    title: `Stage de récupération de points à ${villeDecoded}`,
-    description: `Trouvez et réservez votre stage de récupération de points à ${villeDecoded}. Comparez les centres agréés Ministère de l'Intérieur, les prix et les dates disponibles. Réservation en ligne sécurisée.`,
+  return pageMetadata({
+    title: `Stage récupération de points à ${villeDecoded}`,
+    description: `Trouvez et réservez votre stage de récupération de points à ${villeDecoded}. Centres agréés préfecture, prix transparents, réservation en ligne sécurisée.`,
+    path: `/stages/${ville}`,
     keywords: [
       `stage récupération points ${villeDecoded}`,
       `stage permis ${villeDecoded}`,
       `stage 48N ${villeDecoded}`,
       `stage agréé préfecture ${villeDecoded}`,
-      `récupérer points permis ${villeDecoded}`,
     ],
-    alternates: { canonical: `/stages/${ville}` },
-    openGraph: {
-      title: `Stage de récupération de points à ${villeDecoded}`,
-      description: `Comparez les centres agréés et réservez votre stage de récupération de points à ${villeDecoded}.`,
-      type: "website",
-      locale: "fr_FR",
-      siteName: "BYS Formation",
-      url: `/stages/${ville}`,
-    },
-  };
+  });
 }
 
 interface FormationResult {
@@ -137,12 +130,9 @@ export default async function StagesVillePage({ params }: Props) {
   }
 
   const jsonLd = [
-    breadcrumbJsonLd([
-      { name: "Accueil", url: "/" },
-      { name: "Stages", url: "/recherche" },
-      { name: villeDecoded, url: `/stages/${ville}` },
-    ]),
+    breadcrumbJsonLd(stageCityBreadcrumb(villeDecoded, ville)),
     serviceJsonLd({ city: villeDecoded }),
+    faqJsonLd(STAGE_CITY_FAQ(villeDecoded)),
   ];
 
   return (

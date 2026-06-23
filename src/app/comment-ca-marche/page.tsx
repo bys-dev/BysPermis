@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HomeFaq from "@/components/marketplace/HomeFaq";
+import { pageMetadata } from "@/lib/seo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -23,20 +24,12 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 export const dynamic = "force-static";
 
-export const metadata: Metadata = {
-  title: "Comment ça marche ? — Réserver un stage de récupération de points",
+export const metadata: Metadata = pageMetadata({
+  title: "Comment réserver un stage de récupération de points",
   description:
-    "Découvrez comment réserver votre stage de récupération de points en 4 étapes simples sur BYS Formation. Convocation immédiate, paiement sécurisé.",
-  alternates: { canonical: "/comment-ca-marche" },
-  openGraph: {
-    title: "Comment ça marche ? | BYS Formation",
-    description: "4 étapes simples pour réserver votre stage et récupérer 4 points.",
-    url: "/comment-ca-marche",
-    type: "website",
-    locale: "fr_FR",
-    siteName: "BYS Formation",
-  },
-};
+    "Réservez votre stage en 4 étapes : recherche par ville, choix du centre agréé, paiement sécurisé et convocation immédiate par e-mail.",
+  path: "/comment-ca-marche",
+});
 
 // ─── DATA ────────────────────────────────────────────────
 

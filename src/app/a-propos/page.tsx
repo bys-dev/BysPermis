@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye, faHandshake, faAward, faMapMarkerAlt, faUsers, faStar,
@@ -10,21 +11,12 @@ import {
 
 export const dynamic = "force-static";
 
-export const metadata: Metadata = {
-  title: "À propos — BYS Formation",
+export const metadata: Metadata = pageMetadata({
+  title: "À propos — Marketplace stages permis agréés",
   description:
-    "Découvrez BYS Formation, la plateforme de référence pour réserver un stage de récupération de points permis agréé préfecture partout en France.",
-  alternates: { canonical: "/a-propos" },
-  openGraph: {
-    title: "À propos — BYS Formation",
-    description:
-      "La plateforme de référence pour les stages de récupération de points en France.",
-    url: "/a-propos",
-    type: "website",
-    locale: "fr_FR",
-    siteName: "BYS Formation",
-  },
-};
+    "BYS Formation Permis connecte les conducteurs à 150+ centres agréés préfecture pour réserver un stage de récupération de points partout en France.",
+  path: "/a-propos",
+});
 
 const values = [
   { icon: faEye, title: "Transparence", description: "Des prix clairs sans surprise. Tous nos centres sont agréés par la préfecture et chaque avis est vérifié.", color: "text-blue-400", bg: "bg-blue-400/10" },

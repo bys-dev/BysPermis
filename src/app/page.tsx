@@ -7,7 +7,9 @@ import { CentresProximite } from "@/components/marketplace/CentresProximite";
 import HeroSearchForm from "@/components/marketplace/HeroSearchForm";
 import HomeFaq from "@/components/marketplace/HomeFaq";
 import JsonLd from "@/components/seo/JsonLd";
-import { serviceJsonLd } from "@/lib/seo/jsonld";
+import { serviceJsonLd, faqJsonLd } from "@/lib/seo/jsonld";
+import { pageMetadata } from "@/lib/seo";
+import { HOME_FAQ } from "@/lib/seo-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -40,21 +42,12 @@ import { TricoloreParticles } from "@/components/ui/TricoloreParticles";
 // ISR — la home se régénère toutes les heures
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: "BYS Formation Permis — Stages récupération de points & formations permis",
+export const metadata: Metadata = pageMetadata({
+  title: "Stages récupération de points — Centres agréés partout en France",
   description:
-    "Comparez et réservez votre stage de récupération de points près de chez vous. 150+ centres agréés préfecture, convocation immédiate, paiement sécurisé.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: "BYS Formation Permis — Marketplace de stages permis",
-    description:
-      "Récupérez jusqu'à 4 points en 2 jours dans un centre agréé près de chez vous.",
-    url: "/",
-    type: "website",
-    locale: "fr_FR",
-    siteName: "BYS Formation Permis",
-  },
-};
+    "Comparez et réservez votre stage de récupération de points près de chez vous. 150+ centres agréés préfecture, convocation immédiate, paiement sécurisé. Récupérez jusqu'à 4 points en 2 jours.",
+  path: "/",
+});
 
 // ─── DATA ────────────────────────────────────────────────
 
@@ -260,39 +253,6 @@ const trustBadges = [
   },
 ];
 
-const faqItems = [
-  {
-    question: "Combien de points puis-je récupérer avec un stage ?",
-    answer:
-      "Un stage de sensibilisation à la sécurité routière permet de récupérer 4 points, crédités le lendemain du 2ème jour de stage (art. R223-8 du Code de la route). Le total de vos points ne peut pas dépasser 12 (ou 6 en permis probatoire).",
-  },
-  {
-    question: "Combien coûte un stage de récupération de points ?",
-    answer:
-      "Le prix varie entre 200 € et 300 € selon le centre et la région. Sur BYS Formation Permis, vous pouvez comparer les prix de tous les centres agréés près de chez vous pour trouver le meilleur tarif. Attention : les stages ne sont pas remboursés par la Sécurité sociale ni éligibles CPF.",
-  },
-  {
-    question: "Quels documents dois-je apporter le jour du stage ?",
-    answer:
-      "Vous devez impérativement présenter votre permis de conduire ORIGINAL (pas de copie), une pièce d'identité en cours de validité (carte d'identité ou passeport), et votre convocation reçue par email (imprimée ou sur smartphone).",
-  },
-  {
-    question: "Puis-je faire un stage avec un permis suspendu ?",
-    answer:
-      "Oui, la suspension administrative ou judiciaire de votre permis ne vous empêche pas de suivre un stage de récupération de points. En revanche, si votre permis est invalidé (lettre 48SI), vous ne pouvez plus faire de stage.",
-  },
-  {
-    question: "À quelle fréquence puis-je faire un stage ?",
-    answer:
-      "Vous pouvez effectuer un stage volontaire 1 fois par an maximum (délai de 1 an entre la date du dernier stage et le nouveau stage, art. L223-6 du Code de la route). Ce délai s'applique aussi au stage 48N.",
-  },
-  {
-    question: "Comment vérifier mon solde de points ?",
-    answer:
-      "Rendez-vous sur le site officiel mespoints.permisdeconduire.gouv.fr et connectez-vous avec France Connect. Vous obtiendrez un relevé intégral d'information qui indique votre solde exact et l'historique de vos infractions.",
-  },
-];
-
 const keyStats = [
   { value: "4", label: "points récupérés", icon: faStar },
   { value: "2", label: "jours de stage", icon: faCalendarCheck },
@@ -406,8 +366,8 @@ export default async function Home() {
   return (
     <>
       <JsonLd
-        id="ld-home-service"
-        data={serviceJsonLd({ averagePrice: { min: 200, max: 280 } })}
+        id="ld-home"
+        data={[serviceJsonLd({ averagePrice: { min: 200, max: 280 } }), faqJsonLd(HOME_FAQ)]}
       />
       <Header />
       <main>
@@ -1040,7 +1000,7 @@ export default async function Home() {
               </p>
             </div>
 
-            <HomeFaq items={faqItems} />
+            <HomeFaq items={HOME_FAQ} />
 
             <div className="text-center mt-12">
               <p className="text-gray-500 mb-4">

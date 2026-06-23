@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ContactForm from "@/components/contact/ContactForm";
+import { pageMetadata } from "@/lib/seo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEnvelope,
@@ -18,21 +19,12 @@ import {
 
 export const dynamic = "force-static";
 
-export const metadata: Metadata = {
-  title: "Contact — BYS Formation",
+export const metadata: Metadata = pageMetadata({
+  title: "Contact — Support stages & partenariats",
   description:
-    "Contactez l'équipe BYS Formation pour toute question sur les stages, le partenariat ou le support technique. Réponse sous 24h ouvrées.",
-  alternates: { canonical: "/contact" },
-  openGraph: {
-    title: "Contact — BYS Formation",
-    description:
-      "Une question sur un stage, un partenariat ou besoin d'aide ? Notre équipe répond sous 24h.",
-    url: "/contact",
-    type: "website",
-    locale: "fr_FR",
-    siteName: "BYS Formation",
-  },
-};
+    "Contactez BYS Formation Permis pour vos questions sur les stages de récupération de points, le partenariat centre ou le support technique. Réponse sous 24h ouvrées.",
+  path: "/contact",
+});
 
 const faqLinks = [
   { question: "Comment réserver un stage ?", href: "/comment-ca-marche" },
