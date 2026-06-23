@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { requireAuth } from "@/lib/auth0";
+import { notifyReservationCancelled } from "@/lib/event-notifications";
 import { z } from "zod";
 
 // ─── GET /api/reservations/[id] — détail d'une réservation ───
@@ -211,47 +212,64 @@ export async function PATCH(
           },
         });
 
-        return updated;
+        return { updated, newStatus };
+      });
+
+      const centre = result.updated.session.formation.centre;
+
+      // Emails + notifications centre (hors transaction)
+      notifyReservationCancelled({
+        centreId: centre.id,
+        reservationNumber: result.updated.numero,
+        eleveName: `${result.updated.prenom} ${result.updated.nom}`,
+        eleveEmail: result.updated.email,
+        elevePrenom: result.updated.prenom,
+        formationTitle: result.updated.session.formation.titre,
+        sessionDate: result.updated.session.dateDebut.toLocaleDateString("fr-FR"),
+        centreName: centre.nom,
+        refunded: result.newStatus === "REMBOURSEE",
+      }).catch((err) => {
+        console.error("[PATCH /api/reservations/[id]] Notification annulation:", err);
       });
 
       // Flatten response (same shape as GET)
       const response = {
-        id: result.id,
-        numero: result.numero,
-        status: result.status,
-        montant: result.montant,
-        commissionMontant: result.commissionMontant,
-        stripePaymentId: result.stripePaymentId,
-        civilite: result.civilite,
-        nom: result.nom,
-        prenom: result.prenom,
-        email: result.email,
-        telephone: result.telephone,
-        adresse: result.adresse,
-        codePostal: result.codePostal,
-        ville: result.ville,
-        numeroPermis: result.numeroPermis,
-        createdAt: result.createdAt,
-        updatedAt: result.updatedAt,
+        id: result.updated.id,
+        numero: result.updated.numero,
+        status: result.updated.status,
+        montant: result.updated.montant,
+        commissionMontant: result.updated.commissionMontant,
+        stripePaymentId: result.updated.stripePaymentId,
+        civilite: result.updated.civilite,
+        nom: result.updated.nom,
+        prenom: result.updated.prenom,
+        email: result.updated.email,
+        telephone: result.updated.telephone,
+        adresse: result.updated.adresse,
+        codePostal: result.updated.codePostal,
+        ville: result.updated.ville,
+        numeroPermis: result.updated.numeroPermis,
+        createdAt: result.updated.createdAt,
+        updatedAt: result.updated.updatedAt,
         session: {
-          id: result.session.id,
-          dateDebut: result.session.dateDebut,
-          dateFin: result.session.dateFin,
-          placesTotal: result.session.placesTotal,
-          placesRestantes: result.session.placesRestantes,
-          status: result.session.status,
+          id: result.updated.session.id,
+          dateDebut: result.updated.session.dateDebut,
+          dateFin: result.updated.session.dateFin,
+          placesTotal: result.updated.session.placesTotal,
+          placesRestantes: result.updated.session.placesRestantes,
+          status: result.updated.session.status,
           formation: {
-            id: result.session.formation.id,
-            titre: result.session.formation.titre,
-            slug: result.session.formation.slug,
-            description: result.session.formation.description,
-            duree: result.session.formation.duree,
-            prix: result.session.formation.prix,
-            modalite: result.session.formation.modalite,
-            lieu: result.session.formation.lieu,
-            isQualiopi: result.session.formation.isQualiopi,
-            isCPF: result.session.formation.isCPF,
-            centre: result.session.formation.centre,
+            id: result.updated.session.formation.id,
+            titre: result.updated.session.formation.titre,
+            slug: result.updated.session.formation.slug,
+            description: result.updated.session.formation.description,
+            duree: result.updated.session.formation.duree,
+            prix: result.updated.session.formation.prix,
+            modalite: result.updated.session.formation.modalite,
+            lieu: result.updated.session.formation.lieu,
+            isQualiopi: result.updated.session.formation.isQualiopi,
+            isCPF: result.updated.session.formation.isCPF,
+            centre,
           },
         },
       };

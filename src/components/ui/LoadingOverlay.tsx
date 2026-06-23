@@ -117,7 +117,7 @@ export function KpiGridSkeleton({ cols = 4 }: { cols?: number }) {
       {Array.from({ length: cols }).map((_, i) => (
         <div
           key={i}
-          className="h-24 rounded-xl bg-white/5 border border-white/5"
+          className="h-28 rounded-xl bg-slate-100 border border-slate-200"
         />
       ))}
     </div>

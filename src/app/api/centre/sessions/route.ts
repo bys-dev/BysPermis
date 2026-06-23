@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreStaff, requireCentreManagement, mapAuthError } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
+import { notifySessionCancelledByCentre } from "@/lib/event-notifications";
 import { z } from "zod";
 
 // GET /api/centre/sessions — all sessions for this centre
@@ -240,6 +241,13 @@ export async function DELETE(req: NextRequest) {
     // Verify session belongs to this centre
     const session = await prisma.session.findFirst({
       where: { id, formation: { centreId } },
+      include: {
+        formation: { select: { titre: true, centre: { select: { id: true, nom: true } } } },
+        reservations: {
+          where: { status: { in: ["CONFIRMEE", "EN_ATTENTE"] } },
+          select: { id: true, userId: true, email: true, prenom: true, nom: true, numero: true },
+        },
+      },
     });
     if (!session) {
       return NextResponse.json({ error: "Session introuvable" }, { status: 404 });
@@ -253,6 +261,17 @@ export async function DELETE(req: NextRequest) {
       where: { id },
       data: { status: "ANNULEE" },
     });
+
+    if (session.reservations.length > 0) {
+      const sessionDate = session.dateDebut.toLocaleDateString("fr-FR");
+      notifySessionCancelledByCentre({
+        centreId: session.formation.centre.id,
+        centreName: session.formation.centre.nom,
+        formationTitle: session.formation.titre,
+        sessionDate,
+        reservations: session.reservations,
+      }).catch((err) => console.error("[DELETE /api/centre/sessions] notify:", err));
+    }
 
     return NextResponse.json({ id: updated.id, status: updated.status });
   } catch (err) {

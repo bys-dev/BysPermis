@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAuth, mapAuthError, PLATFORM_ROLES } from "@/lib/auth0";
+import { notifyNewMessage } from "@/lib/event-notifications";
 
 /**
  * Verify that a relationship exists between two users that justifies messaging.
@@ -200,9 +201,22 @@ export async function POST(req: NextRequest) {
       },
       include: {
         sender: { select: { id: true, prenom: true, nom: true } },
-        receiver: { select: { id: true, prenom: true, nom: true } },
+        receiver: { select: { id: true, prenom: true, nom: true, email: true, role: true } },
       },
     });
+
+    const senderName = [message.sender.prenom, message.sender.nom].filter(Boolean).join(" ") || "Un utilisateur";
+    const centreRoles = ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE", "CENTRE_FORMATEUR"];
+    const messagesUrl = centreRoles.includes(message.receiver.role)
+      ? `${process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr"}/espace-centre/messages`
+      : `${process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr"}/espace-eleve/messages`;
+    notifyNewMessage({
+      receiverId: message.receiver.id,
+      receiverEmail: message.receiver.email,
+      senderName,
+      preview: data.contenu,
+      ctaUrl: messagesUrl,
+    }).catch((err) => console.error("[POST /api/messages] notify:", err));
 
     return NextResponse.json(message, { status: 201 });
   } catch (error) {

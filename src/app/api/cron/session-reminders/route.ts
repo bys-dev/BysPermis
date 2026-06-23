@@ -4,6 +4,7 @@ import { renderEmailTemplate } from "@/lib/email-templates";
 import { resend } from "@/lib/email";
 import { formatDate } from "@/lib/utils";
 import { renderConvocationPdf } from "@/lib/pdf-helpers";
+import { notifyEleveSessionReminder } from "@/lib/event-notifications";
 
 const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
 const CRON_SECRET = process.env.CRON_SECRET;
@@ -104,6 +105,15 @@ export async function GET(req: NextRequest) {
             where: { id: reservation.id },
             data: { rappelEnvoye: true },
           });
+
+          await notifyEleveSessionReminder({
+            userId: reservation.userId,
+            formationTitle: formation.titre,
+            sessionDate: formatDate(session.dateDebut),
+            centreName: centre.nom,
+          }).catch((err) =>
+            console.error(`[CRON] Notif in-app rappel ${reservation.numero}:`, err),
+          );
 
           totalSent++;
         } catch (emailErr) {

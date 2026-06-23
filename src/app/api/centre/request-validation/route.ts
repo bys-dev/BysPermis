@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreOwner } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
+import { notifyAdminsCentreValidationRequest } from "@/lib/event-notifications";
 
 // POST /api/centre/request-validation — Centre owner requests admin validation
 
@@ -35,24 +36,14 @@ export async function POST() {
       );
     }
 
-    // Find all admin users to notify them
-    const admins = await prisma.user.findMany({
-      where: { role: { in: ["ADMIN", "OWNER"] } },
-      select: { id: true },
-    });
+    // Notifier les admins plateforme (email + cloche)
+    notifyAdminsCentreValidationRequest({
+      centreName: centre.nom,
+      ville: centre.ville || "ville non renseignee",
+      completionPct: centre.profilCompletionPct,
+    }).catch((err) => console.error("[request-validation] notify admins:", err));
 
-    // Create notifications for all admins
-    if (admins.length > 0) {
-      await prisma.notification.createMany({
-        data: admins.map((admin) => ({
-          titre: "Demande de validation centre",
-          contenu: `Le centre "${centre.nom}" (${centre.ville || "ville non renseignee"}) demande a etre active sur la marketplace (profil ${centre.profilCompletionPct}% complete).`,
-          userId: admin.id,
-        })),
-      });
-    }
-
-    // Create notification for centre owner as confirmation
+    // Confirmation owner
     await prisma.notification.create({
       data: {
         titre: "Demande de validation envoyee",

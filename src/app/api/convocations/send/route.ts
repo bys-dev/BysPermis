@@ -4,6 +4,7 @@ import { requireCentreManagement, PLATFORM_ADMIN_ROLES } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { resend } from "@/lib/email";
+import { notifyCentreConvocationSent } from "@/lib/event-notifications";
 import { formatDate } from "@/lib/utils";
 import { z } from "zod";
 
@@ -87,6 +88,29 @@ export async function POST(req: NextRequest) {
       subject,
       html,
     });
+
+    // Notifier owner + équipe centre (email + cloche)
+    await notifyCentreConvocationSent({
+      centreId: centre.id,
+      reservationNumber: reservation.numero,
+      eleveName: `${reservation.prenom} ${reservation.nom}`,
+      eleveEmail: reservation.email,
+      formationTitle: formation.titre,
+      sessionDate: formatDate(session.dateDebut),
+    }).catch((err) => {
+      console.error("[POST /api/convocations/send] Centre notification error:", err);
+    });
+
+    // Notification in-app élève
+    if (reservation.userId) {
+      await prisma.notification.create({
+        data: {
+          userId: reservation.userId,
+          titre: "Convocation envoyée",
+          contenu: `Votre convocation pour « ${formation.titre} » (${formatDate(session.dateDebut)}) vous a été envoyée par email.`,
+        },
+      }).catch((err) => console.error("[POST /api/convocations/send] Notif élève:", err));
+    }
 
     return NextResponse.json({ success: true, message: "Convocation envoyée" });
   } catch (err) {

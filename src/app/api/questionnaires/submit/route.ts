@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { requireAuth } from "@/lib/auth0"
 import { averageRating, getQuestionsForContext, roundedStarNote } from "@/lib/questionnaires"
+import { notifyCentreQuestionnaireSubmitted } from "@/lib/event-notifications"
 import { z } from "zod"
 import type { Prisma } from "@/generated/prisma/client"
 
@@ -107,6 +108,15 @@ export async function POST(req: NextRequest) {
 
       return created
     })
+
+    if (body.type === "CENTRE") {
+      notifyCentreQuestionnaireSubmitted({
+        centreId,
+        eleveName: [user.prenom, user.nom].filter(Boolean).join(" ") || user.email,
+        formationTitle: reservation.session.formation.titre,
+        noteGlobale,
+      }).catch((err) => console.error("[questionnaires/submit] notify centre:", err))
+    }
 
     return NextResponse.json(response, { status: 201 })
   } catch (err) {

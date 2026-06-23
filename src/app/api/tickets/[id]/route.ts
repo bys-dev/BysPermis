@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAuth, requireSupport, PLATFORM_ROLES } from "@/lib/auth0";
+import { notifyEleveTicketReply, notifyEleveTicketStatus } from "@/lib/event-notifications";
 
 const STAFF_ROLES: readonly string[] = PLATFORM_ROLES;
 
@@ -18,7 +19,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const isStaff = STAFF_ROLES.includes(user.role);
 
     // Vérifier que le ticket appartient à l'utilisateur (ou staff plateforme)
-    const ticket = await prisma.ticket.findUnique({ where: { id } });
+    const ticket = await prisma.ticket.findUnique({
+      where: { id },
+      include: { user: { select: { id: true, email: true, prenom: true, nom: true } } },
+    });
     if (!ticket) return NextResponse.json({ error: "Ticket introuvable" }, { status: 404 });
     if (ticket.userId !== user.id && !isStaff) {
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
@@ -39,6 +43,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         where: { id },
         data: { status: "EN_COURS" as const },
       });
+    }
+
+    if (isStaff && ticket.userId !== user.id) {
+      const staffName = [user.prenom, user.nom].filter(Boolean).join(" ") || "Support BYS";
+      notifyEleveTicketReply({
+        userId: ticket.user.id,
+        email: ticket.user.email,
+        sujet: ticket.sujet,
+        staffName,
+      }).catch((err) => console.error("[POST /api/tickets/:id] notify:", err));
     }
 
     return NextResponse.json(message, { status: 201 });
@@ -65,10 +79,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
     const { status } = parsed.data;
+    const previous = await prisma.ticket.findUnique({
+      where: { id },
+      include: { user: { select: { id: true, email: true } } },
+    });
+    if (!previous) return NextResponse.json({ error: "Ticket introuvable" }, { status: 404 });
+
     const ticket = await prisma.ticket.update({
       where: { id },
       data: { status },
     });
+
+    if (previous.status !== status && ["RESOLU", "FERME", "EN_COURS"].includes(status)) {
+      notifyEleveTicketStatus({
+        userId: previous.user.id,
+        email: previous.user.email,
+        sujet: previous.sujet,
+        status,
+      }).catch((err) => console.error("[PATCH /api/tickets/:id] notify:", err));
+    }
+
     return NextResponse.json(ticket);
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });

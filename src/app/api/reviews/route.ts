@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
+import { notifyCentreQuestionnaireSubmitted } from "@/lib/event-notifications";
 
 // GET /api/reviews — avis de l'utilisateur connecté
 export async function GET() {
@@ -81,9 +82,18 @@ export async function POST(req: NextRequest) {
         commentaire: data.commentaire,
       },
       include: {
-        formation: { select: { id: true, titre: true, slug: true } },
+        formation: { select: { id: true, titre: true, slug: true, centreId: true } },
       },
     });
+
+    if (review.formation.centreId) {
+      notifyCentreQuestionnaireSubmitted({
+        centreId: review.formation.centreId,
+        eleveName: [user.prenom, user.nom].filter(Boolean).join(" ") || user.email,
+        formationTitle: review.formation.titre,
+        noteGlobale: data.note,
+      }).catch((err) => console.error("[POST /api/reviews] notify centre:", err));
+    }
 
     return NextResponse.json(review, { status: 201 });
   } catch (err) {

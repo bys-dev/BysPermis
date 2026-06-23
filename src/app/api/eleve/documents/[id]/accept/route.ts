@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/auth0";
 import { uploadFile } from "@/lib/storage";
 import { renderBonAccordPdf } from "@/lib/pdf-helpers";
 import { sendDocumentEmail } from "@/lib/email";
+import { notifyCentreBonAccordAccepted } from "@/lib/event-notifications";
 import { z } from "zod";
 
 const schema = z.object({ nom: z.string().min(2, "Nom requis") });
@@ -27,7 +28,17 @@ export async function POST(
 
     const document = await prisma.document.findUnique({
       where: { id },
-      include: { reservation: { select: { userId: true, email: true, prenom: true } } },
+      include: {
+        reservation: {
+          select: {
+            userId: true,
+            email: true,
+            prenom: true,
+            nom: true,
+            numero: true,
+          },
+        },
+      },
     });
     if (!document) return NextResponse.json({ error: "Document introuvable" }, { status: 404 });
     if (document.reservation.userId !== user.id) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
@@ -69,18 +80,13 @@ export async function POST(
       console.error("[accept] PDF/email error:", pdfErr);
     }
 
-    // Notifier le centre
     if (document.centreId) {
-      const centre = await prisma.centre.findUnique({ where: { id: document.centreId }, select: { userId: true } });
-      if (centre) {
-        await prisma.notification.create({
-          data: {
-            userId: centre.userId,
-            titre: "Bon d'accord accepté",
-            contenu: `${nom} a accepté le document « ${document.nom} ».`,
-          },
-        });
-      }
+      await notifyCentreBonAccordAccepted({
+        centreId: document.centreId,
+        eleveName: nom,
+        documentName: document.nom,
+        reservationNumber: document.reservation.numero,
+      }).catch((err) => console.error("[accept] notify centre:", err));
     }
 
     const fresh = await prisma.document.findUnique({ where: { id: updated.id } });

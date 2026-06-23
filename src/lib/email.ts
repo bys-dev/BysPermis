@@ -76,6 +76,136 @@ export async function sendConvocationEmail(params: {
 }
 
 /**
+ * Email générique pour les événements élève (annulation, session, messages…).
+ */
+export async function sendEleveEventEmail(params: {
+  to: string;
+  subject: string;
+  title: string;
+  bodyHtml: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+}): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY absent — email élève non envoyé à", params.to);
+    return;
+  }
+
+  const cta = params.ctaUrl
+    ? `<p style="text-align:center;margin:24px 0">
+         <a href="${params.ctaUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">${params.ctaLabel ?? "Accéder à mon espace"}</a>
+       </p>`
+    : "";
+
+  await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: params.subject,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">${params.title}</h1>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    ${params.bodyHtml}
+    ${cta}
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
+      Cordialement,<br/>L'équipe BYS Formation Permis
+    </p>
+  </div>
+</div>`,
+  });
+}
+
+/**
+ * Email générique pour les événements centre (réservation, convocation, annulation…).
+ */
+export async function sendCentreEventEmail(params: {
+  to: string;
+  subject: string;
+  title: string;
+  bodyHtml: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+}): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY absent — email centre non envoyé à", params.to);
+    return;
+  }
+
+  const cta = params.ctaUrl
+    ? `<p style="text-align:center;margin:24px 0">
+         <a href="${params.ctaUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">${params.ctaLabel ?? "Accéder à mon espace"}</a>
+       </p>`
+    : "";
+
+  await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: params.subject,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">${params.title}</h1>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    ${params.bodyHtml}
+    ${cta}
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
+      Cordialement,<br/>L'équipe BYS Formation Permis
+    </p>
+  </div>
+</div>`,
+  });
+}
+
+/**
+ * Email de confirmation d'annulation pour l'élève.
+ */
+export async function sendEleveCancellationEmail(params: {
+  to: string;
+  prenom?: string;
+  reservationNumber: string;
+  formationTitle: string;
+  sessionDate: string;
+  centreName: string;
+  refunded: boolean;
+}): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY absent — email annulation non envoyé à", params.to);
+    return;
+  }
+
+  const refundLine = params.refunded
+    ? "<p>Votre remboursement a été initié et apparaîtra sur votre compte sous 5 à 10 jours ouvrés.</p>"
+    : "<p>Aucun remboursement n'est prévu pour cette annulation selon les conditions applicables.</p>";
+
+  await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `Annulation de votre réservation ${params.reservationNumber}`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">Réservation annulée</h1>
+    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Réf. ${params.reservationNumber}</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
+    <p>Votre réservation <strong>${params.reservationNumber}</strong> pour le stage <strong>${params.formationTitle}</strong> chez <strong>${params.centreName}</strong> (${params.sessionDate}) a bien été annulée.</p>
+    ${refundLine}
+    <p style="text-align:center;margin:24px 0">
+      <a href="${APP_URL}/espace-eleve/reservations" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Voir mes réservations</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
+      Cordialement,<br/>L'équipe BYS Formation Permis
+    </p>
+  </div>
+</div>`,
+  });
+}
+
+/**
  * Send centre notification for new reservation.
  */
 export async function sendCentreNotificationEmail(params: {

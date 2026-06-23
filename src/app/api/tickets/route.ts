@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
+import { notifySupportNewTicket } from "@/lib/event-notifications";
 
 // GET /api/tickets — mes tickets
 export async function GET() {
@@ -58,6 +59,12 @@ export async function POST(req: NextRequest) {
       },
       include: { messages: true },
     });
+
+    notifySupportNewTicket({
+      sujet: data.sujet,
+      authorName: [user.prenom, user.nom].filter(Boolean).join(" ") || user.email,
+      authorEmail: user.email,
+    }).catch((err) => console.error("[POST /api/tickets] notify support:", err));
 
     return NextResponse.json(ticket, { status: 201 });
   } catch (err) {

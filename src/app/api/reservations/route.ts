@@ -4,7 +4,8 @@ import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
 import { calculateCommission, getCommissionRate } from "@/lib/utils";
-import { sendConfirmationEmail, sendCentreNotificationEmail, sendDocumentEmail, resend } from "@/lib/email";
+import { sendConfirmationEmail, sendDocumentEmail, resend } from "@/lib/email";
+import { notifyCentreReservationConfirmed, notifyCentreConvocationSent, notifyEleveDocumentsAvailable } from "@/lib/event-notifications";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { formatDate } from "@/lib/utils";
 import { renderConvocationPdf, renderInvoicePdfFromReservation } from "@/lib/pdf-helpers";
@@ -324,18 +325,17 @@ export async function POST(req: NextRequest) {
         }),
       ];
 
-      // Centre notification
-      if (centre.email) {
-        emailPromises.push(
-          sendCentreNotificationEmail({
-            to: centre.email,
-            eleveName: `${data.prenom} ${data.nom}`,
-            formationTitle: result.reservation.session.formation.titre,
-            sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
-            amount: result.reservation.montant * (1 - getCommissionRate(centre)),
-          })
-        );
-      }
+      // Centre : owner + équipe (email + notifications in-app)
+      emailPromises.push(
+        notifyCentreReservationConfirmed({
+          centreId: centre.id,
+          reservationNumber: result.reservation.numero,
+          eleveName: `${data.prenom} ${data.nom}`,
+          formationTitle: result.reservation.session.formation.titre,
+          sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
+          amount: result.reservation.montant * (1 - getCommissionRate(centre)),
+        })
+      );
 
       // Email convocation via template, avec PDF joint
       const lienConvocation = `${APP_URL}/api/convocation/${result.reservation.id}`;
@@ -372,6 +372,18 @@ export async function POST(req: NextRequest) {
       );
 
       await Promise.all(emailPromises);
+
+      // Centre informé que la convocation a été envoyée à l'élève
+      await notifyCentreConvocationSent({
+        centreId: centre.id,
+        reservationNumber: result.reservation.numero,
+        eleveName: `${data.prenom} ${data.nom}`,
+        eleveEmail: data.email,
+        formationTitle: result.reservation.session.formation.titre,
+        sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
+      }).catch((err) => {
+        console.error("[POST /api/reservations] Centre convocation notification error:", err);
+      });
     } catch (emailErr) {
       console.error("[POST /api/reservations] Email error:", emailErr);
       // Ne pas faire échouer la réservation pour un email
@@ -415,6 +427,11 @@ export async function POST(req: NextRequest) {
             : `Votre centre a mis à disposition des documents pour votre stage. Retrouvez-les dans votre espace élève.`,
           ctaUrl: `${APP_URL}/espace-eleve/documents`,
           ctaLabel: "Voir mes documents",
+        });
+        await notifyEleveDocumentsAvailable({
+          userId: user.id,
+          centreName: centre.nom,
+          needsAck,
         });
       }
     } catch (docErr) {

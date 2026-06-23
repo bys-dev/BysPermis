@@ -3,15 +3,21 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCalendarDays, faEuroSign, faChartPie, faGraduationCap,
-  faArrowTrendUp, faCircleCheck, faTriangleExclamation,
-  faFileExport, faChevronDown,
-  faImage, faArrowRight,
+  faCalendarDays,
+  faEuroSign,
+  faChartPie,
+  faGraduationCap,
+  faCircleCheck,
+  faTriangleExclamation,
+  faFileExport,
+  faChevronDown,
+  faImage,
+  faArrowRight,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { formatDate, formatPrice } from "@/lib/utils";
-import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
+import LoadingOverlay, { KpiGridSkeleton } from "@/components/ui/LoadingOverlay";
 
 interface Stats {
   reservationsCeMois: number;
@@ -42,19 +48,19 @@ interface Stats {
   };
 }
 
-const statusBadge: Record<string, { label: string; color: string; bg: string }> = {
-  CONFIRMEE:  { label: "Confirmée",  color: "text-green-400",  bg: "bg-green-400/10"  },
-  EN_ATTENTE: { label: "En attente", color: "text-yellow-400", bg: "bg-yellow-400/10" },
-  TERMINEE:   { label: "Terminée",   color: "text-gray-400",   bg: "bg-gray-400/10"   },
-  ANNULEE:    { label: "Annulée",    color: "text-red-400",    bg: "bg-red-400/10"    },
-  REMBOURSEE: { label: "Remboursée", color: "text-orange-400", bg: "bg-orange-400/10" },
+const statusBadge: Record<string, { label: string; className: string }> = {
+  CONFIRMEE: { label: "Confirmée", className: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+  EN_ATTENTE: { label: "En attente", className: "bg-amber-100 text-amber-800 border-amber-200" },
+  TERMINEE: { label: "Terminée", className: "bg-slate-100 text-slate-700 border-slate-200" },
+  ANNULEE: { label: "Annulée", className: "bg-red-100 text-red-800 border-red-200" },
+  REMBOURSEE: { label: "Remboursée", className: "bg-orange-100 text-orange-800 border-orange-200" },
 };
 
 const exportOptions = [
-  { label: "Exporter les reservations (CSV)", type: "reservations" },
-  { label: "Exporter les sessions (CSV)", type: "sessions" },
-  { label: "Exporter les formations (CSV)", type: "formations" },
-  { label: "Exporter les revenus (CSV)", type: "revenus" },
+  { label: "Réservations (CSV)", type: "reservations" },
+  { label: "Sessions (CSV)", type: "sessions" },
+  { label: "Formations (CSV)", type: "formations" },
+  { label: "Revenus (CSV)", type: "revenus" },
 ];
 
 export default function DashboardCentrePage() {
@@ -77,25 +83,23 @@ export default function DashboardCentrePage() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
 
-    // Logo manquant ? On affiche un bandeau d'incitation.
     fetch("/api/centre/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data && typeof data === "object") {
-          setHasLogo(Boolean(data.logo));
-        }
+        if (data && typeof data === "object") setHasLogo(Boolean(data.logo));
       })
       .catch(() => null);
   }, []);
 
   if (!loading && (error || !stats)) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
-        <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
-        <p className="text-sm text-red-400">{error ?? "Erreur inconnue"}</p>
+      <div className="rounded-2xl bg-white border border-slate-200 p-10 text-center">
+        <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-500 mb-3" />
+        <p className="text-slate-800 font-medium">{error ?? "Erreur inconnue"}</p>
         <button
+          type="button"
           onClick={() => { setLoading(true); setError(null); location.reload(); }}
-          className="text-xs text-blue-400 hover:text-blue-300 underline"
+          className="mt-4 text-sm font-semibold text-blue-600 hover:text-blue-700 underline"
         >
           Réessayer
         </button>
@@ -105,232 +109,260 @@ export default function DashboardCentrePage() {
 
   const kpis = stats
     ? [
-    {
-      label: "Réservations ce mois",
-      value: String(stats.reservationsCeMois),
-      delta: "Confirmées + terminées",
-      icon: faCalendarDays,
-      color: "text-blue-400",
-      bg: "bg-blue-400/10",
-    },
-    {
-      label: "Revenus nets",
-      value: formatPrice(stats.revenusNets),
-      delta: "Après commission BYS",
-      icon: faEuroSign,
-      color: "text-green-400",
-      bg: "bg-green-400/10",
-    },
-    {
-      label: "Sessions actives",
-      value: String(stats.sessionsActives),
-      delta: "À venir",
-      icon: faCalendarDays,
-      color: "text-purple-400",
-      bg: "bg-purple-400/10",
-    },
-    {
-      label: "Taux de remplissage",
-      value: `${stats.tauxRemplissage}%`,
-      delta: `${stats.formationsTotal} formation${stats.formationsTotal > 1 ? "s" : ""} au total`,
-      icon: faChartPie,
-      color: "text-yellow-400",
-      bg: "bg-yellow-400/10",
-    },
-  ]
+        {
+          label: "Réservations ce mois",
+          hint: "Confirmées et terminées",
+          value: String(stats.reservationsCeMois),
+          icon: faCalendarDays,
+          accent: "text-blue-600 bg-blue-50",
+        },
+        {
+          label: "Revenus nets",
+          hint: "Après commission BYS",
+          value: formatPrice(stats.revenusNets),
+          icon: faEuroSign,
+          accent: "text-emerald-600 bg-emerald-50",
+        },
+        {
+          label: "Sessions actives",
+          hint: "À venir",
+          value: String(stats.sessionsActives),
+          icon: faCalendarDays,
+          accent: "text-violet-600 bg-violet-50",
+        },
+        {
+          label: "Taux de remplissage",
+          hint: `${stats.formationsTotal} formation${stats.formationsTotal > 1 ? "s" : ""}`,
+          value: `${stats.tauxRemplissage}%`,
+          icon: faChartPie,
+          accent: "text-amber-600 bg-amber-50",
+        },
+      ]
     : [];
 
   return (
-    <div className="relative min-h-[60vh]">
-      <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
-      {/* Bandeau logo manquant */}
-      {stats && hasLogo === false && (
-        <div className="mb-6 rounded-xl p-4 flex items-center gap-4 border border-yellow-500/30 bg-yellow-500/5">
-          <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0">
-            <FontAwesomeIcon icon={faImage} className="text-yellow-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-yellow-300">
-              Ajoutez le logo de votre centre
-            </p>
-            <p className="text-xs text-yellow-200/70 mt-0.5">
-              Votre logo s&apos;affichera sur la page d&apos;accueil, dans les résultats de recherche
-              et sur vos convocations / factures PDF.
-            </p>
-          </div>
-          <Link
-            href="/espace-centre/profil-centre?tab=design"
-            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 text-xs font-semibold transition-colors"
-          >
-            Téléverser
-            <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
-          </Link>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-display font-bold text-xl sm:text-2xl text-white mb-1">Tableau de bord</h1>
-          <p className="text-gray-400 text-sm">Bienvenue sur votre espace partenaire BYS Formation</p>
-        </div>
-
-        {/* Export dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setExportOpen(!exportOpen)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-300 transition-all hover:bg-white/[0.07]"
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
-          >
-            <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5 text-blue-400" />
-            Exporter
-            <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-gray-400" />
-          </button>
-          {exportOpen && (
-            <div
-              className="absolute right-0 top-full mt-2 w-64 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
-              style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
-            >
-              {exportOptions.map((opt) => (
-                <button
-                  key={opt.type}
-                  onClick={() => {
-                    window.open(`/api/centre/exports?type=${opt.type}`, "_blank");
-                    setExportOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/[0.06] transition-colors"
-                >
-                  {opt.label}
-                </button>
-              ))}
+    <div className="relative max-w-6xl mx-auto">
+      <div className={loading ? "opacity-50 pointer-events-none select-none" : ""}>
+        {/* Bandeau logo */}
+        {stats && hasLogo === false && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+              <FontAwesomeIcon icon={faImage} className="text-amber-700" />
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* KPIs */}
-      {stats && (
-        <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-        {kpis.map((k) => (
-          <div key={k.label} className="rounded-xl p-3 sm:p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center ${k.bg}`}>
-                <FontAwesomeIcon icon={k.icon} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${k.color}`} />
-              </div>
-              <FontAwesomeIcon icon={faArrowTrendUp} className="text-gray-400 w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            </div>
-            <p className="font-bold text-lg sm:text-2xl text-white">{k.value}</p>
-            <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{k.label}</p>
-            <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 hidden sm:block">{k.delta}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Avis & questionnaires */}
-      {stats.questionnaires && (
-        <div className="mb-8 rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-            <h2 className="font-semibold text-white text-sm flex items-center gap-2">
-              <FontAwesomeIcon icon={faStar} className="text-yellow-400" />
-              Avis stagiaires
-            </h2>
-            <Link href="/espace-centre/avis" className="text-xs text-blue-400 hover:text-blue-300">
-              Gérer →
-            </Link>
-          </div>
-          <div className="p-4 sm:p-6 grid sm:grid-cols-3 gap-4">
-            <div>
-              <p className="text-xs text-gray-400">Note moyenne</p>
-              <p className="text-xl font-bold text-white mt-1">
-                {stats.questionnaires.averageRating > 0 ? `${stats.questionnaires.averageRating}/5` : "—"}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-amber-950">Ajoutez le logo de votre centre</p>
+              <p className="text-sm text-amber-900/80 mt-0.5">
+                Visible sur la recherche, les convocations et vos factures PDF.
               </p>
             </div>
-            <div>
-              <p className="text-xs text-gray-400">Réponses reçues</p>
-              <p className="text-xl font-bold text-white mt-1">{stats.questionnaires.totalResponses}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">En attente de réponse</p>
-              <p className="text-xl font-bold text-yellow-400 mt-1">{stats.questionnaires.pendingCount}</p>
-            </div>
+            <Link
+              href="/espace-centre/profil-centre?tab=design"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold shrink-0"
+            >
+              Téléverser
+              <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
+            </Link>
           </div>
-          {stats.questionnaires.recent.length > 0 && (
-            <div className="px-4 sm:px-6 pb-4 space-y-2">
-              {stats.questionnaires.recent.slice(0, 3).map((r) => (
-                <div key={r.id} className="flex justify-between gap-3 text-sm py-2 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-                  <div className="min-w-0">
-                    <span className="text-white font-medium">{r.auteur}</span>
-                    <span className="text-gray-400 text-xs block truncate">{r.formation}</span>
+        )}
+
+        {/* En-tête */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              Tableau de bord
+            </h1>
+            <p className="text-slate-600 text-base mt-1">
+              Vue d&apos;ensemble de votre activité
+            </p>
+          </div>
+
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setExportOpen(!exportOpen)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm"
+            >
+              <FontAwesomeIcon icon={faFileExport} className="text-blue-600" />
+              Exporter
+              <FontAwesomeIcon icon={faChevronDown} className="text-slate-400 text-xs" />
+            </button>
+            {exportOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white border border-slate-200 shadow-lg z-50 py-1 overflow-hidden">
+                {exportOptions.map((opt) => (
+                  <button
+                    key={opt.type}
+                    type="button"
+                    onClick={() => {
+                      window.open(`/api/centre/exports?type=${opt.type}`, "_blank");
+                      setExportOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {stats && (
+          <>
+            {/* KPIs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {kpis.map((k) => (
+                <div
+                  key={k.label}
+                  className="rounded-xl bg-white border border-slate-200 p-5 shadow-sm"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${k.accent}`}>
+                      <FontAwesomeIcon icon={k.icon} className="w-4 h-4" />
+                    </div>
+                    <p className="text-sm font-medium text-slate-600 leading-snug">{k.label}</p>
                   </div>
-                  <span className="text-yellow-400 font-semibold shrink-0">{r.noteGlobale.toFixed(1)}/5</span>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 tabular-nums">{k.value}</p>
+                  <p className="text-xs text-slate-500 mt-1">{k.hint}</p>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Réservations récentes */}
-      <div className="rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <h2 className="font-semibold text-white text-sm">Reservations recentes</h2>
-          <Link href="/espace-centre/sessions" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-            Voir tout
-          </Link>
-        </div>
-
-        {stats.reservationsRecentes.length === 0 ? (
-          <div className="text-center py-10 text-gray-400">
-            <p className="text-sm">Aucune réservation pour le moment.</p>
-          </div>
-        ) : (
-          <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-            {stats.reservationsRecentes.map((r) => {
-              const badge = statusBadge[r.status] ?? statusBadge["EN_ATTENTE"];
-              const initials = r.eleve.split(" ").map((n) => n[0]).join("");
-              return (
-                <div key={r.id} className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-gray-400">{initials}</span>
+            {/* Avis */}
+            {stats.questionnaires && (
+              <div className="mb-6 rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <h2 className="font-semibold text-slate-900 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faStar} className="text-amber-500" />
+                    Avis stagiaires
+                  </h2>
+                  <Link href="/espace-centre/avis" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                    Gérer →
+                  </Link>
+                </div>
+                <div className="p-5 grid sm:grid-cols-3 gap-6">
+                  <div>
+                    <p className="text-sm text-slate-500">Note moyenne</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">
+                      {stats.questionnaires.averageRating > 0
+                        ? `${stats.questionnaires.averageRating}/5`
+                        : "—"}
+                    </p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{r.eleve}</p>
-                    <p className="text-xs text-gray-400 truncate">{r.formation}</p>
+                  <div>
+                    <p className="text-sm text-slate-500">Réponses reçues</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">
+                      {stats.questionnaires.totalResponses}
+                    </p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${badge.color} ${badge.bg}`}>{badge.label}</span>
-                    <p className="text-xs text-gray-400 mt-1">{formatDate(new Date(r.date))}</p>
+                  <div>
+                    <p className="text-sm text-slate-500">En attente de réponse</p>
+                    <p className="text-2xl font-bold text-amber-600 mt-1">
+                      {stats.questionnaires.pendingCount}
+                    </p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+                {stats.questionnaires.recent.length > 0 && (
+                  <div className="px-5 pb-5 border-t border-slate-100 pt-3 space-y-2">
+                    {stats.questionnaires.recent.slice(0, 3).map((r) => (
+                      <div
+                        key={r.id}
+                        className="flex justify-between gap-3 py-2 border-b border-slate-50 last:border-0"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-900">{r.auteur}</p>
+                          <p className="text-sm text-slate-500 truncate">{r.formation}</p>
+                        </div>
+                        <span className="text-sm font-bold text-amber-600 shrink-0">
+                          {r.noteGlobale.toFixed(1)}/5
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Réservations récentes */}
+            <div className="rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden mb-6">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="font-semibold text-slate-900">Réservations récentes</h2>
+                <Link
+                  href="/espace-centre/sessions"
+                  className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+                >
+                  Voir tout
+                </Link>
+              </div>
+
+              {stats.reservationsRecentes.length === 0 ? (
+                <p className="text-center py-12 text-slate-500 text-sm">
+                  Aucune réservation pour le moment.
+                </p>
+              ) : (
+                <ul className="divide-y divide-slate-100">
+                  {stats.reservationsRecentes.map((r) => {
+                    const badge = statusBadge[r.status] ?? statusBadge.EN_ATTENTE;
+                    const initials = r.eleve
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase();
+                    return (
+                      <li
+                        key={r.id}
+                        className="px-5 py-4 flex items-center gap-4 hover:bg-slate-50/80"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-bold text-slate-600">{initials}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900">{r.eleve}</p>
+                          <p className="text-sm text-slate-600 truncate">{r.formation}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full border ${badge.className}`}
+                          >
+                            {badge.label}
+                          </span>
+                          <p className="text-sm text-slate-500 mt-1.5">
+                            {formatDate(new Date(r.date))}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            {/* Actions rapides */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { label: "Ajouter une session", href: "/espace-centre/sessions", icon: faCalendarDays, color: "text-blue-600" },
+                { label: "Créer une formation", href: "/espace-centre/formations", icon: faGraduationCap, color: "text-violet-600" },
+                { label: "Avis & questionnaires", href: "/espace-centre/avis", icon: faStar, color: "text-amber-600" },
+                { label: "Voir les réservations", href: "/espace-centre/sessions", icon: faCircleCheck, color: "text-emerald-600" },
+              ].map((a) => (
+                <Link
+                  key={a.label}
+                  href={a.href}
+                  className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-200 hover:shadow-md transition-all"
+                >
+                  <FontAwesomeIcon icon={a.icon} className={`w-5 h-5 ${a.color}`} />
+                  <span className="text-sm font-semibold text-slate-800">{a.label}</span>
+                </Link>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
-      {/* Actions rapides */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { label: "Ajouter une session",   href: "/espace-centre/sessions",   icon: faCalendarDays,  color: "text-blue-400"   },
-          { label: "Créer une formation",   href: "/espace-centre/formations", icon: faGraduationCap, color: "text-purple-400" },
-          { label: "Avis & questionnaires", href: "/espace-centre/avis",       icon: faStar,          color: "text-yellow-400" },
-          { label: "Voir les réservations", href: "/espace-centre/sessions",   icon: faCircleCheck,   color: "text-green-400"  },
-        ].map((a) => (
-          <Link key={a.label} href={a.href} className="flex items-center gap-3 p-4 rounded-xl transition-all hover:bg-white/[0.07]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-            <FontAwesomeIcon icon={a.icon} className={`w-5 h-5 ${a.color}`} />
-            <span className="text-sm font-medium text-gray-300">{a.label}</span>
-          </Link>
-        ))}
-      </div>
-        </>
-      )}
-      </div>
       {loading && !stats && (
-        <>
+        <div className="rounded-xl bg-white border border-slate-200 p-4">
           <KpiGridSkeleton />
-          <div className="h-64 rounded-xl bg-white/5 border border-white/5 animate-pulse mt-8" />
-        </>
+        </div>
       )}
       <LoadingOverlay show={loading} label="Chargement du tableau de bord..." />
     </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth0";
 import { uploadFile, extForMime, DOCUMENT_MAX_BYTES } from "@/lib/storage";
+import { notifyCentreEleveDocumentUploaded } from "@/lib/event-notifications";
 
 const ELEVE_KINDS = ["PERMIS", "PIECE_IDENTITE", "LETTRE_48N", "AUTRE"] as const;
 type EleveKind = (typeof ELEVE_KINDS)[number];
@@ -95,14 +96,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notifier le centre
-    await prisma.notification.create({
-      data: {
-        userId: centre.userId,
-        titre: "Nouveau document élève",
-        contenu: `${reservation.prenom} ${reservation.nom} a transmis : ${KIND_LABEL[kind]} (réservation ${reservation.numero}).`,
-      },
-    });
+    // Notifier le centre (owner + équipe)
+    await notifyCentreEleveDocumentUploaded({
+      centreId: centre.id,
+      eleveName: `${reservation.prenom} ${reservation.nom}`,
+      reservationNumber: reservation.numero,
+      documentLabel: KIND_LABEL[kind],
+    }).catch((err) => console.error("[POST /api/eleve/documents] notify centre:", err));
 
     return NextResponse.json(document, { status: 201 });
   } catch (err) {

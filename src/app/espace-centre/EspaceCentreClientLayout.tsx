@@ -401,24 +401,20 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
 
         {showCompletionBanner && (
           <div
-            className="flex items-center gap-3 px-6 py-3 text-sm border-b"
-            style={{
-              background: `linear-gradient(90deg, rgba(${theme.primaryRgb}, 0.14), rgba(${theme.secondaryRgb}, 0.1))`,
-              borderColor,
-            }}
+            className="flex items-center gap-3 px-6 py-3 text-sm border-b bg-white border-slate-200"
           >
             <FontAwesomeIcon
               icon={faRocket}
               className="w-4 h-4 shrink-0"
               style={{ color: theme.primary }}
             />
-            <div className="flex-1 flex items-center gap-3">
-              <span className="text-gray-300">
-                Ameliorez votre profil (
-                <span className="font-semibold" style={{ color: theme.primary }}>
+            <div className="flex-1 flex items-center gap-3 min-w-0">
+              <span className="text-slate-800 text-sm sm:text-base">
+                Améliorez votre profil (
+                <span className="font-bold" style={{ color: theme.primary }}>
                   {completionPct}%
                 </span>
-                ) pour optimiser votre visibilite
+                ) pour optimiser votre visibilité
               </span>
               <div className="hidden sm:block w-24 h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
@@ -448,7 +444,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-slate-100">
           {children}
         </main>
       </div>
