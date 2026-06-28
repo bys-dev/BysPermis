@@ -9,6 +9,7 @@ import {
   faEnvelope, faPhone, faGlobe, faEllipsisVertical, faPlus, faXmark,
   faPaperPlane, faCircleCheck, faShieldHalved,
   faHashtag, faSignature, faRoad, faMapPin, faWandMagicSparkles,
+  faUserTie, faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate, formatPrice } from "@/lib/utils";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
@@ -544,6 +545,271 @@ function RejectModal({
   );
 }
 
+// ─── ADD LIEU MODAL ───────────────────────────────────────
+
+function AddLieuModal({
+  centre,
+  onClose,
+  onSuccess,
+}: {
+  centre: Centre;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [nom, setNom] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [codePostal, setCodePostal] = useState("");
+  const [ville, setVille] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  };
+  const inputClass =
+    "w-full pl-10 pr-4 py-2.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all";
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/centres/${centre.id}/add-lieu`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nom, adresse, codePostal, ville, telephone: telephone || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setSuccess(true);
+      setTimeout(() => { onSuccess(); onClose(); }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="relative w-full max-w-lg mx-4 rounded-xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-indigo-600/20 flex items-center justify-center">
+              <FontAwesomeIcon icon={faMapMarkerAlt} className="text-indigo-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold text-lg">Ajouter un lieu</h2>
+              <p className="text-gray-500 text-xs">Chef de centre : {centre.ownerNom}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+            <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
+          </button>
+        </div>
+
+        {success ? (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+              <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
+            </div>
+            <p className="text-green-400 font-semibold text-lg">Lieu créé !</p>
+            <p className="text-gray-500 text-sm mt-1">Le nouveau lieu a été ajouté au chef de centre.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Nom du lieu *</label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} required className={inputClass} style={inputStyle} placeholder="Ex: Centre ABC — Sarcelles" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Adresse</label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faRoad} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <input type="text" value={adresse} onChange={(e) => setAdresse(e.target.value)} className={inputClass} style={inputStyle} placeholder="12 rue de la Paix" />
+              </div>
+            </div>
+            <div className="grid grid-cols-5 gap-3">
+              <div className="col-span-2">
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Code postal</label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faMapPin} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <input type="text" value={codePostal} onChange={(e) => setCodePostal(e.target.value)} className={inputClass} style={inputStyle} placeholder="95200" inputMode="numeric" maxLength={5} />
+                </div>
+              </div>
+              <div className="col-span-3">
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Ville</label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faLocationDot} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <input type="text" value={ville} onChange={(e) => setVille(e.target.value)} className={inputClass} style={inputStyle} placeholder="Sarcelles" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Téléphone <span className="text-gray-600">(optionnel)</span></label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faPhone} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <input type="tel" value={telephone} onChange={(e) => setTelephone(e.target.value)} className={inputClass} style={inputStyle} placeholder="01 23 45 67 89" />
+              </div>
+            </div>
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <FontAwesomeIcon icon={faCircleXmark} className="w-4 h-4 shrink-0" />
+                {error}
+              </div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20">
+                Annuler
+              </button>
+              <button type="submit" disabled={loading || !nom.trim()} className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all">
+                {loading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" /> : <FontAwesomeIcon icon={faMapMarkerAlt} className="w-3.5 h-3.5" />}
+                {loading ? "Création..." : "Créer ce lieu"}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── INVITE DIRECTEUR MODAL ───────────────────────────────
+
+function InviteDirecteurModal({
+  centre,
+  onClose,
+  onSuccess,
+}: {
+  centre: Centre;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [nom, setNom] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  };
+  const inputClass =
+    "w-full pl-10 pr-4 py-2.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-600 transition-all";
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/centres/${centre.id}/invite-directeur`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, prenom, nom }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setSuccess(true);
+      setTimeout(() => { onSuccess(); onClose(); }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="relative w-full max-w-lg mx-4 rounded-xl p-6 shadow-2xl"
+        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-teal-600/20 flex items-center justify-center">
+              <FontAwesomeIcon icon={faUserTie} className="text-teal-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold text-lg">Inviter un directeur de lieu</h2>
+              <p className="text-gray-500 text-xs">Lieu : {centre.nom}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+            <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
+          </button>
+        </div>
+
+        {success ? (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+              <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
+            </div>
+            <p className="text-green-400 font-semibold text-lg">Invitation envoyée !</p>
+            <p className="text-gray-500 text-sm mt-1">Le directeur de lieu a reçu ses identifiants par email.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="p-3 rounded-lg bg-teal-500/5 border border-teal-500/20 text-teal-300 text-xs">
+              Le directeur de lieu aura accès <strong>uniquement</strong> à ce lieu ({centre.nom}). Il pourra gérer les formations, sessions et l&apos;émargement.
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Prénom *</label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} required className={inputClass} style={inputStyle} placeholder="Jean" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Nom *</label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} required className={inputClass} style={inputStyle} placeholder="Dupont" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Email *</label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} style={inputStyle} placeholder="directeur@centre.fr" />
+              </div>
+            </div>
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <FontAwesomeIcon icon={faCircleXmark} className="w-4 h-4 shrink-0" />
+                {error}
+              </div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20">
+                Annuler
+              </button>
+              <button type="submit" disabled={loading || !email.trim() || !prenom.trim() || !nom.trim()} className="flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all">
+                {loading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin w-4 h-4" /> : <FontAwesomeIcon icon={faPaperPlane} className="w-3.5 h-3.5" />}
+                {loading ? "Envoi..." : "Envoyer l'invitation"}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── MAIN PAGE ────────────────────────────────────────────
 
 export default function AdminCentresPage() {
@@ -557,6 +823,8 @@ export default function AdminCentresPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [rejectCentre, setRejectCentre] = useState<Centre | null>(null);
+  const [addLieuCentre, setAddLieuCentre] = useState<Centre | null>(null);
+  const [inviteDirecteurCentre, setInviteDirecteurCentre] = useState<Centre | null>(null);
 
   const fetchCentres = useCallback(() => {
     setLoading(true);
@@ -967,6 +1235,23 @@ export default function AdminCentresPage() {
                                       {c.adresse}, {c.codePostal} {c.ville}
                                     </p>
                                   </div>
+                                  {/* Actions multi-lieux */}
+                                  <div className="pt-2 flex flex-col gap-2">
+                                    <button
+                                      onClick={() => setAddLieuCentre(c)}
+                                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 hover:bg-indigo-500/20 transition-colors text-xs font-medium"
+                                    >
+                                      <FontAwesomeIcon icon={faMapMarkerAlt} className="w-3 h-3" />
+                                      Ajouter un lieu à ce chef de centre
+                                    </button>
+                                    <button
+                                      onClick={() => setInviteDirecteurCentre(c)}
+                                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-300 hover:bg-teal-500/20 transition-colors text-xs font-medium"
+                                    >
+                                      <FontAwesomeIcon icon={faUserTie} className="w-3 h-3" />
+                                      Inviter un directeur pour ce lieu
+                                    </button>
+                                  </div>
                                 </div>
 
                                 {/* Subscription & Stats */}
@@ -1058,6 +1343,20 @@ export default function AdminCentresPage() {
         <RejectModal
           centre={rejectCentre}
           onClose={() => setRejectCentre(null)}
+          onSuccess={fetchCentres}
+        />
+      )}
+      {addLieuCentre && (
+        <AddLieuModal
+          centre={addLieuCentre}
+          onClose={() => setAddLieuCentre(null)}
+          onSuccess={fetchCentres}
+        />
+      )}
+      {inviteDirecteurCentre && (
+        <InviteDirecteurModal
+          centre={inviteDirecteurCentre}
+          onClose={() => setInviteDirecteurCentre(null)}
           onSuccess={fetchCentres}
         />
       )}

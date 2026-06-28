@@ -299,6 +299,57 @@ export async function sendCentreInvitationEmail(params: {
 }
 
 /**
+ * Send invitation email to a new directeur de lieu (CENTRE_ADMIN on a single location).
+ */
+export async function sendDirecteurLieuInvitationEmail(params: {
+  to: string;
+  prenom: string;
+  centreName: string;
+  loginUrl: string;
+  tempPassword?: string;
+}): Promise<void> {
+  const credentialsBlock = params.tempPassword
+    ? `<div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
+        <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">Vos identifiants de connexion :</p>
+        <table style="border-collapse:collapse">
+          <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Email</td><td style="font-size:13px;color:#1E3A5F">${params.to}</td></tr>
+          <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Mot de passe temporaire</td><td style="font-size:13px;color:#1E3A5F;font-family:monospace;background:#E0F2FE;padding:2px 8px;border-radius:4px">${params.tempPassword}</td></tr>
+        </table>
+        <p style="margin:8px 0 0;color:#64748B;font-size:11px">Nous vous recommandons de changer votre mot de passe lors de votre premiere connexion.</p>
+      </div>`
+    : "";
+
+  await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `BYS Formation — Votre acces directeur de lieu est pret`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Formation</h1>
+    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Acces directeur de lieu</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour ${params.prenom},</p>
+    <p>Un acces directeur de lieu a ete cree pour vous sur la plateforme <strong>BYS Formation</strong> pour le centre <strong>${params.centreName}</strong>.</p>
+    <p>En tant que directeur de lieu, vous pouvez gerer les formations, sessions, inscrits et l'emargement de votre lieu.</p>
+
+    ${credentialsBlock}
+
+    <p style="text-align:center;margin:24px 0">
+      <a href="${params.loginUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Acceder a mon espace</a>
+    </p>
+
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
+      Si vous avez des questions, contactez votre chef de centre ou notre equipe support.<br/>
+      Cordialement,<br/>L'equipe BYS Formation
+    </p>
+  </div>
+</div>`,
+  });
+}
+
+/**
  * Send centre activation email when admin approves the centre.
  */
 export async function sendCentreActivationEmail(params: {

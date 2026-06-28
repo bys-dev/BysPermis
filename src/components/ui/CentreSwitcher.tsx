@@ -4,12 +4,20 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBuilding,
   faChevronDown,
   faCheck,
   faPlus,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+
+function centreInitials(nom: string): string {
+  return (nom ?? "?")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+}
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface CentreItem {
@@ -107,8 +115,8 @@ export default function CentreSwitcher({ userRole }: { userRole: string | null }
           className="flex items-start gap-3 px-3 py-3 rounded-xl border"
           style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" }}
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-500/25 flex items-center justify-center shrink-0 mt-0.5">
-            <FontAwesomeIcon icon={faBuilding} className="text-blue-300 text-sm" />
+          <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 mt-0.5 text-white font-bold text-xs select-none">
+            {centreInitials(activeCentre.nom)}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-white leading-snug line-clamp-2">{activeCentre.nom}</p>
@@ -134,8 +142,8 @@ export default function CentreSwitcher({ userRole }: { userRole: string | null }
             borderColor: isOpen ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.12)",
           }}
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-500/25 flex items-center justify-center shrink-0 mt-0.5">
-            <FontAwesomeIcon icon={faBuilding} className="text-blue-300 text-sm" />
+          <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 mt-0.5 text-white font-bold text-xs select-none">
+            {centreInitials(activeCentre?.nom ?? "?")}
           </div>
           <div className="min-w-0 flex-1 text-left">
             <p className="text-sm font-semibold text-white leading-snug line-clamp-2">
@@ -172,12 +180,11 @@ export default function CentreSwitcher({ userRole }: { userRole: string | null }
                     onClick={() => switchCentre(centre.id)}
                     className="w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-all hover:bg-white/[0.06] group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-blue-600/15 flex items-center justify-center shrink-0 mt-0.5">
-                      {centre.isActive ? (
-                        <FontAwesomeIcon icon={faCheck} className="text-blue-400 text-xs" />
-                      ) : (
-                        <FontAwesomeIcon icon={faBuilding} className="text-gray-500 text-xs group-hover:text-blue-400 transition-colors" />
-                      )}
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 font-bold text-[11px] select-none transition-colors ${centre.isActive ? "bg-blue-600 text-white" : "bg-blue-600/20 text-blue-300 group-hover:bg-blue-600/30"}`}>
+                      {centre.isActive
+                        ? <FontAwesomeIcon icon={faCheck} className="text-xs" />
+                        : centreInitials(centre.nom)
+                      }
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">

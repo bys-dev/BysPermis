@@ -218,12 +218,12 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
     const active = isNavActive(pathname, href);
     const base = compact
       ? "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors"
-      : "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group";
+      : "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all group";
 
     if (active) {
-      return `${base} text-white`;
+      return `${base} font-semibold text-white`;
     }
-    return `${base} text-gray-400 hover:text-white hover:bg-white/5`;
+    return `${base} font-medium text-slate-300 hover:text-white hover:bg-white/8`;
   }
 
   function navLinkStyle(href: string, compact = false) {
@@ -232,10 +232,12 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
       return compact ? { background: "rgba(255,255,255,0.05)" } : undefined;
     }
     return {
-      background: `rgba(${theme.primaryRgb}, 0.15)`,
-      border: `1px solid rgba(${theme.primaryRgb}, 0.28)`,
-      color: theme.primary,
-      boxShadow: `0 0 0 1px rgba(${theme.primaryRgb}, 0.08)`,
+      background: "rgba(255,255,255,0.14)",
+      borderLeft: `3px solid ${theme.primary}`,
+      borderTop: "1px solid rgba(255,255,255,0.1)",
+      borderRight: "1px solid rgba(255,255,255,0.1)",
+      borderBottom: "1px solid rgba(255,255,255,0.1)",
+      color: "#ffffff",
     };
   }
 
@@ -272,14 +274,15 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
               </div>
             ) : (
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
-                style={{
-                  background: `rgba(${theme.primaryRgb}, 0.2)`,
-                  borderColor: `rgba(${theme.primaryRgb}, 0.35)`,
-                  color: theme.primary,
-                }}
+                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm text-white select-none"
+                style={{ background: theme.primary }}
               >
-                <FontAwesomeIcon icon={faBuilding} className="text-base" />
+                {(theme.nom ?? "?")
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((w: string) => w[0].toUpperCase())
+                  .join("")}
               </div>
             )}
             <div className="min-w-0">
@@ -305,11 +308,9 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
             >
               <FontAwesomeIcon
                 icon={link.icon}
-                className="w-4 h-4 transition-colors"
+                className="w-4 h-4 shrink-0 transition-colors"
                 style={{
-                  color: isNavActive(pathname, link.href)
-                    ? theme.primary
-                    : undefined,
+                  color: isNavActive(pathname, link.href) ? "#ffffff" : "rgb(148 163 184)",
                 }}
               />
               {link.label}
