@@ -168,10 +168,10 @@ export default function DashboardCentrePage() {
         {/* En-tête */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Tableau de bord
             </h1>
-            <p className="text-slate-600 text-base mt-1">
+            <p className="text-gray-400 text-base mt-1">
               Vue d&apos;ensemble de votre activité
             </p>
           </div>

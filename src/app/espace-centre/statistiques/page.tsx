@@ -154,10 +154,10 @@ export default function StatistiquesPage() {
           <PageHeaderSkeleton />
         ) : (
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Statistiques
             </h1>
-            <p className="text-slate-600 text-base mt-1">
+            <p className="text-gray-400 text-base mt-1">
               Analyses détaillées de votre activité
             </p>
           </div>

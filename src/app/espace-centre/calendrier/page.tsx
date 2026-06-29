@@ -128,8 +128,8 @@ export default function CalendrierPage() {
       ) : (
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display font-bold text-2xl text-gray-900 mb-1">
-            <FontAwesomeIcon icon={faCalendarDays} className="text-blue-600 mr-3" />
+          <h1 className="font-display font-bold text-2xl text-white mb-1">
+            <FontAwesomeIcon icon={faCalendarDays} className="text-blue-400 mr-3" />
             Calendrier des sessions
           </h1>
           <p className="text-gray-500 text-sm">
@@ -156,7 +156,7 @@ export default function CalendrierPage() {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: statusColors[key] }}
             />
-            <span className="text-xs text-gray-600">{label}</span>
+            <span className="text-xs text-gray-400">{label}</span>
           </div>
         ))}
       </div>
@@ -167,7 +167,7 @@ export default function CalendrierPage() {
           style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}
         >
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
-          <p className="text-gray-900 font-medium mb-1">Erreur de chargement</p>
+          <p className="text-white font-medium mb-1">Erreur de chargement</p>
           <p className="text-gray-500 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}

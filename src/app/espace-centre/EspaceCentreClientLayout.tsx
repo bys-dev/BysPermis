@@ -445,7 +445,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-slate-100">
+        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {children}
         </main>
       </div>

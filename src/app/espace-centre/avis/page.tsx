@@ -83,8 +83,8 @@ export default function CentreAvisPage() {
         <PageHeaderSkeleton />
       ) : (
       <div className="mb-8">
-        <h1 className="font-display font-bold text-2xl text-gray-900">Avis & questionnaires</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="font-display font-bold text-2xl text-white">Avis & questionnaires</h1>
+        <p className="text-sm text-gray-400 mt-1">
           Personnalisez les questions envoyées à vos stagiaires après chaque formation (1 à 10).
         </p>
       </div>
@@ -154,8 +154,8 @@ export default function CentreAvisPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <FontAwesomeIcon icon={faStar} className="text-yellow-500" />
+        <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
+          <FontAwesomeIcon icon={faStar} className="text-yellow-400" />
           Derniers avis reçus
         </h2>
         {responses.length === 0 ? (

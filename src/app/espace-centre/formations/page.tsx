@@ -210,7 +210,7 @@ export default function FormationsCentrePage() {
       ) : (
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl text-gray-900 mb-1">Mes formations</h1>
+          <h1 className="font-display font-bold text-2xl text-white mb-1">Mes formations</h1>
           <p className="text-gray-500 text-sm">
             {loading ? "Chargement..." : `${actives} formation${actives > 1 ? "s" : ""} active${actives > 1 ? "s" : ""}`}
           </p>
@@ -238,7 +238,7 @@ export default function FormationsCentrePage() {
       {!loading && !error && formations.length === 0 && (
         <div className="text-center py-16 text-gray-500">
           <FontAwesomeIcon icon={faGraduationCap} className="text-3xl mb-3" />
-          <p className="font-medium text-gray-900 mb-1">Aucune formation</p>
+          <p className="font-medium text-gray-300 mb-1">Aucune formation</p>
           <p className="text-sm">Créez votre première formation en cliquant sur &quot;Nouvelle formation&quot;.</p>
         </div>
       )}
