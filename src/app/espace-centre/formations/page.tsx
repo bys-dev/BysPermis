@@ -210,7 +210,7 @@ export default function FormationsCentrePage() {
       ) : (
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl text-white mb-1">Mes formations</h1>
+          <h1 className="font-display font-bold text-2xl text-gray-900 mb-1">Mes formations</h1>
           <p className="text-gray-500 text-sm">
             {loading ? "Chargement..." : `${actives} formation${actives > 1 ? "s" : ""} active${actives > 1 ? "s" : ""}`}
           </p>
@@ -238,7 +238,7 @@ export default function FormationsCentrePage() {
       {!loading && !error && formations.length === 0 && (
         <div className="text-center py-16 text-gray-500">
           <FontAwesomeIcon icon={faGraduationCap} className="text-3xl mb-3" />
-          <p className="font-medium text-white mb-1">Aucune formation</p>
+          <p className="font-medium text-gray-900 mb-1">Aucune formation</p>
           <p className="text-sm">Créez votre première formation en cliquant sur &quot;Nouvelle formation&quot;.</p>
         </div>
       )}
@@ -249,10 +249,9 @@ export default function FormationsCentrePage() {
           {formations.map((f) => (
             <div
               key={f.id}
-              className="rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+              className="rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 bg-white"
               style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.07)",
+                border: "1px solid #E5E7EB",
                 opacity: f.isActive ? 1 : 0.6,
               }}
             >
@@ -262,7 +261,7 @@ export default function FormationsCentrePage() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-white text-sm">{f.titre}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm">{f.titre}</h3>
                   {f.isQualiopi && (
                     <span className="text-xs text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <FontAwesomeIcon icon={faAward} className="w-3 h-3" />Qualiopi
@@ -295,16 +294,16 @@ export default function FormationsCentrePage() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => openEditModal(f)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition-colors"
-                  style={{ background: "rgba(255,255,255,0.06)" }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  style={{ background: "rgba(0,0,0,0.05)" }}
                 >
                   <FontAwesomeIcon icon={faPen} className="w-3 h-3" />
                   Modifier
                 </button>
                 <button
                   onClick={() => toggleActive(f.id, f.isActive)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${f.isActive ? "text-yellow-400 hover:text-yellow-300" : "text-green-400 hover:text-green-300"}`}
-                  style={{ background: "rgba(255,255,255,0.06)" }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${f.isActive ? "text-yellow-600 hover:text-yellow-700" : "text-green-600 hover:text-green-700"}`}
+                  style={{ background: "rgba(0,0,0,0.05)" }}
                 >
                   <FontAwesomeIcon icon={f.isActive ? faToggleOn : faToggleOff} className="w-3.5 h-3.5" />
                   {f.isActive ? "Désactiver" : "Activer"}
@@ -313,14 +312,14 @@ export default function FormationsCentrePage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => deleteFormation(f.id)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-400/10"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:text-red-700 transition-colors bg-red-50 border border-red-200"
                     >
                       Confirmer
                     </button>
                     <button
                       onClick={() => setDeletingId(null)}
-                      className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition-colors"
-                      style={{ background: "rgba(255,255,255,0.06)" }}
+                      className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                      style={{ background: "rgba(0,0,0,0.05)" }}
                     >
                       <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
                     </button>
@@ -328,8 +327,8 @@ export default function FormationsCentrePage() {
                 ) : (
                   <button
                     onClick={() => setDeletingId(f.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 transition-colors"
-                    style={{ background: "rgba(255,255,255,0.06)" }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:text-red-600 transition-colors"
+                    style={{ background: "rgba(0,0,0,0.05)" }}
                   >
                     <FontAwesomeIcon icon={faTrash} className="w-3 h-3" />
                   </button>

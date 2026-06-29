@@ -250,7 +250,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
       }}
     >
       <aside
-        className="hidden lg:flex flex-col w-64 shrink-0 border-r"
+        className="hidden lg:flex flex-col w-64 shrink-0 border-r bg-[#0A1628]"
         style={{ background: sidebarBg, borderColor: "rgba(255,255,255,0.07)" }}
       >
         <div

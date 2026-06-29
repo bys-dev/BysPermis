@@ -189,7 +189,7 @@ export default function SessionsCentrePage() {
       ) : (
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl text-white mb-1">Mes sessions</h1>
+          <h1 className="font-display font-bold text-2xl text-gray-900 mb-1">Mes sessions</h1>
           <p className="text-gray-500 text-sm">
             {loading ? "Chargement..." : `${actives.length} session${actives.length > 1 ? "s" : ""} active${actives.length > 1 ? "s" : ""}`}
           </p>
@@ -217,7 +217,7 @@ export default function SessionsCentrePage() {
       {!loading && !error && sessions.length === 0 && (
         <div className="text-center py-16 text-gray-500">
           <FontAwesomeIcon icon={faCalendarDays} className="text-3xl mb-3" />
-          <p className="font-medium text-white mb-1">Aucune session</p>
+          <p className="font-medium text-gray-900 mb-1">Aucune session</p>
           <p className="text-sm">Créez votre première session en cliquant sur &quot;Nouvelle session&quot;.</p>
         </div>
       )}
@@ -233,7 +233,7 @@ export default function SessionsCentrePage() {
             const badge = statusLabels[s.status] ?? statusLabels["ACTIVE"];
 
             return (
-              <div key={s.id} className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", opacity: isTerminee ? 0.6 : 1 }}>
+              <div key={s.id} className="rounded-xl p-5 bg-white" style={{ border: "1px solid #E5E7EB", opacity: isTerminee ? 0.6 : 1 }}>
                 <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-blue-600/15 flex items-center justify-center shrink-0">
                     <FontAwesomeIcon icon={faCalendarDays} className="text-blue-400" />
@@ -241,7 +241,7 @@ export default function SessionsCentrePage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-white text-sm">{s.formation}</h3>
+                      <h3 className="font-semibold text-gray-900 text-sm">{s.formation}</h3>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${badge.color} ${badge.bg}`}>
                         {badge.label}
                       </span>
@@ -276,7 +276,7 @@ export default function SessionsCentrePage() {
                         </span>
                         <span>{taux}% rempli</span>
                       </div>
-                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <div className="h-1.5 rounded-full overflow-hidden bg-gray-200">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{
@@ -295,8 +295,8 @@ export default function SessionsCentrePage() {
                         href={`/api/centre/sessions/${s.id}/emargement`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors"
-                        style={{ background: "rgba(255,255,255,0.06)" }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                        style={{ background: "rgba(0,0,0,0.05)" }}
                         title="Feuille d'émargement (PDF)"
                       >
                         <FontAwesomeIcon icon={faFileLines} className="w-3 h-3" />
@@ -307,8 +307,8 @@ export default function SessionsCentrePage() {
                       <>
                       <button
                         onClick={() => openEditModal(s)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition-colors"
-                        style={{ background: "rgba(255,255,255,0.06)" }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                        style={{ background: "rgba(0,0,0,0.05)" }}
                       >
                         <FontAwesomeIcon icon={faPen} className="w-3 h-3" />
                         Modifier
@@ -317,14 +317,14 @@ export default function SessionsCentrePage() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => cancelSession(s.id)}
-                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-400/10"
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:text-red-700 transition-colors bg-red-50 border border-red-200"
                           >
                             Confirmer
                           </button>
                           <button
                             onClick={() => setCancellingId(null)}
-                            className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition-colors"
-                            style={{ background: "rgba(255,255,255,0.06)" }}
+                            className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                            style={{ background: "rgba(0,0,0,0.05)" }}
                           >
                             <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
                           </button>
@@ -332,8 +332,8 @@ export default function SessionsCentrePage() {
                       ) : (
                         <button
                           onClick={() => setCancellingId(s.id)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 transition-colors"
-                          style={{ background: "rgba(255,255,255,0.06)" }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:text-red-600 transition-colors"
+                          style={{ background: "rgba(0,0,0,0.05)" }}
                         >
                           <FontAwesomeIcon icon={faBan} className="w-3 h-3" />
                           Annuler

@@ -128,8 +128,8 @@ export default function CalendrierPage() {
       ) : (
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display font-bold text-2xl text-white mb-1">
-            <FontAwesomeIcon icon={faCalendarDays} className="text-blue-400 mr-3" />
+          <h1 className="font-display font-bold text-2xl text-gray-900 mb-1">
+            <FontAwesomeIcon icon={faCalendarDays} className="text-blue-600 mr-3" />
             Calendrier des sessions
           </h1>
           <p className="text-gray-500 text-sm">
@@ -156,7 +156,7 @@ export default function CalendrierPage() {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: statusColors[key] }}
             />
-            <span className="text-xs text-gray-400">{label}</span>
+            <span className="text-xs text-gray-600">{label}</span>
           </div>
         ))}
       </div>
@@ -167,7 +167,7 @@ export default function CalendrierPage() {
           style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}
         >
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
-          <p className="text-white font-medium mb-1">Erreur de chargement</p>
+          <p className="text-gray-900 font-medium mb-1">Erreur de chargement</p>
           <p className="text-gray-500 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -180,8 +180,8 @@ export default function CalendrierPage() {
         <>
           {/* Calendar */}
           <div
-            className="rounded-xl border p-4 sm:p-6"
-            style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.07)" }}
+            className="rounded-xl border p-4 sm:p-6 bg-white"
+            style={{ borderColor: "#E5E7EB" }}
           >
             <Calendar
               events={calendarEvents}
@@ -193,15 +193,15 @@ export default function CalendrierPage() {
           {/* Stats summary */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
             {[
-              { label: "Sessions actives", value: sessions.filter((s) => s.status === "ACTIVE").length, color: "text-blue-400" },
-              { label: "Complètes", value: sessions.filter((s) => s.status === "COMPLETE").length, color: "text-green-400" },
-              { label: "Passées", value: sessions.filter((s) => s.status === "PASSEE").length, color: "text-gray-400" },
-              { label: "Annulées", value: sessions.filter((s) => s.status === "ANNULEE").length, color: "text-red-400" },
+              { label: "Sessions actives", value: sessions.filter((s) => s.status === "ACTIVE").length, color: "text-blue-600" },
+              { label: "Complètes", value: sessions.filter((s) => s.status === "COMPLETE").length, color: "text-green-600" },
+              { label: "Passées", value: sessions.filter((s) => s.status === "PASSEE").length, color: "text-gray-600" },
+              { label: "Annulées", value: sessions.filter((s) => s.status === "ANNULEE").length, color: "text-red-600" },
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-lg border p-3 text-center"
-                style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.07)" }}
+                className="rounded-lg border p-3 text-center bg-white"
+                style={{ borderColor: "#E5E7EB" }}
               >
                 <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
                 <p className="text-xs text-gray-500">{stat.label}</p>

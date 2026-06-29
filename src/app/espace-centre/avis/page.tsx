@@ -83,8 +83,8 @@ export default function CentreAvisPage() {
         <PageHeaderSkeleton />
       ) : (
       <div className="mb-8">
-        <h1 className="font-display font-bold text-2xl text-white">Avis & questionnaires</h1>
-        <p className="text-sm text-gray-400 mt-1">
+        <h1 className="font-display font-bold text-2xl text-gray-900">Avis & questionnaires</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Personnalisez les questions envoyées à vos stagiaires après chaque formation (1 à 10).
         </p>
       </div>
@@ -99,11 +99,11 @@ export default function CentreAvisPage() {
       </div>
 
       <section
-        className="rounded-xl border p-6 space-y-4"
-        style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}
+        className="rounded-xl border p-6 space-y-4 bg-white"
+        style={{ borderColor: "#E5E7EB" }}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-white">Vos questions (centre)</h2>
+          <h2 className="font-semibold text-gray-900">Vos questions (centre)</h2>
           <span className="text-xs text-gray-500">{draft.length}/10</span>
         </div>
         {draft.map((libelle, i) => (
@@ -117,15 +117,14 @@ export default function CentreAvisPage() {
                 setDraft(next)
               }}
               maxLength={300}
-              className="flex-1 px-3 py-2 rounded-lg text-sm text-white border focus:outline-none focus:border-blue-500"
-              style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.1)" }}
+              className="flex-1 px-3 py-2 rounded-lg text-sm text-gray-900 border border-gray-200 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
             />
             <button
               type="button"
               onClick={() => setDraft(draft.filter((_, idx) => idx !== i))}
               disabled={draft.length <= 1}
               title="Supprimer"
-              className="mt-1 p-2 text-gray-500 hover:text-red-400 disabled:opacity-30 disabled:hover:text-gray-500"
+              className="mt-1 p-2 text-gray-400 hover:text-red-500 disabled:opacity-30 disabled:hover:text-gray-400"
             >
               <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" />
             </button>
@@ -136,7 +135,7 @@ export default function CentreAvisPage() {
             type="button"
             onClick={() => setDraft([...draft, ""])}
             disabled={draft.length >= 10}
-            className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 disabled:opacity-40"
+            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 disabled:opacity-40"
           >
             <FontAwesomeIcon icon={faPlus} className="w-3 h-3" />
             Ajouter une question
@@ -151,12 +150,12 @@ export default function CentreAvisPage() {
             Enregistrer les questions
           </button>
         </div>
-        {message && <p className="text-xs text-blue-300">{message}</p>}
+        {message && <p className="text-xs text-blue-600">{message}</p>}
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
-          <FontAwesomeIcon icon={faStar} className="text-yellow-400" />
+        <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <FontAwesomeIcon icon={faStar} className="text-yellow-500" />
           Derniers avis reçus
         </h2>
         {responses.length === 0 ? (
@@ -166,26 +165,26 @@ export default function CentreAvisPage() {
             {responses.map((r) => (
               <div
                 key={r.id}
-                className="rounded-xl border p-4"
-                style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.08)" }}
+                className="rounded-xl border p-4 bg-white"
+                style={{ borderColor: "#E5E7EB" }}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
-                    <p className="text-sm font-medium text-white">{r.auteur}</p>
+                    <p className="text-sm font-medium text-gray-900">{r.auteur}</p>
                     <p className="text-xs text-gray-500">{r.formation} — {formatDate(r.createdAt)}</p>
                   </div>
                   <HalfStarRating value={r.noteGlobale} readonly size="sm" />
                 </div>
                 <div className="space-y-1 mb-2">
                   {(r.reponses as Array<{ libelle: string; note: number }>).map((item, idx) => (
-                    <p key={idx} className="text-xs text-gray-400 flex justify-between gap-4">
+                    <p key={idx} className="text-xs text-gray-600 flex justify-between gap-4">
                       <span>{item.libelle}</span>
-                      <span className="text-yellow-400/90 shrink-0">{item.note.toFixed(1)}/5</span>
+                      <span className="text-yellow-600 shrink-0">{item.note.toFixed(1)}/5</span>
                     </p>
                   ))}
                 </div>
                 {r.commentaire && (
-                  <p className="text-sm text-gray-300 italic border-t border-white/5 pt-2 mt-2">
+                  <p className="text-sm text-gray-600 italic border-t border-gray-100 pt-2 mt-2">
                     « {r.commentaire} »
                   </p>
                 )}
@@ -205,11 +204,11 @@ export default function CentreAvisPage() {
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div
-      className="rounded-xl border p-4"
-      style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}
+      className="rounded-xl border p-4 bg-white"
+      style={{ borderColor: "#E5E7EB" }}
     >
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
+      <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
     </div>
   )
 }
