@@ -19,12 +19,15 @@ export async function GET(req: NextRequest) {
       ? { statut: statut as "ACTIF" | "EN_ATTENTE" | "SUSPENDU" }
       : statut === "all"
         ? {}
-        : { statut: "ACTIF" as const, isActive: true };
+        : { statut: "ACTIF" as const, isActive: true, ville: { not: "" } };
 
-    const centres = await prisma.centre.findMany({
+    const centresRaw = await prisma.centre.findMany({
       where: {
         ...statutFilter,
         ...(ville ? { ville: { contains: ville, mode: "insensitive" } } : {}),
+        ...(statutFilter.statut === "ACTIF"
+          ? { formations: { some: { isActive: true } } }
+          : {}),
       },
       include: {
         formations: {
@@ -36,8 +39,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { nom: "asc" },
     });
-
-    // If lat/lng provided, filter by proximity and add distance
+    const centres = centresRaw;
     if (lat && lng) {
       const userLat = parseFloat(lat);
       const userLng = parseFloat(lng);

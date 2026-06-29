@@ -587,7 +587,7 @@ async function main() {
         isActive: true,
         userId: centreUsers[0].id,
         // Identité visuelle — logo BYS officiel
-        logo: "https://bys-permis.fr/colored-logo.png",
+        logo: "/colored-logo.svg",
         bannerImage: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80",
         // Personnalisation
         couleurPrimaire: "#2563EB",
@@ -739,7 +739,7 @@ async function main() {
       userId: centreUsers[0].id,
       couleurPrimaire: "#2563EB",
       couleurSecondaire: "#1E40AF",
-      logo: "https://bys-permis.fr/colored-logo.png",
+      logo: "/colored-logo.svg",
       bannerImage: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1200&q=80",
     },
   });

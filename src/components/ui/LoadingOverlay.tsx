@@ -100,8 +100,8 @@ export function LoadingContainer({
 export function PageHeaderSkeleton() {
   return (
     <div className="mb-8 animate-pulse">
-      <div className="h-8 w-56 bg-white/10 rounded-lg mb-2" />
-      <div className="h-4 w-80 max-w-full bg-white/5 rounded" />
+      <div className="h-8 w-56 bg-slate-200 rounded-lg mb-2" />
+      <div className="h-4 w-80 max-w-full bg-slate-100 rounded" />
     </div>
   );
 }

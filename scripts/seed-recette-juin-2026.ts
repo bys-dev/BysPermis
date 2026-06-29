@@ -7,7 +7,7 @@ import { prisma } from "../src/lib/prisma";
 
 const RECETTE_TAG = "RECETTE-JUIN-2026";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.vercel.app";
-const LOGO_PNG = `${APP_URL}/colored-logo.png`;
+const LOGO_PNG = "/colored-logo.svg";
 
 // 18 juin 2026 (date du jour de recette)
 const RECETTE_DATE = new Date(2026, 5, 18, 10, 0, 0);

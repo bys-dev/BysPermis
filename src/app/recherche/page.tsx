@@ -29,6 +29,7 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import { formatPrice } from "@/lib/utils";
 import {
   GEO_UPDATED_EVENT,
   readGeoFromStorage,
@@ -156,7 +157,7 @@ function RechercheInner() {
   // Categories
   const [categories, setCategories] = useState<CategorieOption[]>([]);
 
-  const perPage = 6;
+  const perPage = 25;
   const skipDebounceRef = useRef(false);
 
   const applyGeoToFilters = useCallback((geo: GeoLocationDetail) => {
@@ -268,6 +269,17 @@ function RechercheInner() {
     if (saved) setDetectedCity(saved);
     const savedDept = localStorage.getItem("bys_dept");
     if (savedDept) setDetectedDept(savedDept);
+  }, []);
+
+  // Auto-apply geo depuis localStorage si pas déjà de lat/lng dans l'URL
+  useEffect(() => {
+    const hasUrlGeo = searchParams.get("lat") && searchParams.get("lng");
+    if (hasUrlGeo) return;
+    const geo = readGeoFromStorage();
+    if (geo?.lat && geo?.lng) {
+      applyGeoToFilters(geo);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Close suggestions on outside click
@@ -563,7 +575,7 @@ function RechercheInner() {
                           className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors flex items-center justify-between gap-2"
                         >
                           <span className="text-sm text-brand-text truncate">{f.titre}</span>
-                          <span className="text-xs text-gray-400 whitespace-nowrap">{f.prix} &euro;</span>
+                          <span className="text-xs text-gray-400 whitespace-nowrap">{formatPrice(f.prix)}</span>
                         </button>
                       ))}
                     </div>
@@ -1071,7 +1083,7 @@ function RechercheInner() {
                       <div className="mt-auto flex items-end justify-between pt-4 border-t border-brand-border">
                         <div>
                           <span className="text-2xl font-bold text-brand-text">
-                            {stage.prix} &euro;
+                            {formatPrice(stage.prix)}
                           </span>
                           <span className="text-sm text-gray-400 ml-1">/ pers.</span>
                         </div>

@@ -21,6 +21,7 @@
     "auth0:sync-metadata": "npx tsx scripts/sync-auth0-app-metadata.ts",
     "db:reset": "npx prisma db push --force-reset --accept-data-loss && npx tsx prisma/seed.ts && npx tsx prisma/seed-demo.ts && npx tsx prisma/seed-auth0.ts",
     "seed:recette": "npx tsx scripts/seed-recette-juin-2026.ts",
+    "fix:centres": "npx tsx scripts/fix-marketplace-centres.ts",
     "verify:recette": "npx tsx scripts/verify-recette-documents.ts",
     "db:migrate:dev": "npx prisma migrate dev",
     "db:migrate:deploy": "npx prisma migrate deploy",
@@ -28,7 +29,9 @@
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:headed": "playwright test --headed",
-    "seed:centres": "npx tsx prisma/seed-centres.ts"
+    "seed:centres": "npx tsx prisma/seed-centres.ts",
+    "seed:centres95": "npx tsx prisma/seed-centres-95.ts",
+    "seed:sessions": "npx tsx prisma/seed-sessions.ts"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.16.0",
