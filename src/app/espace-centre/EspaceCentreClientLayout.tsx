@@ -246,7 +246,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
       className="centre-themed min-h-screen flex"
       style={{
         ...cssVars,
-        background: `linear-gradient(160deg, rgba(${theme.secondaryRgb}, 0.12) 0%, #0A1628 45%)`,
+        background: "#0A1628",
       }}
     >
       <aside
@@ -445,7 +445,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-[#0A1628]">
           {children}
         </main>
       </div>
