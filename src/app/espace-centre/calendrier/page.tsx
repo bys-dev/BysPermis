@@ -180,8 +180,8 @@ export default function CalendrierPage() {
         <>
           {/* Calendar */}
           <div
-            className="rounded-xl border p-4 sm:p-6 bg-white"
-            style={{ borderColor: "#E5E7EB" }}
+            className="rounded-xl border p-4 sm:p-6"
+            style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}
           >
             <Calendar
               events={calendarEvents}
