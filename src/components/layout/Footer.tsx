@@ -119,7 +119,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/inscription"
+                  href="/devenir-partenaire"
                   className="hover:text-white transition-colors"
                 >
                   Devenir centre partenaire

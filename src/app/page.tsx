@@ -866,7 +866,7 @@ export default async function Home() {
                 </ul>
                 <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
                   <Link
-                    href="/inscription"
+                    href="/devenir-partenaire"
                     className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-700 transition-all duration-200 shadow-xl shadow-red-600/20"
                   >
                     Devenir partenaire

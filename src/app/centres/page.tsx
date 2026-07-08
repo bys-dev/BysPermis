@@ -816,7 +816,7 @@ function CentresInner() {
               </div>
             ))}
           </div>
-          <Link href="/inscription" className="btn-primary px-8 py-3.5 rounded-lg text-lg inline-flex items-center gap-2">
+          <Link href="/devenir-partenaire" className="btn-primary px-8 py-3.5 rounded-lg text-lg inline-flex items-center gap-2">
             Rejoignez notre réseau
             <FontAwesomeIcon icon={faArrowRight} />
           </Link>

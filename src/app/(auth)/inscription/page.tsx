@@ -8,15 +8,10 @@ import {
   faEnvelope,
   faLock,
   faUser,
-  faBuilding,
-  faMapMarkerAlt,
-  faPhone,
   faSpinner,
   faCircleCheck,
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
-
-type AccountType = 'eleve' | 'centre';
 
 interface FormState {
   firstName: string;
@@ -24,11 +19,6 @@ interface FormState {
   email: string;
   password: string;
   confirmPassword: string;
-  centreName: string;
-  address: string;
-  postalCode: string;
-  city: string;
-  phone: string;
   acceptCGU: boolean;
 }
 
@@ -38,11 +28,6 @@ const initialFormState: FormState = {
   email: '',
   password: '',
   confirmPassword: '',
-  centreName: '',
-  address: '',
-  postalCode: '',
-  city: '',
-  phone: '',
   acceptCGU: false,
 };
 
@@ -51,7 +36,6 @@ const inputStyle = { background: 'rgba(255,255,255,0.08)', border: '1px solid rg
 
 export default function InscriptionPage() {
   const searchParams = useSearchParams();
-  const [accountType, setAccountType] = useState<AccountType>('eleve');
   const [form, setForm] = useState<FormState>(initialFormState);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -78,10 +62,6 @@ export default function InscriptionPage() {
     if (!form.password) e.password = 'Mot de passe requis';
     else if (form.password.length < 8) e.password = 'Minimum 8 caractères';
     if (form.password !== form.confirmPassword) e.confirmPassword = 'Les mots de passe ne correspondent pas';
-    if (accountType === 'centre') {
-      if (!form.centreName.trim()) e.centreName = 'Nom du centre requis';
-      if (!form.city.trim()) e.city = 'Ville requise';
-    }
     if (!form.acceptCGU) e.acceptCGU = 'Vous devez accepter les CGU';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -95,7 +75,7 @@ export default function InscriptionPage() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, accountType, referralCode: referralCode || undefined }),
+        body: JSON.stringify({ ...form, accountType: 'eleve', referralCode: referralCode || undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -150,32 +130,10 @@ export default function InscriptionPage() {
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2 text-white">Créer votre compte</h2>
-          <p className="text-sm text-gray-400">Rejoignez BYS Formation en quelques clics</p>
-        </div>
-
-        {/* Account type selector */}
-        <div className="flex rounded-lg p-1 mb-8" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <button
-            type="button"
-            onClick={() => setAccountType('eleve')}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-md transition-all ${
-              accountType === 'eleve' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <FontAwesomeIcon icon={faUser} className="mr-2" />
-            Élève
-          </button>
-          <button
-            type="button"
-            onClick={() => setAccountType('centre')}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-md transition-all ${
-              accountType === 'centre' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <FontAwesomeIcon icon={faBuilding} className="mr-2" />
-            Centre de formation
-          </button>
+          <h2 className="text-2xl font-bold mb-2 text-white">Créer votre compte élève</h2>
+          <p className="text-sm text-gray-400">
+            Réservez vos stages et suivez vos réservations en quelques clics.
+          </p>
         </div>
 
         {/* Form */}
@@ -247,55 +205,13 @@ export default function InscriptionPage() {
             {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
 
-          {/* Centre-specific fields */}
-          {accountType === 'centre' && (
-            <div className="space-y-5 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-              <p className="text-xs font-semibold uppercase tracking-wider pt-4 text-gray-400">
-                Informations du centre
-              </p>
-
-              <div>
-                <label htmlFor="centreName" className="block text-sm font-medium text-gray-300 mb-2">Nom du centre</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    <FontAwesomeIcon icon={faBuilding} className="w-4 h-4" />
-                  </span>
-                  <input id="centreName" type="text" value={form.centreName} onChange={(e) => updateField('centreName', e.target.value)} placeholder="Auto-école BYS" className={`${inputClass} pl-10`} style={inputStyle} />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-300 mb-2">Adresse</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="w-4 h-4" />
-                  </span>
-                  <input id="address" type="text" value={form.address} onChange={(e) => updateField('address', e.target.value)} placeholder="12 rue de la Formation" className={`${inputClass} pl-10`} style={inputStyle} autoComplete="street-address" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="postalCode" className="block text-sm font-medium text-gray-300 mb-2">Code postal</label>
-                  <input id="postalCode" type="text" value={form.postalCode} onChange={(e) => updateField('postalCode', e.target.value)} placeholder="95000" className={`${inputClass} pl-4`} style={inputStyle} autoComplete="postal-code" inputMode="numeric" maxLength={5} />
-                </div>
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">Ville</label>
-                  <input id="city" type="text" value={form.city} onChange={(e) => updateField('city', e.target.value)} placeholder="Cergy" className={`${inputClass} pl-4`} style={inputStyle} autoComplete="address-level2" />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">Téléphone</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    <FontAwesomeIcon icon={faPhone} className="w-4 h-4" />
-                  </span>
-                  <input id="phone" type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="01 23 45 67 89" className={`${inputClass} pl-10`} style={inputStyle} autoComplete="tel" />
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Lien centres → lead-gen vérifié */}
+          <p className="text-xs text-gray-500 text-center">
+            Vous êtes un centre agréé ?{' '}
+            <Link href="/devenir-partenaire" className="text-blue-400 hover:text-blue-300 underline">
+              Devenez partenaire
+            </Link>
+          </p>
 
           {/* CGU Checkbox */}
           <div>

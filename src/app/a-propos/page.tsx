@@ -212,7 +212,7 @@ export default function AProposPage() {
               Vous êtes un centre de formation agréé ? Développez votre activité et bénéficiez d&apos;une visibilité accrue auprès de milliers de conducteurs.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/inscription" className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">
+              <Link href="/devenir-partenaire" className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">
                 Devenir centre partenaire
                 <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
               </Link>

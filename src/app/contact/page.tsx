@@ -29,7 +29,7 @@ export const metadata: Metadata = pageMetadata({
 const faqLinks = [
   { question: "Comment réserver un stage ?", href: "/comment-ca-marche" },
   { question: "Tarifs pour les centres partenaires ?", href: "/tarifs-partenaires" },
-  { question: "Comment devenir centre partenaire ?", href: "/inscription" },
+  { question: "Comment devenir centre partenaire ?", href: "/devenir-partenaire" },
   { question: "Consulter toute la FAQ", href: "/faq" },
 ];
 
@@ -142,7 +142,7 @@ export default function ContactPage() {
                       chaque réservation.
                     </p>
                     <Link
-                      href="/inscription"
+                      href="/devenir-partenaire"
                       className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-all shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
                     >
                       Devenir partenaire

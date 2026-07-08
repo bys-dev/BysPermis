@@ -6,7 +6,7 @@ const navLinks = [
   { label: "Stages", href: "/recherche" },
   { label: "Nos Centres", href: "/centres" },
   { label: "Blog", href: "/blog" },
-  { label: "Espace Pro", href: "/inscription" },
+  { label: "Espace Pro", href: "/devenir-partenaire" },
   { label: "FAQ", href: "/faq" },
 ];
 

@@ -577,7 +577,7 @@ export default function TarifsPartenairesPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
-                    href="/inscription"
+                    href="/devenir-partenaire"
                     className="inline-flex items-center gap-2 bg-white text-blue-700 font-semibold px-8 py-3.5 rounded-lg hover:bg-blue-50 transition-colors"
                   >
                     Devenir centre partenaire

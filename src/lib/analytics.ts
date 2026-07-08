@@ -41,6 +41,9 @@ export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "";
 export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? "";
 export const GOOGLE_ADS_CONVERSION_LABEL =
   process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL ?? "";
+/** Label de l'action de conversion Google Ads dédiée aux leads (formulaire partenaire, contact). */
+export const GOOGLE_ADS_LEAD_LABEL =
+  process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL ?? "";
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
 
 export const hasGA4 = () => Boolean(GA4_ID);
@@ -248,6 +251,14 @@ export function trackPurchase(p: PurchasePayload) {
 
 export function trackLead(source: string, extra?: Record<string, unknown>) {
   trackEvent("generate_lead", { source, ...extra });
+
+  // Conversion Google Ads « lead » (nécessite une action de conversion dédiée).
+  if (hasGoogleAds() && GOOGLE_ADS_LEAD_LABEL) {
+    safeGtag("event", "conversion", {
+      send_to: `${GOOGLE_ADS_ID}/${GOOGLE_ADS_LEAD_LABEL}`,
+    });
+  }
+
   if (hasMetaPixel()) {
     safeFbq("track", "Lead", { source, ...extra });
   }

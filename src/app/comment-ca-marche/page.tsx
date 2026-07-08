@@ -300,7 +300,7 @@ export default function CommentCaMarchePage() {
                 </div>
                 <div className="mt-8">
                   <Link
-                    href="/inscription"
+                    href="/devenir-partenaire"
                     className="btn-primary inline-flex items-center gap-2"
                   >
                     Devenir centre partenaire
