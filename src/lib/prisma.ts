@@ -6,9 +6,11 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL;
+  // Clever Cloud injecte POSTGRESQL_ADDON_URI ; en local on utilise DATABASE_URL.
+  const connectionString =
+    process.env.DATABASE_URL ?? process.env.POSTGRESQL_ADDON_URI;
   if (!connectionString) {
-    throw new Error("DATABASE_URL is not set");
+    throw new Error("DATABASE_URL / POSTGRESQL_ADDON_URI is not set");
   }
   const adapter = new PrismaPg({ connectionString });
   return new (PrismaClient as unknown as new (opts: { adapter: PrismaPg }) => PrismaClient)({ adapter });
