@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { renderEmailTemplate } from "@/lib/email-templates";
-import { resend } from "@/lib/email";
+import { sendMail } from "@/lib/email";
 import { formatDate } from "@/lib/utils";
 import { renderConvocationPdf } from "@/lib/pdf-helpers";
 import { notifyEleveSessionReminder } from "@/lib/event-notifications";
@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
             }
           );
 
-          await resend.emails.send({
+          await sendMail({
             from: FROM,
             to: reservation.email,
             subject,

@@ -2,6 +2,23 @@ import { Resend } from "resend";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
+/**
+ * Envoie un email via Resend en surfaçant les erreurs.
+ * Le SDK Resend ne THROW PAS sur erreur API (clé invalide, domaine non vérifié,
+ * quota…) : il résout `{ data: null, error }`. Sans ce wrapper, tous les envois
+ * échouaient silencieusement (faux succès côté UI, aucun log). Ici on loggue et
+ * on throw pour que les try/catch appelants réagissent.
+ */
+export async function sendMail(
+  payload: Parameters<typeof resend.emails.send>[0],
+): Promise<void> {
+  const { error } = await resend.emails.send(payload);
+  if (error) {
+    console.error("[resend] échec envoi email:", error);
+    throw new Error(`Resend: ${error.message ?? error.name ?? "erreur inconnue"}`);
+  }
+}
+
 const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr";
 // Logo embed pour emails — PNG fiable sur tous les clients (Outlook compris).
@@ -19,7 +36,7 @@ export async function sendConfirmationEmail(params: {
   centreName: string;
   attachments?: { filename: string; content: Buffer }[];
 }): Promise<void> {
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Confirmation de réservation ${params.reservationNumber}`,
@@ -56,7 +73,7 @@ export async function sendConvocationEmail(params: {
   formationTitle: string;
   pdfBuffer: Buffer;
 }): Promise<void> {
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Convocation - ${params.formationTitle}`,
@@ -97,7 +114,7 @@ export async function sendEleveEventEmail(params: {
        </p>`
     : "";
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: params.subject,
@@ -139,7 +156,7 @@ export async function sendCentreEventEmail(params: {
        </p>`
     : "";
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: params.subject,
@@ -180,7 +197,7 @@ export async function sendEleveCancellationEmail(params: {
     ? "<p>Votre remboursement a été initié et apparaîtra sur votre compte sous 5 à 10 jours ouvrés.</p>"
     : "<p>Aucun remboursement n'est prévu pour cette annulation selon les conditions applicables.</p>";
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Annulation de votre réservation ${params.reservationNumber}`,
@@ -220,7 +237,7 @@ export async function sendCentreNotificationEmail(params: {
     currency: "EUR",
   }).format(params.amount);
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Nouvelle réservation - ${params.formationTitle}`,
@@ -259,7 +276,7 @@ export async function sendCentreInvitationEmail(params: {
       </div>`
     : "";
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Bienvenue sur BYS Formation — Votre espace centre est pret`,
@@ -319,7 +336,7 @@ export async function sendDirecteurLieuInvitationEmail(params: {
       </div>`
     : "";
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `BYS Formation — Votre acces directeur de lieu est pret`,
@@ -357,7 +374,7 @@ export async function sendCentreActivationEmail(params: {
   centreName: string;
   dashboardUrl: string;
 }): Promise<void> {
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Votre centre est maintenant visible sur BYS Formation !`,
@@ -411,7 +428,7 @@ export async function sendQuestionnaireEmail(params: {
     return;
   }
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `Votre avis compte — ${params.formationTitle}`,
@@ -469,7 +486,7 @@ export async function sendDocumentEmail(params: {
        </p>`
     : "";
 
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: params.sujet,
@@ -503,7 +520,7 @@ export async function sendCentreRejectionEmail(params: {
   reason: string;
   onboardingUrl: string;
 }): Promise<void> {
-  await resend.emails.send({
+  await sendMail({
     from: FROM,
     to: params.to,
     subject: `BYS Formation — Votre demande d'activation necessite des modifications`,

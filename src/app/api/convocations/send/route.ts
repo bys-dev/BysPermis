@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCentreManagement, PLATFORM_ADMIN_ROLES } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 import { renderEmailTemplate } from "@/lib/email-templates";
-import { resend } from "@/lib/email";
+import { sendMail } from "@/lib/email";
 import { notifyCentreConvocationSent } from "@/lib/event-notifications";
 import { formatDate } from "@/lib/utils";
 import { z } from "zod";
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       variables
     );
 
-    await resend.emails.send({
+    await sendMail({
       from: FROM,
       to: reservation.email,
       subject,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { resend } from "@/lib/email";
+import { sendMail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const safeSujet = escapeHtml(sujet);
     const safeMessage = escapeHtml(message).replace(/\n/g, "<br/>");
 
-    await resend.emails.send({
+    await sendMail({
       from: FROM,
       to: TO,
       replyTo: email,

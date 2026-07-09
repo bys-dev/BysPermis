@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { resend } from "@/lib/email";
+import { sendMail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
 
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
         <td style="padding:8px 0;color:#111827">${value}</td>
       </tr>`;
 
-    await resend.emails.send({
+    await sendMail({
       from: FROM,
       to: TO,
       replyTo: email,

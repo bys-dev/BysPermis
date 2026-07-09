@@ -4,7 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
 import { calculateCommission, getCommissionRate } from "@/lib/utils";
-import { sendConfirmationEmail, sendDocumentEmail, resend } from "@/lib/email";
+import { sendConfirmationEmail, sendDocumentEmail, sendMail } from "@/lib/email";
 import { notifyCentreReservationConfirmed, notifyCentreConvocationSent, notifyEleveDocumentsAvailable } from "@/lib/event-notifications";
 import { renderEmailTemplate } from "@/lib/email-templates";
 import { formatDate } from "@/lib/utils";
@@ -356,7 +356,7 @@ export async function POST(req: NextRequest) {
       emailPromises.push(
         renderEmailTemplate("convocation", centre.id, convocationVars)
           .then(({ subject, html }) =>
-            resend.emails.send({
+            sendMail({
               from: FROM,
               to: data.email,
               subject,
