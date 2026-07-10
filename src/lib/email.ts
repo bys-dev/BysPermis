@@ -55,6 +55,11 @@ export async function sendConfirmationEmail(params: {
       <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold">Centre</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.centreName}</td></tr>
     </table>
     <p>Votre <strong>facture</strong> est jointe à ce mail au format PDF. Votre <strong>convocation</strong> vous sera envoyée 48h avant la session.</p>
+    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:0 0 6px;font-weight:bold;color:#92400E">Dernière étape : transmettez vos justificatifs</p>
+      <p style="margin:0 0 12px;font-size:14px;color:#78350F">Pour valider définitivement votre inscription, envoyez votre <strong>pièce d'identité</strong> et votre <strong>permis de conduire</strong> à votre centre depuis votre espace élève.</p>
+      <a href="${APP_URL}/espace-eleve/documents" style="display:inline-block;background:#F59E0B;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;padding:10px 18px;border-radius:8px">Envoyer mes documents</a>
+    </div>
     <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation Permis</p>
   </div>
 </div>`,

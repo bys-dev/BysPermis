@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleCheck, faEnvelope, faCalendarDays, faLocationDot,
-  faDownload, faArrowRight, faPhone, faShieldHalved,
+  faDownload, faArrowRight, faPhone, faShieldHalved, faIdCard,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface SessionData {
@@ -56,6 +56,32 @@ export default function ConfirmationPage() {
         </p>
         <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold">
           Référence : <span className="font-mono">{reservationNum}</span>
+        </div>
+      </div>
+
+      {/* Action requise : pièces d'identité */}
+      <div className="bg-amber-50 rounded-2xl border border-amber-200 shadow-sm p-7 mb-5">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+            <FontAwesomeIcon icon={faIdCard} className="text-amber-600 text-lg" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-display font-semibold text-gray-900 mb-1">
+              Dernière étape : transmettez vos justificatifs
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Pour valider définitivement votre inscription, envoyez dès maintenant votre{" "}
+              <strong>pièce d&apos;identité</strong> et votre <strong>permis de conduire</strong> à
+              votre centre depuis votre espace élève.
+            </p>
+            <Link
+              href="/espace-eleve/documents"
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-all"
+            >
+              <FontAwesomeIcon icon={faIdCard} className="text-xs" />
+              Envoyer mes documents
+            </Link>
+          </div>
         </div>
       </div>
 
