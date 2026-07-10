@@ -6,9 +6,19 @@ import { z } from "zod";
 
 const VALID_MEMBRE_ROLES = ["CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE"] as const;
 
+const VALID_FONCTIONS = ["EXPERT_SR", "PSYCHOLOGUE"] as const;
+
 const postSchema = z.object({
   email: z.string().email("Email invalide").max(254),
   role: z.enum(VALID_MEMBRE_ROLES),
+  fonctionAnimateur: z.enum(VALID_FONCTIONS).nullable().optional(),
+  numeroAutorisation: z.string().max(100).nullable().optional(),
+});
+
+const patchSchema = z.object({
+  userId: z.string().min(1).regex(/^[a-z0-9]{20,}$/i, "userId invalide"),
+  fonctionAnimateur: z.enum(VALID_FONCTIONS).nullable().optional(),
+  numeroAutorisation: z.string().max(100).nullable().optional(),
 });
 
 const deleteSchema = z.object({
@@ -52,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
     }
-    const { email, role } = parsed.data;
+    const { email, role, fonctionAnimateur, numeroAutorisation } = parsed.data;
 
     // Find the owner's active centre
     const centreId = await getUserCentreId(owner.id, owner.role);
@@ -87,6 +97,8 @@ export async function POST(req: NextRequest) {
         userId: targetUser.id,
         centreId: centre.id,
         role: role as typeof CENTRE_ROLES[number],
+        fonctionAnimateur: fonctionAnimateur ?? null,
+        numeroAutorisation: numeroAutorisation?.trim() || null,
       },
       include: {
         user: {
@@ -104,6 +116,46 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(membre, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+}
+
+// PATCH /api/centre/membres — Update a member's animator function + authorisation number (CENTRE_OWNER only)
+export async function PATCH(req: NextRequest) {
+  try {
+    const owner = await requireCentreOwner();
+
+    const body = await req.json();
+    const parsed = patchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+    }
+    const { userId, fonctionAnimateur, numeroAutorisation } = parsed.data;
+
+    const centreId = await getUserCentreId(owner.id, owner.role);
+    if (!centreId) {
+      return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
+    }
+
+    const data: { fonctionAnimateur?: typeof VALID_FONCTIONS[number] | null; numeroAutorisation?: string | null } = {};
+    if (fonctionAnimateur !== undefined) data.fonctionAnimateur = fonctionAnimateur;
+    if (numeroAutorisation !== undefined) data.numeroAutorisation = numeroAutorisation?.trim() || null;
+
+    const updated = await prisma.centreMembre.updateMany({
+      where: { userId, centreId },
+      data,
+    });
+    if (updated.count === 0) {
+      return NextResponse.json({ error: "Membre introuvable" }, { status: 404 });
+    }
+
+    const membre = await prisma.centreMembre.findFirst({
+      where: { userId, centreId },
+      include: { user: { select: { id: true, prenom: true, nom: true, email: true } } },
+    });
+
+    return NextResponse.json(membre);
   } catch {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }

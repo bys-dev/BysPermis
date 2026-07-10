@@ -27,6 +27,14 @@ enum Role {
   OWNER // Super-admin (Sébastien — accès total)
 }
 
+// Fonction réglementaire d'un animateur de stage (distincte du droit d'accès `Role`).
+// Chaque stage est co-animé par un expert en sécurité routière et un psychologue,
+// chacun titulaire d'un numéro d'autorisation d'animer délivré par la préfecture.
+enum FonctionAnimateur {
+  EXPERT_SR // Expert en sécurité routière (BAFM)
+  PSYCHOLOGUE // Animateur psychologue
+}
+
 enum ReservationStatus {
   EN_ATTENTE
   EN_ATTENTE_PAIEMENT // Réservation créée, en attente de validation Stripe (placeholder anti race-condition)
@@ -251,6 +259,10 @@ model Centre {
 model CentreMembre {
   id        String   @id @default(cuid())
   role      Role // CENTRE_ADMIN, CENTRE_FORMATEUR, CENTRE_SECRETAIRE
+  // Fonction réglementaire (optionnelle) : renseignée pour les animateurs de stage.
+  // Alimente l'attestation de suivi (Annexe I) avec le n° d'autorisation d'animer.
+  fonctionAnimateur  FonctionAnimateur?
+  numeroAutorisation String? // N° d'autorisation d'animer (préfecture)
   createdAt DateTime @default(now())
 
   userId   String

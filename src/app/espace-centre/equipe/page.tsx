@@ -12,14 +12,21 @@ import {
   faShieldHalved,
   faCircleCheck,
   faTriangleExclamation,
+  faStamp,
+  faPen,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 type CentreRole = "CENTRE_ADMIN" | "CENTRE_FORMATEUR" | "CENTRE_SECRETAIRE";
+
+type FonctionAnimateur = "EXPERT_SR" | "PSYCHOLOGUE";
 
 interface Membre {
   id: string;
   userId: string;
   role: string;
+  fonctionAnimateur: FonctionAnimateur | null;
+  numeroAutorisation: string | null;
   createdAt: string;
   user: {
     id: string;
@@ -28,6 +35,17 @@ interface Membre {
     email: string;
   };
 }
+
+const fonctionLabels: Record<FonctionAnimateur, string> = {
+  EXPERT_SR: "Expert sécurité routière",
+  PSYCHOLOGUE: "Animateur psychologue",
+};
+
+const fonctionOptions: { value: "" | FonctionAnimateur; label: string }[] = [
+  { value: "", label: "— Aucune (pas animateur) —" },
+  { value: "EXPERT_SR", label: "Expert en sécurité routière" },
+  { value: "PSYCHOLOGUE", label: "Animateur psychologue" },
+];
 
 const roleLabels: Record<string, { label: string; color: string; bg: string }> = {
   CENTRE_OWNER:      { label: "Propriétaire",   color: "text-yellow-400", bg: "bg-yellow-400/10" },
@@ -50,11 +68,19 @@ export default function EquipePage() {
   // Invite form
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<CentreRole>("CENTRE_FORMATEUR");
+  const [fonction, setFonction] = useState<"" | FonctionAnimateur>("");
+  const [numero, setNumero] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteMsg, setInviteMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Delete confirm
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Inline edit fonction animateur
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFonction, setEditFonction] = useState<"" | FonctionAnimateur>("");
+  const [editNumero, setEditNumero] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -79,12 +105,19 @@ export default function EquipePage() {
       const res = await fetch("/api/centre/membres", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), role }),
+        body: JSON.stringify({
+          email: email.trim(),
+          role,
+          fonctionAnimateur: fonction || null,
+          numeroAutorisation: numero.trim() || null,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
         setMembres((prev) => [...prev, data]);
         setEmail("");
+        setFonction("");
+        setNumero("");
         setInviteMsg({ type: "success", text: "Membre ajouté avec succès." });
       } else {
         setInviteMsg({ type: "error", text: data.error || "Erreur lors de l'ajout." });
@@ -93,6 +126,42 @@ export default function EquipePage() {
       setInviteMsg({ type: "error", text: "Erreur réseau." });
     } finally {
       setInviting(false);
+    }
+  }
+
+  function startEdit(m: Membre) {
+    setEditingId(m.userId);
+    setEditFonction(m.fonctionAnimateur ?? "");
+    setEditNumero(m.numeroAutorisation ?? "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditFonction("");
+    setEditNumero("");
+  }
+
+  async function saveEdit(userId: string) {
+    setSavingEdit(true);
+    try {
+      const res = await fetch("/api/centre/membres", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          fonctionAnimateur: editFonction || null,
+          numeroAutorisation: editNumero.trim() || null,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.userId) {
+        setMembres((prev) => prev.map((m) => (m.userId === userId ? { ...m, ...data } : m)));
+        cancelEdit();
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSavingEdit(false);
     }
   }
 
@@ -174,6 +243,34 @@ export default function EquipePage() {
             </button>
           </div>
 
+          {/* Fonction animateur (optionnel) — alimente l'attestation Annexe I */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-3">
+            <select
+              value={fonction}
+              onChange={(e) => setFonction(e.target.value as "" | FonctionAnimateur)}
+              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50"
+            >
+              {fonctionOptions.map((f) => (
+                <option key={f.value} value={f.value} className="bg-[#0A1628]">
+                  {f.label}
+                </option>
+              ))}
+            </select>
+            {fonction && (
+              <input
+                type="text"
+                placeholder="N° d'autorisation d'animer (préfecture)"
+                value={numero}
+                onChange={(e) => setNumero(e.target.value)}
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+              />
+            )}
+          </div>
+          <p className="text-gray-500 text-xs mt-2">
+            La fonction animateur (expert sécurité routière / psychologue) et son n° d&apos;autorisation
+            apparaissent sur l&apos;attestation de suivi de stage.
+          </p>
+
           {inviteMsg && (
             <div className={`mt-3 flex items-center gap-2 text-sm ${inviteMsg.type === "success" ? "text-green-400" : "text-red-400"}`}>
               <FontAwesomeIcon
@@ -215,6 +312,7 @@ export default function EquipePage() {
                   <th className="px-6 py-3 font-medium">Membre</th>
                   <th className="px-6 py-3 font-medium">E-mail</th>
                   <th className="px-6 py-3 font-medium">Rôle</th>
+                  <th className="px-6 py-3 font-medium">Fonction animateur</th>
                   <th className="px-6 py-3 font-medium">Ajouté le</th>
                   {isOwner && <th className="px-6 py-3 font-medium text-right">Actions</th>}
                 </tr>
@@ -247,6 +345,76 @@ export default function EquipePage() {
                           <FontAwesomeIcon icon={faShieldHalved} className="w-3 h-3" />
                           {rl.label}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {editingId === m.userId ? (
+                          <div className="flex flex-col gap-2 min-w-[220px]">
+                            <select
+                              value={editFonction}
+                              onChange={(e) => setEditFonction(e.target.value as "" | FonctionAnimateur)}
+                              className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500/50"
+                            >
+                              {fonctionOptions.map((f) => (
+                                <option key={f.value} value={f.value} className="bg-[#0A1628]">
+                                  {f.label}
+                                </option>
+                              ))}
+                            </select>
+                            {editFonction && (
+                              <input
+                                type="text"
+                                placeholder="N° d'autorisation"
+                                value={editNumero}
+                                onChange={(e) => setEditNumero(e.target.value)}
+                                className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+                              />
+                            )}
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => saveEdit(m.userId)}
+                                disabled={savingEdit}
+                                className="inline-flex items-center gap-1.5 text-xs font-medium text-green-400 hover:text-green-300 disabled:opacity-50"
+                              >
+                                <FontAwesomeIcon icon={savingEdit ? faSpinner : faCircleCheck} className={savingEdit ? "animate-spin" : ""} />
+                                Enregistrer
+                              </button>
+                              <button
+                                onClick={cancelEdit}
+                                className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300"
+                              >
+                                <FontAwesomeIcon icon={faXmark} />
+                                Annuler
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            {m.fonctionAnimateur ? (
+                              <span className="inline-flex flex-col">
+                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-400">
+                                  <FontAwesomeIcon icon={faStamp} className="w-3 h-3" />
+                                  {fonctionLabels[m.fonctionAnimateur]}
+                                </span>
+                                {m.numeroAutorisation && (
+                                  <span className="text-[11px] text-gray-500 mt-0.5 ml-4">
+                                    N° {m.numeroAutorisation}
+                                  </span>
+                                )}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-600">—</span>
+                            )}
+                            {isOwner && (
+                              <button
+                                onClick={() => startEdit(m)}
+                                className="text-gray-600 hover:text-blue-400 transition-colors"
+                                title="Modifier la fonction animateur"
+                              >
+                                <FontAwesomeIcon icon={faPen} className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-500">
