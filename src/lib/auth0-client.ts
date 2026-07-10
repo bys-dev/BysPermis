@@ -6,6 +6,12 @@ import { enrichSessionWithRole } from "@/lib/auth0-session"
  * Le hook beforeSessionSaved DOIT être ici : sans lui, le rôle n'est jamais lu au callback.
  */
 export const auth0 = new Auth0Client({
+  session: {
+    rolling: true,
+    // Défauts SDK trop courts (1 j d'inactivité / 3 j max) → déconnexions intempestives.
+    inactivityDuration: 60 * 60 * 24 * 7, // 7 jours sans activité
+    absoluteDuration: 60 * 60 * 24 * 30, // 30 jours maximum
+  },
   async beforeSessionSaved(session, idToken) {
     return enrichSessionWithRole(session, idToken)
   },
