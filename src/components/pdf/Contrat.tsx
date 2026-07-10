@@ -144,10 +144,11 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 14,
+    fontSize: 13,
     color: colors.navy,
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginBottom: 4,
+    lineHeight: 1.25,
   },
   subtitle: {
     fontSize: 8,
@@ -283,7 +284,7 @@ export function Contrat({ data }: { data: ContratData }) {
 
   return (
     <Document
-      title={`Contrat de formation ${numeroContrat} — ${organisme.nom}`}
+      title={`Contrat de stage ${numeroContrat} — ${organisme.nom}`}
       author={organisme.nom}
       subject={`Contrat ${formation.titre} — ${stagiaire.prenom} ${stagiaire.nom}`}
     >
@@ -314,9 +315,11 @@ export function Contrat({ data }: { data: ContratData }) {
         <View style={styles.body}>
           {/* Title */}
           <View style={styles.titleSection}>
-            <Text style={styles.mainTitle}>CONTRAT DE FORMATION PROFESSIONNELLE</Text>
+            <Text style={styles.mainTitle}>
+              CONTRAT DE STAGE DE SENSIBILISATION À LA SÉCURITÉ ROUTIÈRE
+            </Text>
             <Text style={styles.subtitle}>
-              (Article L.6353-3 du Code du Travail)
+              (Articles L.223-6 et R.223-5 et suivants du Code de la route)
             </Text>
           </View>
 
