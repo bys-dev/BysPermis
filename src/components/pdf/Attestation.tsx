@@ -20,6 +20,18 @@ export interface AttestationData {
     adresse?: string;
     codePostal?: string;
     ville?: string;
+    numeroPermis?: string;
+  };
+  // Cas réglementaire du stage (1 à 4) et agrément préfectoral du centre.
+  casStage?: number;
+  agrement?: {
+    numero?: string;
+    departement?: string;
+  };
+  // Animateurs réglementaires : expert en sécurité routière + psychologue.
+  animateurs?: {
+    expertSr?: { nom?: string; numeroAutorisation?: string };
+    psychologue?: { nom?: string; numeroAutorisation?: string };
   };
   formation: {
     titre: string;
@@ -245,6 +257,9 @@ export function Attestation({ data }: { data: AttestationData }) {
     session,
     centre,
     verificationUrl,
+    casStage,
+    agrement,
+    animateurs,
   } = data;
 
   const modaliteLabel: Record<string, string> = {
@@ -253,11 +268,25 @@ export function Attestation({ data }: { data: AttestationData }) {
     HYBRIDE: "Hybride",
   };
 
+  // Les 4 cas réglementaires (art. R.223-5 et s. du Code de la route).
+  const casLabels: Record<number, string> = {
+    1: "Cas n°1 — Stage volontaire (récupération de points)",
+    2: "Cas n°2 — Stage obligatoire, permis probatoire (lettre 48N)",
+    3: "Cas n°3 — Stage en composition pénale ou alternative aux poursuites",
+    4: "Cas n°4 — Stage en peine complémentaire ou sursis avec mise à l'épreuve",
+  };
+  const casLabel = casStage ? casLabels[casStage] : undefined;
+
+  const agrementText =
+    agrement?.numero || agrement?.departement
+      ? `${agrement?.numero ?? "—"}${agrement?.departement ? ` (dép. ${agrement.departement})` : ""}`
+      : undefined;
+
   const centreDisplay = centre.raisonSociale ?? centre.nom;
 
   return (
     <Document
-      title={`Attestation de formation — ${numeroAttestation}`}
+      title={`Attestation de suivi de stage — ${numeroAttestation}`}
       author={centreDisplay}
       subject={`Attestation ${formation.titre} — ${stagiaire.prenom} ${stagiaire.nom}`}
     >
@@ -285,9 +314,9 @@ export function Attestation({ data }: { data: AttestationData }) {
         <View style={styles.body}>
           {/* Title */}
           <View style={styles.titleSection}>
-            <Text style={styles.mainTitle}>ATTESTATION DE FORMATION</Text>
+            <Text style={styles.mainTitle}>ATTESTATION DE SUIVI DE STAGE</Text>
             <Text style={styles.subtitle}>
-              Document officiel délivré par {centreDisplay}
+              Stage de sensibilisation à la sécurité routière — art. L.223-6 et R.223-5 et s. du Code de la route
             </Text>
           </View>
 
@@ -297,6 +326,12 @@ export function Attestation({ data }: { data: AttestationData }) {
               <Text style={styles.refLabel}>Numero d&apos;attestation</Text>
               <Text style={styles.refValue}>{numeroAttestation}</Text>
             </View>
+            {agrementText && (
+              <View>
+                <Text style={styles.refLabel}>Agrément préfectoral</Text>
+                <Text style={{ ...styles.refValue, textAlign: "center" }}>{agrementText}</Text>
+              </View>
+            )}
             <View>
               <Text style={styles.refLabel}>Date de delivrance</Text>
               <Text style={{ ...styles.refValue, textAlign: "right" }}>{dateDelivrance}</Text>
@@ -374,10 +409,22 @@ export function Attestation({ data }: { data: AttestationData }) {
                 <Text style={styles.rowLabel}>Nom complet</Text>
                 <Text style={styles.rowValue}>{stagiaire.civilite ? `${stagiaire.civilite} ` : ""}{stagiaire.prenom} {stagiaire.nom}</Text>
               </View>
+              {stagiaire.numeroPermis && (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>N° de permis</Text>
+                  <Text style={styles.rowValue}>{stagiaire.numeroPermis}</Text>
+                </View>
+              )}
               {stagiaire.adresse && (
                 <View style={styles.row}>
                   <Text style={styles.rowLabel}>Adresse</Text>
                   <Text style={styles.rowValue}>{stagiaire.adresse}{"\n"}{stagiaire.codePostal} {stagiaire.ville}</Text>
+                </View>
+              )}
+              {casLabel && (
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Cas du stage</Text>
+                  <Text style={styles.rowValue}>{casLabel}</Text>
                 </View>
               )}
             </View>
@@ -408,6 +455,35 @@ export function Attestation({ data }: { data: AttestationData }) {
             </View>
           </View>
 
+          {/* Animateurs réglementaires du stage */}
+          {(animateurs?.expertSr || animateurs?.psychologue) && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Animateurs du stage</Text>
+              <View style={styles.grid}>
+                <View style={styles.col}>
+                  <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Expert SR</Text>
+                    <Text style={styles.rowValue}>{animateurs?.expertSr?.nom ?? "—"}</Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.rowLabel}>N° autorisation</Text>
+                    <Text style={styles.rowValue}>{animateurs?.expertSr?.numeroAutorisation ?? "—"}</Text>
+                  </View>
+                </View>
+                <View style={styles.col}>
+                  <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Psychologue</Text>
+                    <Text style={styles.rowValue}>{animateurs?.psychologue?.nom ?? "—"}</Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.rowLabel}>N° autorisation</Text>
+                    <Text style={styles.rowValue}>{animateurs?.psychologue?.numeroAutorisation ?? "—"}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          )}
+
           {/* QR Code placeholder */}
           <View style={styles.qrBox}>
             <View style={styles.qrPlaceholder}>
@@ -422,20 +498,27 @@ export function Attestation({ data }: { data: AttestationData }) {
             </View>
           </View>
 
-          {/* Signatures */}
+          {/* Signatures — expert SR, psychologue, cachet du centre (Annexe I) */}
           <View style={styles.signBlock}>
             <View style={styles.signBox}>
               <Text style={styles.signTitle}>
-                {centre.nomResponsable ? `Signature de ${centre.nomResponsable}` : "Signature du formateur"}
+                L&apos;expert en sécurité routière{animateurs?.expertSr?.nom ? `\n${animateurs.expertSr.nom}` : ""}
               </Text>
               <View style={styles.signLine} />
-              <Text style={styles.signLabel}>Fait à {centre.ville}, le {dateDelivrance}</Text>
+              <Text style={styles.signLabel}>Signature</Text>
             </View>
             <View style={styles.signBox}>
-              <Text style={styles.signTitle}>Cachet & signature du centre</Text>
+              <Text style={styles.signTitle}>
+                Le psychologue{animateurs?.psychologue?.nom ? `\n${animateurs.psychologue.nom}` : ""}
+              </Text>
+              <View style={styles.signLine} />
+              <Text style={styles.signLabel}>Signature</Text>
+            </View>
+            <View style={styles.signBox}>
+              <Text style={styles.signTitle}>Cachet du centre</Text>
               <PdfCentreSeal sealUrl={centre.signatureUrl} />
               <View style={styles.signLine} />
-              <Text style={styles.signLabel}>{centreDisplay}</Text>
+              <Text style={styles.signLabel}>{centreDisplay}, le {dateDelivrance}</Text>
             </View>
           </View>
         </View>
@@ -448,8 +531,8 @@ export function Attestation({ data }: { data: AttestationData }) {
         </View>
         <View style={{ backgroundColor: colors.navy, paddingHorizontal: 40, paddingBottom: 10 }}>
           <Text style={styles.footerLegal}>
-            Cette attestation est délivrée conformément aux dispositions du Code du travail relatives à la formation professionnelle.
-            {"\n"}{centreDisplay}{centre.siret ? ` — SIRET ${centre.siret}` : ""} — {centre.adresse}, {centre.codePostal} {centre.ville}
+            Attestation de suivi de stage de sensibilisation à la sécurité routière délivrée conformément aux articles L.223-6 et R.223-5 et suivants du Code de la route.
+            {"\n"}{centreDisplay}{centre.siret ? ` — SIRET ${centre.siret}` : ""}{agrementText ? ` — Agrément ${agrementText}` : ""} — {centre.adresse}, {centre.codePostal} {centre.ville}
           </Text>
         </View>
       </Page>

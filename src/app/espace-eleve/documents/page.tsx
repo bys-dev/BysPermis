@@ -169,7 +169,7 @@ export default function DocumentsPage() {
       docs.push({
         ...baseInfo,
         type: "attestation",
-        label: "Attestation de formation",
+        label: "Attestation de suivi de stage",
         status: isTerminee ? "disponible" : isConfirmee ? "en_attente" : "non_applicable",
         href: isTerminee ? `/api/attestations/${r.id}` : null,
       });

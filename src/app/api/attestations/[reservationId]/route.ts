@@ -50,6 +50,17 @@ export async function GET(
     const { formation } = session;
     const centre = formation.centre;
 
+    // Animateurs réglementaires du centre (expert SR + psychologue) pour l'attestation Annexe I.
+    const animateurs = await prisma.centreMembre.findMany({
+      where: { centreId: centre.id, fonctionAnimateur: { not: null } },
+      include: { user: { select: { prenom: true, nom: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+    const expert = animateurs.find((a) => a.fonctionAnimateur === "EXPERT_SR");
+    const psy = animateurs.find((a) => a.fonctionAnimateur === "PSYCHOLOGUE");
+    const animateurNom = (a?: { user: { prenom: string; nom: string } }) =>
+      a ? `${a.user.prenom} ${a.user.nom}`.trim() : undefined;
+
     const numeroAttestation = `ATT-${new Date().getFullYear()}-${reservation.numero}`;
 
     const data = {
@@ -62,6 +73,20 @@ export async function GET(
         adresse: reservation.adresse ?? undefined,
         codePostal: reservation.codePostal ?? undefined,
         ville: reservation.ville ?? undefined,
+        numeroPermis: reservation.numeroPermis ?? undefined,
+      },
+      casStage: reservation.casStage ?? undefined,
+      agrement: {
+        numero: centre.agrementNumber ?? undefined,
+        departement: centre.agrementDepartement ?? undefined,
+      },
+      animateurs: {
+        expertSr: expert
+          ? { nom: animateurNom(expert), numeroAutorisation: expert.numeroAutorisation ?? undefined }
+          : undefined,
+        psychologue: psy
+          ? { nom: animateurNom(psy), numeroAutorisation: psy.numeroAutorisation ?? undefined }
+          : undefined,
       },
       formation: {
         titre: formation.titre,
