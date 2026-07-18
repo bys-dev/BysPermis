@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/utils";
 import { renderConvocationPdf } from "@/lib/pdf-helpers";
 import { notifyEleveSessionReminder } from "@/lib/event-notifications";
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
+const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
 const CRON_SECRET = process.env.CRON_SECRET;
 
 /**

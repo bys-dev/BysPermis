@@ -296,7 +296,7 @@ export async function POST(req: NextRequest) {
 
     // 7. Envoyer les emails (hors transaction)
     const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-    const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
+    const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
     const centre = result.reservation.session.formation.centre;
 
     try {

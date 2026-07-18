@@ -181,7 +181,7 @@ export default function ConfirmationPage() {
           <p className="text-gray-400 text-sm">Notre équipe répond sous 24h ouvrées.</p>
         </div>
         <div className="flex gap-3 shrink-0">
-          <a href="mailto:bysforma95@gmail.com" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-colors" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
+          <a href="mailto:contact@byspermis.fr" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-colors" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
             <FontAwesomeIcon icon={faEnvelope} className="text-xs" />
             Email
           </a>

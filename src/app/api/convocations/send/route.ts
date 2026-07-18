@@ -8,7 +8,7 @@ import { notifyCentreConvocationSent } from "@/lib/event-notifications";
 import { formatDate } from "@/lib/utils";
 import { z } from "zod";
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
+const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
 const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
 const sendSchema = z.object({

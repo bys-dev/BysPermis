@@ -29,7 +29,7 @@ export default function CGUPage() {
                 Les présentes conditions générales d&apos;utilisation (ci-après
                 « CGU ») ont pour objet de définir les modalités et conditions
                 d&apos;utilisation de la plateforme BYS Formation (ci-après « la
-                Plateforme »), accessible à l&apos;adresse bys-formation.fr.
+                Plateforme »), accessible à l&apos;adresse byspermis.fr.
               </p>
               <p>
                 L&apos;inscription et l&apos;utilisation de la Plateforme
@@ -48,7 +48,7 @@ export default function CGUPage() {
             <ul className="leading-relaxed text-gray-700 space-y-2">
               <li>
                 <strong>« Plateforme »</strong> : le site internet
-                bys-formation.fr et l&apos;ensemble de ses fonctionnalités.
+                byspermis.fr et l&apos;ensemble de ses fonctionnalités.
               </li>
               <li>
                 <strong>« BYS Formation »</strong> : la société BYS Formation —
@@ -172,10 +172,10 @@ export default function CGUPage() {
                 Toute demande d&apos;annulation doit être adressée depuis
                 l&apos;espace personnel de l&apos;Utilisateur ou par email à{" "}
                 <a
-                  href="mailto:bysforma95@gmail.com"
+                  href="mailto:contact@byspermis.fr"
                   className="text-brand-accent hover:text-brand-accent-hover underline"
                 >
-                  bysforma95@gmail.com
+                  contact@byspermis.fr
                 </a>
                 .
               </p>

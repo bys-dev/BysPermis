@@ -48,7 +48,7 @@ export default function AdminParametresPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
   const [platformName] = useState("BYS Permis");
-  const [contactEmail] = useState("bysforma95@gmail.com");
+  const [contactEmail] = useState("contact@byspermis.fr");
 
   const isOwner = user?.role === "OWNER";
 

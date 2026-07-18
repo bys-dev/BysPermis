@@ -26,7 +26,7 @@ export default function MentionsLegalesPage() {
             <div className="leading-relaxed text-gray-700 space-y-1">
               <p>
                 La marketplace <strong>BYS Formation Permis</strong> (accessible
-                sur <strong>bys-permis.fr</strong>) est une marque éditée par :
+                sur <strong>byspermis.fr</strong>) est une marque éditée par :
               </p>
               <ul className="list-none mt-3 space-y-1">
                 <li>
@@ -42,10 +42,10 @@ export default function MentionsLegalesPage() {
                 <li>
                   <strong>Email :</strong>{" "}
                   <a
-                    href="mailto:bysforma95@gmail.com"
+                    href="mailto:contact@byspermis.fr"
                     className="text-brand-accent hover:text-brand-accent-hover underline"
                   >
-                    bysforma95@gmail.com
+                    contact@byspermis.fr
                   </a>
                 </li>
               </ul>

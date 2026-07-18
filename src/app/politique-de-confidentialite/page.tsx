@@ -290,10 +290,10 @@ export default function PolitiqueDeConfidentialitePage() {
               <p>
                 Pour exercer ces droits, contactez-nous à l&apos;adresse :{" "}
                 <a
-                  href="mailto:bysforma95@gmail.com"
+                  href="mailto:contact@byspermis.fr"
                   className="text-brand-accent hover:text-brand-accent-hover underline"
                 >
-                  bysforma95@gmail.com
+                  contact@byspermis.fr
                 </a>
               </p>
               <p>
@@ -331,10 +331,10 @@ export default function PolitiqueDeConfidentialitePage() {
                 <li>
                   Email :{" "}
                   <a
-                    href="mailto:bysforma95@gmail.com"
+                    href="mailto:contact@byspermis.fr"
                     className="text-brand-accent hover:text-brand-accent-hover underline"
                   >
-                    bysforma95@gmail.com
+                    contact@byspermis.fr
                   </a>
                 </li>
               </ul>

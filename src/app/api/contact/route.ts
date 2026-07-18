@@ -11,8 +11,8 @@ const ContactSchema = z.object({
   message: z.string().min(10, "Message trop court"),
 });
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
-const TO = "bysforma95@gmail.com";
+const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const TO = "contact@byspermis.fr";
 
 export async function POST(req: NextRequest) {
   try {

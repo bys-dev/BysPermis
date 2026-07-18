@@ -208,8 +208,8 @@ export async function POST(req: NextRequest) {
     const senderName = [message.sender.prenom, message.sender.nom].filter(Boolean).join(" ") || "Un utilisateur";
     const centreRoles = ["CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_SECRETAIRE", "CENTRE_FORMATEUR"];
     const messagesUrl = centreRoles.includes(message.receiver.role)
-      ? `${process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr"}/espace-centre/messages`
-      : `${process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr"}/espace-eleve/messages`;
+      ? `${process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}/espace-centre/messages`
+      : `${process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}/espace-eleve/messages`;
     notifyNewMessage({
       receiverId: message.receiver.id,
       receiverEmail: message.receiver.email,

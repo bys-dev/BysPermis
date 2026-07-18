@@ -398,10 +398,10 @@ export default function CookiesPage() {
                 Pour toute question relative à notre utilisation des cookies,
                 vous pouvez nous contacter à l&apos;adresse :{" "}
                 <a
-                  href="mailto:bysforma95@gmail.com"
+                  href="mailto:contact@byspermis.fr"
                   className="text-brand-accent hover:text-brand-accent-hover underline"
                 >
-                  bysforma95@gmail.com
+                  contact@byspermis.fr
                 </a>
               </p>
               <p>

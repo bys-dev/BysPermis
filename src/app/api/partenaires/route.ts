@@ -24,8 +24,8 @@ const PartnerLeadSchema = z.object({
   }),
 });
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
-const TO = "bysforma95@gmail.com";
+const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const TO = "contact@byspermis.fr";
 
 export async function POST(req: NextRequest) {
   try {

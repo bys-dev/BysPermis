@@ -19,8 +19,8 @@ export async function sendMail(
   }
 }
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@bysformations.fr>";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr";
+const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 // Logo embed pour emails — PNG fiable sur tous les clients (Outlook compris).
 const LOGO_IMG = `<img src="${APP_URL}/colored-logo.png" alt="BYS Formation" height="48" style="display:block;height:48px;width:auto;margin:0 auto 12px"/>`;
 

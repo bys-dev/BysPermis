@@ -5,7 +5,7 @@ import {
   sendEleveEventEmail,
 } from "@/lib/email";
 
-const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://bys-permis.fr";
+const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
 const STAFF_ROLES = ["CENTRE_ADMIN", "CENTRE_SECRETAIRE", "CENTRE_FORMATEUR"] as const;
 const PLATFORM_STAFF_ROLES = ["ADMIN", "OWNER", "SUPPORT"] as const;

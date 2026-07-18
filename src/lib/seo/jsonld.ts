@@ -34,7 +34,7 @@ export function organizationJsonLd() {
       {
         "@type": "ContactPoint",
         contactType: "customer support",
-        email: "contact@bys-permis.fr",
+        email: "contact@byspermis.fr",
         availableLanguage: ["French"],
         areaServed: "FR",
       },

@@ -272,7 +272,7 @@ export default function CentreSupportPage() {
         <FontAwesomeIcon icon={faEnvelope} className="text-blue-400 mt-0.5" />
         <div>
           <p className="text-blue-300 text-sm font-medium">Notre équipe répond sous 24h ouvrées</p>
-          <p className="text-blue-400/70 text-xs mt-0.5">Lundi – Vendredi : 9h – 18h · Email : bysforma95@gmail.com</p>
+          <p className="text-blue-400/70 text-xs mt-0.5">Lundi – Vendredi : 9h – 18h · Email : contact@byspermis.fr</p>
         </div>
       </div>
 

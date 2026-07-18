@@ -34,14 +34,14 @@ const faqLinks = [
 ];
 
 const heroContacts = [
-  { icon: faEnvelope, label: "Email", value: "bysforma95@gmail.com", href: "mailto:bysforma95@gmail.com" },
+  { icon: faEnvelope, label: "Email", value: "contact@byspermis.fr", href: "mailto:contact@byspermis.fr" },
   { icon: faPhone, label: "Téléphone", value: "01 34 25 XX XX" },
   { icon: faLocationDot, label: "Adresse", value: "Osny (95) — Val-d'Oise" },
   { icon: faClock, label: "Horaires", value: "Lun – Ven : 9h – 18h" },
 ];
 
 const sidebarContacts = [
-  { icon: faEnvelope, label: "Email", value: "bysforma95@gmail.com", href: "mailto:bysforma95@gmail.com" },
+  { icon: faEnvelope, label: "Email", value: "contact@byspermis.fr", href: "mailto:contact@byspermis.fr" },
   { icon: faPhone, label: "Téléphone", value: "01 34 25 XX XX", href: "tel:+33134250000" },
   { icon: faLocationDot, label: "Adresse", value: "Bât. 7, 9 Chaussée Jules César, 95520 Osny" },
   { icon: faClock, label: "Horaires", value: "Lun – Ven : 9h – 18h" },

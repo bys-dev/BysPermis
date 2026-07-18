@@ -31,11 +31,11 @@ export default function Footer() {
             {/* Contact info */}
             <div className="flex flex-col gap-2 mb-6 text-sm text-gray-400">
               <a
-                href="mailto:bysforma95@gmail.com"
+                href="mailto:contact@byspermis.fr"
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4" />
-                bysforma95@gmail.com
+                contact@byspermis.fr
               </a>
               <span className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faLocationDot} className="w-4 h-4" />
