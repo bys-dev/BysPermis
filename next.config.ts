@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // Build ID déterministe partagé par toutes les instances Clever Cloud
+  // (chaque instance rebuild indépendamment) → évite les mismatches de
+  // Server Actions / chunks entre instances derrière le load-balancer.
+  generateBuildId: () =>
+    process.env.COMMIT_ID ?? process.env.CC_COMMIT_ID ?? null,
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 7,

@@ -170,11 +170,26 @@ export default function HeaderInteractive() {
       if (!isNaN(lat) && !isNaN(lng)) setCoords({ lat, lng });
     }
 
-    fetch("/api/users/me")
-      .then((r) => {
-        if (r.ok) setIsAuthenticated(true);
-      })
-      .catch(() => {});
+    let cancelled = false;
+    // État connecté = session Auth0 valide (signal léger /api/auth/status,
+    // sans DB ni Management API). Sur erreur réseau transitoire on NE bascule
+    // PAS en "déconnecté" : on garde l'état et on retente une fois.
+    async function checkAuth(attempt = 0) {
+      try {
+        const r = await fetch("/api/auth/status");
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        const data = (await r.json()) as { authenticated?: boolean };
+        if (!cancelled) setIsAuthenticated(!!data.authenticated);
+      } catch {
+        if (attempt < 1 && !cancelled) {
+          setTimeout(() => checkAuth(attempt + 1), 1500);
+        }
+      }
+    }
+    checkAuth();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function detectLocation() {
