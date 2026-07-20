@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGraduationCap, faPlus, faPen, faToggleOn, faToggleOff,
-  faEuroSign, faClock, faAward, faSpinner, faTrash,
+  faEuroSign, faClock, faSpinner, faTrash,
   faXmark, faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import LoadingOverlay, { PageHeaderSkeleton } from "@/components/ui/LoadingOverlay";
@@ -262,11 +262,6 @@ export default function FormationsCentrePage() {
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <h3 className="font-semibold text-gray-900 text-sm">{f.titre}</h3>
-                  {f.isQualiopi && (
-                    <span className="text-xs text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <FontAwesomeIcon icon={faAward} className="w-3 h-3" />Qualiopi
-                    </span>
-                  )}
                   {f.isCPF && (
                     <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">CPF</span>
                   )}
@@ -461,15 +456,6 @@ export default function FormationsCentrePage() {
 
               {/* Certifications */}
               <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.isQualiopi}
-                    onChange={(e) => setFormData({ ...formData, isQualiopi: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-600 bg-white/5 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0"
-                  />
-                  <span className="text-sm text-gray-300">Qualiopi</span>
-                </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"

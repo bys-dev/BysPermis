@@ -13,7 +13,6 @@ import {
   faLocationDot,
   faCalendarDays,
   faShieldHalved,
-  faAward,
   faArrowRight,
   faMagnifyingGlass,
   faClock,
@@ -203,11 +202,6 @@ export default async function StagesVillePage({ params }: Props) {
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-2">
-                          {f.isQualiopi && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-purple-50 text-purple-700 border border-purple-200 font-medium">
-                              <FontAwesomeIcon icon={faAward} className="text-[9px]" /> Qualiopi
-                            </span>
-                          )}
                           {f.isCPF && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-green-50 text-green-700 border border-green-200 font-medium">
                               CPF

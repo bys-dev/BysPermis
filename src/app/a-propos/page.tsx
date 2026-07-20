@@ -179,7 +179,6 @@ export default function AProposPage() {
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {[
                 { title: "Agréé Ministère de l'Intérieur", description: "Tous nos stages sont dispensés par des centres titulaires d'un agrément préfectoral, conformément au Code de la route.", icon: faShieldHalved },
-                { title: "Certification Qualiopi", description: "Nos centres partenaires respectent les critères du Référentiel National Qualité, gage d'un enseignement de qualité.", icon: faAward },
               ].map((cert) => (
                 <div key={cert.title} className="bg-white rounded-2xl border border-brand-border p-8 flex gap-5 hover:shadow-lg transition-all duration-200">
                   <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">

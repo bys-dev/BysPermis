@@ -12,7 +12,6 @@ import {
   faFilter,
   faCalendarDays,
   faUsers,
-  faAward,
   faShieldHalved,
   faChevronLeft,
   faChevronRight,
@@ -1015,12 +1014,6 @@ function RechercheInner() {
                           <FontAwesomeIcon icon={faShieldHalved} className="mr-1 text-[9px]" />
                           Agréé Préfecture
                         </span>
-                        {stage.isQualiopi && (
-                          <span className="badge badge-qualiopi text-[11px]">
-                            <FontAwesomeIcon icon={faAward} className="mr-1" />
-                            Qualiopi
-                          </span>
-                        )}
                         {stage.isCPF && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border bg-green-50 text-green-700 border-green-200">
                             <FontAwesomeIcon icon={faCoins} className="mr-1 text-[9px]" />

@@ -237,11 +237,6 @@ const trustBadges = [
     desc: "Tous nos stages sont agréés par la préfecture",
   },
   {
-    icon: faAward,
-    title: "Certifié Qualiopi",
-    desc: "Certification qualité des organismes de formation",
-  },
-  {
     icon: faCreditCard,
     title: "Paiement sécurisé Stripe",
     desc: "Transactions cryptées et 100% sécurisées",
@@ -402,8 +397,8 @@ export default async function Home() {
                   </div>
 
                   <h1 className="font-display font-bold text-3xl sm:text-5xl lg:text-[3.25rem] text-white mb-5 leading-tight tracking-tight">
-                    Récupérez vos <span className="text-red-300">points</span> près de chez vous
-                    <br className="hidden sm:block" /> au meilleur prix
+                    Récupérez vos <span className="text-red-300">4 points</span>
+                    <br className="hidden sm:block" /> partout en France
                   </h1>
 
                   <p className="text-base sm:text-lg text-white leading-relaxed max-w-3xl mx-auto">
@@ -422,11 +417,6 @@ export default async function Home() {
                       <rect width="10" height="20" x="20" fill="#ED2939" />
                     </svg>
                     Agréé Préfecture
-                  </span>
-                  <span className="hidden sm:inline text-white/30">|</span>
-                  <span className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faAward} className="text-blue-300 shrink-0" />
-                    Certifié Qualiopi
                   </span>
                   <span className="hidden sm:inline text-white/30">|</span>
                   <span className="flex items-center gap-2">
@@ -676,7 +666,7 @@ export default async function Home() {
               <p className="text-sm text-gray-500">
                 Animé par{" "}
                 <span className="font-medium text-brand-text">
-                  1 psychologue + 1 formateur BAFM agréés
+                  1 psychologue + 1 animateur BAFM agréés
                 </span>{" "}
                 • 6 à 20 participants • Pas de contrôle de connaissances
               </p>

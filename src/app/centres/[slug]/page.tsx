@@ -12,7 +12,6 @@ import {
   faCalendarDays,
   faClock,
   faEuroSign,
-  faAward,
   faShieldHalved,
   faBuilding,
   faMapLocationDot,
@@ -171,7 +170,6 @@ export default async function CentreDetailPage({
     _count: { formations: formationCount, sessions: sessionCount },
   };
 
-  const hasQualiopi = centre.formations.some((f) => f.isQualiopi);
   const accentColor = centre.couleurPrimaire || "#3B82F6";
   const socials = centre.reseauxSociaux;
   const hasSocials = socials && Object.values(socials).some((v) => v);
@@ -229,12 +227,6 @@ export default async function CentreDetailPage({
               )}
 
               <div className="mt-6 flex flex-wrap gap-2">
-                {hasQualiopi && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-400/10 text-green-300 border border-green-500/20 text-xs font-semibold">
-                    <FontAwesomeIcon icon={faAward} className="text-[10px]" />
-                    Qualiopi
-                  </span>
-                )}
                 {centre.certifications?.length > 0 && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-400/10 text-blue-200 border border-blue-500/20 text-xs font-semibold">
                     <FontAwesomeIcon icon={faShieldHalved} className="text-[10px]" />
@@ -448,12 +440,6 @@ export default async function CentreDetailPage({
                         ? `${totalPlaces} place${totalPlaces > 1 ? "s" : ""} dispo`
                         : `${f.sessions.length} session${f.sessions.length > 1 ? "s" : ""}`}
                     </span>
-                    {f.isQualiopi && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-100">
-                        <FontAwesomeIcon icon={faAward} className="text-[10px]" />
-                        Qualiopi
-                      </span>
-                    )}
                     {f.isCPF && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
                         <FontAwesomeIcon icon={faEuroSign} className="text-[10px]" />

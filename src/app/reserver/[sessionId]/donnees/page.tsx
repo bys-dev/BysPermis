@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser, faEnvelope, faPhone, faLocationDot, faIdCard,
   faCalendarDays, faUsers, faEuroSign, faShieldHalved,
-  faAward, faArrowRight, faCircleInfo,
+  faArrowRight, faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { trackBeginCheckout } from "@/lib/analytics";
 
@@ -297,11 +297,6 @@ export default function DonneesPage() {
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-blue-50 text-blue-700 border border-blue-200 font-medium">
                 <FontAwesomeIcon icon={faShieldHalved} className="text-[9px]" /> Agréé Préfecture
               </span>
-              {s.formation.isQualiopi && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-purple-50 text-purple-700 border border-purple-200 font-medium">
-                  <FontAwesomeIcon icon={faAward} className="text-[9px]" /> Qualiopi
-                </span>
-              )}
             </div>
           </div>
         </div>

@@ -105,8 +105,7 @@ const formationsData: Record<string, FormationData> = {
     modalite: "Presentiel obligatoire",
     pointsRecuperes: "Jusqu'a 4 points",
     badges: [
-      { label: "Agree Prefecture", variant: "qualiopi" },
-      { label: "Qualiopi", variant: "qualiopi" },
+      { label: "Agree Prefecture", variant: "prefecture" },
       { label: "+4 points", variant: "success" },
     ],
     sessions: [
@@ -200,7 +199,7 @@ const formationsData: Record<string, FormationData> = {
     modalite: "Presentiel obligatoire",
     pointsRecuperes: "Jusqu'a 4 points",
     badges: [
-      { label: "Agree Prefecture", variant: "qualiopi" },
+      { label: "Agree Prefecture", variant: "prefecture" },
       { label: "Obligatoire (48N)", variant: "danger" },
       { label: "+4 points", variant: "success" },
       { label: "Amende remboursable", variant: "info" },
@@ -307,7 +306,7 @@ function StarRating({ rating }: { rating: number }) {
 
 function BadgeInline({ label, variant }: { label: string; variant: string }) {
   const styles: Record<string, string> = {
-    qualiopi: "bg-blue-50 text-blue-700 border border-blue-200",
+    prefecture: "bg-blue-50 text-blue-700 border border-blue-200",
     cpf: "bg-indigo-50 text-indigo-700 border border-indigo-200",
     success: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     warning: "bg-amber-50 text-amber-700 border border-amber-200",
@@ -404,10 +403,9 @@ function parseProgramme(programme?: string | null): ProgrammeJour[] {
 
 function mapApiToFormationData(data: ApiFormationResponse): FormationData {
   const badges: { label: string; variant: string }[] = [];
-  if (data.isQualiopi) badges.push({ label: "Qualiopi", variant: "qualiopi" });
   if (data.isCPF) badges.push({ label: "Eligible CPF", variant: "cpf" });
   if (data.pointsRecovered) badges.push({ label: `+${data.pointsRecovered} points`, variant: "success" });
-  if (badges.length === 0) badges.push({ label: "Agree Prefecture", variant: "qualiopi" });
+  if (badges.length === 0) badges.push({ label: "Agree Prefecture", variant: "prefecture" });
 
   const infosPratiques = [
     data.lieu,

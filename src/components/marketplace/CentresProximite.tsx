@@ -7,7 +7,6 @@ import {
   faLocationDot,
   faLocationCrosshairs,
   faStar,
-  faAward,
   faShieldHalved,
   faArrowRight,
   faSpinner,
@@ -227,12 +226,6 @@ export function CentresProximite() {
                     <span className="inline-flex items-center gap-1 text-[10px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
                       <FontAwesomeIcon icon={faShieldHalved} className="w-2.5 h-2.5" />
                       Agréé préfecture
-                    </span>
-                  )}
-                  {c.isQualiopi && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
-                      <FontAwesomeIcon icon={faAward} className="w-2.5 h-2.5" />
-                      Qualiopi
                     </span>
                   )}
                 </div>

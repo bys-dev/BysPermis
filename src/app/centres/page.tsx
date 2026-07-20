@@ -11,7 +11,6 @@ import {
   faMagnifyingGlass,
   faLocationDot,
   faStar,
-  faAward,
   faShieldHalved,
   faBookOpen,
   faMapLocationDot,
@@ -178,11 +177,6 @@ function CentreCardGrid({ centre }: { centre: Centre }) {
           <span className="badge badge-success text-[10px]">
             <FontAwesomeIcon icon={faShieldHalved} className="mr-1" />Agréé
           </span>
-          {centre.isQualiopi && (
-            <span className="badge badge-qualiopi text-[10px]">
-              <FontAwesomeIcon icon={faAward} className="mr-1" />Qualiopi
-            </span>
-          )}
           <DeptBadge dept={centre.dept} />
         </div>
 
@@ -241,7 +235,6 @@ function CentreCardList({ centre }: { centre: Centre }) {
                 </span>
               )}
               <span className="badge badge-success text-[10px]">Agréé Préfecture</span>
-              {centre.isQualiopi && <span className="badge badge-qualiopi text-[10px]">Qualiopi</span>}
               <DeptBadge dept={centre.dept} />
             </div>
             <h3 className="font-semibold text-brand-text group-hover:text-brand-accent transition-colors truncate">
@@ -348,7 +341,6 @@ function CentresInner() {
 
   // Filters & display
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
-  const [onlyQualiopi, setOnlyQualiopi] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [sortMode, setSortMode] = useState<SortMode>("alpha");
   const [page, setPage] = useState(1);
@@ -442,7 +434,7 @@ function CentresInner() {
   }, [searchVille, userLat, userLng, geoRayon]);
 
   // Reset page when filters change
-  useEffect(() => { setPage(1); }, [selectedDept, onlyQualiopi, sortMode]);
+  useEffect(() => { setPage(1); }, [selectedDept, sortMode]);
 
   // ── Compute available departments ─────────────────────────
 
@@ -456,7 +448,6 @@ function CentresInner() {
   const filtered = useMemo(() => {
     let list = [...allCentres];
     if (selectedDept) list = list.filter((c) => c.dept === selectedDept);
-    if (onlyQualiopi) list = list.filter((c) => c.isQualiopi);
     list.sort((a, b) => {
       if (a.isBYS && !b.isBYS) return -1;
       if (!a.isBYS && b.isBYS) return 1;
@@ -465,7 +456,7 @@ function CentresInner() {
       return a.nom.localeCompare(b.nom, "fr");
     });
     return list;
-  }, [allCentres, selectedDept, onlyQualiopi, sortMode]);
+  }, [allCentres, selectedDept, sortMode]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -506,24 +497,10 @@ function CentresInner() {
           </div>
         </div>
 
-        {/* Certification */}
-        <div>
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Certification</h4>
-          <label className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors">
-            <input
-              type="checkbox"
-              checked={onlyQualiopi}
-              onChange={(e) => setOnlyQualiopi(e.target.checked)}
-              className="w-4 h-4 rounded accent-brand-accent"
-            />
-            <span className="font-medium">Qualiopi uniquement</span>
-          </label>
-        </div>
-
         {/* Reset */}
-        {(selectedDept || onlyQualiopi) && (
+        {selectedDept && (
           <button
-            onClick={() => { setSelectedDept(null); setOnlyQualiopi(false); }}
+            onClick={() => { setSelectedDept(null); }}
             className="flex items-center gap-2 text-xs text-gray-400 hover:text-red-500 transition-colors px-3"
           >
             <FontAwesomeIcon icon={faXmark} />
@@ -642,7 +619,6 @@ function CentresInner() {
                 <p className="text-gray-600 text-sm">
                   <span className="font-semibold text-brand-text">{loading ? "…" : filtered.length}</span> centre{filtered.length > 1 ? "s" : ""}
                   {selectedDept && <span className="text-brand-accent"> · {DEPT_LABELS[selectedDept] ?? selectedDept}</span>}
-                  {onlyQualiopi && <span className="text-purple-600"> · Qualiopi</span>}
                 </p>
 
                 {/* Mobile filter toggle */}
@@ -652,7 +628,7 @@ function CentresInner() {
                 >
                   <FontAwesomeIcon icon={faSlidersH} className="text-brand-accent" />
                   Filtres
-                  {(selectedDept || onlyQualiopi) && (
+                  {selectedDept && (
                     <span className="w-2 h-2 rounded-full bg-brand-accent"></span>
                   )}
                 </button>
@@ -728,9 +704,9 @@ function CentresInner() {
                   <FontAwesomeIcon icon={faMagnifyingGlass} className="text-4xl text-gray-300 mb-4" />
                   <h3 className="font-display font-semibold text-xl text-brand-text mb-2">Aucun centre trouvé</h3>
                   <p className="text-gray-500 text-sm">Essayez de modifier votre recherche ou vos filtres.</p>
-                  {(selectedDept || onlyQualiopi) && (
+                  {selectedDept && (
                     <button
-                      onClick={() => { setSelectedDept(null); setOnlyQualiopi(false); }}
+                      onClick={() => { setSelectedDept(null); }}
                       className="mt-4 text-brand-accent text-sm font-medium hover:underline"
                     >
                       Supprimer les filtres

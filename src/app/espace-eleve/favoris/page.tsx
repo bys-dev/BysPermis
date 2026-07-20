@@ -168,11 +168,6 @@ export default function FavorisPage() {
 
                   {/* Badges */}
                   <div className="absolute bottom-3 left-3 flex gap-1.5">
-                    {fav.formation.isQualiopi && (
-                      <span className="bg-green-500/90 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                        Qualiopi
-                      </span>
-                    )}
                     {fav.formation.isCPF && (
                       <span className="bg-blue-500/90 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                         CPF

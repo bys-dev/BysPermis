@@ -274,12 +274,6 @@ export function Convocation({ data }: { data: ConvocationData }) {
                 <Text style={styles.rowLabel}>Durée</Text>
                 <Text style={styles.rowValue}>{formation.duree}</Text>
               </View>
-              {formation.isQualiopi && (
-                <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Certification</Text>
-                  <Text style={{ ...styles.rowValue, color: colors.blue }}>Qualiopi ✓</Text>
-                </View>
-              )}
             </View>
           </View>
 

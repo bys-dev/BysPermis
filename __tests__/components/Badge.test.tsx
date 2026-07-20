@@ -3,8 +3,8 @@ import { Badge } from '@/components/ui/Badge'
 
 describe('Badge', () => {
   it('renders children text', () => {
-    render(<Badge>Qualiopi</Badge>)
-    expect(screen.getByText('Qualiopi')).toBeInTheDocument()
+    render(<Badge>Éligible CPF</Badge>)
+    expect(screen.getByText('Éligible CPF')).toBeInTheDocument()
   })
 
   it('applies the default variant class when no variant is provided', () => {
@@ -16,7 +16,6 @@ describe('Badge', () => {
   })
 
   it.each([
-    ['qualiopi', 'badge-qualiopi'],
     ['cpf', 'badge-cpf'],
     ['success', 'badge-success'],
     ['warning', 'badge-warning'],

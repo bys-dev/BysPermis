@@ -172,14 +172,13 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const header = "Titre,Prix,Duree,Modalite,Qualiopi,CPF,Sessions,Reservations";
+        const header = "Titre,Prix,Duree,Modalite,CPF,Sessions,Reservations";
         const rows = formations.map((f) =>
           [
             csvEscape(f.titre),
             csvEscape(formatEUR(f.prix)),
             csvEscape(f.duree),
             csvEscape(f.modalite),
-            csvEscape(f.isQualiopi ? "Oui" : "Non"),
             csvEscape(f.isCPF ? "Oui" : "Non"),
             csvEscape(f._count.sessions),
             csvEscape(formationResCounts.get(f.id) ?? 0),

@@ -104,7 +104,7 @@ const faqItems: FaqItem[] = [
   {
     question: "Quels documents sont nécessaires pour s'inscrire ?",
     answer:
-      "Pour rejoindre la plateforme, vous aurez besoin de : votre agrément préfectoral en cours de validité, un KBIS de moins de 3 mois, votre RIB pour les paiements, et optionnellement votre certification Qualiopi.",
+      "Pour rejoindre la plateforme, vous aurez besoin de : votre agrément préfectoral en cours de validité, un KBIS de moins de 3 mois, et votre RIB pour les paiements.",
   },
   {
     question: "Combien de temps faut-il pour être référencé ?",

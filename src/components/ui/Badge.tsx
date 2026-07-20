@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 type BadgeVariant =
-  | "qualiopi"
   | "cpf"
   | "success"
   | "warning"
@@ -17,7 +16,6 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  qualiopi: "badge badge-qualiopi",
   cpf: "badge badge-cpf",
   success: "badge badge-success",
   warning: "badge badge-warning",

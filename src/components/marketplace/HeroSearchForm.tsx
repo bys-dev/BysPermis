@@ -77,7 +77,7 @@ export default function HeroSearchForm() {
             className="w-full inline-flex items-center justify-center gap-2 bg-red-600 text-white py-3.5 rounded-xl font-semibold hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/25 transition-all duration-200 active:scale-[0.98]"
           >
             <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
-            <span>Rechercher</span>
+            <span>Trouver mon stage</span>
           </button>
         </div>
       </div>

@@ -190,7 +190,6 @@ const EQUIPEMENT_SUGGESTIONS = [
 ];
 
 const CERTIFICATION_SUGGESTIONS = [
-  "Qualiopi",
   "Datadock",
   "Agree Prefecture",
   "Label qualite",

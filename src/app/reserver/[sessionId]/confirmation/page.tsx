@@ -119,7 +119,7 @@ export default function ConfirmationPage() {
             <div>
               <p className="font-semibold text-gray-900 text-sm">{titre}</p>
               <p className="text-gray-600 text-xs mt-0.5">
-                Centre agréé Préfecture{session?.formation.isQualiopi ? " · Qualiopi" : ""}
+                Centre agréé Préfecture
               </p>
             </div>
             {prix > 0 && (

@@ -1306,9 +1306,6 @@ export default function AdminCentresPage() {
                                             </p>
                                           </div>
                                           <div className="flex items-center gap-2 shrink-0 ml-2">
-                                            {f.isQualiopi && (
-                                              <span className="text-[9px] text-purple-400">Qualiopi</span>
-                                            )}
                                             <span className="text-green-400 text-xs font-semibold">{formatPrice(f.prix)}</span>
                                           </div>
                                         </div>
