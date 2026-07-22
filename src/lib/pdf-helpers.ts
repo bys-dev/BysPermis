@@ -6,6 +6,7 @@ import { createElement, JSXElementConstructor, ReactElement } from "react";
 import { prisma } from "@/lib/prisma";
 import { Convocation } from "@/components/pdf/Convocation";
 import { Facture } from "@/components/pdf/Facture";
+import { Attestation } from "@/components/pdf/Attestation";
 import { EmargementIndividuel } from "@/components/pdf/EmargementIndividuel";
 import { BonAccord } from "@/components/pdf/BonAccord";
 import { formatDate } from "@/lib/utils";
@@ -231,6 +232,108 @@ export async function renderIndividualEmargementPdf(reservationIdOrNumero: strin
   );
 
   return { buffer, filename: `emargement-${reservation.numero}.pdf` };
+}
+
+/**
+ * Rend l'attestation de suivi de stage (format officiel Annexe I).
+ *
+ * Extrait de `GET /api/attestations/[reservationId]` pour être réutilisable par
+ * le pipeline d'archivage (lib/documents.ts). Ne fait AUCUN contrôle d'accès ni
+ * de statut : c'est à l'appelant de vérifier que la réservation est TERMINEE et
+ * que le demandeur y a droit.
+ */
+export async function renderAttestationPdf(reservationIdOrNumero: string): Promise<{
+  buffer: Buffer;
+  filename: string;
+  numeroAttestation: string;
+}> {
+  const reservation = await prisma.reservation.findFirst({
+    where: { OR: [{ id: reservationIdOrNumero }, { numero: reservationIdOrNumero }] },
+    include: {
+      session: { include: { formation: { include: { centre: true } } } },
+      user: true,
+    },
+  });
+  if (!reservation) throw new Error(`Réservation introuvable: ${reservationIdOrNumero}`);
+
+  const { session } = reservation;
+  const { formation } = session;
+  const centre = formation.centre;
+
+  // Animateurs réglementaires du centre (expert SR + psychologue) pour l'Annexe I.
+  const animateurs = await prisma.centreMembre.findMany({
+    where: { centreId: centre.id, fonctionAnimateur: { not: null } },
+    include: { user: { select: { prenom: true, nom: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+  const expert = animateurs.find((a) => a.fonctionAnimateur === "EXPERT_SR");
+  const psy = animateurs.find((a) => a.fonctionAnimateur === "PSYCHOLOGUE");
+  const animateurNom = (a?: { user: { prenom: string; nom: string } }) =>
+    a ? `${a.user.prenom} ${a.user.nom}`.trim() : undefined;
+
+  const numeroAttestation = `ATT-${new Date().getFullYear()}-${reservation.numero}`;
+
+  const data = {
+    numeroAttestation,
+    dateDelivrance: formatDate(new Date()),
+    stagiaire: {
+      civilite: reservation.civilite ?? undefined,
+      prenom: reservation.prenom,
+      nom: reservation.nom,
+      adresse: reservation.adresse ?? undefined,
+      codePostal: reservation.codePostal ?? undefined,
+      ville: reservation.ville ?? undefined,
+      numeroPermis: reservation.numeroPermis ?? undefined,
+    },
+    casStage: reservation.casStage ?? undefined,
+    agrement: {
+      numero: centre.agrementNumber ?? undefined,
+      departement: centre.agrementDepartement ?? undefined,
+    },
+    animateurs: {
+      expertSr: expert
+        ? { nom: animateurNom(expert), numeroAutorisation: expert.numeroAutorisation ?? undefined }
+        : undefined,
+      psychologue: psy
+        ? { nom: animateurNom(psy), numeroAutorisation: psy.numeroAutorisation ?? undefined }
+        : undefined,
+    },
+    formation: {
+      titre: formation.titre,
+      duree: formation.duree,
+      objectifs: formation.objectifs ?? undefined,
+      modalite: formation.modalite,
+    },
+    session: {
+      dateDebut: formatDate(session.dateDebut),
+      dateFin: formatDate(session.dateFin),
+      lieu: formation.lieu ?? `${centre.adresse}, ${centre.codePostal} ${centre.ville}`,
+    },
+    centre: {
+      nom: centre.nom,
+      raisonSociale: centre.raisonSociale ?? undefined,
+      siret: centre.siret ?? undefined,
+      adresse: centre.adresse,
+      codePostal: centre.codePostal,
+      ville: centre.ville,
+      telephone: centre.telephone ?? undefined,
+      email: centre.email ?? undefined,
+      logoUrl: resolveCentreLogoUrl(centre.logo),
+      signatureUrl: resolveCentreSealUrl(centre.signatureUrl),
+      nomResponsable: centre.nomResponsable ?? undefined,
+    },
+    verificationUrl: `${APP_URL}/verification/${numeroAttestation}`,
+  };
+
+  const buffer = await renderToBuffer(
+    createElement(Attestation, { data }) as ReactElement<DocumentProps, string | JSXElementConstructor<unknown>>
+  );
+
+  return {
+    buffer,
+    filename: `attestation-${reservation.numero}.pdf`,
+    numeroAttestation,
+  };
 }
 
 /**

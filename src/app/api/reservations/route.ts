@@ -4,11 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth0";
 import { calculateCommission, getCommissionRate } from "@/lib/utils";
-import { sendConfirmationEmail, sendDocumentEmail, sendMail } from "@/lib/email";
-import { notifyCentreReservationConfirmed, notifyCentreConvocationSent, notifyEleveDocumentsAvailable } from "@/lib/event-notifications";
-import { renderEmailTemplate } from "@/lib/email-templates";
-import { formatDate } from "@/lib/utils";
-import { renderConvocationPdf, renderInvoicePdfFromReservation } from "@/lib/pdf-helpers";
+import { fulfillReservation } from "@/lib/reservation-fulfillment";
 
 // ─── GET /api/reservations — mes réservations ─────────────
 export async function GET() {
@@ -200,19 +196,27 @@ export async function POST(req: NextRequest) {
       // 7. Facture (idempotent : seulement si pas déjà existante)
       const existingInvoice = await tx.invoice.findFirst({ where: { reservationId: reservation.id } });
       if (!existingInvoice) {
-        const invoiceCount = await tx.invoice.count();
-        const invoiceNum = `FAC-${new Date().getFullYear()}-${String(invoiceCount + 1).padStart(4, "0")}`;
-        const montantHT = Math.round((reservation.montant / 1.2) * 100) / 100;
-        const tvaAmount = Math.round((reservation.montant - montantHT) * 100) / 100;
+        const year = new Date().getFullYear();
+        // Numérotation par année civile — même règle que lib/pdf-helpers.ts, qui
+        // crée la facture quand elle n'existe pas encore au moment du rendu PDF.
+        const invoiceCount = await tx.invoice.count({
+          where: { createdAt: { gte: new Date(`${year}-01-01`) } },
+        });
+        const invoiceNum = `FAC-${year}-${String(invoiceCount + 1).padStart(4, "0")}`;
+        // TVA 0% : les stages de récupération de points relèvent de la formation
+        // professionnelle continue exonérée (art. 261-4-4° CGI). Ce chemin
+        // appliquait 20% alors que le rendu PDF documentait 0% : les deux factures
+        // possibles pour une même réservation ne concordaient pas.
         await tx.invoice.create({
           data: {
             numero: invoiceNum,
             type: "ELEVE",
-            montantHT,
-            tva: tvaAmount,
+            montantHT: reservation.montant,
+            tva: 0,
             montantTTC: reservation.montant,
             status: "PAYEE",
             userId: user.id,
+            centreId: centre.id,
             reservationId: reservation.id,
           },
         });
@@ -294,149 +298,10 @@ export async function POST(req: NextRequest) {
       return { reservation };
     });
 
-    // 7. Envoyer les emails (hors transaction)
-    const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-    const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
-    const centre = result.reservation.session.formation.centre;
-
-    try {
-      // Génère facture PDF + convocation PDF en parallèle (renderToBuffer est CPU-bound).
-      const [invoicePdf, convocationPdf] = await Promise.all([
-        renderInvoicePdfFromReservation(result.reservation.id).catch((err) => {
-          console.error("[POST /api/reservations] Invoice PDF render error:", err);
-          return null;
-        }),
-        renderConvocationPdf(result.reservation.id).catch((err) => {
-          console.error("[POST /api/reservations] Convocation PDF render error:", err);
-          return null;
-        }),
-      ]);
-
-      const emailPromises: Promise<unknown>[] = [
-        sendConfirmationEmail({
-          to: data.email,
-          reservationNumber: result.reservation.numero,
-          formationTitle: result.reservation.session.formation.titre,
-          sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
-          centreName: centre.nom,
-          attachments: invoicePdf
-            ? [{ filename: invoicePdf.filename, content: invoicePdf.buffer }]
-            : undefined,
-        }),
-      ];
-
-      // Centre : owner + équipe (email + notifications in-app)
-      emailPromises.push(
-        notifyCentreReservationConfirmed({
-          centreId: centre.id,
-          reservationNumber: result.reservation.numero,
-          eleveName: `${data.prenom} ${data.nom}`,
-          formationTitle: result.reservation.session.formation.titre,
-          sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
-          amount: result.reservation.montant * (1 - getCommissionRate(centre)),
-        })
-      );
-
-      // Email convocation via template, avec PDF joint
-      const lienConvocation = `${APP_URL}/api/convocation/${result.reservation.id}`;
-      const convocationVars: Record<string, string> = {
-        prenom: data.prenom,
-        nom: data.nom,
-        email: data.email,
-        formation: result.reservation.session.formation.titre,
-        centre: centre.nom,
-        dateDebut: formatDate(result.reservation.session.dateDebut),
-        dateFin: formatDate(result.reservation.session.dateFin),
-        lieu: result.reservation.session.formation.lieu ?? `${centre.adresse}, ${centre.codePostal} ${centre.ville}`,
-        prix: `${result.reservation.montant} €`,
-        numero: result.reservation.numero,
-        lienConvocation,
-      };
-
-      emailPromises.push(
-        renderEmailTemplate("convocation", centre.id, convocationVars)
-          .then(({ subject, html }) =>
-            sendMail({
-              from: FROM,
-              to: data.email,
-              subject,
-              html,
-              ...(convocationPdf
-                ? { attachments: [{ filename: convocationPdf.filename, content: convocationPdf.buffer }] }
-                : {}),
-            })
-          )
-          .catch((err) => {
-            console.error("[POST /api/reservations] Convocation email error:", err);
-          })
-      );
-
-      await Promise.all(emailPromises);
-
-      // Centre informé que la convocation a été envoyée à l'élève
-      await notifyCentreConvocationSent({
-        centreId: centre.id,
-        reservationNumber: result.reservation.numero,
-        eleveName: `${data.prenom} ${data.nom}`,
-        eleveEmail: data.email,
-        formationTitle: result.reservation.session.formation.titre,
-        sessionDate: result.reservation.session.dateDebut.toLocaleDateString("fr-FR"),
-      }).catch((err) => {
-        console.error("[POST /api/reservations] Centre convocation notification error:", err);
-      });
-    } catch (emailErr) {
-      console.error("[POST /api/reservations] Email error:", emailErr);
-      // Ne pas faire échouer la réservation pour un email
-    }
-
-    // Envoi automatique des documents configurés par le centre (règlement, bon d'accord…)
-    try {
-      const templates = await prisma.centreDocumentTemplate.findMany({
-        where: { centreId: centre.id, actif: true, autoSend: true },
-        orderBy: { ordre: "asc" },
-      });
-      for (const t of templates) {
-        const exists = await prisma.document.findFirst({
-          where: { reservationId: result.reservation.id, templateId: t.id },
-        });
-        if (exists) continue;
-        await prisma.document.create({
-          data: {
-            kind: t.kind,
-            direction: "CENTRE_VERS_ELEVE",
-            nom: t.nom,
-            description: t.description,
-            blobUrl: t.blobUrl,
-            contenu: t.contenu,
-            requiresAck: t.requiresAck,
-            status: "ENVOYE",
-            reservationId: result.reservation.id,
-            centreId: centre.id,
-            templateId: t.id,
-          },
-        });
-      }
-      if (templates.length > 0) {
-        const needsAck = templates.some((t) => t.requiresAck);
-        await sendDocumentEmail({
-          to: data.email,
-          prenom: data.prenom,
-          sujet: `Documents de votre stage — ${centre.nom}`,
-          intro: needsAck
-            ? `Votre centre a mis à disposition des documents pour votre stage, dont un ou plusieurs à lire et accepter. Rendez-vous dans votre espace élève pour les consulter et valider le bon d'accord.`
-            : `Votre centre a mis à disposition des documents pour votre stage. Retrouvez-les dans votre espace élève.`,
-          ctaUrl: `${APP_URL}/espace-eleve/documents`,
-          ctaLabel: "Voir mes documents",
-        });
-        await notifyEleveDocumentsAvailable({
-          userId: user.id,
-          centreName: centre.nom,
-          needsAck,
-        });
-      }
-    } catch (docErr) {
-      console.error("[POST /api/reservations] Auto-send documents error:", docErr);
-    }
+    // 7. Archivage des PDF + envoi des emails (hors transaction).
+    //    Mutualisé avec le webhook Stripe, qui rejoue ce même pipeline en filet
+    //    de sécurité si cette route échoue après encaissement. Idempotent.
+    await fulfillReservation(result.reservation.id, { source: "api/reservations" });
 
     return NextResponse.json(result.reservation, { status: 200 });
   } catch (err) {

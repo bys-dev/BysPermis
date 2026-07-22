@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth0";
-import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
-import { Attestation } from "@/components/pdf/Attestation";
-import { createElement, JSXElementConstructor, ReactElement } from "react";
-import { formatDate } from "@/lib/utils";
-import { resolveCentreLogoUrl, resolveCentreSealUrl } from "@/lib/pdf-branding";
+import { renderAttestationPdf } from "@/lib/pdf-helpers";
 
 export async function GET(
   _req: NextRequest,
@@ -17,16 +13,7 @@ export async function GET(
 
     const reservation = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: {
-        session: {
-          include: {
-            formation: {
-              include: { centre: true },
-            },
-          },
-        },
-        user: true,
-      },
+      select: { id: true, userId: true, status: true, numero: true },
     });
 
     if (!reservation) {
@@ -46,83 +33,12 @@ export async function GET(
       );
     }
 
-    const { session } = reservation;
-    const { formation } = session;
-    const centre = formation.centre;
+    const { buffer, filename } = await renderAttestationPdf(reservation.id);
 
-    // Animateurs réglementaires du centre (expert SR + psychologue) pour l'attestation Annexe I.
-    const animateurs = await prisma.centreMembre.findMany({
-      where: { centreId: centre.id, fonctionAnimateur: { not: null } },
-      include: { user: { select: { prenom: true, nom: true } } },
-      orderBy: { createdAt: "asc" },
-    });
-    const expert = animateurs.find((a) => a.fonctionAnimateur === "EXPERT_SR");
-    const psy = animateurs.find((a) => a.fonctionAnimateur === "PSYCHOLOGUE");
-    const animateurNom = (a?: { user: { prenom: string; nom: string } }) =>
-      a ? `${a.user.prenom} ${a.user.nom}`.trim() : undefined;
-
-    const numeroAttestation = `ATT-${new Date().getFullYear()}-${reservation.numero}`;
-
-    const data = {
-      numeroAttestation,
-      dateDelivrance: formatDate(new Date()),
-      stagiaire: {
-        civilite: reservation.civilite ?? undefined,
-        prenom: reservation.prenom,
-        nom: reservation.nom,
-        adresse: reservation.adresse ?? undefined,
-        codePostal: reservation.codePostal ?? undefined,
-        ville: reservation.ville ?? undefined,
-        numeroPermis: reservation.numeroPermis ?? undefined,
-      },
-      casStage: reservation.casStage ?? undefined,
-      agrement: {
-        numero: centre.agrementNumber ?? undefined,
-        departement: centre.agrementDepartement ?? undefined,
-      },
-      animateurs: {
-        expertSr: expert
-          ? { nom: animateurNom(expert), numeroAutorisation: expert.numeroAutorisation ?? undefined }
-          : undefined,
-        psychologue: psy
-          ? { nom: animateurNom(psy), numeroAutorisation: psy.numeroAutorisation ?? undefined }
-          : undefined,
-      },
-      formation: {
-        titre: formation.titre,
-        duree: formation.duree,
-        objectifs: formation.objectifs ?? undefined,
-        modalite: formation.modalite,
-      },
-      session: {
-        dateDebut: formatDate(session.dateDebut),
-        dateFin: formatDate(session.dateFin),
-        lieu: formation.lieu ?? `${centre.adresse}, ${centre.codePostal} ${centre.ville}`,
-      },
-      centre: {
-        nom: centre.nom,
-        raisonSociale: centre.raisonSociale ?? undefined,
-        siret: centre.siret ?? undefined,
-        adresse: centre.adresse,
-        codePostal: centre.codePostal,
-        ville: centre.ville,
-        telephone: centre.telephone ?? undefined,
-        email: centre.email ?? undefined,
-        logoUrl: resolveCentreLogoUrl(centre.logo),
-        signatureUrl: resolveCentreSealUrl(centre.signatureUrl),
-        nomResponsable: centre.nomResponsable ?? undefined,
-      },
-      verificationUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}/verification/${numeroAttestation}`,
-    };
-
-    const pdfBuffer = await renderToBuffer(
-      createElement(Attestation, { data }) as ReactElement<DocumentProps, string | JSXElementConstructor<unknown>>
-    );
-
-    return new NextResponse(pdfBuffer as unknown as BodyInit, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="attestation-${reservation.numero}.pdf"`,
+        "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
   } catch (err) {

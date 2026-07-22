@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { fulfillReservation } from "@/lib/reservation-fulfillment";
 import Stripe from "stripe";
 
 /**
@@ -45,11 +46,36 @@ export async function POST(req: NextRequest) {
       // ── Paiement réussi ──────────────────────────────────
       case "payment_intent.succeeded": {
         const pi = event.data.object as Stripe.PaymentIntent;
-        // Mettre à jour le statut de la réservation si elle existe déjà
+
+        // État AVANT mise à jour : permet de savoir si POST /api/reservations est
+        // déjà passé (il confirme la résa et remplit adresse / n° de permis…).
+        const before = await prisma.reservation.findFirst({
+          where: { stripePaymentId: pi.id },
+          select: { id: true, status: true },
+        });
+
         await prisma.reservation.updateMany({
           where: { stripePaymentId: pi.id },
           data: { status: "CONFIRMEE" },
         });
+
+        // Filet de sécurité : la route synchrone a bien tourné (données client
+        // complètes) mais son pipeline de documents/emails a pu échouer après
+        // encaissement. `fulfillReservation` est idempotent : si tout est déjà
+        // parti, il ne fait rien.
+        //
+        // Si la résa était encore EN_ATTENTE_PAIEMENT, on NE fulfill PAS ici : le
+        // stagiaire n'a pas encore saisi ses coordonnées, la convocation serait
+        // générée sans adresse ni numéro de permis. Le cron de réparation
+        // (/api/cron/fulfillment-repair) s'en chargera si la route ne revient jamais.
+        if (before?.status === "CONFIRMEE") {
+          const outcome = await fulfillReservation(before.id, { source: "webhook-stripe" });
+          if (outcome.executed) {
+            console.warn(
+              `[Webhook] fulfillment de rattrapage exécuté pour ${before.id} — la route synchrone avait échoué`,
+            );
+          }
+        }
         break;
       }
 

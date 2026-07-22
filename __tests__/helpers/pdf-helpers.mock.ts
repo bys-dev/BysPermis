@@ -22,3 +22,35 @@ export async function renderInvoicePdfFromReservation(reservationId: string): Pr
     invoiceNumero: "FAC-MOCK-0001",
   };
 }
+
+export async function renderAttestationPdf(reservationIdOrNumero: string): Promise<{
+  buffer: Buffer;
+  filename: string;
+  numeroAttestation: string;
+}> {
+  return {
+    buffer: Buffer.from(`mock-attestation-${reservationIdOrNumero}`),
+    filename: `attestation-${reservationIdOrNumero}.pdf`,
+    numeroAttestation: "ATT-MOCK-0001",
+  };
+}
+
+export async function renderIndividualEmargementPdf(reservationIdOrNumero: string): Promise<{
+  buffer: Buffer;
+  filename: string;
+}> {
+  return {
+    buffer: Buffer.from(`mock-emargement-${reservationIdOrNumero}`),
+    filename: `emargement-${reservationIdOrNumero}.pdf`,
+  };
+}
+
+export async function renderBonAccordPdf(documentId: string): Promise<{
+  buffer: Buffer;
+  filename: string;
+}> {
+  return {
+    buffer: Buffer.from(`mock-bon-accord-${documentId}`),
+    filename: `bon-accord-${documentId}.pdf`,
+  };
+}

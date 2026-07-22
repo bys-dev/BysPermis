@@ -26,6 +26,11 @@ interface DocItem {
   acceptedAt: string | null;
   acceptedNom: string | null;
   createdAt: string;
+  /** Contrôle du justificatif par le centre (documents ELEVE_VERS_CENTRE). */
+  verifiedAt: string | null;
+  motifRefus: string | null;
+  /** Purge RGPD : fichier détruit 45 jours après la fin du stage. */
+  purgedAt: string | null;
 }
 
 const ELEVE_KINDS = [
@@ -171,20 +176,47 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
 
           <div className="space-y-2">
             {envois.length === 0 && <p className="text-xs text-gray-500">Aucun document transmis.</p>}
-            {envois.map((d) => (
-              <div key={d.id} className="flex items-center justify-between gap-2 p-2.5 rounded-lg" style={cardStyle}>
-                <div className="min-w-0 flex items-center gap-2">
-                  <FontAwesomeIcon icon={faFileArrowUp} className="text-gray-400 text-xs shrink-0" />
-                  <span className="text-sm text-white truncate">{d.nom}</span>
+            {envois.map((d) => {
+              const valide = d.verifiedAt && d.status === "ACCEPTE";
+              const refuse = d.verifiedAt && d.status === "REFUSE";
+              return (
+                <div key={d.id} className="p-2.5 rounded-lg" style={cardStyle}>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex items-center gap-2">
+                      <FontAwesomeIcon icon={faFileArrowUp} className="text-gray-400 text-xs shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-sm text-white truncate block">{d.nom}</span>
+                        <span
+                          className={`text-[10px] ${
+                            d.purgedAt ? "text-gray-500"
+                              : valide ? "text-green-400"
+                              : refuse ? "text-red-400"
+                              : "text-amber-400"
+                          }`}
+                        >
+                          {d.purgedAt ? "Supprimé (délai légal écoulé)"
+                            : valide ? "Validé par le centre"
+                            : refuse ? "Refusé — à renvoyer"
+                            : "En attente de vérification"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {d.blobUrl && <a href={d.blobUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs"><FontAwesomeIcon icon={faDownload} /></a>}
+                      {/* Un justificatif déjà validé ou purgé ne doit plus être supprimé par l'élève. */}
+                      {!valide && !d.purgedAt && (
+                        <button onClick={() => handleDelete(d.id)} disabled={busyId === d.id} className="text-gray-400 hover:text-red-400 text-xs">
+                          <FontAwesomeIcon icon={busyId === d.id ? faSpinner : faTrash} className={busyId === d.id ? "animate-spin" : ""} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {refuse && d.motifRefus && (
+                    <p className="mt-1.5 text-[11px] text-red-300/90 pl-6">Motif : {d.motifRefus}</p>
+                  )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {d.blobUrl && <a href={d.blobUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs"><FontAwesomeIcon icon={faDownload} /></a>}
-                  <button onClick={() => handleDelete(d.id)} disabled={busyId === d.id} className="text-gray-400 hover:text-red-400 text-xs">
-                    <FontAwesomeIcon icon={busyId === d.id ? faSpinner : faTrash} className={busyId === d.id ? "animate-spin" : ""} />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

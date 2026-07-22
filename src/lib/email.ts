@@ -1,6 +1,13 @@
 import { Resend } from "resend";
+import { logEmail, EMAIL_KIND, type EmailLogContext } from "@/lib/email-log";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
+
+/** Normalise le destinataire Resend (string | string[]) en une chaîne journalisable. */
+function formatDestinataire(to: unknown): string {
+  if (Array.isArray(to)) return to.join(", ");
+  return typeof to === "string" ? to : "";
+}
 
 /**
  * Envoie un email via Resend en surfaçant les erreurs.
@@ -8,15 +15,45 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
  * quota…) : il résout `{ data: null, error }`. Sans ce wrapper, tous les envois
  * échouaient silencieusement (faux succès côté UI, aucun log). Ici on loggue et
  * on throw pour que les try/catch appelants réagissent.
+ *
+ * Chaque envoi (succès ou échec) est journalisé dans `EmailLog` — traçabilité et
+ * idempotence du pipeline de fulfillment. Passer `context` pour rattacher la
+ * ligne de journal à une réservation / un centre / un élève.
  */
 export async function sendMail(
   payload: Parameters<typeof resend.emails.send>[0],
+  context?: EmailLogContext,
 ): Promise<void> {
-  const { error } = await resend.emails.send(payload);
+  const destinataire = formatDestinataire(payload.to);
+  const sujet = payload.subject ?? "";
+  const { data, error } = await resend.emails.send(payload);
+
   if (error) {
     console.error("[resend] échec envoi email:", error);
-    throw new Error(`Resend: ${error.message ?? error.name ?? "erreur inconnue"}`);
+    const message = error.message ?? error.name ?? "erreur inconnue";
+    await logEmail({
+      destinataire,
+      sujet,
+      status: "ECHEC",
+      error: message,
+      kind: context?.kind ?? EMAIL_KIND.AUTRE,
+      reservationId: context?.reservationId,
+      userId: context?.userId,
+      centreId: context?.centreId,
+    });
+    throw new Error(`Resend: ${message}`);
   }
+
+  await logEmail({
+    destinataire,
+    sujet,
+    status: "ENVOYE",
+    providerId: data?.id ?? null,
+    kind: context?.kind ?? EMAIL_KIND.AUTRE,
+    reservationId: context?.reservationId,
+    userId: context?.userId,
+    centreId: context?.centreId,
+  });
 }
 
 const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
@@ -35,6 +72,7 @@ export async function sendConfirmationEmail(params: {
   sessionDate: string;
   centreName: string;
   attachments?: { filename: string; content: Buffer }[];
+  context?: EmailLogContext;
 }): Promise<void> {
   await sendMail({
     from: FROM,
@@ -66,35 +104,51 @@ export async function sendConfirmationEmail(params: {
     ...(params.attachments && params.attachments.length > 0
       ? { attachments: params.attachments }
       : {}),
-  });
+  }, params.context ?? { kind: EMAIL_KIND.CONFIRMATION });
 }
 
 /**
- * Send convocation email with PDF attachment.
+ * Accusé de réception d'un justificatif déposé par le stagiaire (permis, CNI,
+ * lettre 48N). Jusqu'ici seul le centre était notifié : l'élève n'avait aucune
+ * confirmation que son document était bien arrivé.
  */
-export async function sendConvocationEmail(params: {
+export async function sendJustificatifRecuEmail(params: {
   to: string;
-  reservationNumber: string;
+  prenom?: string;
+  documentLabel: string;
   formationTitle: string;
-  pdfBuffer: Buffer;
+  centreName: string;
+  reservationNumber: string;
+  context?: EmailLogContext;
 }): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY absent — accusé justificatif non envoyé à", params.to);
+    return;
+  }
+
   await sendMail({
     from: FROM,
     to: params.to,
-    subject: `Convocation - ${params.formationTitle}`,
-    html: `
-      <h1>Convocation</h1>
-      <p>Veuillez trouver ci-joint votre convocation pour la formation <strong>${params.formationTitle}</strong>.</p>
-      <p>Numéro de réservation : <strong>${params.reservationNumber}</strong></p>
-      <p>Cordialement,<br/>L'équipe BYS Formation Permiss</p>
-    `,
-    attachments: [
-      {
-        filename: `convocation-${params.reservationNumber}.pdf`,
-        content: params.pdfBuffer,
-      },
-    ],
-  });
+    subject: `Justificatif bien reçu — ${params.documentLabel}`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+    ${LOGO_IMG}
+    <h1 style="color:#fff;margin:0;font-size:22px">Justificatif bien reçu</h1>
+    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Réservation ${params.reservationNumber}</p>
+  </div>
+  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+    <p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
+    <p>Nous avons bien reçu votre <strong>${params.documentLabel}</strong> pour le stage
+      « ${params.formationTitle} » auprès de <strong>${params.centreName}</strong>.</p>
+    <p>Votre centre va le vérifier. Vous n'avez rien d'autre à faire pour ce document — vous serez
+      prévenu si une pièce complémentaire est nécessaire.</p>
+    <p style="text-align:center;margin:24px 0">
+      <a href="${APP_URL}/espace-eleve/documents" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Voir mes documents</a>
+    </p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation Permis</p>
+  </div>
+</div>`,
+  }, params.context ?? { kind: EMAIL_KIND.JUSTIFICATIF_RECU });
 }
 
 /**
@@ -480,6 +534,7 @@ export async function sendDocumentEmail(params: {
   ctaUrl?: string;
   ctaLabel?: string;
   attachments?: { filename: string; content: Buffer }[];
+  context?: EmailLogContext;
 }): Promise<void> {
   if (!process.env.RESEND_API_KEY) {
     console.warn("[email] RESEND_API_KEY absent — document non envoyé à", params.to);
@@ -513,7 +568,7 @@ export async function sendDocumentEmail(params: {
     ...(params.attachments && params.attachments.length > 0
       ? { attachments: params.attachments }
       : {}),
-  });
+  }, params.context);
 }
 
 /**

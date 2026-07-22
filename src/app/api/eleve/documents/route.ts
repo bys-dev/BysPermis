@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth0";
 import { uploadFile, extForMime, DOCUMENT_MAX_BYTES } from "@/lib/storage";
 import { notifyCentreEleveDocumentUploaded } from "@/lib/event-notifications";
+import { sendJustificatifRecuEmail } from "@/lib/email";
+import { EMAIL_KIND } from "@/lib/email-log";
 
 const ELEVE_KINDS = ["PERMIS", "PIECE_IDENTITE", "LETTRE_48N", "AUTRE"] as const;
 type EleveKind = (typeof ELEVE_KINDS)[number];
@@ -96,13 +98,34 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notifier le centre (owner + équipe)
-    await notifyCentreEleveDocumentUploaded({
-      centreId: centre.id,
-      eleveName: `${reservation.prenom} ${reservation.nom}`,
-      reservationNumber: reservation.numero,
-      documentLabel: KIND_LABEL[kind],
-    }).catch((err) => console.error("[POST /api/eleve/documents] notify centre:", err));
+    // Notifier le centre (owner + équipe) et accuser réception à l'élève.
+    // Les deux sont best-effort : le document est déjà stocké, un incident
+    // d'email ne doit pas faire échouer l'upload.
+    await Promise.allSettled([
+      notifyCentreEleveDocumentUploaded({
+        centreId: centre.id,
+        eleveName: `${reservation.prenom} ${reservation.nom}`,
+        reservationNumber: reservation.numero,
+        documentLabel: KIND_LABEL[kind],
+      }).catch((err) => console.error("[POST /api/eleve/documents] notify centre:", err)),
+
+      sendJustificatifRecuEmail({
+        to: reservation.email,
+        prenom: reservation.prenom,
+        documentLabel: KIND_LABEL[kind],
+        formationTitle: reservation.session.formation.titre,
+        centreName: centre.nom,
+        reservationNumber: reservation.numero,
+        context: {
+          kind: EMAIL_KIND.JUSTIFICATIF_RECU,
+          reservationId: reservation.id,
+          userId: user.id,
+          centreId: centre.id,
+        },
+      }).catch((err) =>
+        console.error("[POST /api/eleve/documents] accusé réception élève:", err),
+      ),
+    ]);
 
     return NextResponse.json(document, { status: 201 });
   } catch (err) {

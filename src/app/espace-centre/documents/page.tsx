@@ -6,7 +6,7 @@ import LoadingOverlay from "@/components/ui/LoadingOverlay";
 import {
   faFileLines, faPlus, faTrash, faSpinner, faDownload, faStamp,
   faPaperPlane, faToggleOn, faToggleOff, faCircleCheck, faTriangleExclamation,
-  faFileArrowUp, faFileArrowDown,
+  faFileArrowUp, faFileArrowDown, faCheck, faXmark, faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 
 const cardStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" } as const;
@@ -31,7 +31,11 @@ interface SessionLite { id: string; formation: string; dateDebut: string; stagia
 interface DocItem {
   id: string; kind: string; direction: string; nom: string;
   blobUrl: string | null; status: string; requiresAck: boolean; acceptedAt: string | null; createdAt: string;
+  verifiedAt: string | null; motifRefus: string | null; purgedAt: string | null;
 }
+
+/** Justificatifs transmis par le stagiaire, que le centre doit contrôler. */
+const JUSTIFICATIF_KINDS = ["PERMIS", "PIECE_IDENTITE", "LETTRE_48N", "AUTRE"];
 
 const KIND_OPTIONS = [
   { value: "REGLEMENT", label: "Règlement / programme" },
@@ -201,6 +205,7 @@ function StagiairesTab() {
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [sendForm, setSendForm] = useState({ nom: "", requiresAck: false });
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/centre/formateur/sessions")
@@ -219,6 +224,39 @@ function StagiairesTab() {
   }, []);
 
   function selectStagiaire(s: Stagiaire) { setResa(s); setMsg(null); loadDocs(s.reservationId); }
+
+  // Validation / refus d'un justificatif transmis par le stagiaire.
+  async function verify(doc: DocItem, decision: "ACCEPTE" | "REFUSE") {
+    if (!resa) return;
+    let motifRefus: string | undefined;
+    if (decision === "REFUSE") {
+      const saisi = window.prompt(
+        `Motif du refus de « ${doc.nom} » ?\nIl sera communiqué au stagiaire pour qu'il puisse renvoyer une pièce conforme.`,
+      );
+      if (saisi === null) return; // annulé
+      if (!saisi.trim()) { setMsg({ type: "err", text: "Le motif est obligatoire pour refuser." }); return; }
+      motifRefus = saisi.trim();
+    }
+    setVerifyingId(doc.id); setMsg(null);
+    try {
+      const res = await fetch(`/api/centre/documents/${doc.id}/verify`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision, motifRefus }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setMsg({ type: "err", text: data.error ?? "Échec de la vérification." }); return; }
+      setMsg({
+        type: "ok",
+        text: decision === "ACCEPTE" ? "Justificatif validé, le stagiaire est prévenu." : "Justificatif refusé, le stagiaire est prévenu.",
+      });
+      loadDocs(resa.reservationId);
+    } catch {
+      setMsg({ type: "err", text: "Erreur réseau." });
+    } finally {
+      setVerifyingId(null);
+    }
+  }
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
@@ -303,16 +341,77 @@ function StagiairesTab() {
                   {docs.map((d) => {
                     const recu = d.direction === "ELEVE_VERS_CENTRE";
                     const href = d.blobUrl ?? (d.kind === "EMARGEMENT" && resa ? `/api/emargement/${resa.reservationId}` : null);
+                    // Un justificatif reçu, non purgé, est à contrôler par le centre.
+                    const aVerifier = recu && !d.purgedAt && JUSTIFICATIF_KINDS.includes(d.kind);
+                    const enCours = verifyingId === d.id;
+
+                    let statut: string;
+                    if (d.purgedAt) statut = "supprimé (RGPD)";
+                    else if (recu && d.verifiedAt && d.status === "ACCEPTE") statut = "validé";
+                    else if (recu && d.verifiedAt && d.status === "REFUSE") statut = "refusé";
+                    else if (recu) statut = "à vérifier";
+                    else statut = d.status === "ACCEPTE" ? "envoyé · accepté" : "envoyé";
+
+                    const statutColor = d.purgedAt
+                      ? "text-gray-500"
+                      : statut === "validé" ? "text-green-400"
+                      : statut === "refusé" ? "text-red-400"
+                      : statut === "à vérifier" ? "text-amber-400"
+                      : "text-gray-500";
+
                     return (
-                      <div key={d.id} className="flex items-center justify-between gap-2 p-2.5 rounded-lg" style={cardStyle}>
-                        <div className="min-w-0 flex items-center gap-2">
-                          <FontAwesomeIcon icon={recu ? faFileArrowUp : faFileArrowDown} className={`text-xs shrink-0 ${recu ? "text-amber-400" : "text-green-400"}`} />
-                          <div className="min-w-0">
-                            <span className="text-sm text-white truncate block">{d.nom}</span>
-                            <span className="text-[10px] text-gray-500">{recu ? "Reçu de l'élève" : "Envoyé"}{d.status === "ACCEPTE" ? " · accepté" : ""}</span>
+                      <div key={d.id} className="p-2.5 rounded-lg" style={cardStyle}>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex items-center gap-2">
+                            <FontAwesomeIcon
+                              icon={d.purgedAt ? faShieldHalved : recu ? faFileArrowUp : faFileArrowDown}
+                              className={`text-xs shrink-0 ${d.purgedAt ? "text-gray-500" : recu ? "text-amber-400" : "text-green-400"}`}
+                            />
+                            <div className="min-w-0">
+                              <span className="text-sm text-white truncate block">{d.nom}</span>
+                              <span className={`text-[10px] ${statutColor}`}>
+                                {recu ? "Reçu de l'élève" : "Envoyé"} · {statut}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {aVerifier && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => verify(d, "ACCEPTE")}
+                                  disabled={enCours || d.status === "ACCEPTE"}
+                                  title="Valider ce justificatif"
+                                  className="px-2 py-1 rounded-md text-[11px] font-semibold bg-green-600/20 text-green-300 hover:bg-green-600/30 disabled:opacity-40"
+                                >
+                                  <FontAwesomeIcon icon={enCours ? faSpinner : faCheck} className={enCours ? "animate-spin" : ""} /> Valider
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => verify(d, "REFUSE")}
+                                  disabled={enCours}
+                                  title="Refuser ce justificatif"
+                                  className="px-2 py-1 rounded-md text-[11px] font-semibold bg-red-600/20 text-red-300 hover:bg-red-600/30 disabled:opacity-40"
+                                >
+                                  <FontAwesomeIcon icon={faXmark} /> Refuser
+                                </button>
+                              </>
+                            )}
+                            {href && (
+                              <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs px-1">
+                                <FontAwesomeIcon icon={faDownload} />
+                              </a>
+                            )}
                           </div>
                         </div>
-                        {href && <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs shrink-0"><FontAwesomeIcon icon={faDownload} /></a>}
+                        {d.motifRefus && (
+                          <p className="mt-1.5 text-[11px] text-red-300/90 pl-6">Motif du refus : {d.motifRefus}</p>
+                        )}
+                        {d.purgedAt && (
+                          <p className="mt-1.5 text-[11px] text-gray-500 pl-6">
+                            Fichier détruit le {new Date(d.purgedAt).toLocaleDateString("fr-FR")} — conservation légale de 45 jours écoulée.
+                          </p>
+                        )}
                       </div>
                     );
                   })}

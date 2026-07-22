@@ -28,6 +28,14 @@ export async function DELETE(
   if (document.status === "ACCEPTE") {
     return NextResponse.json({ error: "Un document accepté ne peut pas être supprimé" }, { status: 403 });
   }
+  // Le fichier a déjà été détruit par la purge RGPD : la ligne restante est la
+  // preuve que la pièce a été fournie puis supprimée, on la conserve.
+  if (document.purgedAt) {
+    return NextResponse.json(
+      { error: "Ce document a déjà été supprimé automatiquement (délai légal écoulé)" },
+      { status: 410 },
+    );
+  }
 
   if (document.blobUrl) await deleteFile(document.blobUrl);
   await prisma.document.delete({ where: { id } });

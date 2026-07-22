@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireCentreStaff } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
 import { sendQuestionnaireEmail, sendDocumentEmail } from "@/lib/email";
-import { renderIndividualEmargementPdf } from "@/lib/pdf-helpers";
+import { archiveAttestation, archiveEmargement } from "@/lib/documents";
+import { EMAIL_KIND, emailAlreadySent } from "@/lib/email-log";
 import { z } from "zod";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "https://bys-permis.vercel.app";
@@ -106,35 +107,38 @@ export async function POST(
         data: { questionnaireEnvoye: true },
       });
 
-      // Feuille d'émargement individuelle : générée et envoyée par PDF à chaque stagiaire présent
+      // Feuille d'émargement individuelle + attestation : archivées (upload dans le
+      // storage + Document.blobUrl renseigné) puis envoyées par email.
+      // Auparavant le Document était créé sans blobUrl : le PDF n'existait que dans
+      // l'email reçu, donc impossible à re-télécharger depuis l'espace élève.
       await Promise.allSettled(
         terminatedReservations.map(async (r) => {
-          // Évite les doublons si l'émargement est revalidé
-          const already = await prisma.document.findFirst({
-            where: { reservationId: r.id, kind: "EMARGEMENT" },
-          });
-          if (already) return;
-          const pdf = await renderIndividualEmargementPdf(r.id);
-          await prisma.document.create({
-            data: {
-              kind: "EMARGEMENT",
-              direction: "CENTRE_VERS_ELEVE",
-              nom: "Feuille d'émargement",
-              mimeType: "application/pdf",
-              status: "ENVOYE",
-              reservationId: r.id,
-              centreId,
-              uploadedById: user.id,
-            },
-          });
+          // archiveEmargement / archiveAttestation sont idempotents.
+          const emargement = await archiveEmargement(r.id, centreId);
+
+          // Attestation de suivi (Annexe I) : la réservation vient de passer
+          // TERMINEE, l'attestation est donc délivrable et on la fige.
+          await archiveAttestation(r.id, centreId).catch((err) =>
+            console.error(`[émargement] archivage attestation ${r.numero}:`, err),
+          );
+
+          // N'envoyer l'email qu'une fois, même si l'émargement est revalidé.
+          if (await emailAlreadySent(r.id, EMAIL_KIND.EMARGEMENT)) return;
+
           await sendDocumentEmail({
             to: r.email,
             prenom: r.prenom,
             sujet: `Feuille d'émargement — ${r.session.formation.titre}`,
-            intro: `Votre présence au stage « ${r.session.formation.titre} » a été validée. Vous trouverez ci-joint votre feuille d'émargement individuelle.`,
+            intro: `Votre présence au stage « ${r.session.formation.titre} » a été validée. Vous trouverez ci-joint votre feuille d'émargement individuelle. Votre attestation de suivi est disponible dans votre espace élève.`,
             ctaUrl: `${APP_URL}/espace-eleve/documents`,
             ctaLabel: "Voir mes documents",
-            attachments: [{ filename: pdf.filename, content: pdf.buffer }],
+            attachments: [{ filename: emargement.filename, content: emargement.buffer }],
+            context: {
+              kind: EMAIL_KIND.EMARGEMENT,
+              reservationId: r.id,
+              userId: r.userId,
+              centreId,
+            },
           });
         }),
       );

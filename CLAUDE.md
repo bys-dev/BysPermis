@@ -122,7 +122,7 @@ STRIPE_WEBHOOK_SECRET=""                 # whsec_... (stripe listen)
 
 # Email
 RESEND_API_KEY=""                        # re_...
-EMAIL_FROM="noreply@bys-formation.fr"
+EMAIL_FROM="BYS Formations <noreply@byspermis.fr>"   # doit correspondre au domaine vérifié Resend
 
 # App
 NEXT_PUBLIC_APP_URL="http://localhost:3000"

@@ -118,6 +118,10 @@ enum DocumentKind {
   EMARGEMENT // feuille d'émargement individuelle (généré par le centre)
   BON_ACCORD // bon d'accord à valeur probante (à cocher par l'élève)
   REGLEMENT // règlement intérieur / programme (centre → élève)
+  // Documents transactionnels archivés (générés par la plateforme, cf. lib/documents.ts)
+  CONVOCATION // convocation de stage
+  FACTURE // facture élève
+  ATTESTATION // attestation de suivi de stage (Annexe I)
   AUTRE
 }
 
@@ -165,7 +169,9 @@ model User {
   reviews                  Review[]
   questionnaireResponses   QuestionnaireResponse[]
   uploadedDocuments        Document[]              @relation("UploadedDocuments")
+  verifiedDocuments        Document[]              @relation("VerifiedDocuments")
   invoices                 Invoice[]
+  emailLogs                EmailLog[]
   articles         Article[]
   messagesSent     Message[]       @relation("messagesSent")
   messagesReceived Message[]       @relation("messagesReceived")
@@ -250,6 +256,7 @@ model Centre {
   questionnaireResponses QuestionnaireResponse[]
   documents              Document[]
   documentTemplates      CentreDocumentTemplate[]
+  emailLogs              EmailLog[]
 
   @@map("centres")
 }
@@ -398,11 +405,21 @@ model Reservation {
   attestationPasStage12Mois Boolean   @default(false) // n'a pas suivi de stage récup points < 12 mois avant la date de début
   attestationPermisValide   Boolean   @default(false) // permis en cours de validité (même si solde de points nul ou négatif)
   attestationLe             DateTime? // horodatage de l'attestation
-  // Justificatifs uploadés par le stagiaire (URL Vercel Blob)
+  /// @deprecated Remplacés par le modèle `Document` (kind LETTRE_48N / PIECE_IDENTITE,
+  /// direction ELEVE_VERS_CENTRE). Plus aucune lecture/écriture dans src/ : conservés
+  /// uniquement pour ne pas perdre les URL des réservations antérieures à la migration.
+  /// Supprimables via un DROP COLUMN une fois les données legacy vérifiées.
   lettre48NUrl      String?
   pieceIdentiteUrl  String?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+
+  /// Verrou d'idempotence du pipeline post-paiement (archivage des PDF + emails).
+  /// La route /api/reservations ET le webhook Stripe tentent tous deux de le
+  /// réclamer via un UPDATE ... WHERE "fulfilledAt" IS NULL : un seul gagne, ce qui
+  /// évite le double envoi. Remis à NULL si le pipeline échoue, pour permettre au
+  /// filet de sécurité de réessayer. Cf. lib/reservation-fulfillment.ts
+  fulfilledAt           DateTime?
 
   rappelEnvoye          Boolean @default(false)
   questionnaireEnvoye   Boolean @default(false)
@@ -417,6 +434,7 @@ model Reservation {
   questionnaireResponses QuestionnaireResponse[]
   review                 Review?
   documents              Document[]
+  emailLogs              EmailLog[]
 
   @@map("reservations")
 }
@@ -434,11 +452,25 @@ model Document {
   mimeType    String?
   taille      Int? // octets
   status      DocumentStatus @default(ENVOYE)
-  // Acceptation à valeur probante (bon d'accord)
+  // Acceptation à valeur probante (bon d'accord) — action de l'ÉLÈVE
   requiresAck Boolean   @default(false)
   acceptedAt  DateTime?
   acceptedNom String?
   acceptedIp  String?
+
+  // Vérification des justificatifs (permis, CNI, 48N) — action du CENTRE.
+  // Distincte de l'acceptation ci-dessus : ici c'est le centre qui contrôle une
+  // pièce fournie par l'élève. status passe à ACCEPTE (validé) ou REFUSE.
+  verifiedAt   DateTime?
+  verifiedById String?
+  verifiedBy   User?     @relation("VerifiedDocuments", fields: [verifiedById], references: [id])
+  motifRefus   String?
+
+  /// Purge RGPD : horodatage de destruction du fichier. La ligne est conservée
+  /// (preuve que la pièce a bien été fournie puis détruite) mais `blobUrl` est
+  /// vidé. Cf. /api/cron/purge-documents — 45 jours après la fin du stage.
+  purgedAt DateTime?
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -649,6 +681,40 @@ model EmailTemplate {
 
   @@unique([slug, centreId])
   @@map("email_templates")
+}
+
+/// Journal des emails sortants. Sert à deux choses :
+///   1. Traçabilité (qui a reçu quoi, quand, succès/échec + id Resend).
+///   2. Idempotence des envois : le webhook Stripe rejoue le pipeline de
+///      fulfillment en filet de sécurité et s'appuie sur ce journal pour ne pas
+///      renvoyer un email déjà parti (cf. lib/reservation-fulfillment.ts).
+model EmailLog {
+  id           String       @id @default(cuid())
+  destinataire String
+  sujet        String
+  /// Identifiant fonctionnel de l'envoi ("confirmation_reservation", "convocation"…)
+  kind       String
+  status     EmailLogStatus @default(ENVOYE)
+  error      String?
+  providerId String? // id du message Resend
+  createdAt  DateTime       @default(now())
+
+  reservationId String?
+  reservation   Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  userId        String?
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  centreId      String?
+  centre        Centre?      @relation(fields: [centreId], references: [id], onDelete: SetNull)
+
+  @@index([reservationId, kind, status])
+  @@index([destinataire])
+  @@index([createdAt])
+  @@map("email_logs")
+}
+
+enum EmailLogStatus {
+  ENVOYE
+  ECHEC
 }
 
 // ─── PAIEMENTS CENTRES ──────────────────────────────────
