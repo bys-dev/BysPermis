@@ -17,7 +17,10 @@ export function createPrismaMock() {
     delete: jest.fn().mockResolvedValue({}),
     deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     count: jest.fn().mockResolvedValue(0),
-    aggregate: jest.fn().mockResolvedValue({}),
+    // Forme complète : les routes lisent directement `_avg.<champ>` / `_sum.<champ>`
+    // et plantaient sur un `{}` nu.
+    aggregate: jest.fn().mockResolvedValue({ _avg: {}, _sum: {}, _min: {}, _max: {}, _count: 0 }),
+    groupBy: jest.fn().mockResolvedValue([]),
     upsert: jest.fn().mockResolvedValue({}),
   });
 
@@ -44,6 +47,12 @@ export function createPrismaMock() {
     message: modelStub(),
     article: modelStub(),
     loyaltyPoints: modelStub(),
+    questionnaireResponse: modelStub(),
+    questionnaireQuestion: modelStub(),
+    document: modelStub(),
+    centreDocumentTemplate: modelStub(),
+    emailLog: modelStub(),
+    webhookEvent: modelStub(),
     $transaction: jest.fn((fn: (tx: unknown) => Promise<unknown>) => fn({})),
   };
 }

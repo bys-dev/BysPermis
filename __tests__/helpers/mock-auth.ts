@@ -10,6 +10,7 @@
  * The mock intercepts `@/lib/auth0` so that requireAuth / requireRole / etc.
  * resolve to a fake Prisma-shaped User object with the chosen role.
  */
+import { NextResponse } from "next/server";
 
 import type { User } from "@/generated/prisma/client";
 
@@ -336,6 +337,20 @@ export function getAuth0Mocks() {
     requireAdmin: mockRequireAdmin,
     requireOwner: mockRequireOwner,
     requireCentre: mockRequireCentreStaff,
+    // Reproduit fidèlement lib/auth0.mapAuthError : les routes l'appellent dans
+    // leur catch pour convertir les erreurs d'auth en 401/403, et renvoient 500
+    // quand il retourne null.
+    mapAuthError: (err: unknown) => {
+      if (err instanceof Error) {
+        if (err.message === "Non authentifié") {
+          return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+        }
+        if (err.message === "Non autorisé") {
+          return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+        }
+      }
+      return null;
+    },
     auth0: {},
     ALL_ROLES: [
       "ELEVE", "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE",

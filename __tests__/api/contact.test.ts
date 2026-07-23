@@ -4,12 +4,10 @@
 import { NextRequest } from "next/server";
 
 // ─── Mocks ────────────────────────────────────────────────────
+// La route passe par le wrapper sendMail (qui journalise dans EmailLog), pas par
+// le client Resend brut.
 jest.mock("@/lib/email", () => ({
-  resend: {
-    emails: {
-      send: jest.fn().mockResolvedValue({ id: "email_test_001" }),
-    },
-  },
+  sendMail: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Désactiver le rate limit en mémoire (sinon il persiste entre tests)
@@ -17,7 +15,7 @@ jest.mock("@/lib/rate-limit", () => ({
   rateLimit: jest.fn().mockReturnValue(null),
 }));
 
-import { resend } from "@/lib/email";
+import { sendMail } from "@/lib/email";
 import { POST } from "@/app/api/contact/route";
 
 // ─── Helper ───────────────────────────────────────────────────
@@ -57,10 +55,10 @@ describe("POST /api/contact", () => {
   it("envoie un email via Resend avec les bonnes donnees", async () => {
     await POST(makeReq(validContact));
 
-    expect(resend.emails.send).toHaveBeenCalledTimes(1);
-    const call = (resend.emails.send as jest.Mock).mock.calls[0][0];
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    const call = (sendMail as jest.Mock).mock.calls[0][0];
 
-    expect(call.to).toBe("bysforma95@gmail.com");
+    expect(call.to).toBe("contact@byspermis.fr");
     expect(call.replyTo).toBe("jean.dupont@test.fr");
     expect(call.subject).toContain("Jean Dupont");
     expect(call.subject).toContain("Question sur les formations");
@@ -150,7 +148,7 @@ describe("POST /api/contact", () => {
 
   // ─── Erreur Resend ───────────────────────────────────────
   it("retourne 500 si Resend echoue", async () => {
-    (resend.emails.send as jest.Mock).mockRejectedValueOnce(
+    (sendMail as jest.Mock).mockRejectedValueOnce(
       new Error("Resend API error")
     );
 
@@ -165,6 +163,6 @@ describe("POST /api/contact", () => {
   it("n'envoie pas d'email si la validation echoue", async () => {
     await POST(makeReq({ nom: "", email: "invalide", sujet: "", message: "" }));
 
-    expect(resend.emails.send).not.toHaveBeenCalled();
+    expect(sendMail).not.toHaveBeenCalled();
   });
 });

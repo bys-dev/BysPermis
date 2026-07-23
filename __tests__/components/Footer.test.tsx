@@ -75,6 +75,6 @@ describe('Footer', () => {
 
   it('affiche le lien contact email', () => {
     render(<Footer />)
-    expect(screen.getByText('bysforma95@gmail.com')).toBeInTheDocument()
+    expect(screen.getByText('contact@byspermis.fr')).toBeInTheDocument()
   })
 })
