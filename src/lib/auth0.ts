@@ -66,24 +66,39 @@ export { ALL_ROLES, CENTRE_ROLES, CENTRE_MANAGEMENT_ROLES, CENTRE_FINANCE_ROLES,
 
 // ─── Helpers ─────────────────────────────────────────────
 
+/** Retente une opération DB une fois après un court délai en cas d'erreur transitoire
+ *  (cold-start Neon, connexion serverless coupée). Évite qu'un hoquet ponctuel
+ *  soit interprété comme "utilisateur déconnecté". */
+async function withDbRetry<T>(op: () => Promise<T>): Promise<T> {
+  try {
+    return await op()
+  } catch {
+    await new Promise((r) => setTimeout(r, 300))
+    return op()
+  }
+}
+
 /**
  * Get current user from session.
  * Le rôle est lu depuis Auth0 (API Management + token) puis synchronisé en base.
+ *
+ * Règle d'or : si la session Auth0 est valide, on ne renvoie JAMAIS null à cause
+ * d'un souci backend transitoire (DB/Management). null == "réellement déconnecté".
  */
 export async function getCurrentUser(): Promise<User | null> {
+  // 1. Session : seul signal fiable de "déconnecté". Lecture locale du cookie.
+  const session = await auth0.getSession().catch(() => null)
+  if (!session?.user) return null
+
+  const auth0Id = session.user.sub as string
+  const email = normalizeEmail(session.user.email as string | undefined)
+
   try {
-    const session = await auth0.getSession()
-    if (!session?.user) return null
-
-    const auth0Id = session.user.sub as string
-    const email = normalizeEmail(session.user.email as string | undefined)
-
-    // Source de vérité : Auth0 (app_metadata, rôles natifs, claims JWT)
+    // Source de vérité : Auth0 (app_metadata, rôles natifs, claims JWT).
+    // resolveAuth0Role gère ses propres erreurs (renvoie undefined) → ne throw pas.
     const auth0Role = await resolveAuth0Role(auth0Id, session.user as Record<string, unknown>, email)
 
-    let user = await prisma.user.findUnique({
-      where: { auth0Id },
-    })
+    let user = await withDbRetry(() => prisma.user.findUnique({ where: { auth0Id } }))
 
     // auth0Id lié à un autre email (ex. 1er login Google perso) → rattacher le compte seed par email
     if (user && email && normalizeEmail(user.email) !== email) {
@@ -133,22 +148,34 @@ export async function getCurrentUser(): Promise<User | null> {
         })
       }
     } else {
-      const updated = await syncDbRoleFromAuth0(user.id, auth0Role, user.role)
-      if (updated) user = updated
+      // Synchro de rôle : best-effort — un échec d'écriture ne doit pas invalider la session.
+      try {
+        const updated = await syncDbRoleFromAuth0(user.id, auth0Role, user.role)
+        if (updated) user = updated
+      } catch (err) {
+        console.error("[getCurrentUser] sync rôle (best-effort) a échoué:", err)
+      }
     }
 
-    // Sync emailVerified from Auth0 session
+    // Sync emailVerified from Auth0 session — best-effort également
     const isVerified = (session.user.email_verified as boolean) ?? false
-    if (user.emailVerified !== isVerified) {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: { emailVerified: isVerified },
-      })
+    if (user && user.emailVerified !== isVerified) {
+      try {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { emailVerified: isVerified },
+        })
+      } catch (err) {
+        console.error("[getCurrentUser] sync emailVerified (best-effort) a échoué:", err)
+      }
     }
 
     return user
-  } catch {
-    return null
+  } catch (err) {
+    // Session valide mais souci backend transitoire (DB indisponible pendant la synchro).
+    // On NE renvoie PAS null : dernière tentative de simple lecture par auth0Id.
+    console.error("[getCurrentUser] erreur transitoire (session valide):", err)
+    return withDbRetry(() => prisma.user.findUnique({ where: { auth0Id } })).catch(() => null)
   }
 }
 
@@ -199,6 +226,11 @@ export async function requireSupport(): Promise<User> {
 /** Platform comptable */
 export async function requireComptable(): Promise<User> {
   return requireRole(["COMPTABLE", "ADMIN", "OWNER"])
+}
+
+/** Business dev — fichier de prospects, campagnes de démarchage, demandes partenaires */
+export async function requireCommercial(): Promise<User> {
+  return requireRole(["COMMERCIAL", "ADMIN", "OWNER"])
 }
 
 /** Any platform staff (SUPPORT, COMPTABLE, COMMERCIAL, ADMIN, OWNER) */
