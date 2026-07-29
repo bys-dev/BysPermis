@@ -10,7 +10,7 @@ const CRON_SECRET = process.env.CRON_SECRET;
  * (utilisateur a abandonné le checkout). Ré-incrémente les placesRestantes
  * de la session associée.
  *
- * À appeler toutes les 5 minutes via Vercel Cron (vercel.json).
+ * À appeler toutes les 5 minutes via le cron de l'hébergeur (Clever Cloud).
  */
 export async function GET(req: NextRequest) {
   // Verify cron secret
