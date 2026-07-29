@@ -132,6 +132,86 @@ enum DocumentStatus {
   REFUSE
 }
 
+// ─── PARTENARIAT CENTRES (acquisition) ───────────────────
+
+/// Cycle de vie d'une demande d'inscription déposée depuis /devenir-partenaire.
+enum PartnerLeadStatus {
+  NOUVEAU // reçue, personne ne l'a encore ouverte
+  EN_COURS // prise en charge par le staff (échange téléphonique, vérifs)
+  COMPTE_CREE // compte + accès envoyés au centre
+  REFUSE // demande écartée (motif renseigné)
+  ARCHIVE // doublon / sans suite
+}
+
+/// Justificatifs du dossier de vérification d'un centre (distincts des pièces
+/// élève du modèle `Document`, qui sont rattachées à une réservation).
+enum CentreDocumentKind {
+  KBIS // extrait Kbis de moins de 3 mois
+  AGREMENT_PREFECTORAL // arrêté d'agrément CSSR délivré par la préfecture
+  PIECE_IDENTITE_REPRESENTANT // CNI / passeport du représentant légal
+  ASSURANCE_RC_PRO // attestation de responsabilité civile professionnelle
+  ATTESTATION_URSSAF // attestation de vigilance URSSAF
+  RIB // coordonnées bancaires (versement des reversements)
+  AUTORISATION_ANIMER // autorisation d'animer (expert SR / psychologue)
+  AUTRE
+}
+
+enum CentreDocumentStatus {
+  EN_ATTENTE
+  VALIDE
+  REFUSE
+}
+
+/// État du dossier administratif d'un centre, indépendant de `CentreStatus`
+/// (qui gère la visibilité marketplace).
+enum CentreVerificationStatus {
+  INCOMPLET // pièces obligatoires manquantes
+  EN_VERIFICATION // dossier complet, en cours de contrôle par le staff
+  VERIFIE // toutes les pièces obligatoires validées
+  REFUSE // dossier rejeté (motif renseigné)
+}
+
+// ─── PROSPECTION CENTRES (démarchage sortant) ────────────
+
+/// Avancement d'un prospect dans le tunnel de démarchage.
+enum ProspectStatus {
+  NOUVEAU // importé, jamais travaillé
+  A_CONTACTER // qualifié, prêt pour une campagne
+  CONTACTE // au moins un email de campagne envoyé
+  RELANCE // relancé au moins une fois
+  INTERESSE // a répondu favorablement / a ouvert plusieurs fois
+  INSCRIT // a déposé une demande (converti en PartnerLead)
+  REFUSE // a décliné
+  INJOIGNABLE // email en erreur permanente (bounce dur)
+  DESABONNE // opposition au démarchage — ne plus jamais contacter
+}
+
+enum ProspectImportFormat {
+  XLSX
+  CSV
+  JSON
+}
+
+enum CampaignStatus {
+  BROUILLON // en cours de rédaction
+  PROGRAMMEE // départ planifié
+  EN_COURS // envoi en cours (traité par lots)
+  ENVOYEE // terminée
+  PAUSEE // interrompue par le staff
+  ANNULEE
+}
+
+enum CampaignRecipientStatus {
+  EN_ATTENTE
+  ENVOYE
+  ECHEC
+  IGNORE // exclu à l'envoi (désabonné, sans email, doublon)
+  OUVERT
+  CLIQUE
+  BOUNCE
+  PLAINTE // signalé comme spam
+}
+
 // ─── USERS ───────────────────────────────────────────────
 
 model User {
@@ -148,6 +228,10 @@ model User {
   isBlocked           Boolean   @default(false)
   emailVerified       Boolean   @default(false)
   isProfileComplete   Boolean   @default(false)
+  /// Compte créé par le staff avec un mot de passe temporaire : on affiche une
+  /// bannière bloquante jusqu'au changement (cf. /api/compte/change-password).
+  mustChangePassword  Boolean   @default(false)
+  passwordChangedAt   DateTime?
   dateNaissance       DateTime?
   numeroPermis        String?
   dateObtentionPermis DateTime?
@@ -182,6 +266,16 @@ model User {
   totalPoints      Int             @default(0)
   referralCode     String?         @unique // Auto-generated, e.g. "BYS-JEAN42"
   referredBy       String? // referralCode of the person who referred them
+
+  // Partenariat / vérification (staff plateforme)
+  partnerLeadsTraites    PartnerLead[]                @relation("PartnerLeadsTraites")
+  centreDocsUploades     CentreVerificationDocument[] @relation("CentreDocsUploades")
+  centreDocsVerifies     CentreVerificationDocument[] @relation("CentreDocsVerifies")
+
+  // Prospection sortante (staff commercial)
+  prospectsAssignes      Prospect[]       @relation("ProspectsAssignes")
+  prospectImports        ProspectImport[] @relation("ProspectImports")
+  campagnesCreees        EmailCampaign[]  @relation("CampagnesCreees")
 
   @@map("users")
 }
@@ -241,6 +335,14 @@ model Centre {
   agrementDepartement String? // ex "95"
   agrementValidUntil  DateTime?
 
+  // Dossier administratif (KBIS, agrément, assurance…) — axe distinct de `statut`,
+  // qui pilote la visibilité marketplace. Un centre peut être VERIFIE sans être ACTIF.
+  verificationStatut    CentreVerificationStatus @default(INCOMPLET)
+  verificationAt        DateTime?
+  verificationMotif     String? // motif de refus du dossier
+  representantFonction  String? // gérant, directeur, responsable pédagogique…
+  assuranceRcPro        String? // n° de police RC professionnelle
+
   // Relations
   userId             String
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -257,8 +359,280 @@ model Centre {
   documents              Document[]
   documentTemplates      CentreDocumentTemplate[]
   emailLogs              EmailLog[]
+  verificationDocuments  CentreVerificationDocument[]
+  partnerLead            PartnerLead?
 
   @@map("centres")
+}
+
+// ─── DEMANDES D'INSCRIPTION PARTENAIRE ───────────────────
+
+/// Demande déposée par un centre depuis la page publique /devenir-partenaire.
+/// Elle vit avant toute création de compte : le staff plateforme la reçoit
+/// (cloche + email), la qualifie, puis déclenche la création du compte + du centre
+/// (cf. POST /api/admin/partenaires/[id]/create-account) qui renseigne `centreId`.
+model PartnerLead {
+  id String @id @default(cuid())
+
+  // ── Le centre ──
+  centreNom           String
+  raisonSociale       String?
+  siret               String?
+  agrementNumber      String? // n° d'agrément préfectoral CSSR
+  agrementDepartement String? // département de délivrance, ex "95"
+  adresse             String?
+  codePostal          String?
+  ville               String
+  telephone           String
+  email               String // email du centre
+  siteWeb             String?
+
+  // ── Le représentant légal / interlocuteur ──
+  contactNom       String
+  contactPrenom    String?
+  contactFonction  String?
+  contactEmail     String // deviendra l'identifiant de connexion
+  contactTelephone String?
+
+  // ── Activité déclarée ──
+  volumeMensuel      String? // "1-4" | "5-10" | "10+" | "ne_sait_pas"
+  typesStages        String[] // valeurs de l'enum StageType
+  capaciteParSession Int?
+  prixPublic         Float?
+  nbLieux            Int?
+  message            String?
+
+  // ── Traitement côté plateforme ──
+  statut        PartnerLeadStatus @default(NOUVEAU)
+  notesInternes String?
+  motifRefus    String?
+  traiteParId   String?
+  traitePar     User?             @relation("PartnerLeadsTraites", fields: [traiteParId], references: [id], onDelete: SetNull)
+  traiteAt      DateTime?
+  /// Centre créé à partir de cette demande (null tant que le compte n'existe pas).
+  centreId      String?           @unique
+  centre        Centre?           @relation(fields: [centreId], references: [id], onDelete: SetNull)
+
+  // ── Traçabilité du consentement (RGPD) ──
+  consentAt DateTime @default(now())
+  consentIp String?
+  source    String?  @default("devenir-partenaire")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([statut, createdAt])
+  @@index([contactEmail])
+  @@map("partner_leads")
+}
+
+// ─── DOSSIER DE VÉRIFICATION D'UN CENTRE ─────────────────
+
+/// Justificatif administratif fourni par le centre pour faire vérifier son compte.
+/// Séparé de `Document` (qui exige une réservation) car ces pièces sont
+/// rattachées au centre lui-même et ne sont pas purgées avec les stages.
+model CentreVerificationDocument {
+  id       String             @id @default(cuid())
+  kind     CentreDocumentKind
+  nom      String
+  blobUrl  String
+  mimeType String?
+  taille   Int? // octets
+
+  status     CentreDocumentStatus @default(EN_ATTENTE)
+  motifRefus String?
+  /// Fin de validité de la pièce (agrément, assurance, attestation URSSAF).
+  expiresAt  DateTime?
+
+  verifiedAt   DateTime?
+  verifiedById String?
+  verifiedBy   User?     @relation("CentreDocsVerifies", fields: [verifiedById], references: [id], onDelete: SetNull)
+
+  centreId     String
+  centre       Centre  @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  uploadedById String?
+  uploadedBy   User?   @relation("CentreDocsUploades", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([centreId, kind])
+  @@index([status])
+  @@map("centre_verification_documents")
+}
+
+// ─── PROSPECTION : FICHIER DE PROSPECTS ──────────────────
+
+/// Centre agréé identifié comme cible commerciale, alimenté par import de
+/// fichiers (listes préfectorales en XLSX/CSV/JSON). Distinct de `PartnerLead` :
+/// un prospect n'a rien demandé — c'est nous qui le démarchons. Quand il dépose
+/// une demande, on le rattache via `partnerLeadId` et il passe en INSCRIT.
+model Prospect {
+  id String @id @default(cuid())
+
+  // ── Identité du centre ──
+  nom                 String
+  raisonSociale       String?
+  siret               String?
+  agrementNumber      String?
+  agrementDepartement String?
+
+  // ── Coordonnées ──
+  email       String?
+  emailValide Boolean @default(true) // passe à false sur bounce dur
+  telephone   String?
+  siteWeb     String?
+  adresse     String?
+  codePostal  String?
+  ville       String?
+  departement String? // dérivé du code postal si absent du fichier
+
+  // ── Interlocuteur ──
+  contactNom      String?
+  contactPrenom   String?
+  contactFonction String?
+
+  // ── Provenance ──
+  /// Étiquette libre de la source ("liste-prefecture-2024", "salon", "manuel").
+  source   String?
+  importId String?
+  import   ProspectImport? @relation(fields: [importId], references: [id], onDelete: SetNull)
+  /// Ligne d'origine du fichier, conservée telle quelle pour audit / remapping.
+  raw      Json?
+  /// Clé de déduplication normalisée (email, sinon SIRET, sinon nom+CP).
+  /// Garantit qu'un réimport met à jour au lieu de dupliquer.
+  dedupeKey String @unique
+
+  // ── Suivi commercial ──
+  statut          ProspectStatus @default(NOUVEAU)
+  score           Int? // 0-100, priorisation manuelle ou calculée
+  notesInternes   String?
+  /// Commercial assigné (rôle COMMERCIAL / ADMIN / OWNER).
+  ownerId         String?
+  owner           User?          @relation("ProspectsAssignes", fields: [ownerId], references: [id], onDelete: SetNull)
+  lastContactedAt DateTime?
+  nbEmailsEnvoyes Int            @default(0)
+  nbOuvertures    Int            @default(0)
+  nbClics         Int            @default(0)
+
+  // ── Opposition au démarchage (obligation CNIL / LCEN) ──
+  /// Jeton du lien de désinscription présent dans chaque email de campagne.
+  unsubscribeToken String    @unique @default(cuid())
+  unsubscribedAt   DateTime?
+  bouncedAt        DateTime?
+
+  // ── Conversion ──
+  partnerLeadId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipients CampaignRecipient[]
+
+  @@index([statut, createdAt])
+  @@index([departement])
+  @@index([email])
+  @@map("prospects")
+}
+
+/// Trace d'un import de fichier : combien de lignes lues, créées, mises à jour,
+/// ignorées. Permet de rejouer / annuler un import et d'auditer la provenance.
+model ProspectImport {
+  id       String               @id @default(cuid())
+  filename String
+  format   ProspectImportFormat
+  source   String?
+
+  totalRows   Int @default(0)
+  nbCrees     Int @default(0)
+  nbMisAJour  Int @default(0)
+  nbIgnores   Int @default(0)
+  nbErreurs   Int @default(0)
+  /// Détail des lignes rejetées : [{ ligne, motif }].
+  erreurs     Json?
+  /// Correspondance colonne fichier → champ Prospect retenue pour cet import.
+  mappage     Json?
+
+  importedById String?
+  importedBy   User?   @relation("ProspectImports", fields: [importedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  prospects Prospect[]
+
+  @@index([createdAt])
+  @@map("prospect_imports")
+}
+
+// ─── PROSPECTION : CAMPAGNES EMAIL ───────────────────────
+
+/// Campagne de démarchage. `sujet` et `contenu` acceptent des variables
+/// {{nom}}, {{ville}}, {{contactPrenom}}… résolues prospect par prospect
+/// (cf. lib/prospects/template.ts).
+model EmailCampaign {
+  id      String @id @default(cuid())
+  nom     String
+  sujet   String
+  contenu String // HTML avec placeholders {{variable}}
+
+  fromName String?
+  replyTo  String?
+
+  statut CampaignStatus @default(BROUILLON)
+  /// Critères de ciblage sérialisés : { statuts, departements, source, avecEmail… }.
+  filtre Json?
+
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  totalCibles Int @default(0)
+  nbEnvoyes   Int @default(0)
+  nbEchecs    Int @default(0)
+  nbOuvertures Int @default(0)
+  nbClics      Int @default(0)
+
+  createdById String?
+  createdBy   User?   @relation("CampagnesCreees", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipients CampaignRecipient[]
+
+  @@index([statut, createdAt])
+  @@map("email_campaigns")
+}
+
+/// Un prospect dans une campagne. La contrainte unique (campaignId, prospectId)
+/// rend l'envoi idempotent : un lot rejoué ne renvoie jamais deux fois.
+model CampaignRecipient {
+  id String @id @default(cuid())
+
+  campaignId String
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  prospectId String
+  prospect   Prospect      @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  /// Email figé au moment du ciblage (le prospect peut changer d'adresse ensuite).
+  email  String
+  status CampaignRecipientStatus @default(EN_ATTENTE)
+  error  String?
+  /// Id du message Resend — corrèle les webhooks (ouverture, clic, bounce).
+  providerId String?
+
+  sentAt     DateTime?
+  openedAt   DateTime?
+  clickedAt  DateTime?
+  bouncedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([campaignId, prospectId])
+  @@index([campaignId, status])
+  @@index([providerId])
+  @@map("campaign_recipients")
 }
 
 // ─── MEMBRES D'UN CENTRE (formateurs, admins, secrétaires) ──
