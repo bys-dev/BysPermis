@@ -12,7 +12,7 @@ const BASE_URL =
 
 const ORG_NAME = "BYS Formation";
 const ORG_LEGAL = "BYS Formation"; // À ajuster une fois la raison sociale exacte fournie par le client
-const ORG_LOGO = `${BASE_URL}/logo.png`;
+const ORG_LOGO = `${BASE_URL}/colored-logo.png`;
 
 // ─── Organization ──────────────────────────────────────────────────
 
