@@ -16,18 +16,16 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       {
         src: "/favicon.ico",
-        sizes: "any",
+        sizes: "16x16 32x32 48x48 64x64",
         type: "image/x-icon",
       },
       {
-        src: "/icon",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
+        // icon.tsx rend en 512 : ne declarer que cette taille, sinon
+        // l'icone d'installation est upscalee depuis une taille inexistante.
         src: "/icon",
         sizes: "512x512",
         type: "image/png",
+        purpose: "any",
       },
     ],
   };
