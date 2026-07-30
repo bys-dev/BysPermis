@@ -4,8 +4,14 @@ import { deleteFile } from "@/lib/storage";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
-/** Durée de conservation des justificatifs d'identité après la fin du stage. */
-export const RETENTION_DAYS = 45;
+/**
+ * Durée de conservation des justificatifs d'identité après la fin du stage.
+ *
+ * Non exporté : un module de route ne peut exposer que les handlers HTTP et les
+ * options de segment reconnues par Next. Toute autre export fait échouer la
+ * vérification de types du build (« not assignable to type never »).
+ */
+const RETENTION_DAYS = 45;
 /** Garde-fou : nombre de fichiers détruits par passage. */
 const BATCH_SIZE = 200;
 
