@@ -110,7 +110,10 @@ function cellToString(value: unknown): string {
 
 async function parseXlsx(buffer: Buffer): Promise<{ headers: string[]; rows: RawRow[] }> {
   // Import dynamique : exceljs est lourd et n'est utile que sur cette route.
-  const ExcelJS = await import("exceljs");
+  // exceljs est publié en CommonJS : selon le chargeur, ses classes arrivent sur
+  // l'espace de noms ou uniquement sur `default`. On accepte les deux formes.
+  const mod = await import("exceljs");
+  const ExcelJS = (mod as unknown as { default?: typeof mod }).default ?? mod;
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
 
