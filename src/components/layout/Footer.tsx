@@ -23,8 +23,8 @@ export default function Footer() {
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
               BYS Formation Permis est la marketplace de référence pour les stages
-              agréés de récupération de points du permis de conduire. Tous nos
-              centres partenaires sont agréés par le Ministère de
+              agréés de récupération de points du permis de conduire. Les stages
+              proposés sont dispensés par des centres agréés par le Ministère de
               l&apos;Intérieur.
             </p>
 

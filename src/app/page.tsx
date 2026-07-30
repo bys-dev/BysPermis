@@ -403,7 +403,7 @@ export default async function Home() {
 
                   <p className="text-base sm:text-lg text-white leading-relaxed max-w-3xl mx-auto">
                     Stage agréé préfecture — Récupérez jusqu&apos;à 4 points en 2 jours.
-                    Convocation immédiate par email. Plus de 150 centres partenaires en France.
+                    Convocation immédiate par email.
                   </p>
                 </div>
 
