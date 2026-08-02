@@ -183,6 +183,10 @@ export async function GET(req: NextRequest) {
     let userLat: number | null = null;
     let userLng: number | null = null;
 
+    // Filtres d'origine, avant que la recherche par distance ne retire le
+    // filtre ville : ils servent de repli si le rayon ne ramène rien.
+    const andAvecVille = where.AND as unknown[] | undefined;
+
     if (lat && lng) {
       const parsedLat = parseFloat(lat);
       const parsedLng = parseFloat(lng);
@@ -227,17 +231,29 @@ export async function GET(req: NextRequest) {
         .filter((f) => f.distance <= rayon)
         .sort((a, b) => a.distance - b.distance);
 
-      const total = withDistance.length;
-      const paginated = withDistance.slice((page - 1) * perPage, page * perPage);
+      // Un centre sans latitude/longitude est écarté du calcul de distance
+      // ci-dessus. Si aucun centre géolocalisé n'entre dans le rayon alors que
+      // l'utilisateur a saisi une ville, renvoyer une page vide serait faux :
+      // la recherche textuelle, elle, sait retrouver ces centres. On restaure
+      // donc le filtre ville et on repasse par la requête standard.
+      const aucunResultatGeo = withDistance.length === 0;
+      const villeSaisie = Boolean(ville && ville.trim());
 
-      return NextResponse.json({
-        formations: paginated,
-        total,
-        page,
-        perPage,
-        totalPages: Math.ceil(total / perPage),
-        geo: { lat: userLat, lng: userLng, rayon },
-      });
+      if (aucunResultatGeo && villeSaisie) {
+        if (andAvecVille) where.AND = andAvecVille;
+      } else {
+        const total = withDistance.length;
+        const paginated = withDistance.slice((page - 1) * perPage, page * perPage);
+
+        return NextResponse.json({
+          formations: paginated,
+          total,
+          page,
+          perPage,
+          totalPages: Math.ceil(total / perPage),
+          geo: { lat: userLat, lng: userLng, rayon },
+        });
+      }
     }
 
     // ── Standard query ────────────────────────────────────
