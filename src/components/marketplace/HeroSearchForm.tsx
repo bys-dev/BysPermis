@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -16,14 +15,6 @@ import {
   saveGeoToStorage,
   type GeoLocationDetail,
 } from "@/lib/geo-client";
-
-const popularTags = [
-  "Récupération de points",
-  "Stage volontaire",
-  "Stage 48N",
-  "Stage 48SI",
-  "Permis probatoire",
-];
 
 /** Rayon de recherche autour de la position détectée, en kilomètres. */
 const RAYON_KM = 25;
@@ -139,7 +130,7 @@ export default function HeroSearchForm() {
           <input
             id="hero-search"
             type="text"
-            placeholder="Stage 48N, récupération de points, ville…"
+            placeholder="Ville, code postal ou type de stage"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400 text-sm sm:text-base transition-all duration-200 hover:border-gray-300"
@@ -198,18 +189,6 @@ export default function HeroSearchForm() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mt-6 pt-5 border-t border-gray-100">
-        <span className="text-sm text-gray-500 mr-1 font-medium">Populaires :</span>
-        {popularTags.map((tag) => (
-          <Link
-            key={tag}
-            href={`/recherche?q=${encodeURIComponent(tag)}`}
-            className="px-3.5 py-1.5 bg-gray-50 hover:bg-blue-600 hover:text-white text-gray-700 text-xs sm:text-sm rounded-full transition-all duration-200 border border-gray-200 hover:border-blue-600 hover:shadow-md hover:shadow-blue-600/20 font-medium"
-          >
-            {tag}
-          </Link>
-        ))}
-      </div>
     </form>
   );
 }
