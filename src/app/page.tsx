@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { CentresProximite } from "@/components/marketplace/CentresProximite";
 import HeroSearchForm from "@/components/marketplace/HeroSearchForm";
 import HomeFaq from "@/components/marketplace/HomeFaq";
 import JsonLd from "@/components/seo/JsonLd";
@@ -251,7 +250,7 @@ const trustBadges = [
 const keyStats = [
   { value: "4", label: "points récupérés", icon: faStar },
   { value: "2", label: "jours de stage", icon: faCalendarCheck },
-  { value: "150+", label: "centres agréés", icon: faMapMarkerAlt },
+  { value: "1 an", label: "délai entre 2 stages", icon: faClock },
   { value: "5 min", label: "convocation email", icon: faBolt },
 ];
 
@@ -420,11 +419,6 @@ export default async function Home() {
                   </span>
                   <span className="hidden sm:inline text-white/30">|</span>
                   <span className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-blue-300 shrink-0" />
-                    +150 centres en France
-                  </span>
-                  <span className="hidden sm:inline text-white/30">|</span>
-                  <span className="flex items-center gap-2">
                     <FontAwesomeIcon icon={faEnvelopeOpenText} className="text-blue-300 shrink-0" />
                     Convocation immédiate
                   </span>
@@ -460,9 +454,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
-        {/* ═══ 3. CENTRES À PROXIMITÉ ═══ */}
-        <CentresProximite />
 
         {/* ═══ 4. LES 4 TYPES DE STAGES ═══ */}
         <section className="py-20 px-4 sm:px-8 bg-white">
