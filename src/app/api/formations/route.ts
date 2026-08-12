@@ -3,25 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireCentre } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
-import { geocodeAddress, haversineDistance } from "@/lib/geocoding";
+import { geocodeAddress } from "@/lib/geocoding";
 import { getUserCentreId } from "@/lib/centre-utils";
+import { termes } from "@/lib/search/text";
+import { classerFormations, estTri, resoudreLieu, type Coordonnees } from "@/lib/search/formations";
 
-function isVilleFilterClause(clause: unknown): boolean {
-  if (!clause || typeof clause !== "object" || !("OR" in clause)) return false;
-  const or = (clause as { OR: unknown[] }).OR;
-  return or.some((item) => {
-    if (!item || typeof item !== "object") return false;
-    if ("lieu" in item) return true;
-    const centre = (item as { centre?: { ville?: unknown } }).centre;
-    return Boolean(centre && "ville" in centre);
-  });
-}
-
-function stripVilleFilter(where: Record<string, unknown>) {
-  if (!where.AND) return;
-  where.AND = (where.AND as unknown[]).filter((c) => !isVilleFilterClause(c));
-  if ((where.AND as unknown[]).length === 0) delete where.AND;
-}
+/**
+ * Plafond du classement en mémoire.
+ *
+ * Le filtrage dur reste en base ; seul l'ordonnancement (pertinence, distance,
+ * date de la prochaine session) se fait ici, sur un catalogue qui se compte en
+ * centaines de lignes. Le plafond est un garde-fou, pas un mode de pagination :
+ * s'il est atteint, c'est que le catalogue a changé d'ordre de grandeur et que
+ * la recherche mérite un vrai index plein texte.
+ */
+const MAX_CLASSEMENT = 500;
 
 // ─── GET /api/formations ──────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -59,7 +55,6 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
     const prixMin = searchParams.get("prixMin");
     const prixMax = searchParams.get("prixMax");
-    const modalite = searchParams.get("modalite");
     const isQualiopi = searchParams.get("isQualiopi");
     const isCPF = searchParams.get("isCPF");
     const duree = searchParams.get("duree");
@@ -100,28 +95,11 @@ export async function GET(req: NextRequest) {
       AND: [scopeRecupPoints],
     };
 
-    // Full-text search across multiple fields
-    if (q && q.trim()) {
-      where.AND.push({
-        OR: [
-          { titre: { contains: q, mode: "insensitive" } },
-          { description: { contains: q, mode: "insensitive" } },
-          { centre: { nom: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
-          { centre: { ville: { contains: q, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
-          { categorie: { nom: { contains: q, mode: "insensitive" } } },
-        ],
-      });
-    }
-
-    // Ville filter (on centre.ville or formation.lieu)
-    if (ville && ville.trim()) {
-      where.AND.push({
-        OR: [
-          { lieu: { contains: ville, mode: "insensitive" } },
-          { centre: { ville: { contains: ville, mode: "insensitive" }, statut: "ACTIF", isActive: true } },
-        ],
-      });
-    }
+    // La requête libre `q` et la commune ne sont volontairement pas filtrées en
+    // base : `contains` ignore la casse mais pas les accents, si bien que
+    // « recuperation de points » ou « saint etienne » ne remontaient rien. Le
+    // tri se faisant de toute façon en mémoire, ces deux filtres y sont traités
+    // ensemble, sans accent et avec un vrai score (cf. lib/search).
 
     // Dept filter — sur les 2-3 premiers chiffres du code postal du centre.
     // (Métropole = 2 chiffres, DOM-TOM 97x/98x = 3 chiffres).
@@ -154,129 +132,57 @@ export async function GET(req: NextRequest) {
       where.duree = { contains: duree, mode: "insensitive" };
     }
 
-    // ── Sort ───────────────────────────────────────────────
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let orderBy: any = { createdAt: "desc" };
-    switch (tri) {
-      case "prix_asc":
-        orderBy = { prix: "asc" };
-        break;
-      case "prix_desc":
-        orderBy = { prix: "desc" };
-        break;
-      case "date":
-        orderBy = { createdAt: "desc" };
-        break;
-      case "pertinence":
-      default:
-        // Default: BYS-priority already handled client-side, use createdAt
-        orderBy = { createdAt: "desc" };
-        break;
-    }
-
     const centreSelect = {
-      nom: true, ville: true, slug: true, stripeOnboardingDone: true,
+      nom: true, ville: true, codePostal: true, slug: true, stripeOnboardingDone: true,
       latitude: true, longitude: true,
     };
 
-    // ── Proximity search (lat/lng explicites ou ville géocodée) ──
-    let userLat: number | null = null;
-    let userLng: number | null = null;
-
-    // Filtres d'origine, avant que la recherche par distance ne retire le
-    // filtre ville : ils servent de repli si le rayon ne ramène rien.
-    const andAvecVille = where.AND as unknown[] | undefined;
-
+    // ── Point de référence géographique ────────────────────
+    // Priorité au référentiel communal local : il couvre les communes
+    // courantes sans appel réseau, et le géocodeur ne sert plus que de repli.
+    let origine: Coordonnees | null = null;
     if (lat && lng) {
       const parsedLat = parseFloat(lat);
       const parsedLng = parseFloat(lng);
-      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-        userLat = parsedLat;
-        userLng = parsedLng;
-        stripVilleFilter(where);
-      }
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) origine = { lat: parsedLat, lng: parsedLng };
     } else if (ville && ville.trim()) {
-      const coords = await geocodeAddress(ville.trim());
-      if (coords) {
-        userLat = coords.lat;
-        userLng = coords.lng;
-        stripVilleFilter(where);
-      }
+      origine = resoudreLieu(ville) ?? (await geocodeAddress(ville.trim()));
     }
 
-    if (userLat !== null && userLng !== null) {
-      const allFormations = await prisma.formation.findMany({
-        where,
-        include: {
-          centre: { select: centreSelect },
-          categorie: { select: { nom: true } },
-          sessions: {
-            where: availableSessionFilter,
-            orderBy: { dateDebut: "asc" },
-            take: 1,
-          },
+    const lignes = await prisma.formation.findMany({
+      where,
+      include: {
+        centre: { select: centreSelect },
+        categorie: { select: { nom: true } },
+        sessions: {
+          where: availableSessionFilter,
+          orderBy: { dateDebut: "asc" },
+          take: 1,
         },
-        orderBy,
-      });
+      },
+      orderBy: { createdAt: "desc" },
+      take: MAX_CLASSEMENT,
+    });
 
-      const withDistance = allFormations
-        .filter((f) => f.centre.latitude !== null && f.centre.longitude !== null)
-        .map((f) => ({
-          ...f,
-          distance:
-            Math.round(
-              haversineDistance(userLat!, userLng!, f.centre.latitude!, f.centre.longitude!) * 10
-            ) / 10,
-        }))
-        .filter((f) => f.distance <= rayon)
-        .sort((a, b) => a.distance - b.distance);
+    const { resultats, elargi } = classerFormations(lignes, {
+      termesRecherche: q?.trim() ? termes(q) : [],
+      origine,
+      villeRecherchee: ville,
+      rayonKm: rayon,
+      tri: estTri(tri) ? tri : "pertinence",
+    });
 
-      // Un centre sans latitude/longitude est écarté du calcul de distance
-      // ci-dessus. Si aucun centre géolocalisé n'entre dans le rayon alors que
-      // l'utilisateur a saisi une ville, renvoyer une page vide serait faux :
-      // la recherche textuelle, elle, sait retrouver ces centres. On restaure
-      // donc le filtre ville et on repasse par la requête standard.
-      const aucunResultatGeo = withDistance.length === 0;
-      const villeSaisie = Boolean(ville && ville.trim());
+    const total = resultats.length;
+    const formations = resultats.slice((page - 1) * perPage, page * perPage);
 
-      if (aucunResultatGeo && villeSaisie) {
-        if (andAvecVille) where.AND = andAvecVille;
-      } else {
-        const total = withDistance.length;
-        const paginated = withDistance.slice((page - 1) * perPage, page * perPage);
-
-        return NextResponse.json({
-          formations: paginated,
-          total,
-          page,
-          perPage,
-          totalPages: Math.ceil(total / perPage),
-          geo: { lat: userLat, lng: userLng, rayon },
-        });
-      }
-    }
-
-    // ── Standard query ────────────────────────────────────
-    const [formations, total] = await Promise.all([
-      prisma.formation.findMany({
-        where,
-        include: {
-          centre: { select: centreSelect },
-          categorie: { select: { nom: true } },
-          sessions: {
-            where: availableSessionFilter,
-            orderBy: { dateDebut: "asc" },
-            take: 1,
-          },
-        },
-        skip: (page - 1) * perPage,
-        take: perPage,
-        orderBy,
-      }),
-      prisma.formation.count({ where }),
-    ]);
-
-    return NextResponse.json({ formations, total, page, perPage, totalPages: Math.ceil(total / perPage) });
+    return NextResponse.json({
+      formations,
+      total,
+      page,
+      perPage,
+      totalPages: Math.max(1, Math.ceil(total / perPage)),
+      ...(origine ? { geo: { ...origine, rayon, elargi } } : {}),
+    });
   } catch (err) {
     console.error("[GET /api/formations]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
