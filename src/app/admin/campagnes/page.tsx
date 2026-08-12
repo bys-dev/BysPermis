@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPaperPlane,
@@ -13,8 +14,10 @@ import {
   faTriangleExclamation,
   faCircleCheck,
   faEnvelopeOpenText,
+  faLayerGroup,
 } from "@fortawesome/free-solid-svg-icons";
-import CampaignEditor, { type CampagneForm } from "./CampaignEditor";
+import CampaignEditor, { nouvelleCampagne } from "./CampaignEditor";
+import type { CampagneForm, Variable } from "./types";
 
 type CampagneStatut = "BROUILLON" | "PROGRAMMEE" | "EN_COURS" | "ENVOYEE" | "PAUSEE" | "ANNULEE";
 
@@ -33,12 +36,6 @@ interface Campagne {
   finishedAt: string | null;
   createdAt: string;
   createdBy: { prenom: string; nom: string } | null;
-}
-
-interface Variable {
-  key: string;
-  label: string;
-  example: string;
 }
 
 const STATUT_BADGE: Record<CampagneStatut, string> = {
@@ -86,6 +83,23 @@ export default function AdminCampagnesPage() {
   useEffect(() => {
     charger();
   }, [charger]);
+
+  /**
+   * Reprise d'une sélection venue de l'écran Prospects (« Contacter la
+   * sélection ») : les fiches cochées arrivent en paramètre d'URL et ouvrent
+   * directement une campagne en ciblage nominatif.
+   */
+  useEffect(() => {
+    const ids = new URLSearchParams(window.location.search)
+      .get("selection")
+      ?.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (!ids?.length) return;
+    setEditeur(nouvelleCampagne({ mode: "SELECTION", prospectIds: ids }));
+    // Nettoyage de l'URL : un rafraîchissement ne doit pas rouvrir l'éditeur.
+    window.history.replaceState({}, "", "/admin/campagnes");
+  }, []);
 
   /**
    * Lancement de l'envoi.
@@ -212,23 +226,22 @@ export default function AdminCampagnesPage() {
             Emails personnalisés envoyés aux centres du fichier de prospects.
           </p>
         </div>
-        {!editeur && (
-          <button
-            onClick={() =>
-              setEditeur({
-                nom: "",
-                sujet: "",
-                contenu: "",
-                fromName: "BYS Permis",
-                replyTo: "",
-                filtre: { statuts: ["NOUVEAU", "A_CONTACTER"], exclureDejaContactes: true },
-              })
-            }
-            className="px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/campagnes/modeles"
+            className="px-4 py-2.5 rounded-lg border border-white/15 text-gray-300 text-sm font-semibold hover:border-blue-500 hover:text-white transition-colors inline-flex items-center gap-2"
           >
-            <FontAwesomeIcon icon={faPlus} /> Nouvelle campagne
-          </button>
-        )}
+            <FontAwesomeIcon icon={faLayerGroup} /> Modèles d&apos;email
+          </Link>
+          {!editeur && (
+            <button
+              onClick={() => setEditeur(nouvelleCampagne())}
+              className="px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faPlus} /> Nouvelle campagne
+            </button>
+          )}
+        </div>
       </div>
 
       {erreur && (
@@ -399,6 +412,7 @@ export default function AdminCampagnesPage() {
       </div>
 
       <p className="text-gray-600 text-[11px]">
+        Chaque centre reçoit un message qui lui est propre — aucune adresse n&apos;est en copie.
         Les envois sont étalés par lots de 100 : une campagne volumineuse se poursuit
         automatiquement en tâche de fond (cron toutes les 5 minutes) pour préserver la
         délivrabilité du domaine.

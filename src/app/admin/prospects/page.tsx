@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBullseye,
@@ -14,6 +15,7 @@ import {
   faTriangleExclamation,
   faBan,
   faUserSlash,
+  faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import ImportPanel from "./ImportPanel";
 
@@ -80,6 +82,7 @@ const inputClass =
   "px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500";
 
 export default function AdminProspectsPage() {
+  const router = useRouter();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
   const [total, setTotal] = useState(0);
@@ -212,6 +215,19 @@ export default function AdminProspectsPage() {
     } catch {
       setErreur("Impossible de contacter le serveur.");
     }
+  };
+
+  /**
+   * Ouvre une campagne ciblée sur les fiches cochées.
+   *
+   * On transmet les identifiants plutôt qu'un filtre : le staff veut écrire à
+   * *ces* centres-là. Les fiches non contactables présentes dans la sélection
+   * (sans email, désabonnées) seront écartées côté serveur, et le compte affiché
+   * dans l'éditeur reflète ce tri.
+   */
+  const contacterSelection = () => {
+    if (selection.size === 0) return;
+    router.push(`/admin/campagnes?selection=${[...selection].join(",")}`);
   };
 
   const contactables = useMemo(
@@ -397,6 +413,14 @@ export default function AdminProspectsPage() {
               </option>
             ))}
           </select>
+          <button
+            onClick={contacterSelection}
+            disabled={actionEnCours}
+            title="Créer une campagne adressée uniquement à ces centres"
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-40 transition-colors inline-flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faPaperPlane} /> Contacter la sélection
+          </button>
           <button
             onClick={() => setSelection(new Set())}
             className="text-gray-300 text-sm hover:text-white transition-colors ml-auto"

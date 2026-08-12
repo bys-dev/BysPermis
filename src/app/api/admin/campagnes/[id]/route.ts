@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCommercial, requireAdmin, mapAuthError } from "@/lib/auth0";
 import { countAudience, type AudienceFilter } from "@/lib/prospects/campaign";
 import { validateCampaignTemplate } from "@/lib/prospects/template";
+import { AudienceFilterSchema } from "@/lib/prospects/audience-schema";
 
 const UpdateSchema = z.object({
   nom: z.string().min(2).max(150).optional(),
@@ -11,7 +12,7 @@ const UpdateSchema = z.object({
   contenu: z.string().min(10).max(100_000).optional(),
   fromName: z.string().max(100).nullable().optional(),
   replyTo: z.string().email("Adresse de réponse invalide").nullable().optional(),
-  filtre: z.record(z.string(), z.unknown()).optional(),
+  filtre: AudienceFilterSchema.optional(),
   scheduledAt: z.string().datetime().nullable().optional(),
 });
 
