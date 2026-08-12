@@ -123,13 +123,15 @@ export async function GET() {
     });
     const revenusMoisDernier = montantsMoisDernier.reduce((sum, r) => sum + r.montant * 0.1, 0);
 
+    // `null` = pas de base de comparaison (mois précédent à zéro), à distinguer
+    // d'une évolution nulle. Cf. lib/dashboard/admin-stats.
     const revenusEvolution = revenusMoisDernier > 0
       ? Math.round(((revenusPlateforme - revenusMoisDernier) / revenusMoisDernier) * 100)
-      : 0;
+      : null;
 
     const reservationsEvolution = reservationsMoisDernier > 0
       ? Math.round(((reservationsCeMois - reservationsMoisDernier) / reservationsMoisDernier) * 100)
-      : 0;
+      : null;
 
     // ── Monthly data (last 6 months) ──
     const monthlyData: { month: string; revenue: number; reservations: number }[] = [];

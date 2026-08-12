@@ -14,11 +14,13 @@ export default async function AdminDashboardPage() {
     console.error("[admin/dashboard] stats load failed:", err);
     stats = {
       revenusPlateforme: 0,
-      revenusEvolution: 0,
+      // Les statistiques n'ont pas pu être chargées : on n'affiche pas une
+      // évolution nulle, qui se lirait comme un mois stable.
+      revenusEvolution: null,
       centresActifs: 0,
       centresEnAttente: 0,
       reservationsCeMois: 0,
-      reservationsEvolution: 0,
+      reservationsEvolution: null,
       utilisateurs: 0,
       ticketsOuverts: 0,
       reservationsRecentes: [],

@@ -30,11 +30,12 @@ interface TopCentre {
 
 interface StatsData {
   revenusPlateforme: number;
-  revenusEvolution: number;
+  /** `null` : aucune base de comparaison (mois précédent à zéro). */
+  revenusEvolution: number | null;
   centresActifs: number;
   centresEnAttente: number;
   reservationsCeMois: number;
-  reservationsEvolution: number;
+  reservationsEvolution: number | null;
   utilisateurs: number;
   ticketsOuverts: number;
   monthlyData: MonthlyData[];
