@@ -16,11 +16,10 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
+// Le géocodeur distant ne doit jamais être appelé dans un test : le
+// référentiel communal local suffit pour les villes courantes.
 jest.mock("@/lib/geocoding", () => ({
-  haversineDistance: jest.fn((lat1: number, lon1: number, lat2: number, lon2: number) => {
-    if (lat2 === 48.8566 && lon2 === 2.3522) return 5;
-    return 100;
-  }),
+  haversineDistance: jest.fn(() => 0),
   geocodeAddress: jest.fn().mockResolvedValue(null),
 }));
 
@@ -37,7 +36,15 @@ const mockFormations = [
     isQualiopi: true,
     isCPF: false,
     isActive: true,
-    centre: { nom: "BYS Formation Osny", ville: "Osny", slug: "bys-osny", stripeOnboardingDone: true },
+    centre: {
+      nom: "BYS Formation Osny",
+      ville: "Osny",
+      codePostal: "95520",
+      slug: "bys-osny",
+      stripeOnboardingDone: true,
+      latitude: null,
+      longitude: null,
+    },
     categorie: { nom: "Récupération de points" },
     sessions: [],
     _count: { sessions: 3 },
@@ -51,7 +58,15 @@ const mockFormations = [
     isQualiopi: true,
     isCPF: false,
     isActive: true,
-    centre: { nom: "Conduite Plus Paris", ville: "Paris", slug: "conduite-plus-paris", stripeOnboardingDone: true },
+    centre: {
+      nom: "Conduite Plus Paris",
+      ville: "Paris",
+      codePostal: "75011",
+      slug: "conduite-plus-paris",
+      stripeOnboardingDone: true,
+      latitude: 48.8566,
+      longitude: 2.3522,
+    },
     categorie: { nom: "Récupération de points" },
     sessions: [],
     _count: { sessions: 2 },
@@ -78,33 +93,49 @@ describe("GET /api/formations", () => {
 
   it("filtre par ville", async () => {
     const req = new NextRequest("http://localhost/api/formations?ville=Osny");
-    await GET(req);
+    const res = await GET(req);
 
-    expect(prisma.formation.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          AND: expect.arrayContaining([
-            expect.objectContaining({
-              OR: expect.arrayContaining([
-                expect.objectContaining({ lieu: expect.objectContaining({ contains: "Osny" }) }),
-              ]),
-            }),
-          ]),
-        }),
-      })
-    );
+    const data = await res.json();
+    expect(data.formations).toHaveLength(1);
+    expect(data.formations[0].centre.ville).toBe("Osny");
+  });
+
+  it("filtre par ville sans tenir compte des accents ni de la casse", async () => {
+    // « recherche par ville » passait par un `contains` SQL, insensible à la
+    // casse mais pas aux accents : « saint etienne » ne trouvait rien.
+    const res = await GET(new NextRequest("http://localhost/api/formations?ville=OSNY"));
+    const data = await res.json();
+    expect(data.formations).toHaveLength(1);
+  });
+
+  it("trouve « recuperation » écrit sans accent", async () => {
+    const res = await GET(new NextRequest("http://localhost/api/formations?q=recuperation"));
+    const data = await res.json();
+    expect(data.total).toBe(2);
+  });
+
+  it("n'invente pas de résultat pour un terme absent", async () => {
+    const res = await GET(new NextRequest("http://localhost/api/formations?q=plomberie"));
+    const data = await res.json();
+    expect(data.total).toBe(0);
   });
 
   it("respecte la pagination (page + perPage)", async () => {
-    const req = new NextRequest("http://localhost/api/formations?page=2&perPage=1");
-    await GET(req);
+    // La pagination s'applique après le classement : découper en base
+    // renverrait la deuxième page d'un ordre qui n'est pas celui affiché.
+    const res = await GET(new NextRequest("http://localhost/api/formations?page=2&perPage=1"));
 
-    expect(prisma.formation.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        skip: 1,
-        take: 1,
-      })
-    );
+    const data = await res.json();
+    expect(data.formations).toHaveLength(1);
+    expect(data.total).toBe(2);
+    expect(data.totalPages).toBe(2);
+    expect(data.page).toBe(2);
+  });
+
+  it("trie par prix croissant sur l'ensemble des résultats", async () => {
+    const res = await GET(new NextRequest("http://localhost/api/formations?tri=prix_asc"));
+    const data = await res.json();
+    expect(data.formations.map((f: { prix: number }) => f.prix)).toEqual([250, 280]);
   });
 
   it("retourne 200 même si la liste est vide", async () => {

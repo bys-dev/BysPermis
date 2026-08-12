@@ -67,18 +67,26 @@ interface CategorieOption {
   nom: string;
 }
 
-// ─── DÉPARTEMENT MAP ──────────────────────────────────────
-const cityToDept: Record<string, string> = {
-  paris: "75", lyon: "69", marseille: "13", toulouse: "31", nice: "06",
-  nantes: "44", bordeaux: "33", lille: "59", strasbourg: "67", montpellier: "34",
-  rennes: "35", cergy: "95", osny: "95", pontoise: "95", argenteuil: "95",
-  versailles: "78", nanterre: "92", "saint-denis": "93", creteil: "94",
-};
-
-function getDeptFromCity(city: string): string | null {
-  const key = city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  return cityToDept[key] ?? null;
+/**
+ * D\u00e9partement d\u00e9duit du code postal du centre.
+ *
+ * Remplace une table de 19 communes cod\u00e9e en dur, qui laissait sans d\u00e9partement
+ * la quasi-totalit\u00e9 des villes fran\u00e7aises. Le code postal, lui, est toujours
+ * renseign\u00e9 (DOM en 97x/98x, sur trois chiffres).
+ */
+function deptFromCodePostal(cp: string | null | undefined): string | null {
+  if (!cp) return null;
+  const clean = cp.replace(/\s/g, "");
+  if (clean.length < 2) return null;
+  return clean.startsWith("97") || clean.startsWith("98") ? clean.slice(0, 3) : clean.slice(0, 2);
 }
+
+/**
+ * Un stage de r\u00e9cup\u00e9ration de points se n\u00e9gocie entre 150 et 300 \u20ac. La borne \u00e0
+ * 5 000 \u20ac, h\u00e9rit\u00e9e du catalogue multi-formations, rendait le curseur inutile :
+ * tout le catalogue tenait dans son premier vingti\u00e8me.
+ */
+const PRIX_MAX = 400;
 
 const rayonOptions = [
   { value: 10, label: "10 km" },
@@ -106,7 +114,7 @@ function RechercheInner() {
   const initialDept = searchParams.get("dept") ?? "";
   const initialType = searchParams.get("type") ?? "Tous les types";
   const initialPrixMin = Number(searchParams.get("prixMin") ?? 0);
-  const initialPrixMax = Number(searchParams.get("prixMax") ?? 5000);
+  const initialPrixMax = Number(searchParams.get("prixMax") ?? PRIX_MAX);
   const initialTri = searchParams.get("tri") ?? "pertinence";
   const initialRayon = Number(searchParams.get("rayon") ?? 25) || 25;
   const initialLat = searchParams.get("lat") ?? "";
@@ -144,6 +152,8 @@ function RechercheInner() {
   const [total, setTotal] = useState(0);
   const [stages, setStages] = useState<StageCard[]>([]);
   const [loading, setLoading] = useState(false);
+  /** Le rayon demandé ne donnait rien : le serveur a rendu les stages les plus proches. */
+  const [rayonElargi, setRayonElargi] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
   const [detectedDept, setDetectedDept] = useState<string | null>(null);
@@ -191,7 +201,7 @@ function RechercheInner() {
     setSearchQuery(searchParams.get("q") ?? "");
     setSelectedType(searchParams.get("type") ?? "Tous les types");
     setPrixMin(Number(searchParams.get("prixMin") ?? 0));
-    setPrixMax(Number(searchParams.get("prixMax") ?? 5000));
+    setPrixMax(Number(searchParams.get("prixMax") ?? PRIX_MAX));
     setTri(searchParams.get("tri") ?? "pertinence");
     setCurrentPage(Math.max(1, Number(searchParams.get("page") ?? 1) || 1));
 
@@ -212,7 +222,7 @@ function RechercheInner() {
           dept,
           type: searchParams.get("type") ?? "Tous les types",
           prixMin: Number(searchParams.get("prixMin") ?? 0),
-          prixMax: Number(searchParams.get("prixMax") ?? 5000),
+          prixMax: Number(searchParams.get("prixMax") ?? PRIX_MAX),
           tri: searchParams.get("tri") ?? "pertinence",
           rayon: rayonParam,
           lat,
@@ -233,7 +243,7 @@ function RechercheInner() {
       dept,
       type: searchParams.get("type") ?? "Tous les types",
       prixMin: Number(searchParams.get("prixMin") ?? 0),
-      prixMax: Number(searchParams.get("prixMax") ?? 5000),
+      prixMax: Number(searchParams.get("prixMax") ?? PRIX_MAX),
       tri: searchParams.get("tri") ?? "pertinence",
       rayon: rayonParam,
       lat: "",
@@ -302,7 +312,7 @@ function RechercheInner() {
         dept: applied.dept,
         type: applied.type,
         prixMin: applied.prixMin > 0 ? String(applied.prixMin) : "",
-        prixMax: applied.prixMax < 5000 ? String(applied.prixMax) : "",
+        prixMax: applied.prixMax < PRIX_MAX ? String(applied.prixMax) : "",
         tri: applied.tri,
         rayon: applied.lat && applied.lng ? String(applied.rayon) : applied.ville.trim() ? String(applied.rayon) : "",
         lat: applied.lat,
@@ -387,7 +397,7 @@ function RechercheInner() {
       if (applied.dept.trim()) params.set("dept", applied.dept.trim());
       if (applied.type !== "Tous les types") params.set("type", applied.type);
       if (applied.prixMin > 0) params.set("prixMin", String(applied.prixMin));
-      if (applied.prixMax < 5000) params.set("prixMax", String(applied.prixMax));
+      if (applied.prixMax < PRIX_MAX) params.set("prixMax", String(applied.prixMax));
       if (applied.tri && applied.tri !== "pertinence") params.set("tri", applied.tri);
 
       fetch(`/api/formations?${params}`, { signal: controller.signal })
@@ -398,13 +408,13 @@ function RechercheInner() {
             id: string; titre: string; slug: string; prix: number; isQualiopi: boolean; isCPF: boolean;
             modalite: string; duree: string;
             categorie?: { nom: string } | null;
-            centre: { nom: string; ville: string };
+            centre: { nom: string; ville: string; codePostal?: string | null };
             sessions: { id: string; dateDebut: string; dateFin: string; placesRestantes: number }[];
             distance?: number | null;
           }) => {
             const firstSession = f.sessions[0] ?? null;
             const ville = f.centre.ville ?? "";
-            const dept = getDeptFromCity(ville) ?? "";
+            const dept = deptFromCodePostal(f.centre.codePostal) ?? "";
             const dateStr = firstSession
               ? new Date(firstSession.dateDebut).toLocaleDateString("fr-FR") +
                 " — " +
@@ -430,13 +440,14 @@ function RechercheInner() {
               distance: f.distance ?? null,
             };
           });
-          // BYS toujours en premier (only for "pertinence" sort)
-          if (applied.tri === "pertinence" || !applied.tri) {
-            mapped.sort((a, b) => (a.isBYS && !b.isBYS ? -1 : !a.isBYS && b.isBYS ? 1 : 0));
-          }
+          // Le classement (pertinence, priorité BYS, distance, date) est
+          // désormais entièrement calculé côté serveur, sur l'ensemble des
+          // résultats. Le retrier ici ne réordonnait que la page affichée :
+          // l'ordre changeait d'une page à l'autre.
           setStages(mapped);
           setTotal(data.total ?? mapped.length);
           setTotalPages(data.totalPages ?? 1);
+          setRayonElargi(Boolean(data.geo?.elargi));
         })
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -448,7 +459,6 @@ function RechercheInner() {
       controller.abort();
       clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applied, currentPage, updateURL]);
 
   // Auto-suggestions for search query
@@ -474,7 +484,7 @@ function RechercheInner() {
   const hasActiveFilters =
     applied.type !== "Tous les types" ||
     applied.prixMin > 0 ||
-    applied.prixMax < 5000 ||
+    applied.prixMax < PRIX_MAX ||
     applied.q.trim() !== "" ||
     applied.ville.trim() !== "" ||
     Boolean(applied.lat && applied.lng) ||
@@ -488,7 +498,7 @@ function RechercheInner() {
   const resetFilters = () => {
     setSelectedType("Tous les types");
     setPrixMin(0);
-    setPrixMax(5000);
+    setPrixMax(PRIX_MAX);
     setSearchQuery("");
     setSearchVille("");
     setGeoLat("");
@@ -502,7 +512,7 @@ function RechercheInner() {
       dept: "",
       type: "Tous les types",
       prixMin: 0,
-      prixMax: 5000,
+      prixMax: PRIX_MAX,
       tri: "pertinence",
       rayon: 25,
       lat: "",
@@ -513,8 +523,26 @@ function RechercheInner() {
   // All stage types: combine static + dynamic from API categories
   const allTypes = ["Tous les types", ...categories.map((c) => c.nom)];
 
-  // Popular formations for "no results" state
-  const popularSearches = ["Stage 48N", "Stage 48SI", "Stage volontaire", "Stage Paris", "Stage Lyon", "Stage Marseille"];
+  // Suggestions de repli : les requêtes qui amènent réellement du trafic sur
+  // un site de stages de récupération de points.
+  const popularSearches = [
+    "Récupération de points",
+    "Stage 48N",
+    "Stage 48SI",
+    "Permis probatoire",
+    "Cergy",
+    "Paris",
+  ];
+
+  // Fenêtre de pagination : au-delà d'une dizaine de pages, afficher tous les
+  // numéros produisait une ligne de boutons interminable sur mobile.
+  const pagesAffichees = (() => {
+    const fenetre = 5;
+    let debut = Math.max(1, currentPage - Math.floor(fenetre / 2));
+    const fin = Math.min(totalPages, debut + fenetre - 1);
+    debut = Math.max(1, fin - fenetre + 1);
+    return Array.from({ length: fin - debut + 1 }, (_, i) => debut + i);
+  })();
 
   return (
     <div className="min-h-screen bg-brand-bg">
@@ -760,8 +788,8 @@ function RechercheInner() {
                     <input
                       type="range"
                       min={0}
-                      max={5000}
-                      step={50}
+                      max={PRIX_MAX}
+                      step={10}
                       value={prixMin}
                       onChange={(e) => {
                         const val = Number(e.target.value);
@@ -778,8 +806,8 @@ function RechercheInner() {
                     <input
                       type="range"
                       min={0}
-                      max={5000}
-                      step={50}
+                      max={PRIX_MAX}
+                      step={10}
                       value={prixMax}
                       onChange={(e) => {
                         const val = Number(e.target.value);
@@ -791,7 +819,7 @@ function RechercheInner() {
                   </div>
                   <div className="flex justify-between text-xs text-gray-400">
                     <span>0 &euro;</span>
-                    <span>5 000 &euro;</span>
+                    <span>{PRIX_MAX} &euro; et plus</span>
                   </div>
                 </div>
               </div>
@@ -917,6 +945,18 @@ function RechercheInner() {
               </div>
             </div>
 
+            {/* Rayon élargi automatiquement */}
+            {rayonElargi && !loading && stages.length > 0 && (
+              <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <FontAwesomeIcon icon={faLocationDot} className="mt-0.5 text-sm text-blue-500" />
+                <p className="text-xs text-blue-800">
+                  Aucun stage dans un rayon de {applied.rayon} km
+                  {applied.ville.trim() ? ` autour de ${applied.ville}` : ""}. Voici les stages
+                  <strong> les plus proches</strong>, classés par distance.
+                </p>
+              </div>
+            )}
+
             {/* Active filters pills */}
             {hasActiveFilters && (
               <div className="flex flex-wrap gap-2 mb-6 pb-1 -mx-1 px-1 min-w-0">
@@ -962,10 +1002,10 @@ function RechercheInner() {
                     </button>
                   </span>
                 )}
-                {(applied.prixMin > 0 || applied.prixMax < 5000) && (
+                {(applied.prixMin > 0 || applied.prixMax < PRIX_MAX) && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
                     {applied.prixMin}&euro; — {applied.prixMax}&euro;
-                    <button onClick={() => { setPrixMin(0); setPrixMax(5000); setCurrentPage(1); }} className="hover:text-blue-900">
+                    <button onClick={() => { setPrixMin(0); setPrixMax(PRIX_MAX); setCurrentPage(1); }} className="hover:text-blue-900">
                       <FontAwesomeIcon icon={faXmark} className="text-[10px]" />
                     </button>
                   </span>
@@ -1150,7 +1190,8 @@ function RechercheInner() {
                 >
                   <FontAwesomeIcon icon={faChevronLeft} className="text-sm" />
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                {pagesAffichees[0] > 1 && <span className="px-1 text-gray-400">…</span>}
+                {pagesAffichees.map((page) => (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
@@ -1163,6 +1204,9 @@ function RechercheInner() {
                     {page}
                   </button>
                 ))}
+                {pagesAffichees[pagesAffichees.length - 1] < totalPages && (
+                  <span className="px-1 text-gray-400">…</span>
+                )}
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
