@@ -572,8 +572,7 @@ export default function TarifsPartenairesPage() {
                   Prêt à développer votre activité ?
                 </h2>
                 <p className="text-blue-100 max-w-2xl mx-auto mb-8 text-lg">
-                  Rejoignez les 150+ centres qui font confiance à BYS Formation
-                  pour remplir leurs sessions de stage.
+                  Rejoignez BYS Formation pour remplir vos sessions de stage.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link

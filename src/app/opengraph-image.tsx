@@ -96,7 +96,7 @@ export default function OpenGraphImage() {
             maxWidth: 900,
           }}
         >
-          Stages agréés Ministère de l&apos;Intérieur · 150+ centres partenaires
+          Stages agréés Ministère de l&apos;Intérieur · Convocation immédiate
           · Convocation immédiate
         </div>
 

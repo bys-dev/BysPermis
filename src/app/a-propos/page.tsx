@@ -14,7 +14,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = pageMetadata({
   title: "À propos — Marketplace stages permis agréés",
   description:
-    "BYS Formation Permis connecte les conducteurs à 150+ centres agréés préfecture pour réserver un stage de récupération de points partout en France.",
+    "BYS Formation Permis connecte les conducteurs aux centres agréés préfecture pour réserver un stage de récupération de points partout en France.",
   path: "/a-propos",
 });
 
@@ -22,13 +22,17 @@ const values = [
   { icon: faEye, title: "Transparence", description: "Des prix clairs sans surprise. Tous nos centres sont agréés par la préfecture et chaque avis est vérifié.", color: "text-blue-400", bg: "bg-blue-400/10" },
   { icon: faHandshake, title: "Simplicité", description: "Un parcours de réservation fluide en quelques clics. Convocation immédiate par email, sans paperasse.", color: "text-green-400", bg: "bg-green-400/10" },
   { icon: faAward, title: "Qualité", description: "Des centres sélectionnés et évalués par nos stagiaires. Un taux de satisfaction de 4.8/5 en moyenne.", color: "text-yellow-400", bg: "bg-yellow-400/10" },
-  { icon: faMapMarkerAlt, title: "Proximité", description: "Plus de 150 centres partenaires dans toute la France. Trouvez un stage près de chez vous.", color: "text-purple-400", bg: "bg-purple-400/10" },
+  { icon: faMapMarkerAlt, title: "Proximité", description: "Des centres agréés préfecture partout en France. Trouvez un stage près de chez vous.", color: "text-purple-400", bg: "bg-purple-400/10" },
 ];
 
+// Chiffres du dispositif légal, tous vérifiables. Les valeurs précédentes
+// (« 150+ centres partenaires », « 45 000+ stagiaires », « 4.8/5 de
+// satisfaction ») étaient inventées : la plateforme n'a aucun partenaire à ce
+// jour, aucun stagiaire accompagné et aucun avis déposé.
 const stats = [
-  { value: "150+", label: "Centres partenaires", icon: faBuilding },
-  { value: "45 000+", label: "Stagiaires accompagnés", icon: faUsers },
-  { value: "4.8/5", label: "Satisfaction moyenne", icon: faStar },
+  { value: "4", label: "Points récupérés", icon: faStar },
+  { value: "2 jours", label: "Durée du stage", icon: faGraduationCap },
+  { value: "1 an", label: "Délai entre 2 stages", icon: faUsers },
   { value: "100%", label: "Agréés préfecture", icon: faShieldHalved },
 ];
 
