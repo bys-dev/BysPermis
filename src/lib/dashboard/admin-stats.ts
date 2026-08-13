@@ -134,13 +134,16 @@ export async function getAdminStatsForDashboard() {
   // Calcul revenus (10% de commission)
   const revenusPlateforme = montantsRes.reduce((sum, r) => sum + r.montant * 0.1, 0);
   const revenusMoisDernier = montantsMoisDernier.reduce((sum, r) => sum + r.montant * 0.1, 0);
+  // `null` quand le mois précédent est à zéro : il n'y a alors aucune base de
+  // comparaison. Renvoyer 0 ferait passer « rien à comparer » pour « stable »,
+  // deux situations très différentes sur un tableau de bord.
   const revenusEvolution = revenusMoisDernier > 0
     ? Math.round(((revenusPlateforme - revenusMoisDernier) / revenusMoisDernier) * 100)
-    : 0;
+    : null;
 
   const reservationsEvolution = reservationsMoisDernier > 0
     ? Math.round(((reservationsCeMois - reservationsMoisDernier) / reservationsMoisDernier) * 100)
-    : 0;
+    : null;
 
   // ── Monthly data (last 6 months) ──
   const monthlyData: { month: string; revenue: number; reservations: number }[] = [];

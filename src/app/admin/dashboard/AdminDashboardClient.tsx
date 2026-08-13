@@ -9,6 +9,7 @@ import {
   faUsers,
   faClipboardList,
   faArrowUp,
+  faArrowDown,
   faCheckCircle,
   faCircleXmark,
   faHeadset,
@@ -31,11 +32,12 @@ import { formatPrice, formatDate } from "@/lib/utils";
 
 interface AdminStats {
   revenusPlateforme: number;
-  revenusEvolution: number;
+  /** `null` : aucune base de comparaison (mois précédent à zéro). */
+  revenusEvolution: number | null;
   centresActifs: number;
   centresEnAttente: number;
   reservationsCeMois: number;
-  reservationsEvolution: number;
+  reservationsEvolution: number | null;
   utilisateurs: number;
   ticketsOuverts: number;
   reservationsRecentes: {
@@ -112,6 +114,41 @@ const activityIcon = (type: string) => {
   return map[type] ?? map.reservation;
 };
 
+/**
+ * Pastille de tendance d'une carte KPI.
+ *
+ * Le libellé, la flèche et la couleur doivent raconter la même chose. Ils
+ * étaient dissociés : le libellé se construisait avec un « + » en dur — une
+ * baisse s'affichait donc « +-100 % » — tandis que la flèche pointait toujours
+ * vers le haut et la couleur restait au vert, y compris sur un effondrement.
+ */
+interface Tendance {
+  label: string;
+  sens: "hausse" | "baisse" | "neutre";
+}
+
+/** Variation en pourcentage. `null` = pas de base de comparaison. */
+export function variation(pourcentage: number | null): Tendance {
+  if (pourcentage === null) return { label: "—", sens: "neutre" };
+  if (pourcentage === 0) return { label: "stable", sens: "neutre" };
+  const signe = pourcentage > 0 ? "+" : "−"; // signe moins typographique
+  return {
+    label: `${signe}${Math.abs(pourcentage)} %`,
+    sens: pourcentage > 0 ? "hausse" : "baisse",
+  };
+}
+
+/** Simple repère chiffré (« 3 att. ») : ni hausse ni baisse, donc pas de flèche. */
+function indicateur(label: string): Tendance {
+  return { label, sens: "neutre" };
+}
+
+const COULEUR_TENDANCE: Record<Tendance["sens"], string> = {
+  hausse: "text-green-400",
+  baisse: "text-red-400",
+  neutre: "text-gray-400",
+};
+
 const adminExportOptions = [
   { label: "Exporter les centres (CSV)", type: "centres" },
   { label: "Exporter les utilisateurs (CSV)", type: "users" },
@@ -173,7 +210,7 @@ export default function AdminDashboardClient({
       value: formatPrice(stats.revenusPlateforme),
       sub: "Commission percue ce mois",
       icon: faEuro,
-      trend: `+${stats.revenusEvolution}%`,
+      trend: variation(stats.revenusEvolution),
       color: "text-green-400",
       bg: "bg-green-400/10",
       border: "border-green-500/20",
@@ -183,7 +220,7 @@ export default function AdminDashboardClient({
       value: String(stats.centresActifs),
       sub: `${stats.centresEnAttente} en attente de validation`,
       icon: faBuilding,
-      trend: `${stats.centresEnAttente} att.`,
+      trend: indicateur(`${stats.centresEnAttente} att.`),
       color: "text-blue-400",
       bg: "bg-blue-400/10",
       border: "border-blue-500/20",
@@ -193,7 +230,7 @@ export default function AdminDashboardClient({
       value: stats.reservationsCeMois.toLocaleString("fr-FR"),
       sub: "Ce mois",
       icon: faClipboardList,
-      trend: `+${stats.reservationsEvolution}%`,
+      trend: variation(stats.reservationsEvolution),
       color: "text-purple-400",
       bg: "bg-purple-400/10",
       border: "border-purple-500/20",
@@ -203,7 +240,7 @@ export default function AdminDashboardClient({
       value: stats.utilisateurs.toLocaleString("fr-FR"),
       sub: `${stats.ticketsOuverts} tickets ouverts`,
       icon: faUsers,
-      trend: `${stats.ticketsOuverts} tickets`,
+      trend: indicateur(`${stats.ticketsOuverts} tickets`),
       color: "text-yellow-400",
       bg: "bg-yellow-400/10",
       border: "border-yellow-500/20",
@@ -301,12 +338,15 @@ export default function AdminDashboardClient({
               <div className={`w-10 h-10 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
               </div>
-              {k.trend && (
-                <div className="flex items-center gap-1 text-xs font-semibold text-green-400">
-                  <FontAwesomeIcon icon={faArrowUp} className="text-[10px]" />
-                  {k.trend}
-                </div>
-              )}
+              <div className={`flex items-center gap-1 text-xs font-semibold ${COULEUR_TENDANCE[k.trend.sens]}`}>
+                {k.trend.sens !== "neutre" && (
+                  <FontAwesomeIcon
+                    icon={k.trend.sens === "hausse" ? faArrowUp : faArrowDown}
+                    className="text-[10px]"
+                  />
+                )}
+                {k.trend.label}
+              </div>
             </div>
             <p className="text-2xl font-bold text-white">{k.value}</p>
             <p className="text-xs text-gray-400 mt-1">{k.label}</p>
@@ -360,12 +400,21 @@ export default function AdminDashboardClient({
         )}
       </div>
 
+      {/*
+        La colonne de droite (actions rapides + activité) est nettement plus
+        haute que celle de gauche quand il n'y a ni centre en attente ni
+        réservation. Les cartes de gauche s'étirent donc pour occuper la
+        hauteur de la rangée, et leurs états vides se centrent dedans : sans
+        cela, la page se terminait sur un grand aplat noir.
+      */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 space-y-6">
-          <div className="bg-navy-900 rounded-xl border border-white/8 p-5">
+        <div className="xl:col-span-2 flex flex-col gap-6">
+          <div className="bg-navy-900 rounded-xl border border-white/8 p-5 flex flex-col flex-1">
             <h2 className="text-white font-semibold text-sm mb-4">Centres en attente</h2>
             {stats.centresEnAttenteList.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-sm">Aucun centre en attente</div>
+              <div className="flex-1 flex items-center justify-center py-8 text-gray-400 text-sm">
+                Aucun centre en attente
+              </div>
             ) : (
               <div className="space-y-3">
                 {stats.centresEnAttenteList.map((c) => (
@@ -406,10 +455,12 @@ export default function AdminDashboardClient({
             )}
           </div>
 
-          <div className="bg-navy-900 rounded-xl border border-white/8 p-5">
+          <div className="bg-navy-900 rounded-xl border border-white/8 p-5 flex flex-col flex-1">
             <h2 className="text-white font-semibold text-sm mb-4">Réservations récentes</h2>
             {stats.reservationsRecentes.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-sm">Aucune réservation récente</div>
+              <div className="flex-1 flex items-center justify-center py-8 text-gray-400 text-sm">
+                Aucune réservation récente
+              </div>
             ) : (
               <div className="space-y-3">
                 {stats.reservationsRecentes.map((r) => {
