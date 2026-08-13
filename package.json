@@ -11,6 +11,7 @@
     "postinstall": "node scripts/postinstall-prisma.js",
     "start": "next start",
     "lint": "eslint",
+    "check:imports": "node scripts/check-imports.mjs",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
