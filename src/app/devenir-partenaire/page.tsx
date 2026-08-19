@@ -22,6 +22,7 @@ import {
   faLandmarkFlag,
   faCreditCard,
   faUserShield,
+  faFileArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const dynamic = "force-static";
@@ -211,6 +212,16 @@ export default function DevenirPartenairePage() {
                 Comment ça marche
               </a>
             </div>
+
+            <a
+              href="/api/brochure-partenaire"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm font-medium mt-6 transition-colors"
+            >
+              <FontAwesomeIcon icon={faFileArrowDown} className="text-xs" />
+              Télécharger la brochure partenaire (PDF)
+            </a>
 
             <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mt-12">
               {transparency.map((t) => (

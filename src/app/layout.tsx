@@ -49,6 +49,20 @@ export const metadata: Metadata = {
     "BYS Formation Permis",
   ],
   alternates: { canonical: "/" },
+  // Sans ces directives, Google plafonne les extraits à ~160 caractères et
+  // n'utilise que des vignettes réduites. Les lever est la condition pour que
+  // le contenu soit repris en entier dans les AI Overviews et les rich results.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     type: "website",
     locale: "fr_FR",

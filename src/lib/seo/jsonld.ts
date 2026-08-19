@@ -30,6 +30,18 @@ export function organizationJsonLd() {
       // "https://www.facebook.com/bysformation",
       // "https://www.linkedin.com/company/bysformation",
     ],
+    description:
+      "Place de marché des stages de sensibilisation à la sécurité routière (stages de récupération de points) organisés par des centres agréés par les préfectures françaises.",
+    areaServed: { "@type": "Country", name: "France" },
+    knowsAbout: [
+      "Stage de récupération de points",
+      "Stage de sensibilisation à la sécurité routière",
+      "Permis à points",
+      "Lettre 48N",
+      "Lettre 48SI",
+      "Permis probatoire",
+      "Code de la route",
+    ],
     contactPoint: [
       {
         "@type": "ContactPoint",
@@ -244,20 +256,40 @@ export function localBusinessJsonLd(input: LocalBusinessInput) {
 
 export interface ServiceJsonLdInput {
   city?: string;
-  averagePrice?: { min: number; max: number };
+  /** Département servi (page /stages/departement/[dept]). */
+  departement?: { code: string; nom: string };
+  geo?: { lat: number; lng: number; rayonKm?: number };
+  averagePrice?: { min: number; max: number; count?: number };
+  url?: string;
 }
 
 export function serviceJsonLd(input: ServiceJsonLdInput = {}) {
   const areaServed = input.city
     ? { "@type": "City", name: input.city }
-    : { "@type": "Country", name: "France" };
+    : input.departement
+      ? { "@type": "AdministrativeArea", name: `${input.departement.nom} (${input.departement.code})` }
+      : { "@type": "Country", name: "France" };
 
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     serviceType: "Stage de récupération de points du permis de conduire",
+    ...(input.url ? { url: input.url } : {}),
     provider: { "@id": `${BASE_URL}/#organization` },
     areaServed,
+    ...(input.geo
+      ? {
+          serviceArea: {
+            "@type": "GeoCircle",
+            geoMidpoint: {
+              "@type": "GeoCoordinates",
+              latitude: input.geo.lat,
+              longitude: input.geo.lng,
+            },
+            geoRadius: (input.geo.rayonKm ?? 50) * 1000,
+          },
+        }
+      : {}),
     description:
       "Stage de sensibilisation à la sécurité routière agréé par la préfecture, permettant de récupérer jusqu'à 4 points sur le permis de conduire en 2 jours.",
     ...(input.averagePrice
@@ -267,10 +299,155 @@ export function serviceJsonLd(input: ServiceJsonLdInput = {}) {
             priceCurrency: "EUR",
             lowPrice: input.averagePrice.min,
             highPrice: input.averagePrice.max,
-            offerCount: 1,
+            offerCount: input.averagePrice.count ?? 1,
           },
         }
       : {}),
+  };
+}
+
+// ─── HowTo (parcours de récupération de points) ────────────────────
+
+export interface HowToStep {
+  name: string;
+  text: string;
+  url?: string;
+}
+
+export function howToJsonLd(input: {
+  name: string;
+  description: string;
+  steps: HowToStep[];
+  totalTimeISO?: string;
+  estimatedCost?: { min: number; max: number };
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: input.name,
+    description: input.description,
+    inLanguage: "fr-FR",
+    totalTime: input.totalTimeISO ?? "P2D",
+    ...(input.estimatedCost
+      ? {
+          estimatedCost: {
+            "@type": "MonetaryAmount",
+            currency: "EUR",
+            minValue: input.estimatedCost.min,
+            maxValue: input.estimatedCost.max,
+          },
+        }
+      : {}),
+    supply: [
+      { "@type": "HowToSupply", name: "Permis de conduire original" },
+      { "@type": "HowToSupply", name: "Pièce d'identité en cours de validité" },
+      { "@type": "HowToSupply", name: "Convocation reçue par e-mail" },
+    ],
+    step: input.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+      ...(s.url ? { url: s.url.startsWith("http") ? s.url : `${BASE_URL}${s.url}` } : {}),
+    })),
+  };
+}
+
+// ─── ItemList (pages de listing : villes, départements, centres) ───
+
+export interface ItemListEntry {
+  name: string;
+  url: string;
+  description?: string;
+}
+
+export function itemListJsonLd(input: { name: string; items: ItemListEntry[] }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: input.name,
+    numberOfItems: input.items.length,
+    itemListOrder: "https://schema.org/ItemListOrderAscending",
+    itemListElement: input.items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      url: item.url.startsWith("http") ? item.url : `${BASE_URL}${item.url}`,
+      ...(item.description ? { description: item.description } : {}),
+    })),
+  };
+}
+
+// ─── WebPage (ancrage entité + extraits pour moteurs génératifs) ───
+
+/**
+ * Déclare explicitement le sujet de la page et la date de dernière mise à
+ * jour. C'est ce qui permet aux moteurs de réponse (AI Overviews, Perplexity,
+ * ChatGPT Search) de rattacher la page à une entité connue plutôt que de
+ * deviner à partir du seul texte, et de juger sa fraîcheur.
+ */
+export function webPageJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+  dateModifiedISO?: string;
+  /** Entités Wikipédia/Wikidata décrivant le sujet. */
+  aboutUrls?: string[];
+  primaryTopic?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${BASE_URL}${input.path}#webpage`,
+    url: `${BASE_URL}${input.path}`,
+    name: input.name,
+    description: input.description,
+    inLanguage: "fr-FR",
+    isPartOf: { "@id": `${BASE_URL}/#website` },
+    ...(input.dateModifiedISO ? { dateModified: input.dateModifiedISO } : {}),
+    about: {
+      "@type": "Thing",
+      name: input.primaryTopic ?? "Stage de récupération de points du permis de conduire",
+      sameAs: input.aboutUrls ?? [
+        "https://fr.wikipedia.org/wiki/Permis_%C3%A0_points_en_France",
+        "https://www.service-public.fr/particuliers/vosdroits/F14208",
+      ],
+    },
+    publisher: { "@id": `${BASE_URL}/#organization` },
+  };
+}
+
+// ─── QAPage (contenu explicitement citable) ────────────────────────
+
+/**
+ * Une question unique avec sa réponse de référence. Complémentaire de
+ * `faqJsonLd` : les moteurs génératifs privilégient les réponses courtes,
+ * datées et attribuables à une source identifiée.
+ */
+export function qaPageJsonLd(input: {
+  question: string;
+  answer: string;
+  path: string;
+  dateISO: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "QAPage",
+    mainEntity: {
+      "@type": "Question",
+      name: input.question,
+      text: input.question,
+      answerCount: 1,
+      dateCreated: input.dateISO,
+      author: { "@id": `${BASE_URL}/#organization` },
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: input.answer,
+        url: `${BASE_URL}${input.path}`,
+        dateCreated: input.dateISO,
+        author: { "@id": `${BASE_URL}/#organization` },
+      },
+    },
   };
 }
 

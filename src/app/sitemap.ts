@@ -1,25 +1,46 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { DEPARTEMENTS, VILLES } from "@/lib/seo/geo-data";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: BASE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
-    { url: `${BASE_URL}/recherche`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${BASE_URL}/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE_URL}/a-propos`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE_URL}/cgu`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE_URL}/mentions-legales`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE_URL}/politique-de-confidentialite`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE_URL}/comment-ca-marche`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/tarifs-partenaires`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE_URL}/devenir-partenaire`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-    { url: `${BASE_URL}/centres`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: BASE_URL, lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: `${BASE_URL}/recherche`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE_URL}/stages`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE_URL}/a-propos`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/cgu`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE_URL}/mentions-legales`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE_URL}/politique-de-confidentialite`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE_URL}/comment-ca-marche`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/tarifs-partenaires`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/devenir-partenaire`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE_URL}/centres`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
   ];
+
+  // Landing pages géographiques — issues du référentiel statique, donc
+  // présentes dans le sitemap même quand aucun centre n'est encore référencé
+  // dans la commune ou le département.
+  const villePages: MetadataRoute.Sitemap = VILLES.map((v) => ({
+    url: `${BASE_URL}/stages/${v.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  const deptPages: MetadataRoute.Sitemap = DEPARTEMENTS.map((d) => ({
+    url: `${BASE_URL}/stages/departement/${d.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
 
   // Dynamic: formations
   let formationPages: MetadataRoute.Sitemap = [];
@@ -55,24 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB might not be available during build
   }
 
-  // Dynamic: stages par ville (SEO landing pages)
-  let villePages: MetadataRoute.Sitemap = [];
-  try {
-    const villes = await prisma.centre.findMany({
-      where: { isActive: true, statut: "ACTIF" },
-      select: { ville: true },
-      distinct: ["ville"],
-    });
-    villePages = villes.map((v) => ({
-      url: `${BASE_URL}/stages/${encodeURIComponent(v.ville.toLowerCase())}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-  } catch {
-    // DB might not be available during build
-  }
-
   // Dynamic: blog articles
   let blogPages: MetadataRoute.Sitemap = [];
   try {
@@ -90,5 +93,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB might not be available during build
   }
 
-  return [...staticPages, ...formationPages, ...centrePages, ...villePages, ...blogPages];
+  return [
+    ...staticPages,
+    ...villePages,
+    ...deptPages,
+    ...formationPages,
+    ...centrePages,
+    ...blogPages,
+  ];
 }

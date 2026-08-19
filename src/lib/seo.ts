@@ -58,7 +58,7 @@ export function pageMetadata(opts: {
 export function stageCityBreadcrumb(cityLabel: string, citySlug: string) {
   return [
     { name: "Accueil", url: SITE_URL },
-    { name: "Stages par ville", url: `${SITE_URL}/recherche` },
+    { name: "Stages par ville", url: `${SITE_URL}/stages` },
     { name: `Stage ${cityLabel}`, url: canonical(`/stages/${citySlug}`) },
   ];
 }

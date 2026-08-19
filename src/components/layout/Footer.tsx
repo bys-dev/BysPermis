@@ -78,6 +78,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/stages"
+                  className="hover:text-white transition-colors"
+                >
+                  Stages par ville et département
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/stages/paris"
                   className="hover:text-white transition-colors"
                 >
@@ -98,6 +106,22 @@ export default function Footer() {
                   className="hover:text-white transition-colors"
                 >
                   Stage à Marseille
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/toulouse"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Toulouse
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/stages/lille"
+                  className="hover:text-white transition-colors"
+                >
+                  Stage à Lille
                 </Link>
               </li>
               <li>
