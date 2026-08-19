@@ -6,9 +6,16 @@ import Footer from "@/components/layout/Footer";
 import HeroSearchForm from "@/components/marketplace/HeroSearchForm";
 import HomeFaq from "@/components/marketplace/HomeFaq";
 import JsonLd from "@/components/seo/JsonLd";
-import { serviceJsonLd, faqJsonLd } from "@/lib/seo/jsonld";
+import {
+  serviceJsonLd,
+  faqJsonLd,
+  howToJsonLd,
+  itemListJsonLd,
+  webPageJsonLd,
+} from "@/lib/seo/jsonld";
 import { pageMetadata } from "@/lib/seo";
-import { HOME_FAQ } from "@/lib/seo-content";
+import { HOME_FAQ, STAGE_STEPS } from "@/lib/seo-content";
+import { DEPARTEMENTS, topVilles, VILLES } from "@/lib/seo/geo-data";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -41,10 +48,17 @@ import { TricoloreParticles } from "@/components/ui/TricoloreParticles";
 // ISR — la home se régénère toutes les heures
 export const revalidate = 3600;
 
+/**
+ * Villes mises en avant. La home est la page qui reçoit le plus de liens
+ * externes : y placer ces entrées transmet cette autorité aux pages villes,
+ * qui sans cela dépendraient du seul sitemap pour être découvertes.
+ */
+const VILLES_POPULAIRES = topVilles(24);
+
 export const metadata: Metadata = pageMetadata({
   title: "Stages récupération de points — Centres agréés partout en France",
   description:
-    "Comparez et réservez votre stage de récupération de points près de chez vous. 150+ centres agréés préfecture, convocation immédiate, paiement sécurisé. Récupérez jusqu'à 4 points en 2 jours.",
+    "Comparez et réservez votre stage de récupération de points près de chez vous. Centres agréés préfecture, convocation immédiate, paiement sécurisé. Récupérez jusqu'à 4 points en 2 jours.",
   path: "/",
 });
 
@@ -122,7 +136,7 @@ const steps = [
   {
     number: "1",
     title: "Recherchez",
-    desc: "Trouvez un stage agréé préfecture près de chez vous parmi 150+ centres en France",
+    desc: "Trouvez un stage agréé préfecture près de chez vous",
     icon: faMagnifyingGlass,
   },
   {
@@ -361,7 +375,31 @@ export default async function Home() {
     <>
       <JsonLd
         id="ld-home"
-        data={[serviceJsonLd({ averagePrice: { min: 200, max: 280 } }), faqJsonLd(HOME_FAQ)]}
+        data={[
+          webPageJsonLd({
+            name: "BYS Formation Permis — stages agréés de récupération de points",
+            description:
+              "Comparez et réservez un stage de récupération de points dans un centre agréé préfecture, partout en France.",
+            path: "/",
+            dateModifiedISO: new Date().toISOString(),
+          }),
+          serviceJsonLd({ averagePrice: { min: 200, max: 280 }, url: "/" }),
+          howToJsonLd({
+            name: "Récupérer 4 points sur son permis de conduire",
+            description:
+              "Les 5 étapes pour suivre un stage de sensibilisation à la sécurité routière agréé et récupérer 4 points.",
+            steps: STAGE_STEPS,
+            estimatedCost: { min: 200, max: 300 },
+          }),
+          itemListJsonLd({
+            name: "Stages de récupération de points par ville",
+            items: VILLES_POPULAIRES.map((v) => ({
+              name: `Stage de récupération de points à ${v.nom}`,
+              url: `/stages/${v.slug}`,
+            })),
+          }),
+          faqJsonLd(HOME_FAQ),
+        ]}
       />
       <Header />
       <main>
@@ -965,6 +1003,43 @@ export default async function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ 11 bis. STAGES PAR VILLE ═══ */}
+        <section className="py-20 px-4 sm:px-8 bg-brand-bg">
+          <div className="max-w-[1440px] mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
+                Stage de récupération de points près de chez vous
+              </h2>
+              <p className="text-lg text-gray-500 max-w-3xl mx-auto">
+                Un stage suivi dans n&apos;importe quel centre agréé est valable partout en
+                France. Choisissez la ville qui vous arrange : chaque page affiche les
+                sessions sur place, puis les plus proches par ordre de distance.
+              </p>
+            </div>
+
+            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+              {VILLES_POPULAIRES.map((v) => (
+                <li key={v.slug}>
+                  <Link
+                    href={`/stages/${v.slug}`}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-gray-200 text-sm text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-xs text-gray-400" />
+                    <span className="truncate">{v.nom}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <div className="text-center mt-10">
+              <Link href="/stages" className="text-blue-600 font-semibold hover:underline">
+                Voir les {VILLES.length} villes et les {DEPARTEMENTS.length} départements
+                <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+              </Link>
             </div>
           </div>
         </section>

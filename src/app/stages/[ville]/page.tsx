@@ -1,24 +1,38 @@
 import type { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import JsonLd from "@/components/seo/JsonLd";
-import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/seo/jsonld";
-import { pageMetadata, stageCityBreadcrumb } from "@/lib/seo";
-import { STAGE_CITY_FAQ } from "@/lib/seo-content";
-import { formatPlacesDisponibles, getPlacesToneClass } from "@/lib/utils";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faLocationDot,
-  faCalendarDays,
-  faShieldHalved,
-  faArrowRight,
-  faMagnifyingGlass,
-  faClock,
-  faEuroSign,
-  faUsers,
-} from "@fortawesome/free-solid-svg-icons";
+  BaremeRetraits,
+  Definitions,
+  EtapesStage,
+  FaitsCles,
+  FaqSection,
+  FormationsList,
+  MaillageGeo,
+} from "@/components/seo/StageLocalSections";
+import {
+  breadcrumbJsonLd,
+  faqJsonLd,
+  howToJsonLd,
+  itemListJsonLd,
+  serviceJsonLd,
+  webPageJsonLd,
+} from "@/lib/seo/jsonld";
+import { pageMetadata, stageCityBreadcrumb } from "@/lib/seo";
+import { STAGE_CITY_FAQ, STAGE_STEPS } from "@/lib/seo-content";
+import {
+  getDepartement,
+  getVille,
+  VILLES,
+  villesProches,
+} from "@/lib/seo/geo-data";
+import { formationsAutourDe, fourchettePrix } from "@/lib/seo/stages-query";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLocationDot, faShieldHalved, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   params: Promise<{ ville: string }>;
@@ -26,280 +40,236 @@ interface Props {
 
 export const revalidate = 3600;
 
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+/**
+ * `dynamicParams = false` fait rejeter par le routeur tout slug absent de
+ * `generateStaticParams`, avec un vrai 404 émis avant tout rendu.
+ *
+ * C'est volontairement plus strict qu'un `notFound()` dans le corps de la
+ * page : une fois le shell HTML streamé, le statut est figé à 200 et un
+ * `notFound()` ne produit plus qu'un soft 404 — page d'erreur affichée, code
+ * 200 renvoyé, donc URL indexable. Comme la liste des communes valides est
+ * connue statiquement, autant la faire appliquer par le routeur.
+ *
+ * Corollaire : les 240 communes sont prérendues au build, et non plus les 30
+ * premières. Le surcoût est contenu par la mémoïsation de la requête dans
+ * `stages-query.ts`, qui ramène ces 240 pages à une seule interrogation.
+ */
+export const dynamicParams = false;
 
-function slugifyVille(ville: string): string {
-  return ville
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/\s+/g, "-");
-}
-
-export async function generateStaticParams() {
-  try {
-    const centres = await prisma.centre.findMany({
-      where: { isActive: true, statut: "ACTIF" },
-      select: { ville: true },
-      distinct: ["ville"],
-      take: 100,
-    });
-    return centres
-      .filter((c) => c.ville)
-      .map((c) => ({ ville: slugifyVille(c.ville) }));
-  } catch {
-    return [];
-  }
+export function generateStaticParams() {
+  return VILLES.map((v) => ({ ville: v.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { ville } = await params;
-  const villeDecoded = capitalize(decodeURIComponent(ville));
+  const { ville: slug } = await params;
+  const ville = getVille(slug);
+
+  if (!ville) {
+    return { title: "Ville introuvable", robots: { index: false, follow: false } };
+  }
+
+  const dept = getDepartement(ville.dept);
 
   return pageMetadata({
-    title: `Stage récupération de points à ${villeDecoded}`,
-    description: `Trouvez et réservez votre stage de récupération de points à ${villeDecoded}. Centres agréés préfecture, prix transparents, réservation en ligne sécurisée.`,
-    path: `/stages/${ville}`,
+    title: `Stage de récupération de points à ${ville.nom} (${ville.dept}) — Centres agréés`,
+    // Le nom du département n'est ajouté que s'il apporte une information :
+    // « à Paris (Paris) » ou « à Nice (Alpes-Maritimes) » — seul le second aide.
+    description: `Réservez votre stage de récupération de points à ${ville.nom}${
+      dept && dept.nom !== ville.nom ? ` (${dept.nom})` : ""
+    } : centres agréés préfecture, 4 points en 2 jours, prix affiché tout compris et places disponibles en temps réel.`,
+    path: `/stages/${ville.slug}`,
     keywords: [
-      `stage récupération points ${villeDecoded}`,
-      `stage permis ${villeDecoded}`,
-      `stage 48N ${villeDecoded}`,
-      `stage agréé préfecture ${villeDecoded}`,
+      `stage récupération points ${ville.nom}`,
+      `stage récupération de points ${ville.nom}`,
+      `stage permis ${ville.nom}`,
+      `stage points ${ville.cp}`,
+      `stage 48N ${ville.nom}`,
+      `stage sensibilisation sécurité routière ${ville.nom}`,
+      `centre agréé récupération points ${ville.nom}`,
+      ...(dept ? [`stage récupération points ${dept.nom}`] : []),
     ],
   });
 }
 
-interface FormationResult {
-  id: string;
-  titre: string;
-  slug: string;
-  description: string;
-  prix: number;
-  duree: string;
-  isQualiopi: boolean;
-  isCPF: boolean;
-  modalite: string;
-  centre: {
-    nom: string;
-    ville: string;
-    slug: string;
-  };
-  sessions: {
-    id: string;
-    dateDebut: string;
-    dateFin: string;
-    placesRestantes: number;
-  }[];
-}
-
 export default async function StagesVillePage({ params }: Props) {
-  const { ville } = await params;
-  const villeDecoded = capitalize(decodeURIComponent(ville));
+  const { ville: slug } = await params;
+  const ville = getVille(slug);
 
-  let formations: FormationResult[] = [];
-  try {
-    formations = (await prisma.formation.findMany({
-      where: {
-        isActive: true,
-        centre: {
-          isActive: true,
-          statut: "ACTIF",
-          ville: { equals: villeDecoded, mode: "insensitive" },
-        },
-        // On n'affiche que les formations avec au moins une session à venir réservable.
-        sessions: {
-          some: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
-        },
-      },
-      include: {
-        centre: { select: { nom: true, ville: true, slug: true } },
-        sessions: {
-          where: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
-          orderBy: { dateDebut: "asc" },
-          take: 3,
-          select: { id: true, dateDebut: true, dateFin: true, placesRestantes: true },
-        },
-      },
-      orderBy: { prix: "asc" },
-    })) as unknown as FormationResult[];
-  } catch {
-    // DB might not be available
-  }
+  // Une commune hors référentiel ne doit pas produire une page indexable :
+  // ce serait une page sans contenu propre, que Google classe en soft 404.
+  if (!ville) notFound();
+
+  const dept = getDepartement(ville.dept);
+  const formations = await formationsAutourDe(ville);
+  const prix = fourchettePrix(formations);
+  const proches = villesProches(ville);
+  const surPlace = formations.filter((f) => f.memeVille).length;
+
+  const faq = STAGE_CITY_FAQ(ville.nom);
+  const path = `/stages/${ville.slug}`;
 
   const jsonLd = [
-    breadcrumbJsonLd(stageCityBreadcrumb(villeDecoded, ville)),
-    serviceJsonLd({ city: villeDecoded }),
-    faqJsonLd(STAGE_CITY_FAQ(villeDecoded)),
+    webPageJsonLd({
+      name: `Stage de récupération de points à ${ville.nom}`,
+      description: `Centres agréés et sessions de stage de récupération de points à ${ville.nom} et alentours.`,
+      path,
+      dateModifiedISO: new Date().toISOString(),
+    }),
+    breadcrumbJsonLd(stageCityBreadcrumb(ville.nom, ville.slug)),
+    serviceJsonLd({
+      city: ville.nom,
+      url: path,
+      geo: { lat: ville.lat, lng: ville.lng, rayonKm: 50 },
+      ...(prix ? { averagePrice: prix } : {}),
+    }),
+    howToJsonLd({
+      name: `Récupérer 4 points sur son permis à ${ville.nom}`,
+      description: `Les 5 étapes pour suivre un stage de sensibilisation à la sécurité routière à ${ville.nom} et récupérer 4 points.`,
+      steps: STAGE_STEPS,
+      estimatedCost: prix ?? { min: 200, max: 300 },
+    }),
+    faqJsonLd(faq),
+    ...(formations.length > 0
+      ? [
+          itemListJsonLd({
+            name: `Stages de récupération de points à ${ville.nom} et alentours`,
+            items: formations.map((f) => ({
+              name: `${f.titre} — ${f.centre.nom}`,
+              url: `/formations/${f.slug}`,
+              description: `${f.centre.adresse}, ${f.centre.codePostal} ${f.centre.ville} — ${f.prix} €`,
+            })),
+          }),
+        ]
+      : []),
   ];
 
   return (
     <>
-      <JsonLd id={`ld-stages-${ville}`} data={jsonLd} />
+      <JsonLd id={`ld-stages-${ville.slug}`} data={jsonLd} />
       <Header />
       <main className="min-h-screen bg-brand-bg">
         {/* Hero */}
-        <section className="bg-navy-900 text-white py-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-              <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
-              <span>/</span>
-              <Link href="/recherche" className="hover:text-white transition-colors">Stages</Link>
-              <span>/</span>
-              <span className="text-white">{villeDecoded}</span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold mb-4">
-              Stage de récupération de points à {villeDecoded}
-            </h1>
-            <p className="text-gray-400 text-lg max-w-2xl">
-              Trouvez et réservez votre stage de récupération de points à {villeDecoded}.
-              Tous nos centres sont agréés par la préfecture (Ministère de l&apos;Intérieur).
-            </p>
-            <div className="flex items-center gap-4 mt-6">
-              <span className="inline-flex items-center gap-2 text-sm text-blue-400">
-                <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
-                {villeDecoded}
-              </span>
-              <span className="text-gray-600">|</span>
-              <span className="text-sm text-gray-400">
-                {formations.length} formation{formations.length > 1 ? "s" : ""} disponible{formations.length > 1 ? "s" : ""}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* Formations list */}
-        <section className="max-w-7xl mx-auto px-6 py-12">
-          {formations.length === 0 ? (
-            <div className="text-center py-20">
-              <FontAwesomeIcon icon={faMagnifyingGlass} className="text-4xl text-gray-300 mb-4" />
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                Aucune formation disponible à {villeDecoded}
-              </h2>
-              <p className="text-gray-500 mb-6">
-                Essayez une recherche plus large ou consultez les villes à proximité.
-              </p>
-              <Link
-                href="/recherche"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
-              >
-                <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
-                Rechercher partout
-              </Link>
-            </div>
-          ) : (
-            <>
-              <h2 className="text-2xl font-display font-bold text-gray-900 mb-8">
-                {formations.length} formation{formations.length > 1 ? "s" : ""} à {villeDecoded}
-              </h2>
-              <div className="grid gap-6">
-                {formations.map((f) => (
-                  <div
-                    key={f.id}
-                    className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6"
+        <section className="bg-navy-900 py-16 text-white">
+          <div className="mx-auto max-w-7xl px-6">
+            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+              <Link href="/" className="transition-colors hover:text-white">Accueil</Link>
+              <span aria-hidden>/</span>
+              <Link href="/stages" className="transition-colors hover:text-white">Stages par ville</Link>
+              {dept && (
+                <>
+                  <span aria-hidden>/</span>
+                  <Link
+                    href={`/stages/departement/${dept.slug}`}
+                    className="transition-colors hover:text-white"
                   >
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-2">
-                          {f.isCPF && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-green-50 text-green-700 border border-green-200 font-medium">
-                              CPF
-                            </span>
-                          )}
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                            <FontAwesomeIcon icon={faShieldHalved} className="text-[9px]" /> Agréé Préfecture
-                          </span>
-                        </div>
+                    {dept.nom}
+                  </Link>
+                </>
+              )}
+              <span aria-hidden>/</span>
+              <span className="text-white">{ville.nom}</span>
+            </nav>
 
-                        <Link href={`/formations/${f.slug}`} className="hover:text-blue-600 transition-colors">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">{f.titre}</h3>
-                        </Link>
-                        <p className="text-sm text-gray-500 mb-3">
-                          {f.centre.nom} — {f.centre.ville}
-                        </p>
-                        <p className="text-sm text-gray-600 line-clamp-2">{f.description}</p>
+            <h1 className="mb-4 font-display text-3xl font-bold md:text-4xl">
+              Stage de récupération de points à {ville.nom}
+            </h1>
 
-                        <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                          <span className="flex items-center gap-1.5">
-                            <FontAwesomeIcon icon={faClock} className="text-xs text-gray-400" />
-                            {f.duree}
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <FontAwesomeIcon icon={faEuroSign} className="text-xs text-gray-400" />
-                            À partir de {f.prix} €
-                          </span>
-                        </div>
+            {/* Réponse directe : c'est ce paragraphe que les moteurs de réponse
+                reprennent en extrait, il doit tenir seul hors contexte. */}
+            <p className="max-w-3xl text-lg text-gray-300">
+              Un stage de récupération de points à {ville.nom} dure 2 jours consécutifs
+              (14 heures) et permet de récupérer <strong className="text-white">4 points</strong>{" "}
+              sur votre permis de conduire, crédités le lendemain du second jour. Il est
+              organisé par un centre agréé par le préfet {dept ? `du ${dept.nom}` : "du département"}{" "}
+              et coûte généralement entre 200 € et 300 €.
+            </p>
 
-                        {/* Prochaines sessions */}
-                        {f.sessions.length > 0 && (
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {f.sessions.map((sess) => (
-                              <Link
-                                key={sess.id}
-                                href={`/reserver/${sess.id}`}
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-50 border border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all"
-                              >
-                                <FontAwesomeIcon icon={faCalendarDays} className="text-[10px]" />
-                                {new Date(sess.dateDebut).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
-                                <span className={`inline-flex items-center gap-1 ${getPlacesToneClass(sess.placesRestantes)}`}>
-                                  <FontAwesomeIcon icon={faUsers} className="text-[9px]" />
-                                  {formatPlacesDisponibles(sess.placesRestantes)}
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="shrink-0 flex flex-col items-end gap-3">
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">{f.prix} €</p>
-                          <p className="text-xs text-gray-500">TVA incluse</p>
-                        </div>
-                        <Link
-                          href={`/formations/${f.slug}`}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
-                        >
-                          Voir les dates
-                          <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-
-        {/* SEO content */}
-        <section className="max-w-7xl mx-auto px-6 pb-16">
-          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
-            <h2 className="text-xl font-display font-bold text-gray-900 mb-4">
-              Stages de récupération de points à {villeDecoded}
-            </h2>
-            <div className="prose prose-sm text-gray-600 max-w-none">
-              <p>
-                BYS Formation vous permet de trouver et réserver facilement votre stage de
-                récupération de points à {villeDecoded}. Tous nos centres partenaires sont
-                agréés par la préfecture et dispensent des formations conformes à la
-                réglementation en vigueur.
-              </p>
-              <p>
-                Un stage de récupération de points dure 2 jours consécutifs et permet de
-                récupérer jusqu&apos;à 4 points sur votre permis de conduire. Les points sont
-                crédités le lendemain du dernier jour de stage.
-              </p>
-              <p>
-                Tous nos centres partenaires à {villeDecoded} sont agréés par la préfecture
-                (Ministère de l&apos;Intérieur) pour dispenser le « stage de sensibilisation à la
-                sécurité routière et de prévention des risques », nom officiel du stage de
-                récupération de points. Vous pouvez en effectuer un par période de 12 mois.
-              </p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+              <span className="inline-flex items-center gap-2 text-blue-400">
+                <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
+                {ville.nom} ({ville.cp})
+              </span>
+              <span className="text-gray-600" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-gray-300">
+                <FontAwesomeIcon icon={faCalendarDays} className="text-xs" />
+                {formations.length === 0
+                  ? "Aucune session programmée"
+                  : `${formations.length} session${formations.length > 1 ? "s" : ""} réservable${formations.length > 1 ? "s" : ""}`}
+                {surPlace > 0 && ` — dont ${surPlace} à ${ville.nom}`}
+              </span>
+              <span className="text-gray-600" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-gray-300">
+                <FontAwesomeIcon icon={faShieldHalved} className="text-xs" />
+                Centres agréés préfecture
+              </span>
             </div>
           </div>
         </section>
+
+        <div className="mx-auto max-w-7xl space-y-14 px-6 py-12">
+          <FormationsList formations={formations} lieu={ville.nom} />
+
+          <FaitsCles lieu={ville.nom} />
+
+          <EtapesStage lieu={ville.nom} />
+
+          {/* Contenu éditorial propre à la ville */}
+          <section aria-labelledby="contexte-local">
+            <h2 id="contexte-local" className="mb-4 font-display text-2xl font-bold text-gray-900">
+              Faire son stage à {ville.nom} : ce qu&apos;il faut savoir
+            </h2>
+            <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-8 text-gray-600">
+              <p>
+                Les centres de sensibilisation à la sécurité routière de {ville.nom} sont agréés
+                individuellement par le préfet {dept ? `du ${dept.nom} (${dept.code})` : "du département"}.
+                Cet agrément est la seule condition pour qu&apos;un stage ouvre droit à la
+                récupération de 4 points : ni le label du centre, ni son ancienneté, ni son
+                prix n&apos;entrent en compte.
+              </p>
+              <p>
+                L&apos;agrément est départemental, la récupération de points est nationale.
+                Autrement dit, vous n&apos;êtes pas tenu de suivre votre stage à {ville.nom} parce
+                que vous y résidez, ni parce que l&apos;infraction y a été commise : un stage
+                effectué dans n&apos;importe quel centre agréé de France produit exactement le
+                même effet sur votre solde de points.
+              </p>
+              <p>
+                {prix ? (
+                  <>
+                    Les sessions actuellement réservables autour de {ville.nom} se situent entre{" "}
+                    <strong>{prix.min} €</strong> et <strong>{prix.max} €</strong>. Le prix
+                    affiché est le prix final : convocation, support pédagogique et attestation
+                    de suivi sont inclus, sans frais de dossier ajoutés au paiement.
+                  </>
+                ) : (
+                  <>
+                    Le tarif d&apos;un stage est libre : chaque centre fixe le sien, dans une
+                    fourchette généralement comprise entre 200 € et 300 €. Le prix affiché sur
+                    BYS Formation Permis est le prix final, convocation et attestation de suivi
+                    comprises.
+                  </>
+                )}
+              </p>
+              <p>
+                Attention au calendrier si vous avez reçu une lettre 48N : le stage doit être
+                effectué dans les 4 mois suivant sa réception. Les places partant vite sur les
+                périodes chargées, réservez plutôt 2 à 3 semaines à l&apos;avance.
+              </p>
+            </div>
+          </section>
+
+          <BaremeRetraits />
+
+          <Definitions />
+
+          <FaqSection items={faq} titre={`Questions fréquentes sur les stages à ${ville.nom}`} />
+
+          <MaillageGeo
+            villes={proches}
+            departement={dept}
+            titre={`Stages de récupération de points près de ${ville.nom}`}
+          />
+        </div>
       </main>
       <Footer />
     </>
