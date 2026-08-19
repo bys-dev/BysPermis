@@ -1,0 +1,7 @@
+[
+  "*/5 * * * * $ROOT/scripts/cron-call.sh /api/cron/cleanup-pending-reservations",
+  "*/5 * * * * $ROOT/scripts/cron-call.sh /api/cron/campagnes",
+  "*/20 * * * * $ROOT/scripts/cron-call.sh /api/cron/fulfillment-repair",
+  "0 * * * * $ROOT/scripts/cron-call.sh /api/cron/session-reminders",
+  "30 3 * * * $ROOT/scripts/cron-call.sh /api/cron/purge-documents"
+]
