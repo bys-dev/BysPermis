@@ -37,20 +37,6 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    // ─── Empreinte mémoire du build (Clever Cloud) ───
-    // Le conteneur de build fait ~2 Go et Clever y injecte
-    // NODE_OPTIONS=--max-old-space-size=1262. Ce plafond vaut PAR PROCESSUS :
-    // Next lançant plusieurs ouvriers en parallèle (7 observés en génération
-    // statique), la somme dépasse la RAM du conteneur et le noyau tue le build
-    // — « build worker exited with signal SIGKILL ». Changer de bundler n'y
-    // change rien : c'est la multiplication des processus qui coûte.
-    //
-    // On sérialise donc les deux phases concernées :
-    webpackBuildWorker: false, // compilation dans le processus principal
-    cpus: 1, // génération des pages statiques une par une
-    //
-    // Contrepartie : build sensiblement plus lent. À retirer si l'instance de
-    // build passe sur un gabarit plus large (variable CC_BUILD_FLAVOR).
     optimizePackageImports: [
       "@fortawesome/free-solid-svg-icons",
       "@fortawesome/free-brands-svg-icons",
@@ -64,6 +50,16 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: securityHeaders,
       },
+    ];
+  },
+  async redirects() {
+    return [
+      // `/stages/departement` n'a pas de contenu propre : la liste vit sur le
+      // hub. Redirection déclarée ici, et non via une page appelant
+      // `redirect()`, pour qu'elle soit traitée par le routeur — un 308 net,
+      // émis avant tout rendu, là où un `redirect()` dans une page déjà
+      // streamée retomberait en 200.
+      { source: "/stages/departement", destination: "/stages", permanent: true },
     ];
   },
 };
