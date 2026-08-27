@@ -72,7 +72,9 @@ interface StageType {
   badge: string;
   badgeStyle: string;
   price: string;
-  slug: string;
+  /** Destination du lien : recherche pour les stages reservables, glossaire sinon. */
+  href: string;
+  cta: string;
 }
 
 const stageTypes: StageType[] = [
@@ -84,7 +86,8 @@ const stageTypes: StageType[] = [
     badge: "+4 points",
     badgeStyle: "bg-red-50 text-red-600 font-bold",
     price: "À partir de 200 €",
-    slug: "recuperation-de-points",
+    href: "/recherche",
+    cta: "Trouver un stage",
   },
   {
     name: "Stage 48N",
@@ -94,7 +97,8 @@ const stageTypes: StageType[] = [
     badge: "Obligatoire",
     badgeStyle: "bg-red-50 text-red-600 font-bold",
     price: "À partir de 200 €",
-    slug: "sensibilisation-securite-routiere",
+    href: "/recherche",
+    cta: "Trouver un stage",
   },
   {
     name: "Composition pénale",
@@ -104,7 +108,8 @@ const stageTypes: StageType[] = [
     badge: "0 point récupéré",
     badgeStyle: "bg-gray-100 text-gray-500",
     price: "À partir de 250 €",
-    slug: "recuperation-de-points",
+    href: "/stages#definitions",
+    cta: "En savoir plus",
   },
   {
     name: "Peine complémentaire",
@@ -114,7 +119,8 @@ const stageTypes: StageType[] = [
     badge: "0 point récupéré",
     badgeStyle: "bg-gray-100 text-gray-500",
     price: "À partir de 250 €",
-    slug: "recuperation-de-points",
+    href: "/stages#definitions",
+    cta: "En savoir plus",
   },
 ];
 
@@ -530,10 +536,10 @@ export default async function Home() {
                   <div className="pt-4 border-t border-brand-border">
                     <p className="text-sm font-semibold text-brand-text mb-3">{stage.price}</p>
                     <Link
-                      href={`/formations/${stage.slug}`}
-                      className="flex items-center text-sm font-medium text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      href={stage.href}
+                      className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
                     >
-                      <span>En savoir plus</span>
+                      <span>{stage.cta}</span>
                       <FontAwesomeIcon
                         icon={faArrowRight}
                         className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
