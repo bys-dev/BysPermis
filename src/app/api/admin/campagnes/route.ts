@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireCommercial, mapAuthError } from "@/lib/auth0";
-import { countAudience, type AudienceFilter } from "@/lib/prospects/campaign";
+import {
+  countAudience,
+  BATCH_SIZE,
+  CRON_CADENCE_MINUTES,
+  type AudienceFilter,
+} from "@/lib/prospects/campaign";
 import { PROSPECT_TEMPLATE_VARIABLES, validateCampaignTemplate } from "@/lib/prospects/template";
 
 const AudienceFilterSchema = z.object({
@@ -53,7 +58,29 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ campagnes, variables: PROSPECT_TEMPLATE_VARIABLES });
+    // Date du dernier lot réellement expédié, par campagne.
+    //
+    // C'est elle qui pilote le compte à rebours de l'admin — et pas
+    // `updatedAt`, qui bouge aussi à la moindre modification du gabarit et
+    // annoncerait donc une échéance fausse.
+    const derniersLots = await prisma.campaignRecipient.groupBy({
+      by: ["campaignId"],
+      where: { campaignId: { in: campagnes.map((c) => c.id) }, status: "ENVOYE" },
+      _max: { sentAt: true },
+    });
+    const dernierParCampagne = new Map(derniersLots.map((l) => [l.campaignId, l._max.sentAt]));
+
+    return NextResponse.json({
+      campagnes: campagnes.map((c) => ({
+        ...c,
+        dernierEnvoiAt: dernierParCampagne.get(c.id) ?? null,
+      })),
+      variables: PROSPECT_TEMPLATE_VARIABLES,
+      // Le client en a besoin pour afficher l'attente avant le prochain lot :
+      // les constantes vivent côté serveur, l'admin ne les redéclare pas.
+      cadenceMinutes: CRON_CADENCE_MINUTES,
+      lotMax: BATCH_SIZE,
+    });
   } catch (err) {
     const authError = mapAuthError(err);
     if (authError) return authError;
