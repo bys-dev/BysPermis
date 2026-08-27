@@ -1,0 +1,204 @@
+<!--
+  BYS Permis — kit de blocs réutilisables pour composer un modèle sur mesure.
+
+  Ce fichier n'est pas un email : c'est une réserve de morceaux à copier dans
+  `contenus/<slug>.html`, puis à assembler via `node build.mjs`.
+
+  Règles :
+   · styles en ligne uniquement (aucune balise <style>, Gmail la retire) ;
+   · tables pour toute mise en page en colonnes (Outlook ignore flex/grid) ;
+   · border-radius ignoré par Outlook desktop : les angles seront droits, c'est
+     une dégradation acceptable, jamais un bug ;
+   · palette : navy #0E1A38 · bleu #2563EB · gris #64748B / #E2E8F0 / #F8FAFC.
+-->
+
+
+<!-- ═══ TITRE DE SECTION ═══════════════════════════════════════════════ -->
+
+<h2 style="margin:0 0 14px;font-size:21px;line-height:1.3;color:#0E1A38">Titre de la section</h2>
+
+
+<!-- ═══ PARAGRAPHE COURANT ═════════════════════════════════════════════ -->
+
+<p style="margin:0 0 16px">Texte courant. Un mot <strong style="color:#2563EB">mis en avant</strong> se colore en bleu, jamais en gras seul dans une autre teinte.</p>
+
+
+<!-- ═══ BOUTON PRINCIPAL (centré) ══════════════════════════════════════ -->
+<!-- Un seul bouton principal par email. Le lien en clair juste dessous sert
+     de secours quand le client mail bloque les boutons. -->
+
+<div style="text-align:center;margin:30px 0 22px">
+  <a href="{{lienInscription}}" style="display:inline-block;padding:15px 34px;background:#2563EB;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:800;font-size:16px">Libellé de l'action</a>
+</div>
+
+<p style="margin:0 0 22px;font-size:12px;color:#64748B;text-align:center">Si le bouton ne fonctionne pas : <a href="{{lienInscription}}" style="color:#2563EB">{{lienInscription}}</a></p>
+
+
+<!-- ═══ BOUTON SECONDAIRE (contour) ════════════════════════════════════ -->
+
+<div style="text-align:center;margin:0 0 22px">
+  <a href="https://byspermis.fr/plateforme" style="display:inline-block;padding:12px 28px;background:#ffffff;color:#2563EB;text-decoration:none;border:2px solid #2563EB;border-radius:10px;font-weight:700;font-size:15px">Action secondaire</a>
+</div>
+
+
+<!-- ═══ CARTE GRISE — liste de faits ═══════════════════════════════════ -->
+
+<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px 22px;margin:24px 0">
+  <p style="margin:0 0 12px;font-size:13px;font-weight:bold;color:#0E1A38;letter-spacing:.6px;text-transform:uppercase">Intitulé de la carte</p>
+  <p style="margin:0 0 9px;font-size:14px;color:#23303F">Première ligne.</p>
+  <p style="margin:0 0 9px;font-size:14px;color:#23303F">Deuxième ligne.</p>
+  <p style="margin:0;font-size:14px;color:#23303F">Dernière ligne, sans marge basse.</p>
+</div>
+
+
+<!-- ═══ ENCART BLEU — point d'attention, question, rappel ══════════════ -->
+
+<div style="background:#EFF6FF;border-left:4px solid #2563EB;border-radius:8px;padding:18px 20px;margin:0 0 24px">
+  <p style="margin:0 0 7px;font-size:15px;font-weight:700;color:#0E1A38">Le point à retenir</p>
+  <p style="margin:0;font-size:14px;color:#23303F">L'explication, en deux lignes maximum.</p>
+</div>
+
+
+<!-- ═══ BANDEAU CHIFFRE — offre, remise, promesse ══════════════════════ -->
+<!-- N'y mettre qu'un chiffre réel et vérifiable. -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 26px">
+  <tr>
+    <td align="center" bgcolor="#0E1A38" style="background:#0E1A38;border-radius:12px;padding:30px 26px;text-align:center">
+      <div style="font-size:11px;color:#93B4E8;letter-spacing:2.4px;text-transform:uppercase">Surtitre</div>
+      <div style="font-size:46px;line-height:1.05;font-weight:800;color:#ffffff;padding:10px 0 6px">0 %</div>
+      <div style="font-size:17px;color:#ffffff;font-weight:700">Ce que le chiffre veut dire</div>
+      <div style="font-size:13px;color:#93B4E8;padding-top:12px">La condition, en petit</div>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ CODE PROMO ════════════════════════════════════════════════════ -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 26px">
+  <tr>
+    <td align="center" bgcolor="#0E1A38" style="background:#0E1A38;border-radius:12px;padding:28px 24px;text-align:center">
+      <div style="font-size:11px;color:#93B4E8;letter-spacing:2.4px;text-transform:uppercase">Votre code de réduction</div>
+      <div style="padding:14px 0 10px">
+        <span style="display:inline-block;background:#ffffff;border-radius:8px;padding:12px 26px;font-size:24px;font-weight:800;letter-spacing:3px;color:#0E1A38">CODE2026</span>
+      </div>
+      <div style="font-size:13px;color:#93B4E8">Valable jusqu'au 00/00 · à saisir au moment du paiement</div>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ ÉTAPES NUMÉROTÉES ═════════════════════════════════════════════ -->
+<!-- Dupliquer le <tr> pour ajouter une étape ; changer le chiffre. -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 12px">
+  <tr>
+    <td width="30" valign="top" style="padding:0 14px 20px 0">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td bgcolor="#2563EB" width="28" height="28" align="center" valign="middle" style="background:#2563EB;border-radius:14px;width:28px;height:28px;color:#ffffff;font-size:14px;font-weight:800;text-align:center;line-height:28px">1</td>
+        </tr>
+      </table>
+    </td>
+    <td valign="top" style="padding:0 0 20px">
+      <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#0E1A38">Titre de l'étape</p>
+      <p style="margin:0;font-size:14px;color:#23303F">Ce que la personne doit faire, en une phrase.</p>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ COMPARATIF DEUX COLONNES ══════════════════════════════════════ -->
+<!-- Passe en pleine largeur empilée sur mobile dans la plupart des clients. -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 26px">
+  <tr>
+    <td width="50%" valign="top" style="padding:0 7px 0 0">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:18px">
+            <p style="margin:0 0 7px;font-size:12px;font-weight:bold;color:#64748B;text-transform:uppercase;letter-spacing:.6px">Situation actuelle</p>
+            <p style="margin:0;font-size:14px;color:#23303F">Le constat, sans exagérer.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td width="50%" valign="top" style="padding:0 0 0 7px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td bgcolor="#0E1A38" style="background:#0E1A38;border-radius:10px;padding:18px">
+            <p style="margin:0 0 7px;font-size:12px;font-weight:bold;color:#93B4E8;text-transform:uppercase;letter-spacing:.6px">Avec BYS Permis</p>
+            <p style="margin:0;font-size:14px;color:#ffffff">Ce qui change concrètement.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ LIGNE DE STATISTIQUES ═════════════════════════════════════════ -->
+<!-- À n'utiliser qu'avec des chiffres réellement mesurés dans l'admin. -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 26px">
+  <tr>
+    <td width="33%" align="center" style="padding:16px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px 0 0 10px;text-align:center">
+      <div style="font-size:26px;font-weight:800;color:#2563EB;line-height:1.1">00</div>
+      <div style="font-size:12px;color:#64748B;padding-top:4px">libellé</div>
+    </td>
+    <td width="33%" align="center" style="padding:16px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:none;text-align:center">
+      <div style="font-size:26px;font-weight:800;color:#2563EB;line-height:1.1">00</div>
+      <div style="font-size:12px;color:#64748B;padding-top:4px">libellé</div>
+    </td>
+    <td width="33%" align="center" style="padding:16px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:none;border-radius:0 10px 10px 0;text-align:center">
+      <div style="font-size:26px;font-weight:800;color:#2563EB;line-height:1.1">00</div>
+      <div style="font-size:12px;color:#64748B;padding-top:4px">libellé</div>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ ÉTIQUETTE « NOUVEAU » ═════════════════════════════════════════ -->
+
+<div style="display:inline-block;background:#EFF6FF;border:1px solid #DBEAFE;border-radius:20px;padding:5px 14px;margin:0 0 14px">
+  <span style="font-size:11px;font-weight:800;color:#2563EB;letter-spacing:1.2px;text-transform:uppercase">Nouveau</span>
+</div>
+
+
+<!-- ═══ LIGNE DE LISTE (sessions, articles) ═══════════════════════════ -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 10px">
+  <tr>
+    <td style="border-bottom:1px solid #E2E8F0;padding:0 0 12px">
+      <p style="margin:0 0 3px;font-size:15px;font-weight:700;color:#0E1A38">Titre de la ligne</p>
+      <p style="margin:0;font-size:13px;color:#64748B">Détail secondaire · <a href="https://byspermis.fr/recherche" style="color:#2563EB;text-decoration:none">action</a></p>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ SÉPARATEUR ════════════════════════════════════════════════════ -->
+
+<div style="border-top:1px solid #E2E8F0;margin:26px 0 22px"></div>
+
+
+<!-- ═══ SIGNATURE NOMINATIVE ══════════════════════════════════════════ -->
+
+<p style="margin:0">Bien cordialement,<br/><strong>Sébastien Ribes</strong><br/><span style="font-size:13px;color:#64748B">BYS Permis — contact@byspermis.fr</span></p>
+
+
+<!-- ═══ SIGNATURE ÉQUIPE ══════════════════════════════════════════════ -->
+
+<p style="margin:0">À bientôt,<br/><strong>L'équipe BYS Permis</strong></p>
+
+
+<!--
+  ═══ CE QU'IL NE FAUT PAS METTRE ═══════════════════════════════════════
+
+  · un second lien de désinscription — l'habillage l'ajoute déjà ;
+  · une image de fond (background-image) — ignorée par Outlook ;
+  · une police web — seule la pile système est fiable ;
+  · plus d'une image sur un email de démarchage à froid ;
+  · un chiffre non vérifié : nombre de centres, de stagiaires, de réservations.
+-->

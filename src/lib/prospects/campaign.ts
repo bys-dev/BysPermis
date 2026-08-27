@@ -37,6 +37,16 @@ export const CAMPAIGN_EMAIL_KIND = "campagne_prospection";
 /** Taille d'un lot d'envoi. L'API batch de Resend accepte 100 messages par appel. */
 export const BATCH_SIZE = 100;
 
+/**
+ * Cadence du cron qui fait avancer les campagnes, en minutes.
+ *
+ * Doit rester alignée sur `clevercloud/cron.json` (`*​/5 * * * *` sur
+ * `/api/cron/campagnes`). L'admin s'en sert pour afficher le compte à rebours
+ * avant le prochain lot : si la crontab change, changer cette valeur aussi,
+ * sinon l'interface annonce une échéance fausse.
+ */
+export const CRON_CADENCE_MINUTES = 5;
+
 // ─── Ciblage ─────────────────────────────────────────────
 
 export interface AudienceFilter {

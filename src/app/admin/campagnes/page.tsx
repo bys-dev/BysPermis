@@ -13,8 +13,10 @@ import {
   faTriangleExclamation,
   faCircleCheck,
   faEnvelopeOpenText,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import CampaignEditor, { type CampagneForm } from "./CampaignEditor";
+import { attenteRestante, formatAttente } from "@/lib/prospects/cadence";
 
 type CampagneStatut = "BROUILLON" | "PROGRAMMEE" | "EN_COURS" | "ENVOYEE" | "PAUSEE" | "ANNULEE";
 
@@ -33,6 +35,8 @@ interface Campagne {
   finishedAt: string | null;
   createdAt: string;
   createdBy: { prenom: string; nom: string } | null;
+  /** Date du dernier lot réellement expédié — null tant qu'aucun email n'est parti. */
+  dernierEnvoiAt: string | null;
 }
 
 interface Variable {
@@ -67,25 +71,52 @@ export default function AdminCampagnesPage() {
   const [erreur, setErreur] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
+  /** Cadence du cron et taille de lot : valeurs fournies par le serveur. */
+  const [cadenceMinutes, setCadenceMinutes] = useState(5);
+  const [lotMax, setLotMax] = useState(100);
+  /** Horloge locale du compte à rebours. 0 = pas encore démarrée. */
+  const [maintenant, setMaintenant] = useState(0);
 
-  const charger = useCallback(async () => {
-    setLoading(true);
+  const charger = useCallback(async (silencieux = false) => {
+    if (!silencieux) setLoading(true);
     try {
       const res = await fetch("/api/admin/campagnes");
       if (!res.ok) throw new Error("chargement");
       const data = await res.json();
       setCampagnes(data.campagnes ?? []);
       setVariables(data.variables ?? []);
+      if (typeof data.cadenceMinutes === "number") setCadenceMinutes(data.cadenceMinutes);
+      if (typeof data.lotMax === "number") setLotMax(data.lotMax);
     } catch {
-      setErreur("Impossible de charger les campagnes.");
+      if (!silencieux) setErreur("Impossible de charger les campagnes.");
     } finally {
-      setLoading(false);
+      if (!silencieux) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     charger();
   }, [charger]);
+
+  /**
+   * Une campagne EN_COURS avance toute seule en tâche de fond. Sans horloge ni
+   * resynchronisation, le compte à rebours se figerait et la progression
+   * affichée serait périmée dès le premier lot expédié par le cron.
+   */
+  useEffect(() => {
+    if (!campagnes.some((c) => c.statut === "EN_COURS")) return;
+
+    setMaintenant(Date.now());
+    const horloge = setInterval(() => setMaintenant(Date.now()), 1000);
+    const resync = setInterval(() => {
+      if (!actionId) charger(true);
+    }, 30_000);
+
+    return () => {
+      clearInterval(horloge);
+      clearInterval(resync);
+    };
+  }, [campagnes, actionId, charger]);
 
   /**
    * Lancement de l'envoi.
@@ -126,6 +157,32 @@ export default function AdminCampagnesPage() {
     } finally {
       setActionId(null);
     }
+  };
+
+  /**
+   * Clic sur « Envoyer ».
+   *
+   * Le cron expédie déjà un lot toutes les `cadenceMinutes`. Forcer un lot
+   * pendant ce délai double le débit réel d'envoi — exactement ce que
+   * l'étalement cherche à éviter. On ne l'interdit pas (le cron peut être en
+   * panne, ou une campagne peut être urgente), mais jamais sans dire ce que le
+   * clic déclenche.
+   */
+  const demanderEnvoi = (campagne: Campagne) => {
+    const reste = attenteRestante(campagne, maintenant, cadenceMinutes);
+    if (reste > 0) {
+      const aPartir = Math.min(lotMax, Math.max(0, campagne.totalCibles - campagne.nbEnvoyes));
+      const accepte = window.confirm(
+        `Un lot vient de partir pour « ${campagne.nom} ».\n\n` +
+          `Le lot suivant part tout seul dans ${formatAttente(reste)}.\n\n` +
+          `Forcer maintenant expédiera jusqu'à ${aPartir} email(s) de plus immédiatement, ` +
+          `soit deux lots en moins de ${cadenceMinutes} minutes. Un débit doublé sur du ` +
+          `démarchage à froid dégrade la délivrabilité du domaine.\n\n` +
+          `Envoyer quand même ?`,
+      );
+      if (!accepte) return;
+    }
+    envoyer(campagne);
   };
 
   const piloter = async (id: string, action: "pause" | "reprendre" | "annuler") => {
@@ -281,6 +338,7 @@ export default function AdminCampagnesPage() {
               <tbody>
                 {campagnes.map((c) => {
                   const occupe = actionId === c.id;
+                  const attente = attenteRestante(c, maintenant, cadenceMinutes);
                   return (
                     <tr key={c.id} className="border-t border-white/5 hover:bg-white/[0.02]">
                       <td className="px-4 py-3">
@@ -333,11 +391,27 @@ export default function AdminCampagnesPage() {
                         <div className="flex items-center justify-end gap-1.5">
                           {occupe && <FontAwesomeIcon icon={faSpinner} spin className="text-blue-400 mr-1" />}
 
+                          {attente > 0 && (
+                            <span
+                              className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-400 text-[11px] tabular-nums"
+                              title={`Le lot suivant part automatiquement dans ${formatAttente(attente)}`}
+                            >
+                              <FontAwesomeIcon icon={faClock} className="text-gray-500 mr-1" />
+                              {formatAttente(attente)}
+                            </span>
+                          )}
+
                           {(c.statut === "BROUILLON" || c.statut === "PROGRAMMEE" || c.statut === "EN_COURS") && (
                             <button
-                              onClick={() => envoyer(c)}
+                              onClick={() => demanderEnvoi(c)}
                               disabled={occupe}
-                              title={c.statut === "EN_COURS" ? "Envoyer le lot suivant" : "Lancer l'envoi"}
+                              title={
+                                attente > 0
+                                  ? `Prochain lot automatique dans ${formatAttente(attente)} — cliquer force un lot supplémentaire maintenant`
+                                  : c.statut === "EN_COURS"
+                                    ? "Envoyer le lot suivant"
+                                    : "Lancer l'envoi"
+                              }
                               className="px-2.5 py-1.5 rounded-lg bg-green-600/20 border border-green-500/40 text-green-300 text-xs hover:bg-green-600/30 disabled:opacity-40 transition-colors"
                             >
                               <FontAwesomeIcon icon={faPaperPlane} />
