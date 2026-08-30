@@ -1,5 +1,5 @@
 /**
- * BYS Formation - Couche analytics / ads / tracking
+ * BYS Permis - Couche analytics / ads / tracking
  *
  * Centralise l'instrumentation Google Analytics 4, Google Tag Manager,
  * Google Ads (conversion + remarketing) et Meta Pixel.

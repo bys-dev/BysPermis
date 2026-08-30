@@ -4,9 +4,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Conditions générales d'utilisation — BYS Formation",
+  title: "Conditions générales d'utilisation",
   description:
-    "Conditions générales d'utilisation de la plateforme BYS Formation, marketplace de stages de récupération de points permis.",
+    "Conditions générales d'utilisation de la plateforme BYS Permis, marketplace de stages de récupération de points permis.",
 };
 
 export default function CGUPage() {
@@ -28,7 +28,7 @@ export default function CGUPage() {
               <p>
                 Les présentes conditions générales d&apos;utilisation (ci-après
                 « CGU ») ont pour objet de définir les modalités et conditions
-                d&apos;utilisation de la plateforme BYS Formation (ci-après « la
+                d&apos;utilisation de la plateforme BYS Permis (ci-après « la
                 Plateforme »), accessible à l&apos;adresse byspermis.fr.
               </p>
               <p>
@@ -51,8 +51,9 @@ export default function CGUPage() {
                 byspermis.fr et l&apos;ensemble de ses fonctionnalités.
               </li>
               <li>
-                <strong>« BYS Formation »</strong> : la société BYS Formation —
-                SAS, SIRET 987 512 381 00011, éditrice de la Plateforme.
+                <strong>« BYS Permis »</strong> : la société BYS PERMIS —
+                SAS au capital de 100 €, RCS Paris 107 056 327, éditrice de la
+                Plateforme.
               </li>
               <li>
                 <strong>« Utilisateur »</strong> : toute personne physique
@@ -99,7 +100,7 @@ export default function CGUPage() {
                 conditions d&apos;utilisation d&apos;Auth0.
               </p>
               <p>
-                BYS Formation se réserve le droit de suspendre ou supprimer tout
+                BYS Permis se réserve le droit de suspendre ou supprimer tout
                 compte en cas de manquement aux présentes CGU.
               </p>
             </div>
@@ -124,11 +125,11 @@ export default function CGUPage() {
               <p>
                 Le paiement est effectué de manière sécurisée via{" "}
                 <strong>Stripe</strong>. Les données bancaires ne transitent pas
-                par les serveurs de BYS Formation. Un email de confirmation est
+                par les serveurs de BYS Permis. Un email de confirmation est
                 envoyé à l&apos;Utilisateur après le paiement.
               </p>
               <p>
-                BYS Formation agit en qualité d&apos;intermédiaire entre
+                BYS Permis agit en qualité d&apos;intermédiaire entre
                 l&apos;Utilisateur et le Centre partenaire. La facturation du
                 stage est réalisée par le Centre partenaire.
               </p>
@@ -164,7 +165,7 @@ export default function CGUPage() {
               </div>
               <p>
                 En cas d&apos;annulation du stage par le Centre partenaire ou
-                par BYS Formation, l&apos;Utilisateur bénéficie d&apos;un
+                par BYS Permis, l&apos;Utilisateur bénéficie d&apos;un
                 remboursement intégral ou de la possibilité de se reporter sur
                 une autre session.
               </p>
@@ -218,13 +219,13 @@ export default function CGUPage() {
             </div>
           </section>
 
-          {/* Obligations BYS Formation */}
+          {/* Obligations BYS Permis */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold text-brand-text mb-4">
-              7. Obligations de BYS Formation
+              7. Obligations de BYS Permis
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-2">
-              <p>BYS Formation s&apos;engage à :</p>
+              <p>BYS Permis s&apos;engage à :</p>
               <ul className="list-disc list-inside space-y-1 ml-2">
                 <li>
                   Mettre en relation l&apos;Utilisateur avec des Centres
@@ -265,7 +266,7 @@ export default function CGUPage() {
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>
-                BYS Formation agit en qualité d&apos;intermédiaire et de
+                BYS Permis agit en qualité d&apos;intermédiaire et de
                 marketplace. À ce titre, elle n&apos;est pas responsable :
               </p>
               <ul className="list-disc list-inside space-y-1 ml-2">
@@ -286,7 +287,7 @@ export default function CGUPage() {
                 </li>
               </ul>
               <p>
-                BYS Formation met tout en œuvre pour garantir la disponibilité de
+                BYS Permis met tout en œuvre pour garantir la disponibilité de
                 la Plateforme mais ne saurait garantir un accès ininterrompu.
               </p>
             </div>
@@ -301,7 +302,7 @@ export default function CGUPage() {
               <p>
                 L&apos;ensemble des éléments constituant la Plateforme (textes,
                 images, logos, graphismes, logiciels, base de données) est la
-                propriété exclusive de BYS Formation ou de ses partenaires et
+                propriété exclusive de BYS Permis ou de ses partenaires et
                 est protégé par le droit de la propriété intellectuelle.
               </p>
               <p>
@@ -320,7 +321,7 @@ export default function CGUPage() {
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>
-                BYS Formation collecte et traite des données personnelles dans
+                BYS Permis collecte et traite des données personnelles dans
                 le cadre de l&apos;utilisation de la Plateforme. Le détail des
                 traitements, les droits des utilisateurs et les modalités
                 d&apos;exercice de ces droits sont décrits dans notre{" "}
@@ -352,7 +353,7 @@ export default function CGUPage() {
               <p>
                 À défaut de résolution amiable dans un délai de 30 jours, le
                 litige sera porté devant les tribunaux compétents du ressort du
-                siège social de BYS Formation.
+                siège social de BYS Permis.
               </p>
               <p>
                 Conformément à l&apos;article L.612-1 du Code de la

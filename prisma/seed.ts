@@ -133,7 +133,7 @@ async function main() {
   const owner = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|owner001",
-      email: "sebastien@bys-formation.fr",
+      email: "sebastien@byspermis.fr",
       nom: "Moreau",
       prenom: "Sébastien",
       telephone: "06 12 34 56 78",
@@ -148,7 +148,7 @@ async function main() {
   const admin = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|admin001",
-      email: "admin@bys-formation.fr",
+      email: "admin@byspermis.fr",
       nom: "Renault",
       prenom: "Julien",
       telephone: "06 10 20 30 40",
@@ -163,7 +163,7 @@ async function main() {
   const support = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|support001",
-      email: "support@bys-formation.fr",
+      email: "support@byspermis.fr",
       nom: "Leroy",
       prenom: "Camille",
       telephone: "06 10 20 30 41",
@@ -178,7 +178,7 @@ async function main() {
   const comptable = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|comptable001",
-      email: "comptabilite@bys-formation.fr",
+      email: "comptabilite@byspermis.fr",
       nom: "Mercier",
       prenom: "Isabelle",
       telephone: "06 10 20 30 42",
@@ -193,7 +193,7 @@ async function main() {
   const commercial = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|commercial001",
-      email: "commercial@bys-formation.fr",
+      email: "commercial@byspermis.fr",
       nom: "Dubois",
       prenom: "Antoine",
       telephone: "06 10 20 30 43",
@@ -209,7 +209,7 @@ async function main() {
     (prisma as any).user.create({
       data: {
         auth0Id: "auth0|centre001",
-        email: "contact@bys-formation.fr",
+        email: "contact@byspermis.fr",
         nom: "Lambert",
         prenom: "Philippe",
         telephone: "01 34 25 67 89",
@@ -570,16 +570,16 @@ async function main() {
   const centres = await Promise.all([
     (prisma as any).centre.create({
       data: {
-        nom: "BYS Formation Osny",
-        slug: "bys-formation-osny",
+        nom: "BYS Permis Osny",
+        slug: "bys-permis-osny",
         description:
           "Centre agréé préfecture du Val-d'Oise, spécialisé dans les stages de récupération de points du permis de conduire.",
         adresse: "Bât. 7, 9 Chaussée Jules César",
         codePostal: "95520",
         ville: "Osny",
         telephone: "01 34 25 67 89",
-        email: "contact@bys-formation.fr",
-        siteWeb: "https://www.bys-formation.fr",
+        email: "contact@byspermis.fr",
+        siteWeb: "https://www.byspermis.fr",
         latitude: 49.0665,
         longitude: 2.0633,
         profilCompletionPct: 100,
@@ -592,13 +592,13 @@ async function main() {
         // Personnalisation
         couleurPrimaire: "#2563EB",
         couleurSecondaire: "#1E40AF",
-        presentationHtml: "<p>Bienvenue chez <strong>BYS Formation</strong>, votre centre agréé par la préfecture du Val-d'Oise pour les <strong>stages de récupération de points du permis de conduire</strong>. Nos formateurs (psychologue + expert sécurité routière) vous accompagnent sur 2 jours dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de satisfaction supérieur à 95%</li><li>Formateurs certifiés BAFM</li></ul>",
+        presentationHtml: "<p>Bienvenue chez <strong>BYS Permis</strong>, votre centre agréé par la préfecture du Val-d'Oise pour les <strong>stages de récupération de points du permis de conduire</strong>. Nos formateurs (psychologue + expert sécurité routière) vous accompagnent sur 2 jours dans un cadre moderne et convivial.</p><ul><li>Plus de 10 ans d'expérience</li><li>Taux de satisfaction supérieur à 95%</li><li>Formateurs certifiés BAFM</li></ul>",
         horaires: "Lundi - Vendredi : 8h30 - 18h30\nSamedi : 9h00 - 13h00\nDimanche : Fermé",
         equipements: ["Salle climatisée", "Parking gratuit", "Wifi", "Simulateur", "Accès PMR", "Véhicules récents"],
         certifications: ["Qualiopi", "Agréé Préfecture", "Datadock", "CPF"],
         reseauxSociaux: {
-          facebook: "https://www.facebook.com/bysformation",
-          instagram: "https://www.instagram.com/bysformation",
+          facebook: "https://www.facebook.com/byspermis",
+          instagram: "https://www.instagram.com/byspermis",
           linkedin: "",
           youtube: "",
         },
@@ -719,18 +719,18 @@ async function main() {
     )
   );
 
-  // Give BYS Formation Osny owner (centreUsers[0]) a second centre to demo multi-centre
+  // Give BYS Permis Osny owner (centreUsers[0]) a second centre to demo multi-centre
   const centreOsny2 = await (prisma as any).centre.create({
     data: {
-      nom: "BYS Formation Cergy",
-      slug: "bys-formation-cergy",
+      nom: "BYS Permis Cergy",
+      slug: "bys-permis-cergy",
       description:
-        "Second centre BYS Formation, situé à Cergy-Pontoise. Stages de récupération de points du permis de conduire.",
+        "Second centre BYS Permis, situé à Cergy-Pontoise. Stages de récupération de points du permis de conduire.",
       adresse: "5 Place des Merveilles",
       codePostal: "95800",
       ville: "Cergy",
       telephone: "01 34 25 99 88",
-      email: "cergy@bys-formation.fr",
+      email: "cergy@byspermis.fr",
       latitude: 49.0363,
       longitude: 2.0780,
       profilCompletionPct: 60,
@@ -753,7 +753,7 @@ async function main() {
   const centreAdmin = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|centreadmin001",
-      email: "gestion@bys-formation.fr",
+      email: "gestion@byspermis.fr",
       nom: "Nguyen",
       prenom: "Linh",
       telephone: "06 20 30 40 50",
@@ -768,7 +768,7 @@ async function main() {
   const centreFormateur = await (prisma as any).user.create({
     data: {
       auth0Id: "auth0|centreformateur001",
-      email: "formateur@bys-formation.fr",
+      email: "formateur@byspermis.fr",
       nom: "Garcia",
       prenom: "Miguel",
       telephone: "06 20 30 40 51",
@@ -824,7 +824,7 @@ async function main() {
   // ─── 4. FORMATIONS ───────────────────────────────────────
   console.log("📚 Création des formations...");
 
-  // BYS Formation Osny — 3 formations
+  // BYS Permis Osny — 3 formations
   const formBysRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Osny",
@@ -924,7 +924,7 @@ async function main() {
     },
   });
 
-  // BYS Formation Cergy — 1 formation (second centre BYS, scope V1)
+  // BYS Permis Cergy — 1 formation (second centre BYS, scope V1)
   const formCergyRecup = await (prisma as any).formation.create({
     data: {
       titre: "Stage de récupération de points - Cergy",
@@ -1592,7 +1592,7 @@ async function main() {
     (prisma as any).message.create({ data: { contenu: "Bonjour, merci. Une question : puis-je arriver à 8h45 ou faut-il être à 9h pile ?", senderId: eleves[3].id, receiverId: centreSecretaire.id, isRead: true, reservationId: reservations[3].id } }),
     (prisma as any).message.create({ data: { contenu: "L'accueil est ouvert dès 8h30, vous pouvez arriver en avance, ça nous arrange.", senderId: centreSecretaire.id, receiverId: eleves[3].id, isRead: false, reservationId: reservations[3].id } }),
     // Centre BYS → Julien (futur stagiaire)
-    (prisma as any).message.create({ data: { contenu: "Bonjour Julien, bienvenue chez BYS Formation ! Votre stage du 8-9 juin est confirmé. Si vous avez des questions, n'hésitez pas.", senderId: centreAdmin.id, receiverId: eleves[9].id, isRead: true, reservationId: extraReservations[0].id } }),
+    (prisma as any).message.create({ data: { contenu: "Bonjour Julien, bienvenue chez BYS Permis ! Votre stage du 8-9 juin est confirmé. Si vous avez des questions, n'hésitez pas.", senderId: centreAdmin.id, receiverId: eleves[9].id, isRead: true, reservationId: extraReservations[0].id } }),
     (prisma as any).message.create({ data: { contenu: "Merci ! Le centre est-il accessible en bus depuis la gare ?", senderId: eleves[9].id, receiverId: centreAdmin.id, isRead: false, reservationId: extraReservations[0].id } }),
     // Lyon → Mehdi
     (prisma as any).message.create({ data: { contenu: "Bonjour Mehdi, votre réservation est enregistrée. Pensez à apporter votre relevé d'information intégral si vous en avez un.", senderId: centreUsers[2].id, receiverId: eleves[11].id, isRead: true, reservationId: extraReservations[2].id } }),
@@ -1616,7 +1616,7 @@ async function main() {
       {
         question: "Combien coûte un stage de récupération de points ?",
         reponse:
-          "Le prix d'un stage varie en fonction du centre et de la région, généralement entre 200€ et 290€. Sur BYS Formation, vous pouvez comparer les prix de tous les centres agréés et réserver en ligne en quelques clics. Le paiement est sécurisé par Stripe.",
+          "Le prix d'un stage varie en fonction du centre et de la région, généralement entre 200€ et 290€. Sur BYS Permis, vous pouvez comparer les prix de tous les centres agréés et réserver en ligne en quelques clics. Le paiement est sécurisé par Stripe.",
         categorie: "Récupération de points",
         ordre: 2,
         isActive: true,
@@ -1689,23 +1689,23 @@ async function main() {
   await (prisma as any).notification.createMany({
     data: [
       {
-        titre: "Bienvenue sur BYS Formation !",
+        titre: "Bienvenue sur BYS Permis !",
         contenu:
-          "Bonjour Karim, bienvenue sur la plateforme BYS Formation. Vous pouvez dès maintenant rechercher et réserver un stage de récupération de points près de chez vous.",
+          "Bonjour Karim, bienvenue sur la plateforme BYS Permis. Vous pouvez dès maintenant rechercher et réserver un stage de récupération de points près de chez vous.",
         isRead: true,
         userId: eleves[0].id,
       },
       {
         titre: "Réservation confirmée",
         contenu:
-          "Votre réservation RES-2026-0001 pour le stage de récupération de points à BYS Formation Osny (6-7 avril 2026) est confirmée. N'oubliez pas d'apporter votre pièce d'identité et votre permis de conduire.",
+          "Votre réservation RES-2026-0001 pour le stage de récupération de points à BYS Permis Osny (6-7 avril 2026) est confirmée. N'oubliez pas d'apporter votre pièce d'identité et votre permis de conduire.",
         isRead: true,
         userId: eleves[0].id,
       },
       {
-        titre: "Bienvenue sur BYS Formation !",
+        titre: "Bienvenue sur BYS Permis !",
         contenu:
-          "Bonjour Amina, bienvenue sur BYS Formation. Trouvez facilement un stage de récupération de points agréé près de chez vous.",
+          "Bonjour Amina, bienvenue sur BYS Permis. Trouvez facilement un stage de récupération de points agréé près de chez vous.",
         isRead: false,
         userId: eleves[3].id,
       },
@@ -1726,12 +1726,12 @@ async function main() {
       // ─── 15 notifications supplémentaires pour densifier l'activité ──
       {
         titre: "Réservation confirmée",
-        contenu: "Votre réservation RES-2026-0101 pour le stage des 8-9 juin 2026 chez BYS Formation Osny est confirmée. Convocation envoyée par email.",
+        contenu: "Votre réservation RES-2026-0101 pour le stage des 8-9 juin 2026 chez BYS Permis Osny est confirmée. Convocation envoyée par email.",
         isRead: false,
         userId: eleves[9].id,
       },
       {
-        titre: "Bienvenue sur BYS Formation !",
+        titre: "Bienvenue sur BYS Permis !",
         contenu: "Bonjour Julien, bienvenue ! Nous avons trouvé 3 centres disponibles près de chez vous. Découvrez nos prochaines sessions.",
         isRead: true,
         userId: eleves[9].id,
@@ -1767,7 +1767,7 @@ async function main() {
         userId: eleves[20].id,
       },
       {
-        titre: "Bienvenue sur BYS Formation !",
+        titre: "Bienvenue sur BYS Permis !",
         contenu: "Bonjour Mehdi, bienvenue ! Plus de 30 sessions sont disponibles dans toute la France. Trouvez votre stage en quelques clics.",
         isRead: false,
         userId: eleves[11].id,
@@ -1798,7 +1798,7 @@ async function main() {
       },
       {
         titre: "Nouveau message du centre",
-        contenu: "Le centre BYS Formation Osny vous a envoyé un message concernant votre stage à venir.",
+        contenu: "Le centre BYS Permis Osny vous a envoyé un message concernant votre stage à venir.",
         isRead: false,
         userId: eleves[9].id,
       },
@@ -1810,7 +1810,7 @@ async function main() {
       },
       {
         titre: "Sondage satisfaction",
-        contenu: "Merci d'avoir suivi votre stage chez BYS Formation. Pourriez-vous prendre 1 minute pour nous laisser un avis ? Ça nous aide beaucoup !",
+        contenu: "Merci d'avoir suivi votre stage chez BYS Permis. Pourriez-vous prendre 1 minute pour nous laisser un avis ? Ça nous aide beaucoup !",
         isRead: false,
         userId: eleves[8].id,
       },
@@ -1829,7 +1829,7 @@ async function main() {
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
     <h1 style="color:#fff;margin:0;font-size:22px">Convocation</h1>
-    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Permis</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour <strong>{{prenom}} {{nom}}</strong>,</p>
@@ -1853,7 +1853,7 @@ async function main() {
     <p style="margin:20px 0 12px">
       <a href="{{lienConvocation}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-weight:bold;font-size:14px">Télécharger ma convocation PDF</a>
     </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero", "lienConvocation"],
@@ -1869,7 +1869,7 @@ async function main() {
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
     <h1 style="color:#fff;margin:0;font-size:22px">Réservation confirmée</h1>
-    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Permis</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour <strong>{{prenom}}</strong>,</p>
@@ -1885,7 +1885,7 @@ async function main() {
     <p style="margin:20px 0 12px">
       <a href="{{lienConvocation}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-weight:bold;font-size:14px">Télécharger ma convocation PDF</a>
     </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero", "lienConvocation"],
@@ -1901,7 +1901,7 @@ async function main() {
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
     <h1 style="color:#fff;margin:0;font-size:22px">Rappel — Votre formation approche</h1>
-    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Permis</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour <strong>{{prenom}}</strong>,</p>
@@ -1923,7 +1923,7 @@ async function main() {
     <p style="margin:20px 0 12px">
       <a href="{{lienConvocation}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-weight:bold;font-size:14px">Télécharger ma convocation PDF</a>
     </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero", "lienConvocation"],
@@ -1935,16 +1935,16 @@ async function main() {
       data: {
         slug: "bienvenue",
         nom: "Bienvenue",
-        sujet: "Bienvenue sur BYS Formation, {{prenom}} !",
+        sujet: "Bienvenue sur BYS Permis, {{prenom}} !",
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
     <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue !</h1>
-    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Permis</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour <strong>{{prenom}} {{nom}}</strong>,</p>
-    <p>Bienvenue sur <strong>BYS Formation</strong>, votre plateforme de référence pour les stages agréés de récupération de points du permis de conduire.</p>
-    <p>Avec BYS Formation, vous pouvez :</p>
+    <p>Bienvenue sur <strong>BYS Permis</strong>, votre plateforme de référence pour les stages agréés de récupération de points du permis de conduire.</p>
+    <p>Avec BYS Permis, vous pouvez :</p>
     <ul style="color:#4B5563;line-height:1.8">
       <li>Trouver un stage de récupération de points près de chez vous</li>
       <li>Réserver en ligne en quelques clics</li>
@@ -1952,7 +1952,7 @@ async function main() {
       <li>Accéder à toutes vos formations depuis votre espace personnel</li>
     </ul>
     <p>N'hésitez pas à parcourir nos formations disponibles et à réserver votre prochaine session.</p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["prenom", "nom", "email"],
@@ -1964,18 +1964,18 @@ async function main() {
       data: {
         slug: "invitation_centre",
         nom: "Invitation centre",
-        sujet: "Bienvenue sur BYS Formation — Votre espace centre est prêt",
+        sujet: "Bienvenue sur BYS Permis — Votre espace centre est prêt",
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
       <span style="color:#fff;font-weight:bold;font-size:18px">BYS</span>
     </div>
-    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Formation</h1>
+    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Votre espace centre est prêt !</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour,</p>
-    <p>Nous avons le plaisir de vous informer que votre centre <strong>{{centreName}}</strong> a été créé sur la plateforme <strong>BYS Formation</strong>.</p>
+    <p>Nous avons le plaisir de vous informer que votre centre <strong>{{centreName}}</strong> a été créé sur la plateforme <strong>BYS Permis</strong>.</p>
     <p>Votre espace est prêt — il ne reste plus qu'à compléter votre profil pour être visible sur notre marketplace et commencer à recevoir des réservations.</p>
     <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
       <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">Vos identifiants de connexion :</p>
@@ -1995,7 +1995,7 @@ async function main() {
     <p style="text-align:center;margin:24px 0">
       <a href="{{loginUrl}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Accéder à mon espace centre</a>
     </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["centreName", "email", "tempPassword", "loginUrl"],
@@ -2007,7 +2007,7 @@ async function main() {
       data: {
         slug: "activation_centre",
         nom: "Activation centre",
-        sujet: "Votre centre est maintenant visible sur BYS Formation !",
+        sujet: "Votre centre est maintenant visible sur BYS Permis !",
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     <div style="display:inline-block;background:#2563EB;border-radius:8px;padding:8px 16px;margin-bottom:12px">
@@ -2018,7 +2018,7 @@ async function main() {
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour,</p>
-    <p>Excellente nouvelle ! Votre centre <strong>{{centreName}}</strong> a été validé par notre équipe et est désormais <strong>visible sur la marketplace BYS Formation</strong>.</p>
+    <p>Excellente nouvelle ! Votre centre <strong>{{centreName}}</strong> a été validé par notre équipe et est désormais <strong>visible sur la marketplace BYS Permis</strong>.</p>
     <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:16px 20px;margin:20px 0;text-align:center">
       <p style="margin:0;color:#166534;font-size:15px;font-weight:bold">Votre centre est en ligne !</p>
       <p style="margin:8px 0 0;color:#15803D;font-size:13px">Les stagiaires peuvent désormais découvrir et réserver vos formations.</p>
@@ -2033,7 +2033,7 @@ async function main() {
     <p style="text-align:center;margin:24px 0">
       <a href="{{dashboardUrl}}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Accéder à mon dashboard</a>
     </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["centreName", "dashboardUrl"],
@@ -2049,7 +2049,7 @@ async function main() {
         contenu: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0">
     <h1 style="color:#fff;margin:0;font-size:22px">Nouvelle réservation</h1>
-    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Formation</p>
+    <p style="color:#9CA3AF;margin:4px 0 0;font-size:13px">BYS Permis</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour,</p>
@@ -2062,7 +2062,7 @@ async function main() {
       <tr><td style="padding:8px 12px;font-weight:bold;color:#6B7280">Montant</td><td style="padding:8px 12px">{{prix}}</td></tr>
     </table>
     <p>Connectez-vous à votre espace centre pour gérer cette réservation.</p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
         variables: ["prenom", "nom", "email", "formation", "centre", "dateDebut", "dateFin", "lieu", "prix", "numero"],
@@ -2109,7 +2109,7 @@ async function main() {
     (prisma as any).promoCode.create({
       data: {
         code: "BYSOSNY",
-        description: "15% de réduction chez BYS Formation Osny",
+        description: "15% de réduction chez BYS Permis Osny",
         type: "POURCENTAGE",
         valeur: 15,
         minAchat: null,
@@ -2212,7 +2212,7 @@ async function main() {
 <h2>Quand effectuer le stage ?</h2>
 <p>Le stage doit obligatoirement avoir lieu <strong>avant de pouvoir repasser le code</strong> (et la conduite si vous avez le permis depuis moins de 3 ans). Sans attestation de stage, votre dossier de re-candidature en préfecture sera refusé.</p>
 <h2>Comment réserver ?</h2>
-<p>Sur BYS Formation, vous comparez en quelques clics les centres agréés près de chez vous, vous filtrez par date et vous réservez en ligne. Le règlement est sécurisé par Stripe et la convocation officielle vous est envoyée par email sous 24h.</p>
+<p>Sur BYS Permis, vous comparez en quelques clics les centres agréés près de chez vous, vous filtrez par date et vous réservez en ligne. Le règlement est sécurisé par Stripe et la convocation officielle vous est envoyée par email sous 24h.</p>
 <h2>Documents à présenter le jour J</h2>
 <ul>
   <li>Pièce d'identité en cours de validité</li>
@@ -2245,7 +2245,7 @@ async function main() {
 </ul>
 <p>Vous pouvez vérifier votre solde gratuitement sur <code>mespoints.permisdeconduire.gouv.fr</code> via FranceConnect.</p>
 <h2>Étape 2 — Choisissez votre stage</h2>
-<p>Sur BYS Formation, comparez les <strong>5+ centres agréés</strong> (Osny, Paris, Lyon, Marseille, Cergy) selon vos critères :</p>
+<p>Sur BYS Permis, comparez les <strong>5+ centres agréés</strong> (Osny, Paris, Lyon, Marseille, Cergy) selon vos critères :</p>
 <ul>
   <li>Date qui vous arrange</li>
   <li>Prix (entre 210€ et 280€)</li>
@@ -2294,7 +2294,7 @@ async function main() {
   <li>L'impossibilité de récupérer les points perdus</li>
 </ul>
 <h2>Comment trouver et réserver un stage 48N ?</h2>
-<p>Tous les centres agréés sur BYS Formation sont habilités à recevoir les stagiaires en obligation 48N. Réservez en ligne, indiquez « stage 48N » dans le champ <em>« motif de la formation »</em> lors de l'inscription pour pouvoir <strong>demander le remboursement de votre amende ensuite</strong>.</p>
+<p>Tous les centres agréés sur BYS Permis sont habilités à recevoir les stagiaires en obligation 48N. Réservez en ligne, indiquez « stage 48N » dans le champ <em>« motif de la formation »</em> lors de l'inscription pour pouvoir <strong>demander le remboursement de votre amende ensuite</strong>.</p>
 <h2>Le remboursement de l'amende : conditions</h2>
 <p>Vous pouvez demander le remboursement de votre amende forfaitaire si :</p>
 <ul>
@@ -2395,7 +2395,7 @@ async function main() {
   </tbody>
 </table>
 <h2>Notre conseil</h2>
-<p><strong>N'attendez pas la lettre de la préfecture</strong>. Un stage volontaire effectué à temps évite une situation administrative compliquée et garantit que vous restez en règle. Sur BYS Formation, vous comparez les centres en quelques clics et réservez 100% en ligne.</p>`,
+<p><strong>N'attendez pas la lettre de la préfecture</strong>. Un stage volontaire effectué à temps évite une situation administrative compliquée et garantit que vous restez en règle. Sur BYS Permis, vous comparez les centres en quelques clics et réservez 100% en ligne.</p>`,
         image: "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1200&q=80",
         categorie: "conseils",
         tags: ["comparatif", "stage volontaire", "stage obligatoire", "48N", "48SI"],

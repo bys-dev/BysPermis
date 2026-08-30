@@ -4,7 +4,7 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════
- *  TEST COMPLET PAR RÔLE — BYS Formation
+ *  TEST COMPLET PAR RÔLE — BYS Permis
  * ═══════════════════════════════════════════════════════════════
  *
  *  Ce fichier teste l'accès à TOUTES les routes API protégées
@@ -125,13 +125,13 @@ describe("Routes publiques (sans auth)", () => {
     prismaMock.centre.findUnique.mockResolvedValue({
       id: "c1",
       nom: "BYS Osny",
-      slug: "bys-formation-osny",
+      slug: "bys-permis-osny",
       formations: [],
     });
 
     const res = await GET(
-      makeReq("/api/centres/bys-formation-osny"),
-      { params: Promise.resolve({ slug: "bys-formation-osny" }) }
+      makeReq("/api/centres/bys-permis-osny"),
+      { params: Promise.resolve({ slug: "bys-permis-osny" }) }
     );
     expect(res.status).toBe(200);
   });

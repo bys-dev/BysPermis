@@ -45,7 +45,7 @@ const MOCK_SESSION: SessionData = {
   placesTotal: 20,
   prix: 199,
   formation: { titre: "Stage de récupération de points", duree: "2 jours", isQualiopi: true, isCPF: false },
-  centre: "BYS Formation",
+  centre: "BYS Permis",
   ville: "À venir",
   adresse: "",
 };

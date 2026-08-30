@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-export const SITE_NAME = "BYS Formation Permis";
+export const SITE_NAME = "BYS Permis";
 
 export const STAGE_KEYWORDS = [
   "stage récupération points",
@@ -12,7 +12,7 @@ export const STAGE_KEYWORDS = [
   "récupérer points permis",
   "stage agréé préfecture",
   "stage sensibilisation sécurité routière",
-  "BYS Formation Permis",
+  "BYS Permis",
 ] as const;
 
 export function canonical(path: string): string {

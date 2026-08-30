@@ -259,7 +259,7 @@ export default function CommentCaMarchePage() {
                 </h2>
                 <p className="text-gray-500 leading-relaxed mb-8">
                   Vous êtes un centre de formation agréé préfecture ? Rejoignez
-                  le réseau BYS Formation et bénéficiez d&apos;une marketplace
+                  le réseau BYS Permis et bénéficiez d&apos;une marketplace
                   performante pour remplir vos sessions.
                 </p>
                 <div className="space-y-5">

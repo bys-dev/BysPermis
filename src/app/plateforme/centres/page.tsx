@@ -39,9 +39,9 @@ const planConfig: Record<string, { cls: string }> = {
 };
 
 const MOCK_CENTRES: Centre[] = [
-  { id: "1", nom: "BYS Formation Osny", ville: "Osny", email: "osny@bysformation.fr", statut: "ACTIF", plan: "PRO", reservations: 312, revenu: 62400, createdAt: "2026-01-15T00:00:00Z" },
+  { id: "1", nom: "BYS Permis Osny", ville: "Osny", email: "osny@byspermis.fr", statut: "ACTIF", plan: "PRO", reservations: 312, revenu: 62400, createdAt: "2026-01-15T00:00:00Z" },
   { id: "2", nom: "Auto-Ecole Montmartre", ville: "Paris", email: "contact@ae-montmartre.fr", statut: "ACTIF", plan: "ENTREPRISE", reservations: 245, revenu: 48600, createdAt: "2026-02-01T00:00:00Z" },
-  { id: "3", nom: "BYS Formation Cergy", ville: "Cergy", email: "cergy@bysformation.fr", statut: "ACTIF", plan: "STARTER", reservations: 189, revenu: 37800, createdAt: "2026-02-10T00:00:00Z" },
+  { id: "3", nom: "BYS Permis Cergy", ville: "Cergy", email: "cergy@byspermis.fr", statut: "ACTIF", plan: "STARTER", reservations: 189, revenu: 37800, createdAt: "2026-02-10T00:00:00Z" },
   { id: "4", nom: "Centre Conduite Nantes", ville: "Nantes", email: "conduite.nantes@gmail.com", statut: "EN_ATTENTE", plan: "GRATUIT", reservations: 0, revenu: 0, createdAt: "2026-03-21T00:00:00Z" },
   { id: "5", nom: "Auto-Ecole Bordelaise", ville: "Bordeaux", email: "ae-bordelaise@gmail.com", statut: "EN_ATTENTE", plan: "GRATUIT", reservations: 0, revenu: 0, createdAt: "2026-03-22T00:00:00Z" },
   { id: "6", nom: "Permis Express Lyon", ville: "Lyon", email: "contact@permisexpress.fr", statut: "SUSPENDU", plan: "STARTER", reservations: 45, revenu: 9000, createdAt: "2026-01-20T00:00:00Z" },

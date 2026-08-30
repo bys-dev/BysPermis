@@ -13,7 +13,7 @@
       "Bash(curl -s http://localhost:3001/api/centres)",
       "Bash(curl -s http://localhost:3001/api/categories)",
       "Bash(node -e \"const d=[];process.stdin.on\\(''''data'''',c=>d.push\\(c\\)\\);process.stdin.on\\(''''end'''',\\(\\)=>{JSON.parse\\(d.join\\(''''''''\\)\\).forEach\\(c=>console.log\\(''''  -'''', c.nom\\)\\)}\\)\")",
-      "Bash(curl -s http://localhost:3001/api/centres/bys-formation-osny)"
+      "Bash(curl -s http://localhost:3001/api/centres/bys-permis-osny)"
     ]
   }
 }

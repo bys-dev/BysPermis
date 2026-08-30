@@ -781,7 +781,7 @@ function CentresInner() {
             {[
               { icon: faChartLine, title: "Visibilité", desc: "Augmentez votre taux de remplissage" },
               { icon: faHandshake, title: "Simplicité", desc: "Gestion centralisée des réservations" },
-              { icon: faCheckCircle, title: "Confiance", desc: "Label qualité BYS Formation" },
+              { icon: faCheckCircle, title: "Confiance", desc: "Label qualité BYS Permis" },
             ].map((item) => (
               <div key={item.title} className="text-center">
                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mx-auto mb-3">

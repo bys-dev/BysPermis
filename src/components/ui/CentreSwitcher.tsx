@@ -331,7 +331,7 @@ function CreateCentreModal({ onClose }: { onClose: () => void }) {
               type="text"
               value={form.nom}
               onChange={(e) => setForm({ ...form, nom: e.target.value })}
-              placeholder="Ex : BYS Formation Lyon"
+              placeholder="Ex : BYS Permis Lyon"
               required
               className="w-full px-3.5 py-2.5 rounded-lg border text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
               style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}

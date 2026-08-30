@@ -124,7 +124,7 @@ export default function InscriptionPage() {
             <span className="font-display font-bold text-lg text-white">BYS</span>
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-white">
-            BYS Formation
+            BYS Permis
           </h1>
         </div>
 
@@ -262,7 +262,7 @@ export default function InscriptionPage() {
 
       {/* Footer */}
       <p className="text-center text-xs mt-6 text-gray-600">
-        © 2026 BYS Formation — Tous droits réservés
+        © 2026 BYS Permis — Tous droits réservés
       </p>
     </div>
   );

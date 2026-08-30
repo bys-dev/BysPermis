@@ -1,4 +1,4 @@
-# Éléments à fournir par BYS Formation (Sébastien)
+# Éléments à fournir par BYS Permis (Sébastien)
 
 > À transmettre à Andrys MAGAR — Email : `andrys.developper@gmail.com`
 > Délai souhaité : avant le **24 mai 2026** pour mise en ligne.
@@ -16,7 +16,7 @@ Le reste peut arriver après la mise en ligne.
 
 | Élément | Valeur actuelle (provisoire) | À confirmer par le client |
 |---------|------------------------------|---------------------------|
-| 🔴 Email contact public | `bysforma95@gmail.com` | Email pro officiel (ex. `contact@bys-permis.fr`) |
+| 🔴 Email contact public | `bysforma95@gmail.com` | Email pro officiel (ex. `contact@byspermis.fr`) |
 | 🔴 Téléphone | `01 34 25 XX XX` (masqué) | Numéro complet affichable + indicatif |
 | 🔴 Adresse courte (hero contact) | « Osny (95) — Val-d'Oise » | Formulation validée ou adresse complète |
 | 🔴 Adresse postale complète | Bât. 7, 9 Chaussée Jules César, 95520 Osny | Confirmer ou corriger |
@@ -32,8 +32,8 @@ Le reste peut arriver après la mise en ligne.
 
 | Élément | Détail | Format attendu |
 |---------|--------|----------------|
-| 🔴 Raison sociale exacte | « BYS Formation SARL » ou autre | Texte |
-| 🔴 SIRET | N° SIRET de BYS Formation | 14 chiffres |
+| 🔴 Raison sociale exacte | « BYS Permis SARL » ou autre | Texte |
+| 🔴 SIRET | N° SIRET de BYS Permis | 14 chiffres |
 | 🔴 N° TVA intracommunautaire | Si applicable | `FR XX XXXXXXXXX` |
 | 🔴 Code APE / NAF | Activité principale | ex. `8559A` |
 | 🔴 Adresse siège social | Pour CGV + mentions légales | Adresse complète |
@@ -42,7 +42,7 @@ Le reste peut arriver après la mise en ligne.
 | 🔴 Téléphone contact public | Optionnel mais recommandé | +33 X XX XX XX XX |
 | 🔴 K-bis < 3 mois | Demandé par Stripe pour activation Connect | PDF |
 | ⚪ Pièce d'identité du dirigeant | Demandé par Stripe (KYC) | PDF recto/verso |
-| ⚪ RIB de BYS Formation | Pour reverser les commissions de la plateforme | IBAN + BIC |
+| ⚪ RIB de BYS Permis | Pour reverser les commissions de la plateforme | IBAN + BIC |
 
 ---
 
@@ -50,8 +50,8 @@ Le reste peut arriver après la mise en ligne.
 
 | Élément | Détail |
 |---------|--------|
-| 🔴 Domaine définitif | `bys-permis.fr` (déjà pressenti ?) → confirmer + me déléguer DNS ou me donner accès registrar |
-| 🔴 Email de réception | Adresse `noreply@bys-permis.fr` (auto) + adresse réelle pour réponses clients |
+| 🔴 Domaine définitif | `byspermis.fr` (déjà pressenti ?) → confirmer + me déléguer DNS ou me donner accès registrar |
+| 🔴 Email de réception | Adresse `noreply@byspermis.fr` (auto) + adresse réelle pour réponses clients |
 | 🔴 Logo vectoriel | SVG ou AI/PDF, fond transparent |
 | ⚪ Logo carré (favicon) | PNG 512×512 |
 | ⚪ Charte couleurs validée | Actuel : navy `#0A1628` + rouge `#DC2626` |
@@ -60,7 +60,7 @@ Le reste peut arriver après la mise en ligne.
 
 ## 3. Stripe (compte BYS) 🔴
 
-Sébastien doit créer/activer le compte Stripe au nom de BYS Formation. Sans ça, aucun paiement possible.
+Sébastien doit créer/activer le compte Stripe au nom de BYS Permis. Sans ça, aucun paiement possible.
 
 | Étape | Action |
 |-------|--------|
@@ -94,7 +94,7 @@ Pour la V1, j'ai mis des textes par défaut. Sébastien peut les remplacer s'il 
 | Section | Statut actuel | Action client |
 |---------|---------------|---------------|
 | Hero accueil | Texte générique « Récupérez vos points » | Valider ou réécrire |
-| Page « À propos » | Texte générique sur BYS Formation | Réécrire avec vraie histoire / valeurs |
+| Page « À propos » | Texte générique sur BYS Permis | Réécrire avec vraie histoire / valeurs |
 | Page « Comment ça marche » | Texte légal correct | Valider |
 | FAQ | 10 questions/réponses légales en place | Ajouter/modifier au besoin |
 | Articles blog | 3 articles démo | Fournir au moins 3 articles SEO réels (mots-clés : « stage récupération points {ville} ») |
@@ -174,7 +174,7 @@ Pour que je puisse opérer correctement :
 Si tu ne devais me fournir que **5 choses cette semaine** :
 
 1. **Compte Stripe activé en mode Live + Stripe Connect actif** (sans ça, zéro paiement possible)
-2. **Domaine `bys-permis.fr` + accès DNS** (ou délégation à mon compte Vercel)
+2. **Domaine `byspermis.fr` + accès DNS** (ou délégation à mon compte Vercel)
 3. **Logo SVG + favicon 512×512**
 4. **Infos juridiques BYS** : raison sociale, SIRET, TVA, adresse, responsable
 5. **N° d'agrément préfectoral + date d'expiration** pour au moins le centre principal BYS (Osny)

@@ -57,10 +57,10 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
           className="px-6 py-6 border-b"
           style={{ borderColor: "rgba(255,255,255,0.07)" }}
         >
-          <Link href="/" className="flex items-center gap-3" aria-label="BYS Formation — accueil">
+          <Link href="/" className="flex items-center gap-3" aria-label="BYS Permis — accueil">
             <Image
               src="/transparent-logo.svg"
-              alt="BYS Formation"
+              alt="BYS Permis"
               width={36}
               height={36}
               className="h-9 w-auto brightness-0 invert"
@@ -68,7 +68,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
             <div className="hidden">
               <span className="font-bold text-sm text-white">BYS</span>
             </div>
-            <span className="font-semibold text-white text-sm">BYS Formation</span>
+            <span className="font-semibold text-white text-sm">BYS Permis</span>
           </Link>
         </div>
 

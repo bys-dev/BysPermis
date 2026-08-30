@@ -24,7 +24,7 @@ const PartnerLeadSchema = z.object({
   }),
 });
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 const TO = "contact@byspermis.fr";
 
 export async function POST(req: NextRequest) {
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#1e3a5f">Nouvelle demande de partenariat centre</h2>
           <p style="color:#6b7280;font-size:14px">
-            Un centre agréé souhaite rejoindre la plateforme BYS Formation.
+            Un centre agréé souhaite rejoindre la plateforme BYS Permis.
           </p>
           <table style="border-collapse:collapse;width:100%;margin:16px 0">
             ${row("Centre", safeCentre)}
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
             ${safeMessage}
           </div>
           <p style="color:#9ca3af;font-size:12px;margin-top:24px">
-            Envoyé depuis la page « Devenir partenaire » — BYS Formation
+            Envoyé depuis la page « Devenir partenaire » — BYS Permis
           </p>
         </div>
       `,

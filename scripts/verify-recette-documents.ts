@@ -268,7 +268,7 @@ function writeReport() {
 
 | Élément | Valeur |
 |---------|--------|
-| Centre | BYS Formation Cergy |
+| Centre | BYS Permis Cergy |
 | Dates | **18 – 19 juin 2026** |
 | Résa CONFIRMEE | \`${RESA_CONFIRMEE}\` — marie.durand@outlook.fr |
 | Résa TERMINEE | \`${RESA_TERMINEE}\` — karim.bouaziz@gmail.com |

@@ -66,7 +66,7 @@ const faqCategories: FaqCategory[] = [
     icon: faCalendarCheck,
     items: [
       {
-        question: "Comment réserver un stage sur BYS Formation ?",
+        question: "Comment réserver un stage sur BYS Permis ?",
         answer:
           "La réservation se fait en quelques étapes simples : 1) Recherchez un stage par ville, département ou code postal sur notre page de recherche. 2) Sélectionnez le stage qui vous convient (date, lieu, prix). 3) Créez votre compte ou connectez-vous. 4) Renseignez vos informations personnelles et votre numéro de permis. 5) Procédez au paiement sécurisé. Vous recevrez immédiatement un e-mail de confirmation avec votre convocation.",
       },
@@ -83,7 +83,7 @@ const faqCategories: FaqCategory[] = [
       {
         question: "Comment recevoir ma convocation ?",
         answer:
-          "Dès votre réservation confirmée et le paiement validé, votre convocation vous est envoyée automatiquement par e-mail. Vous pouvez également la retrouver dans votre espace personnel sur BYS Formation, rubrique \"Mes réservations\". La convocation précise l'adresse exacte du centre, les horaires et les documents à apporter. Nous vous envoyons un rappel 48h avant le début du stage.",
+          "Dès votre réservation confirmée et le paiement validé, votre convocation vous est envoyée automatiquement par e-mail. Vous pouvez également la retrouver dans votre espace personnel sur BYS Permis, rubrique \"Mes réservations\". La convocation précise l'adresse exacte du centre, les horaires et les documents à apporter. Nous vous envoyons un rappel 48h avant le début du stage.",
       },
       {
         question: "Puis-je changer la date ou le lieu de mon stage ?",
@@ -99,7 +99,7 @@ const faqCategories: FaqCategory[] = [
       {
         question: "Combien coûte un stage de récupération de points ?",
         answer:
-          "Le prix d'un stage de récupération de points varie généralement entre 200 € et 300 € selon le centre de formation, la ville et la période. Sur BYS Formation, vous pouvez comparer les prix de tous les centres agréés dans votre région pour trouver la meilleure offre. Le prix affiché est le prix final, sans frais cachés.",
+          "Le prix d'un stage de récupération de points varie généralement entre 200 € et 300 € selon le centre de formation, la ville et la période. Sur BYS Permis, vous pouvez comparer les prix de tous les centres agréés dans votre région pour trouver la meilleure offre. Le prix affiché est le prix final, sans frais cachés.",
       },
       {
         question: "Quels moyens de paiement sont acceptés ?",
@@ -161,12 +161,12 @@ const faqCategories: FaqCategory[] = [
       {
         question: "Vais-je recevoir une attestation ?",
         answer:
-          "Oui, à l'issue du stage, le centre de formation vous remet une attestation de stage. Ce document officiel est à conserver précieusement. Il prouve que vous avez suivi le stage et peut être demandé en cas de contrôle ou de litige. Une copie est également disponible dans votre espace personnel sur BYS Formation.",
+          "Oui, à l'issue du stage, le centre de formation vous remet une attestation de stage. Ce document officiel est à conserver précieusement. Il prouve que vous avez suivi le stage et peut être demandé en cas de contrôle ou de litige. Une copie est également disponible dans votre espace personnel sur BYS Permis.",
       },
       {
         question: "Que faire si mes points ne sont pas recrédités ?",
         answer:
-          "Si après 3 semaines votre solde de points n'a pas évolué sur Télépoints, contactez d'abord le centre de formation pour vérifier que l'attestation a bien été transmise à la Préfecture. Si le problème persiste, vous pouvez contacter la Préfecture de votre département avec votre attestation de stage. Notre service client BYS Formation peut également vous assister dans ces démarches via l'espace support.",
+          "Si après 3 semaines votre solde de points n'a pas évolué sur Télépoints, contactez d'abord le centre de formation pour vérifier que l'attestation a bien été transmise à la Préfecture. Si le problème persiste, vous pouvez contacter la Préfecture de votre département avec votre attestation de stage. Notre service client BYS Permis peut également vous assister dans ces démarches via l'espace support.",
       },
       {
         question: "Le stage apparaît-il sur mon relevé d'information intégral ?",

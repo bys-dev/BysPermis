@@ -503,7 +503,7 @@ export default function OnboardingPage() {
         </h1>
         <p className="text-gray-400 text-sm max-w-lg mx-auto">
           Renseignez les informations de votre centre a votre rythme. Un profil
-          complet ameliore votre visibilite sur la marketplace BYS Formation.
+          complet ameliore votre visibilite sur la marketplace BYS Permis.
         </p>
       </div>
 
@@ -666,7 +666,7 @@ export default function OnboardingPage() {
                   onChange={(e) => updateField("nom", e.target.value)}
                   className={inputClass}
                   style={inputStyle}
-                  placeholder="Ex: BYS Formation"
+                  placeholder="Ex: BYS Permis"
                 />
               </div>
 

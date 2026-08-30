@@ -209,7 +209,7 @@ const featuredCourses: FeaturedCourse[] = [
     tag: "Récupération de points",
     duration: "2 jours",
     modality: "Présentiel",
-    centre: "BYS Formation Osny",
+    centre: "BYS Permis Osny",
     price: "250 €",
     places: 8,
     icon: faShieldHalved,
@@ -383,7 +383,7 @@ export default async function Home() {
         id="ld-home"
         data={[
           webPageJsonLd({
-            name: "BYS Formation Permis — stages agréés de récupération de points",
+            name: "BYS Permis — stages agréés de récupération de points",
             description:
               "Comparez et réservez un stage de récupération de points dans un centre agréé préfecture, partout en France.",
             path: "/",

@@ -187,7 +187,7 @@ export default async function StagesDepartementPage({ params }: Props) {
                 l&apos;article R223-5 du Code de la route.
               </p>
               <p>
-                BYS Formation Permis contrôle l&apos;agrément, l&apos;assurance responsabilité
+                BYS Permis contrôle l&apos;agrément, l&apos;assurance responsabilité
                 civile professionnelle et les pièces administratives de chaque centre avant sa
                 mise en ligne. Un centre dont l&apos;agrément arrive à expiration est retiré de
                 la marketplace tant que le renouvellement n&apos;est pas justifié.

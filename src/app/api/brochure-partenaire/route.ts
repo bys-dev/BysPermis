@@ -9,7 +9,7 @@ export async function GET() {
   return new NextResponse(pdfBuffer as unknown as BodyInit, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": 'inline; filename="bys-formation-brochure-partenaire.pdf"',
+      "Content-Disposition": 'inline; filename="bys-permis-brochure-partenaire.pdf"',
       "Cache-Control": "public, max-age=3600",
     },
   });

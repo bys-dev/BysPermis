@@ -19,7 +19,7 @@ export default function ConnexionPage() {
         <div className="text-center mb-8">
           <Image
             src="/transparent-logo.svg"
-            alt="BYS Formation"
+            alt="BYS Permis"
             width={200}
             height={56}
             priority
@@ -94,7 +94,7 @@ export default function ConnexionPage() {
 
       {/* Footer */}
       <p className="text-center text-xs mt-6 text-gray-600">
-        © 2026 BYS Formation — Tous droits réservés
+        © 2026 BYS Permis — Tous droits réservés
       </p>
     </div>
   );

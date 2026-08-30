@@ -22,7 +22,13 @@ async function main() {
   console.log("\n=== Fix marketplace centres ===\n");
 
   const bys = await prisma.centre.updateMany({
-    where: { nom: { contains: "BYS Formation", mode: "insensitive" } },
+    where: {
+      OR: [
+        { nom: { contains: "BYS Permis", mode: "insensitive" } },
+        // Ancien nom de marque : encore present sur les bases non migrees
+        { nom: { contains: "BYS Formation", mode: "insensitive" } },
+      ],
+    },
     data: { logo: BYS_LOGO },
   });
   console.log(`✓ Logos BYS corrigés (${bys.count})`);
@@ -38,6 +44,7 @@ async function main() {
   const brokenLogos = await prisma.centre.findMany({
     where: {
       OR: [
+        { logo: { contains: "byspermis.fr/colored-logo.png" } },
         { logo: { contains: "bys-permis.fr/colored-logo.png" } },
         { logo: { contains: "colored-logo.png" } },
       ],

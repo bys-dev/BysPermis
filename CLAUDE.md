@@ -1,4 +1,4 @@
-# CLAUDE.md — BYS Formation Platform
+# CLAUDE.md — BYS Permis Platform
 
 Ce fichier est lu automatiquement par Claude Code à chaque session.
 Il contient tout le contexte du projet, les règles de développement et les commandes utiles.
@@ -8,8 +8,8 @@ Il contient tout le contexte du projet, les règles de développement et les com
 ## 🎯 Contexte projet
 
 **Plateforme** : Marketplace dédiée EXCLUSIVEMENT aux stages de récupération de points du permis de conduire (stages agréés Ministère de l'Intérieur, dits « stages de sensibilisation à la sécurité routière »).
-**Scope V1 (mai 2026)** : aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.). Le modèle de données reste extensible mais aucun contenu/seed/page ne doit faire référence à d'autres produits. Voir CDC_BYS_Formation.md §Vision produit pour le détail.
-**Client** : BYS Formation — Sébastien — bysforma95@gmail.com
+**Scope V1 (mai 2026)** : aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.). Le modèle de données reste extensible mais aucun contenu/seed/page ne doit faire référence à d'autres produits. Voir CDC_BYS_Permis.md §Vision produit pour le détail.
+**Client** : BYS Permis — Sébastien — bysforma95@gmail.com
 **Prestataire** : Andrys MAGAR — Auto-entrepreneur — SIRET : 908 058 092 00028
 **Contrat** : 10 000 € — 5 mensualités de 2 000 € — Démarrage 9 mars 2026
 **Délai** : 19 semaines (9 mars → 19 juillet 2026)
@@ -36,7 +36,7 @@ Il contient tout le contexte du projet, les règles de développement et les com
 ## 📁 Structure du projet
 
 ```
-bys-formation/
+bys-permis/
 ├── prisma/
 │   ├── schema.prisma          # Schéma BDD complet (10 tables)
 │   └── seed.ts                # Données de test
@@ -122,7 +122,7 @@ STRIPE_WEBHOOK_SECRET=""                 # whsec_... (stripe listen)
 
 # Email
 RESEND_API_KEY=""                        # re_...
-EMAIL_FROM="BYS Formations <noreply@byspermis.fr>"   # doit correspondre au domaine vérifié Resend
+EMAIL_FROM="BYS Permis <noreply@byspermis.fr>"   # doit correspondre au domaine vérifié Resend
 
 # App
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
@@ -317,7 +317,7 @@ Notification  → userId, title, message, type, isRead
 
 - **Client** : Sébastien — bysforma95@gmail.com
 - **Prestataire** : Andrys MAGAR
-- **Repo** : github.com/[À_COMPLÉTER]/bys-formation
+- **Repo** : github.com/[À_COMPLÉTER]/bys-permis
 - **Vercel** : [À_COMPLÉTER].vercel.app
 
 ---

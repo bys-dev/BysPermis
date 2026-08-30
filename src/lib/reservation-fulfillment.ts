@@ -33,7 +33,7 @@ import { formatDate, getCommissionRate } from "@/lib/utils";
 
 const APP_URL =
   process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 
 export interface FulfillResult {
   /** true si le pipeline a tourné, false s'il était déjà fait / non applicable. */

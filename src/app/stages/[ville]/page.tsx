@@ -245,7 +245,7 @@ export default async function StagesVillePage({ params }: Props) {
                   <>
                     Le tarif d&apos;un stage est libre : chaque centre fixe le sien, dans une
                     fourchette généralement comprise entre 200 € et 300 €. Le prix affiché sur
-                    BYS Formation Permis est le prix final, convocation et attestation de suivi
+                    BYS Permis est le prix final, convocation et attestation de suivi
                     comprises.
                   </>
                 )}

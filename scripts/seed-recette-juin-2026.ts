@@ -32,7 +32,7 @@ async function main() {
   console.log(`\n=== Seed recette ${RECETTE_TAG} — ${SESSION_DEBUT.toISOString().slice(0, 10)} ===\n`);
 
   const centre = await prisma.centre.findUnique({
-    where: { slug: "bys-formation-cergy" },
+    where: { slug: "bys-permis-cergy" },
     include: { user: { select: { id: true, email: true } } },
   });
   if (!centre) throw new Error("Centre BYS Cergy introuvable — lancez npm run db:seed");
@@ -82,7 +82,7 @@ async function main() {
     data: {
       statut: "ACTIF",
       isActive: true,
-      raisonSociale: "BYS Formation SAS",
+      raisonSociale: "BYS Permis SAS",
       siret: "98751238100011",
       tva: "FR12987512381",
       ape: "8559A",
@@ -94,10 +94,10 @@ async function main() {
       logo: LOGO_PNG,
       signatureUrl: LOGO_PNG,
       mentionsLegales:
-        "BYS Formation SAS — SIRET 987 512 381 00011 — Document de recette juin 2026.",
+        "BYS PERMIS SAS — RCS Paris 107 056 327 — Document de recette juin 2026.",
       cgv: "CGV recette juin 2026 — annulation gratuite jusqu'à J-7.",
       presentationHtml:
-        "<p>Centre BYS Formation Cergy — session de recette <strong>juin 2026</strong>. Agréé préfecture Val-d'Oise.</p>",
+        "<p>Centre BYS Permis Cergy — session de recette <strong>juin 2026</strong>. Agréé préfecture Val-d'Oise.</p>",
     },
   });
   console.log("✓ Centre Cergy enrichi (logo, cachet, mentions légales juin 2026)");
@@ -268,7 +268,7 @@ async function main() {
       actif: true,
       ordre: 1,
       contenu:
-        "Je soussigné(e) déclare avoir pris connaissance du règlement intérieur et du programme du stage BYS Formation Cergy. Session de recette — juin 2026. Lu et approuvé.",
+        "Je soussigné(e) déclare avoir pris connaissance du règlement intérieur et du programme du stage BYS Permis Cergy. Session de recette — juin 2026. Lu et approuvé.",
     },
     update: { actif: true, contenu: "Je soussigné(e) déclare avoir pris connaissance du règlement intérieur — recette juin 2026." },
   });
@@ -285,7 +285,7 @@ async function main() {
       actif: true,
       ordre: 2,
       contenu:
-        "Règlement intérieur BYS Formation Cergy — version recette juin 2026. Horaires : 9h-17h30. Tenue correcte exigée. Téléphones en silencieux.",
+        "Règlement intérieur BYS Permis Cergy — version recette juin 2026. Horaires : 9h-17h30. Tenue correcte exigée. Téléphones en silencieux.",
     },
     update: { actif: true },
   });

@@ -27,7 +27,7 @@ const MOCK_SESSION: SessionData = {
   id: "mock", dateDebut: "2026-03-21T09:00:00", dateFin: "2026-03-22T17:30:00",
   placesRestantes: 4, prix: 199,
   formation: { titre: "Stage de récupération de points", duree: "2 jours (14h)", isQualiopi: true },
-  centre: "BYS Formation — Osny", ville: "Osny (95)", adresse: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
+  centre: "BYS Permis — Osny", ville: "Osny (95)", adresse: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
 };
 
 const inputClass = "w-full px-4 py-3 rounded-xl text-sm text-gray-800 bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder-gray-400";

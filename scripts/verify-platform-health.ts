@@ -110,13 +110,13 @@ async function main() {
   }
 
   const owner = await prisma.user.findFirst({
-    where: { email: "sebastien@bys-formation.fr" },
+    where: { email: "sebastien@byspermis.fr" },
     select: { id: true, role: true },
   });
-  record("DATA.owner", !!owner && owner.role === "OWNER", owner ? `sebastien@bys-formation.fr (${owner.role})` : "introuvable");
+  record("DATA.owner", !!owner && owner.role === "OWNER", owner ? `sebastien@byspermis.fr (${owner.role})` : "introuvable");
 
   const centreOwner = await prisma.user.findFirst({
-    where: { email: "contact@bys-formation.fr" },
+    where: { email: "contact@byspermis.fr" },
     select: {
       id: true,
       email: true,

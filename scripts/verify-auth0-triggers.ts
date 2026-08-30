@@ -8,9 +8,9 @@ import "dotenv/config";
 import { AUTH0_ACTION_NAME, AUTH0_LEGACY_ACTION_NAME, AUTH0_ROLE_NAMESPACE } from "./auth0-action-code";
 
 const DEMO_EMAILS = [
-  "sebastien@bys-formation.fr",
-  "admin@bys-formation.fr",
-  "contact@bys-formation.fr",
+  "sebastien@byspermis.fr",
+  "admin@byspermis.fr",
+  "contact@byspermis.fr",
   "marie.durand@outlook.fr",
 ];
 

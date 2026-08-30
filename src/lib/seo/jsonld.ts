@@ -1,5 +1,5 @@
 /**
- * Helpers JSON-LD (schema.org) pour le SEO de BYS Formation.
+ * Helpers JSON-LD (schema.org) pour le SEO de BYS Permis.
  *
  * Chaque fonction renvoie un objet sérialisable à injecter via
  * <JsonLd data={...} /> ou <script type="application/ld+json">.
@@ -10,8 +10,8 @@
 const BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
-const ORG_NAME = "BYS Formation";
-const ORG_LEGAL = "BYS Formation"; // À ajuster une fois la raison sociale exacte fournie par le client
+const ORG_NAME = "BYS Permis";
+const ORG_LEGAL = "BYS Permis"; // À ajuster une fois la raison sociale exacte fournie par le client
 const ORG_LOGO = `${BASE_URL}/colored-logo.png`;
 
 // ─── Organization ──────────────────────────────────────────────────
@@ -27,8 +27,8 @@ export function organizationJsonLd() {
     logo: ORG_LOGO,
     sameAs: [
       // À remplir quand les comptes seront fournis
-      // "https://www.facebook.com/bysformation",
-      // "https://www.linkedin.com/company/bysformation",
+      // "https://www.facebook.com/byspermis",
+      // "https://www.linkedin.com/company/byspermis",
     ],
     description:
       "Place de marché des stages de sensibilisation à la sécurité routière (stages de récupération de points) organisés par des centres agréés par les préfectures françaises.",

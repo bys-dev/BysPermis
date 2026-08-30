@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   const description = article.extrait.slice(0, 155);
   return {
-    title: `${article.titre} | BYS Formation`,
+    title: article.titre,
     description,
     alternates: { canonical: `/blog/${article.slug}` },
     openGraph: {
@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: `/blog/${article.slug}`,
       type: "article",
       locale: "fr_FR",
-      siteName: "BYS Formation",
+      siteName: "BYS Permis",
       images: article.image ? [{ url: article.image }] : undefined,
       publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
     },
@@ -148,7 +148,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-200">
           <span className="flex items-center gap-1.5">
             <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" />
-            BYS Formation
+            BYS Permis
           </span>
           <span className="flex items-center gap-1.5">
             <FontAwesomeIcon icon={faCalendar} className="w-3.5 h-3.5" />

@@ -11,7 +11,7 @@ const ContactSchema = z.object({
   message: z.string().min(10, "Message trop court"),
 });
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 const TO = "contact@byspermis.fr";
 
 export async function POST(req: NextRequest) {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
             ${safeMessage}
           </div>
           <p style="color:#9ca3af;font-size:12px;margin-top:24px">
-            Envoyé depuis le formulaire de contact BYS Formations
+            Envoyé depuis le formulaire de contact BYS Permis
           </p>
         </div>
       `,

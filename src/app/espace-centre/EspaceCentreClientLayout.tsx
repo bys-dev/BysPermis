@@ -289,7 +289,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
               <p className="text-[15px] font-bold text-white leading-tight tracking-tight">
                 Espace centre
               </p>
-              <p className="text-xs text-gray-300 mt-1 font-medium">BYS Formation · Permis</p>
+              <p className="text-xs text-gray-300 mt-1 font-medium">BYS Permis · Permis</p>
             </div>
           </Link>
         </div>
@@ -358,7 +358,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
             ) : (
               <Image
                 src="/transparent-logo.svg"
-                alt="BYS Formation"
+                alt="BYS Permis"
                 width={120}
                 height={32}
                 className="h-8 w-auto brightness-0 invert"

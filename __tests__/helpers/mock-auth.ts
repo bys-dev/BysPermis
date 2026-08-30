@@ -125,7 +125,7 @@ const FAKE_USERS: Record<string, User> = {
   SUPPORT: {
     id: "user-support-001",
     auth0Id: "auth0|test-support",
-    email: "support@bys-formation.fr",
+    email: "support@byspermis.fr",
     nom: "Martin",
     prenom: "Sophie",
     telephone: "0155667788",
@@ -146,7 +146,7 @@ const FAKE_USERS: Record<string, User> = {
   COMPTABLE: {
     id: "user-comptable-001",
     auth0Id: "auth0|test-comptable",
-    email: "compta@bys-formation.fr",
+    email: "compta@byspermis.fr",
     nom: "Petit",
     prenom: "Claire",
     telephone: null,
@@ -167,7 +167,7 @@ const FAKE_USERS: Record<string, User> = {
   COMMERCIAL: {
     id: "user-commercial-001",
     auth0Id: "auth0|test-commercial",
-    email: "commercial@bys-formation.fr",
+    email: "commercial@byspermis.fr",
     nom: "Lemaire",
     prenom: "Hugo",
     telephone: null,
@@ -188,7 +188,7 @@ const FAKE_USERS: Record<string, User> = {
   ADMIN: {
     id: "user-admin-001",
     auth0Id: "auth0|test-admin",
-    email: "admin@bys-formation.fr",
+    email: "admin@byspermis.fr",
     nom: "Magar",
     prenom: "Andrys",
     telephone: "0612345678",
@@ -209,7 +209,7 @@ const FAKE_USERS: Record<string, User> = {
   OWNER: {
     id: "user-owner-001",
     auth0Id: "auth0|test-owner",
-    email: "sebastien@bys-formation.fr",
+    email: "sebastien@byspermis.fr",
     nom: "BYS",
     prenom: "Sebastien",
     telephone: "0600000000",

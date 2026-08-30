@@ -460,7 +460,7 @@ export default function ParametresCentrePage() {
               onChange={(e) => update("raisonSociale", e.target.value)}
               className={inputClass}
               style={inputStyle}
-              placeholder="Ex: BYS Formations SARL"
+              placeholder="Ex: BYS Permis SARL"
             />
           </div>
 

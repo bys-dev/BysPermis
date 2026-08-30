@@ -46,7 +46,7 @@ const mockSession = {
     isQualiopi: true,
     isCPF: false,
     centre: {
-      nom: "BYS Formation Osny",
+      nom: "BYS Permis Osny",
       ville: "Osny",
       adresse: "Bât. 7, 9 Chaussée Jules César",
       codePostal: "95520",
@@ -69,7 +69,7 @@ describe("GET /api/sessions/[id]", () => {
     expect(data.id).toBe("sess_1");
     expect(data.formation.titre).toBe("Stage récupération de points");
     expect(data.prix).toBe(250);
-    expect(data.centre).toBe("BYS Formation Osny");
+    expect(data.centre).toBe("BYS Permis Osny");
   });
 
   it("retourne 404 si session introuvable", async () => {

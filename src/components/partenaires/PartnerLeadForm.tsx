@@ -260,7 +260,7 @@ export default function PartnerLeadForm() {
             className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/40 cursor-pointer"
           />
           <span className="text-xs text-gray-500 leading-relaxed">
-            J&apos;accepte d&apos;être recontacté(e) par BYS Formation au sujet de ce
+            J&apos;accepte d&apos;être recontacté(e) par BYS Permis au sujet de ce
             partenariat. Mes données sont traitées conformément au RGPD et ne sont
             jamais revendues.
           </span>

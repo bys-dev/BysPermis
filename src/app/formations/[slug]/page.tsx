@@ -110,11 +110,11 @@ const formationsData: Record<string, FormationData> = {
     ],
     sessions: [
       { date: "5-6 Avril 2026", ville: "Paris 12e", centre: "Centre BYS Paris Est", placesRestantes: 8, prix: 230 },
-      { date: "12-13 Avril 2026", ville: "Cergy-Pontoise", centre: "BYS Formation Osny", placesRestantes: 12, prix: 200 },
+      { date: "12-13 Avril 2026", ville: "Cergy-Pontoise", centre: "BYS Permis Osny", placesRestantes: 12, prix: 200 },
       { date: "19-20 Avril 2026", ville: "Lyon 3e", centre: "Centre Permis Lyon", placesRestantes: 3, prix: 250 },
       { date: "26-27 Avril 2026", ville: "Marseille 1er", centre: "Auto-Ecole du Vieux Port", placesRestantes: 6, prix: 240 },
       { date: "3-4 Mai 2026", ville: "Toulouse", centre: "Centre Occitanie Formation", placesRestantes: 15, prix: 220 },
-      { date: "10-11 Mai 2026", ville: "Bordeaux", centre: "BYS Formation Aquitaine", placesRestantes: 9, prix: 235 },
+      { date: "10-11 Mai 2026", ville: "Bordeaux", centre: "BYS Permis Aquitaine", placesRestantes: 9, prix: 235 },
     ],
     programme: [
       {
@@ -172,7 +172,7 @@ const formationsData: Record<string, FormationData> = {
       {
         name: "Sophie M.",
         rating: 5,
-        text: "Excellent stage. Le psychologue et l'animateur etaient tres professionnels. Je recommande le centre BYS Formation.",
+        text: "Excellent stage. Le psychologue et l'animateur etaient tres professionnels. Je recommande le centre BYS Permis.",
         date: "Janvier 2026",
         ville: "Lyon",
       },
@@ -206,7 +206,7 @@ const formationsData: Record<string, FormationData> = {
     ],
     sessions: [
       { date: "5-6 Avril 2026", ville: "Paris 12e", centre: "Centre BYS Paris Est", placesRestantes: 6, prix: 250 },
-      { date: "12-13 Avril 2026", ville: "Cergy-Pontoise", centre: "BYS Formation Osny", placesRestantes: 10, prix: 210 },
+      { date: "12-13 Avril 2026", ville: "Cergy-Pontoise", centre: "BYS Permis Osny", placesRestantes: 10, prix: 210 },
       { date: "19-20 Avril 2026", ville: "Lille", centre: "Centre Formation Nord", placesRestantes: 8, prix: 230 },
       { date: "26-27 Avril 2026", ville: "Nantes", centre: "Formation Atlantique", placesRestantes: 5, prix: 240 },
       { date: "3-4 Mai 2026", ville: "Strasbourg", centre: "Centre Alsace Formation", placesRestantes: 12, prix: 220 },
@@ -264,7 +264,7 @@ const formationsData: Record<string, FormationData> = {
       {
         name: "Emma G.",
         rating: 5,
-        text: "Stage obligatoire mais finalement tres enrichissant. J'ai recupere mes points et j'ai pu me faire rembourser l'amende. Merci BYS Formation !",
+        text: "Stage obligatoire mais finalement tres enrichissant. J'ai recupere mes points et j'ai pu me faire rembourser l'amende. Merci BYS Permis !",
         date: "Fevrier 2026",
         ville: "Paris",
       },

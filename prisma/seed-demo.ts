@@ -134,7 +134,7 @@ const articleTemplates = [
   <li>Des supports pédagogiques actualisés</li>
   <li>Un processus d'amélioration continue</li>
 </ul>
-<p>Tous les centres partenaires référencés sur BYS Formation respectent les 7 critères Qualiopi.</p>`,
+<p>Tous les centres partenaires référencés sur BYS Permis respectent les 7 critères Qualiopi.</p>`,
   },
   {
     titre: "Stage obligatoire vs stage volontaire : quelles différences ?",
@@ -161,7 +161,7 @@ const articleTemplates = [
 <p>Service en ligne accessible avec votre numéro de permis et un code confidentiel (reçu par courrier).</p>
 <h3>3. En préfecture</h3>
 <p>Sur présentation d'une pièce d'identité, la préfecture peut vous remettre un relevé d'information.</p>
-<p><em>À savoir :</em> BYS Formation ne peut pas vérifier votre solde pour vous — ces démarches restent strictement personnelles.</p>`,
+<p><em>À savoir :</em> BYS Permis ne peut pas vérifier votre solde pour vous — ces démarches restent strictement personnelles.</p>`,
   },
   {
     titre: "Lettre 48N, 48SI : décoder les courriers de la préfecture",

@@ -243,7 +243,7 @@ describe("classerFormations — commune hors référentiel", () => {
 });
 
 describe("classerFormations — priorité BYS", () => {
-  const bys = formation({ titre: "BYS", prix: 300, centre: { nom: "BYS Formation Osny", ville: "Osny", latitude: null, longitude: null } });
+  const bys = formation({ titre: "BYS", prix: 300, centre: { nom: "BYS Permis Osny", ville: "Osny", latitude: null, longitude: null } });
   const autre = formation({ titre: "Autre", prix: 180, centre: { nom: "Autre centre", ville: "Osny", latitude: null, longitude: null } });
 
   it("passe devant à pertinence égale", () => {

@@ -20,9 +20,9 @@ const ROLE_LEVELS: Record<string, number> = {
 
 const DEFAULT_EMAILS = [
   "bysandrys95@gmail.com",
-  "sebastien@bys-formation.fr",
-  "admin@bys-formation.fr",
-  "contact@bys-formation.fr",
+  "sebastien@byspermis.fr",
+  "admin@byspermis.fr",
+  "contact@byspermis.fr",
 ];
 
 async function getToken(domain: string, clientId: string, clientSecret: string) {

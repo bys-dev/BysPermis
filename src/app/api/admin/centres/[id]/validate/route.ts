@@ -61,7 +61,7 @@ export async function POST(
       data: {
         titre: "Votre centre est actif !",
         contenu:
-          "Felicitations ! Votre centre est maintenant visible sur la marketplace BYS Formation. Les stagiaires peuvent desormais decouvrir et reserver vos formations.",
+          "Felicitations ! Votre centre est maintenant visible sur la marketplace BYS Permis. Les stagiaires peuvent desormais decouvrir et reserver vos formations.",
         userId: centre.user.id,
       },
     });

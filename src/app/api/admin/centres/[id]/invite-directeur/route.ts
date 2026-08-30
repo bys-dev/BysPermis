@@ -185,7 +185,7 @@ export async function POST(
 
       await tx.notification.create({
         data: {
-          titre: "Bienvenue sur BYS Formation",
+          titre: "Bienvenue sur BYS Permis",
           contenu: `Votre accès directeur de lieu pour "${centre.nom}" est prêt.`,
           userId: user.id,
         },

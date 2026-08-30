@@ -23,7 +23,7 @@ export default async function MaintenancePage() {
         {/* Logo */}
         <Image
           src="/transparent-logo.svg"
-          alt="BYS Formation"
+          alt="BYS Permis"
           width={200}
           height={56}
           className="h-14 w-auto mx-auto mb-8 brightness-0 invert"
@@ -60,7 +60,7 @@ export default async function MaintenancePage() {
         {/* Footer */}
         <div className="mt-12 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <p className="text-gray-600 text-xs">
-            BYS Formation — Stages agrees de recuperation de points
+            BYS Permis — Stages agrees de recuperation de points
           </p>
         </div>
       </div>
