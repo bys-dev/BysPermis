@@ -16,7 +16,7 @@ import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/email";
 import { logEmail } from "@/lib/email-log";
 import type { Prisma, ProspectStatus } from "@/generated/prisma/client";
-import { renderCampaignEmail } from "./template";
+import { renderCampaignEmail, unsubscribeUrl, type TemplateProspect } from "./template";
 
 const RAW_FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
 
@@ -49,7 +49,20 @@ export const CRON_CADENCE_MINUTES = 5;
 
 // ─── Ciblage ─────────────────────────────────────────────
 
+/**
+ * Deux façons de désigner les destinataires :
+ *
+ *  - `FILTRE` (défaut) — ciblage par critères ; la liste peut évoluer entre la
+ *    rédaction et l'envoi (un import qui arrive entre-temps s'y ajoute).
+ *  - `SELECTION` — liste nominative : le staff a coché des centres un par un.
+ *    C'est exactement ces fiches qui partent, ni plus ni moins.
+ */
+export type AudienceMode = "FILTRE" | "SELECTION";
+
 export interface AudienceFilter {
+  mode?: AudienceMode;
+  /** Fiches cochées à la main. Seul critère retenu en mode `SELECTION`. */
+  prospectIds?: string[];
   statuts?: ProspectStatus[];
   departements?: string[];
   villes?: string[];
@@ -70,7 +83,8 @@ export interface AudienceFilter {
  * Les quatre premières conditions ne sont pas négociables et ne dépendent
  * d'aucun filtre : sans email valide et sans consentement (absence
  * d'opposition), un prospect n'est jamais destinataire. C'est ce qui garantit
- * qu'une désinscription est définitive, quelle que soit la campagne suivante.
+ * qu'une désinscription est définitive, quelle que soit la campagne suivante —
+ * y compris quand le staff a coché la fiche à la main.
  */
 export function buildAudienceWhere(filter: AudienceFilter = {}): Prisma.ProspectWhereInput {
   const where: Prisma.ProspectWhereInput = {
@@ -79,6 +93,14 @@ export function buildAudienceWhere(filter: AudienceFilter = {}): Prisma.Prospect
     unsubscribedAt: null,
     statut: { notIn: ["DESABONNE", "INJOIGNABLE"] },
   };
+
+  // Liste nominative : les critères de ciblage n'ont plus de sens et ne sont
+  // pas appliqués. `in: []` ne remonte rien — une sélection vide ne peut pas
+  // se transformer en « tout le fichier ».
+  if (filter.mode === "SELECTION") {
+    where.id = { in: filter.prospectIds ?? [] };
+    return where;
+  }
 
   if (filter.statuts?.length) {
     // On intersecte avec l'exclusion obligatoire ci-dessus.
@@ -176,6 +198,54 @@ export async function prepareCampaign(campaignId: string): Promise<{ totalCibles
 
 // ─── Envoi ───────────────────────────────────────────────
 
+/** Un message de campagne, tel qu'il est remis au fournisseur d'envoi. */
+export interface CampaignMessage {
+  from: string;
+  /** Adresse unique : un message par destinataire, jamais une liste. */
+  to: string;
+  subject: string;
+  html: string;
+  replyTo?: string;
+  headers: Record<string, string>;
+}
+
+/**
+ * Construit le message destiné à un prospect.
+ *
+ * Un message = un destinataire. Il n'y a ni `cc` ni `bcc`, et `to` ne contient
+ * jamais plus d'une adresse : deux centres démarchés ne peuvent pas découvrir
+ * leurs coordonnées mutuelles dans l'en-tête du message qu'ils reçoivent. Le
+ * corps est rendu fiche par fiche, donc personnalisé pour chacun.
+ */
+export function buildCampaignMessage(params: {
+  campaign: { sujet: string; contenu: string; fromName?: string | null; replyTo?: string | null };
+  /** Adresse figée au ciblage — le prospect a pu changer d'email depuis. */
+  email: string;
+  prospect: TemplateProspect;
+}): CampaignMessage {
+  const rendu = renderCampaignEmail({
+    sujet: params.campaign.sujet,
+    contenu: params.campaign.contenu,
+    fromName: params.campaign.fromName,
+    prospect: params.prospect,
+  });
+
+  return {
+    from: buildFrom(params.campaign.fromName),
+    to: params.email,
+    subject: rendu.subject,
+    html: rendu.html,
+    ...(params.campaign.replyTo ? { replyTo: params.campaign.replyTo } : {}),
+    headers: {
+      // En-tête standard : certains clients affichent un bouton natif de
+      // désinscription, ce qui vaut mieux qu'un signalement en spam. Il pointe
+      // vers la même URL que le lien du pied de page.
+      "List-Unsubscribe": `<${unsubscribeUrl(params.prospect.unsubscribeToken)}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  };
+}
+
 export interface SendBatchResult {
   envoyes: number;
   echecs: number;
@@ -268,30 +338,15 @@ export async function sendCampaignBatch(
   let echecs = 0;
 
   if (sendable.length > 0) {
-    const from = buildFrom(campaign.fromName);
-    const rendered = sendable.map((recipient) => {
-      const email = renderCampaignEmail({
-        sujet: campaign.sujet,
-        contenu: campaign.contenu,
-        fromName: campaign.fromName,
-        prospect: { ...recipient.prospect, unsubscribeToken: recipient.prospect.unsubscribeToken },
-      });
-      return { recipient, email };
-    });
-
-    const payload = rendered.map(({ recipient, email }) => ({
-      from,
-      to: recipient.email,
-      subject: email.subject,
-      html: email.html,
-      ...(campaign.replyTo ? { replyTo: campaign.replyTo } : {}),
-      headers: {
-        // En-tête standard : certains clients affichent un bouton natif de
-        // désinscription, ce qui vaut mieux qu'un signalement en spam.
-        "List-Unsubscribe": `<${process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr"}/desabonnement/${recipient.prospect.unsubscribeToken}>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-      },
-    }));
+    // Un message par destinataire : l'API batch n'est qu'un moyen de les
+    // expédier en un seul appel réseau, pas un envoi groupé.
+    const payload = sendable.map((recipient) =>
+      buildCampaignMessage({
+        campaign,
+        email: recipient.email,
+        prospect: recipient.prospect,
+      }),
+    );
 
     const { data, error } = await resend.batch.send(payload);
 
@@ -317,7 +372,7 @@ export async function sendCampaignBatch(
       const now = new Date();
 
       await Promise.all(
-        rendered.map(async ({ recipient }, index) => {
+        sendable.map(async (recipient, index) => {
           const providerId = ids[index]?.id ?? null;
           await prisma.campaignRecipient.update({
             where: { id: recipient.id },
@@ -342,7 +397,7 @@ export async function sendCampaignBatch(
         }),
       );
 
-      envoyes = rendered.length;
+      envoyes = sendable.length;
       await logEmail({
         destinataire: `${envoyes} destinataires (campagne ${campaign.nom})`,
         sujet: campaign.sujet,

@@ -11,63 +11,33 @@ import {
   faTriangleExclamation,
   faCircleCheck,
   faCode,
+  faFilter,
+  faListCheck,
+  faBookmark,
+  faUserLock,
 } from "@fortawesome/free-solid-svg-icons";
+import BibliothequeModeles from "./BibliothequeModeles";
+import SelecteurDestinataires from "./SelecteurDestinataires";
+import {
+  STATUTS_CIBLABLES,
+  inputClass,
+  type AudienceFilter,
+  type CampagneForm,
+  type Facettes,
+  type Modele,
+  type ModeCiblage,
+  type Statut,
+  type Variable,
+} from "./types";
 
-// ─── Types ───────────────────────────────────────────────
+export type { CampagneForm } from "./types";
 
-type Statut =
-  | "NOUVEAU"
-  | "A_CONTACTER"
-  | "CONTACTE"
-  | "RELANCE"
-  | "INTERESSE"
-  | "INSCRIT"
-  | "REFUSE"
-  | "INJOIGNABLE"
-  | "DESABONNE";
-
-export interface AudienceFilter {
-  statuts?: Statut[];
-  departements?: string[];
-  sources?: string[];
-  exclureDejaContactes?: boolean;
-  exclureCampagneIds?: string[];
+interface ImportFichier {
+  id: string;
+  filename: string;
+  createdAt: string;
+  _count?: { prospects: number };
 }
-
-export interface CampagneForm {
-  id?: string;
-  nom: string;
-  sujet: string;
-  contenu: string;
-  fromName: string;
-  replyTo: string;
-  filtre: AudienceFilter;
-}
-
-interface Variable {
-  key: string;
-  label: string;
-  example: string;
-}
-
-interface Facettes {
-  departements: { valeur: string; nb: number }[];
-  sources: { valeur: string; nb: number }[];
-}
-
-// Les statuts non ciblables sont volontairement absents : un désabonné ou un
-// email injoignable ne peut pas être destinataire, quel que soit le filtre.
-const STATUTS_CIBLABLES: { value: Statut; label: string }[] = [
-  { value: "NOUVEAU", label: "Nouveau" },
-  { value: "A_CONTACTER", label: "À contacter" },
-  { value: "CONTACTE", label: "Contacté" },
-  { value: "RELANCE", label: "Relancé" },
-  { value: "INTERESSE", label: "Intéressé" },
-  { value: "REFUSE", label: "Refusé" },
-];
-
-const inputClass =
-  "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500";
 
 const MODELE_DEFAUT = `<p>{{salutation}}</p>
 
@@ -82,6 +52,22 @@ via la plateforme.</p>
 <a href="{{lienInscription}}">{{lienInscription}}</a></p>
 
 <p>Bien cordialement,</p>`;
+
+/**
+ * Formulaire d'une campagne vierge. Le ciblage par défaut vise les fiches
+ * jamais travaillées ; passer un filtre permet d'ouvrir directement l'éditeur
+ * sur une sélection venue d'un autre écran.
+ */
+export function nouvelleCampagne(filtre?: AudienceFilter): CampagneForm {
+  return {
+    nom: "",
+    sujet: "",
+    contenu: MODELE_DEFAUT,
+    fromName: "BYS Permis",
+    replyTo: "",
+    filtre: filtre ?? { mode: "FILTRE", statuts: ["NOUVEAU", "A_CONTACTER"], exclureDejaContactes: true },
+  };
+}
 
 export default function CampaignEditor({
   initial,
@@ -101,15 +87,19 @@ export default function CampaignEditor({
       contenu: MODELE_DEFAUT,
       fromName: "BYS Permis",
       replyTo: "",
-      filtre: { statuts: ["NOUVEAU", "A_CONTACTER"], exclureDejaContactes: true },
+      filtre: { mode: "FILTRE", statuts: ["NOUVEAU", "A_CONTACTER"], exclureDejaContactes: true },
     },
   );
   const [facettes, setFacettes] = useState<Facettes>({ departements: [], sources: [] });
+  const [imports, setImports] = useState<ImportFichier[]>([]);
   const [cibles, setCibles] = useState<number | null>(null);
   const [comptage, setComptage] = useState(false);
-  const [apercu, setApercu] = useState<{ sujet: string; html: string; vides: string[] } | null>(null);
+  const [apercu, setApercu] = useState<{ sujet: string; html: string; vides: string[]; centre: string | null } | null>(
+    null,
+  );
   const [chargementApercu, setChargementApercu] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
+  const [sauvegardeModele, setSauvegardeModele] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [emailTest, setEmailTest] = useState("");
@@ -117,11 +107,17 @@ export default function CampaignEditor({
 
   const contenuRef = useRef<HTMLTextAreaElement>(null);
 
-  // ── Facettes de ciblage ──
+  const mode: ModeCiblage = form.filtre.mode ?? "FILTRE";
+  const selection = form.filtre.prospectIds ?? [];
+
+  // ── Facettes de ciblage et historique d'imports ──
   useEffect(() => {
     fetch("/api/admin/prospects/imports")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => d?.facettes && setFacettes(d.facettes))
+      .then((d) => {
+        if (d?.facettes) setFacettes(d.facettes);
+        if (d?.imports) setImports(d.imports);
+      })
       .catch(() => {});
   }, []);
 
@@ -168,14 +164,85 @@ export default function CampaignEditor({
     });
   };
 
-  const voirApercu = async () => {
+  /**
+   * Applique un modèle au formulaire.
+   *
+   * Le ciblage conseillé n'écrase jamais une sélection nominative en cours :
+   * on ne fait pas perdre au staff les centres qu'il vient de cocher un par un.
+   */
+  const appliquerModele = (m: Modele) => {
+    setErreur(null);
+    setForm((f) => ({
+      ...f,
+      nom: f.nom.trim() || m.nom,
+      sujet: m.sujet,
+      contenu: m.contenu,
+      fromName: m.fromName ?? f.fromName,
+      replyTo: m.replyTo ?? f.replyTo,
+      filtre:
+        (f.filtre.mode ?? "FILTRE") === "SELECTION" || !m.filtreSuggere
+          ? f.filtre
+          : { mode: "FILTRE", ...m.filtreSuggere },
+    }));
+    setApercu(null);
+    setMessage(`Modèle « ${m.nom} » chargé — le texte reste librement modifiable.`);
+  };
+
+  const enregistrerCommeModele = async () => {
+    if (!form.sujet.trim() || !form.contenu.trim()) {
+      setErreur("Renseignez l'objet et le contenu avant d'en faire un modèle.");
+      return;
+    }
+    setSauvegardeModele(true);
+    setErreur(null);
+    setMessage(null);
+    try {
+      // Un modèle est réutilisable : ni la sélection nominative ni le fichier
+      // d'import du moment n'y ont leur place, seuls les critères durables.
+      const criteres: AudienceFilter = {};
+      if (form.filtre.statuts?.length) criteres.statuts = form.filtre.statuts;
+      if (form.filtre.departements?.length) criteres.departements = form.filtre.departements;
+      if (form.filtre.sources?.length) criteres.sources = form.filtre.sources;
+      if (form.filtre.exclureDejaContactes) criteres.exclureDejaContactes = true;
+
+      const res = await fetch("/api/admin/prospects/modeles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom: form.nom.trim() || form.sujet.trim().slice(0, 80),
+          sujet: form.sujet,
+          contenu: form.contenu,
+          fromName: form.fromName || null,
+          replyTo: form.replyTo || null,
+          filtreSuggere: Object.keys(criteres).length ? criteres : null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErreur(data?.error ?? "Enregistrement du modèle impossible.");
+        return;
+      }
+      setMessage("Modèle ajouté à la bibliothèque.");
+    } catch {
+      setErreur("Impossible de contacter le serveur.");
+    } finally {
+      setSauvegardeModele(false);
+    }
+  };
+
+  const voirApercu = async (prospectId?: string) => {
     setChargementApercu(true);
     setErreur(null);
     try {
       const res = await fetch("/api/admin/campagnes/apercu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sujet: form.sujet, contenu: form.contenu, fromName: form.fromName || null }),
+        body: JSON.stringify({
+          sujet: form.sujet,
+          contenu: form.contenu,
+          fromName: form.fromName || null,
+          prospectId: prospectId ?? null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -185,7 +252,12 @@ export default function CampaignEditor({
       if (data.validation?.errors?.length) {
         setErreur(data.validation.errors.join(" "));
       }
-      setApercu({ sujet: data.sujet, html: data.html, vides: data.variablesVides ?? [] });
+      setApercu({
+        sujet: data.sujet,
+        html: data.html,
+        vides: data.variablesVides ?? [],
+        centre: data.prospectUtilise?.nom ?? null,
+      });
     } catch {
       setErreur("Impossible de générer l'aperçu.");
     } finally {
@@ -260,8 +332,14 @@ export default function CampaignEditor({
     });
   };
 
-  const multiSelect = (valeurs: string[], cle: "departements" | "sources") =>
+  const multiSelect = (valeurs: string[], cle: "departements" | "sources" | "importIds") =>
     setForm((f) => ({ ...f, filtre: { ...f.filtre, [cle]: valeurs.length ? valeurs : undefined } }));
+
+  const changerMode = (nouveau: ModeCiblage) =>
+    setForm((f) => ({ ...f, filtre: { ...f.filtre, mode: nouveau } }));
+
+  const changerSelection = (ids: string[]) =>
+    setForm((f) => ({ ...f, filtre: { ...f.filtre, mode: "SELECTION", prospectIds: ids } }));
 
   return (
     <div className="rounded-xl border border-white/10 p-6 space-y-6" style={{ background: "#0D1D3A" }}>
@@ -291,6 +369,8 @@ export default function CampaignEditor({
           <p className="text-green-300 text-xs">{message}</p>
         </div>
       )}
+
+      <BibliothequeModeles onChoisir={appliquerModele} ouvertParDefaut={!form.id} />
 
       {/* ── Identité de la campagne ── */}
       <div className="grid sm:grid-cols-3 gap-4">
@@ -368,17 +448,32 @@ export default function CampaignEditor({
           rows={14}
           className={`${inputClass} font-mono text-xs leading-relaxed`}
         />
-        <p className="text-gray-600 text-[11px] mt-1.5">
-          Le pied de page (identité de l&apos;expéditeur et lien de désinscription) est ajouté
-          automatiquement à chaque envoi — obligatoire pour le démarchage.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-1.5">
+          <p className="text-gray-600 text-[11px] flex-1 min-w-[240px]">
+            Le pied de page (identité de l&apos;expéditeur et lien de désinscription) est ajouté
+            automatiquement à chaque envoi — obligatoire pour le démarchage.
+          </p>
+          <button
+            type="button"
+            onClick={enregistrerCommeModele}
+            disabled={sauvegardeModele}
+            className="px-3 py-1.5 rounded-lg border border-white/15 text-gray-300 text-xs hover:border-blue-500 hover:text-white disabled:opacity-40 transition-colors inline-flex items-center gap-2 shrink-0"
+          >
+            {sauvegardeModele ? (
+              <FontAwesomeIcon icon={faSpinner} spin />
+            ) : (
+              <FontAwesomeIcon icon={faBookmark} />
+            )}
+            Enregistrer comme modèle
+          </button>
+        </div>
       </div>
 
       {/* ── Ciblage ── */}
       <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <p className="text-white text-sm font-semibold flex items-center gap-2">
-            <FontAwesomeIcon icon={faUsers} className="text-blue-400" /> Ciblage
+            <FontAwesomeIcon icon={faUsers} className="text-blue-400" /> Destinataires
           </p>
           <p className="text-sm">
             {comptage ? (
@@ -393,102 +488,173 @@ export default function CampaignEditor({
           </p>
         </div>
 
-        <div>
-          <p className="text-gray-400 text-xs mb-2">Statuts inclus</p>
-          <div className="flex flex-wrap gap-2">
-            {STATUTS_CIBLABLES.map((s) => {
-              const actif = (form.filtre.statuts ?? []).includes(s.value);
-              return (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => basculerStatut(s.value)}
-                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                    actif
-                      ? "bg-blue-500/20 border-blue-500/50 text-blue-200"
-                      : "bg-white/5 border-white/10 text-gray-400 hover:border-white/25"
-                  }`}
+        {/* Choix du mode */}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => changerMode("FILTRE")}
+            className={`flex-1 px-3 py-2.5 rounded-lg border text-xs font-medium transition-colors inline-flex items-center justify-center gap-2 ${
+              mode === "FILTRE"
+                ? "bg-blue-500/20 border-blue-500/50 text-blue-200"
+                : "bg-white/5 border-white/10 text-gray-400 hover:border-white/25"
+            }`}
+          >
+            <FontAwesomeIcon icon={faFilter} /> Par critères
+          </button>
+          <button
+            type="button"
+            onClick={() => changerMode("SELECTION")}
+            className={`flex-1 px-3 py-2.5 rounded-lg border text-xs font-medium transition-colors inline-flex items-center justify-center gap-2 ${
+              mode === "SELECTION"
+                ? "bg-blue-500/20 border-blue-500/50 text-blue-200"
+                : "bg-white/5 border-white/10 text-gray-400 hover:border-white/25"
+            }`}
+          >
+            <FontAwesomeIcon icon={faListCheck} /> Liste choisie à la main
+            {selection.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded bg-blue-500/30 text-blue-100 text-[10px]">
+                {selection.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {mode === "SELECTION" ? (
+          <SelecteurDestinataires
+            selection={selection}
+            onChange={changerSelection}
+            facettes={facettes}
+            onApercu={(prospectId) => voirApercu(prospectId)}
+          />
+        ) : (
+          <>
+            <div>
+              <p className="text-gray-400 text-xs mb-2">Statuts inclus</p>
+              <div className="flex flex-wrap gap-2">
+                {STATUTS_CIBLABLES.map((s) => {
+                  const actif = (form.filtre.statuts ?? []).includes(s.value);
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => basculerStatut(s.value)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                        actif
+                          ? "bg-blue-500/20 border-blue-500/50 text-blue-200"
+                          : "bg-white/5 border-white/10 text-gray-400 hover:border-white/25"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-gray-600 text-[11px] mt-2">
+                Aucun statut sélectionné = tous les prospects contactables.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-400 text-xs mb-1.5">
+                  Départements <span className="text-gray-600">(Ctrl pour plusieurs)</span>
+                </label>
+                <select
+                  multiple
+                  value={form.filtre.departements ?? []}
+                  onChange={(e) =>
+                    multiSelect(
+                      Array.from(e.target.selectedOptions, (o) => o.value),
+                      "departements",
+                    )
+                  }
+                  className={`${inputClass} h-28`}
                 >
-                  {s.label}
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-gray-600 text-[11px] mt-2">
-            Aucun statut sélectionné = tous les prospects contactables.
+                  {facettes.departements.map((d) => (
+                    <option key={d.valeur} value={d.valeur}>
+                      {d.valeur} ({d.nb})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-400 text-xs mb-1.5">Sources</label>
+                <select
+                  multiple
+                  value={form.filtre.sources ?? []}
+                  onChange={(e) =>
+                    multiSelect(
+                      Array.from(e.target.selectedOptions, (o) => o.value),
+                      "sources",
+                    )
+                  }
+                  className={`${inputClass} h-28`}
+                >
+                  {facettes.sources.map((s) => (
+                    <option key={s.valeur} value={s.valeur}>
+                      {s.valeur} ({s.nb})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-400 text-xs mb-1.5">Fichiers importés</label>
+                <select
+                  multiple
+                  value={form.filtre.importIds ?? []}
+                  onChange={(e) =>
+                    multiSelect(
+                      Array.from(e.target.selectedOptions, (o) => o.value),
+                      "importIds",
+                    )
+                  }
+                  className={`${inputClass} h-28`}
+                >
+                  {imports.map((i) => (
+                    <option key={i.id} value={i.id}>
+                      {i.filename} ({i._count?.prospects ?? 0})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.filtre.exclureDejaContactes ?? false}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, filtre: { ...f.filtre, exclureDejaContactes: e.target.checked } }))
+                }
+                className="rounded border-white/20 bg-white/5"
+              />
+              <span className="text-gray-300 text-xs">
+                N&apos;inclure que les prospects jamais contactés par email
+              </span>
+            </label>
+          </>
+        )}
+
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 flex items-start gap-2.5">
+          <FontAwesomeIcon icon={faUserLock} className="text-blue-400 mt-0.5 text-sm" />
+          <p className="text-gray-400 text-[11px] leading-relaxed">
+            <span className="text-gray-200">Chaque centre reçoit son propre email</span>, adressé à lui
+            seul et personnalisé avec ses données. Aucun destinataire n&apos;est en copie et personne ne
+            voit les autres adresses.
+            <br />
+            Les prospects sans email, avec une adresse invalide ou opposés au démarchage sont toujours
+            exclus, quel que soit le ciblage.
           </p>
         </div>
-
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-400 text-xs mb-1.5">
-              Départements <span className="text-gray-600">(Ctrl pour plusieurs)</span>
-            </label>
-            <select
-              multiple
-              value={form.filtre.departements ?? []}
-              onChange={(e) =>
-                multiSelect(
-                  Array.from(e.target.selectedOptions, (o) => o.value),
-                  "departements",
-                )
-              }
-              className={`${inputClass} h-28`}
-            >
-              {facettes.departements.map((d) => (
-                <option key={d.valeur} value={d.valeur}>
-                  {d.valeur} ({d.nb})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-400 text-xs mb-1.5">Sources</label>
-            <select
-              multiple
-              value={form.filtre.sources ?? []}
-              onChange={(e) =>
-                multiSelect(
-                  Array.from(e.target.selectedOptions, (o) => o.value),
-                  "sources",
-                )
-              }
-              className={`${inputClass} h-28`}
-            >
-              {facettes.sources.map((s) => (
-                <option key={s.valeur} value={s.valeur}>
-                  {s.valeur} ({s.nb})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.filtre.exclureDejaContactes ?? false}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, filtre: { ...f.filtre, exclureDejaContactes: e.target.checked } }))
-            }
-            className="rounded border-white/20 bg-white/5"
-          />
-          <span className="text-gray-300 text-xs">
-            N&apos;inclure que les prospects jamais contactés par email
-          </span>
-        </label>
-
-        <p className="text-gray-600 text-[11px]">
-          Les prospects sans email, avec une adresse invalide ou opposés au démarchage sont
-          toujours exclus, quel que soit le filtre.
-        </p>
       </div>
 
       {/* ── Aperçu ── */}
       {apercu && (
         <div className="rounded-lg border border-white/10 overflow-hidden">
           <div className="px-4 py-2.5 bg-white/5 border-b border-white/10">
-            <p className="text-gray-400 text-[11px]">Objet</p>
+            <p className="text-gray-400 text-[11px]">
+              Objet {apercu.centre && <span className="text-gray-500">— aperçu pour {apercu.centre}</span>}
+            </p>
             <p className="text-white text-sm font-medium">{apercu.sujet || "(vide)"}</p>
             {apercu.vides.length > 0 && (
               <p className="text-orange-300 text-[11px] mt-1">
@@ -516,7 +682,7 @@ export default function CampaignEditor({
         </button>
 
         <button
-          onClick={voirApercu}
+          onClick={() => voirApercu()}
           disabled={chargementApercu}
           className="px-5 py-2.5 rounded-lg border border-white/15 text-gray-300 text-sm font-semibold hover:border-blue-500 hover:text-white disabled:opacity-40 transition-colors inline-flex items-center gap-2"
         >

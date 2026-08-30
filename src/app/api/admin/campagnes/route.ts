@@ -9,20 +9,7 @@ import {
   type AudienceFilter,
 } from "@/lib/prospects/campaign";
 import { PROSPECT_TEMPLATE_VARIABLES, validateCampaignTemplate } from "@/lib/prospects/template";
-
-const AudienceFilterSchema = z.object({
-  statuts: z
-    .array(z.enum(["NOUVEAU", "A_CONTACTER", "CONTACTE", "RELANCE", "INTERESSE", "INSCRIT", "REFUSE", "INJOIGNABLE", "DESABONNE"]))
-    .optional(),
-  departements: z.array(z.string().max(5)).optional(),
-  villes: z.array(z.string().max(120)).optional(),
-  sources: z.array(z.string().max(100)).optional(),
-  importIds: z.array(z.string()).optional(),
-  scoreMin: z.number().int().min(0).max(100).optional(),
-  exclureDejaContactes: z.boolean().optional(),
-  exclureCampagneIds: z.array(z.string()).optional(),
-  recherche: z.string().max(200).optional(),
-});
+import { AudienceFilterSchema } from "@/lib/prospects/audience-schema";
 
 const CreateCampaignSchema = z.object({
   nom: z.string().min(2, "Nom de campagne requis").max(150),

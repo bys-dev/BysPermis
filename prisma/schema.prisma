@@ -273,9 +273,10 @@ model User {
   centreDocsVerifies     CentreVerificationDocument[] @relation("CentreDocsVerifies")
 
   // Prospection sortante (staff commercial)
-  prospectsAssignes      Prospect[]       @relation("ProspectsAssignes")
-  prospectImports        ProspectImport[] @relation("ProspectImports")
-  campagnesCreees        EmailCampaign[]  @relation("CampagnesCreees")
+  prospectsAssignes      Prospect[]              @relation("ProspectsAssignes")
+  prospectImports        ProspectImport[]        @relation("ProspectImports")
+  campagnesCreees        EmailCampaign[]         @relation("CampagnesCreees")
+  modelesProspection     ProspectEmailTemplate[] @relation("ModelesProspection")
 
   @@map("users")
 }
@@ -633,6 +634,51 @@ model CampaignRecipient {
   @@index([campaignId, status])
   @@index([providerId])
   @@map("campaign_recipients")
+}
+
+// ─── PROSPECTION : BIBLIOTHÈQUE DE MODÈLES ───────────────
+
+/// Modèle d'email de démarchage, éditable par le staff.
+///
+/// Un modèle est un *point de départ* : il est copié dans la campagne, qui vit
+/// ensuite sa propre vie. Modifier un modèle ne réécrit donc jamais une
+/// campagne déjà rédigée — et encore moins un email déjà parti.
+model ProspectEmailTemplate {
+  id String @id @default(cuid())
+
+  /// Identifiant stable des modèles livrés avec la plateforme (`premier-contact`,
+  /// `relance-1`…), `null` pour un modèle créé par le staff. Sert à réinstaller
+  /// le catalogue de base sans dupliquer ce qui existe déjà.
+  slug String? @unique
+
+  nom String
+  /// Moment de la séquence où le modèle s'emploie ("Étape 2 — 7 jours après").
+  moment   String?
+  objectif String?
+
+  sujet   String
+  contenu String // HTML avec placeholders {{variable}}
+
+  fromName String?
+  replyTo  String?
+
+  /// Ciblage conseillé, pré-appliqué au chargement du modèle : { statuts, … }.
+  filtreSuggere Json?
+  /// Délai indicatif depuis l'étape précédente de la séquence, en jours.
+  delaiJours Int?
+
+  ordre     Int     @default(0)
+  /// Archivé plutôt que supprimé : les campagnes passées gardent leur sens.
+  isArchive Boolean @default(false)
+
+  createdById String?
+  createdBy   User?   @relation("ModelesProspection", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isArchive, ordre])
+  @@map("prospect_email_templates")
 }
 
 // ─── MEMBRES D'UN CENTRE (formateurs, admins, secrétaires) ──

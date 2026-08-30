@@ -1,21 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { requireCommercial, mapAuthError } from "@/lib/auth0";
 import { countAudience, sampleAudience, type AudienceFilter } from "@/lib/prospects/campaign";
-
-const FilterSchema = z.object({
-  statuts: z
-    .array(z.enum(["NOUVEAU", "A_CONTACTER", "CONTACTE", "RELANCE", "INTERESSE", "INSCRIT", "REFUSE", "INJOIGNABLE", "DESABONNE"]))
-    .optional(),
-  departements: z.array(z.string().max(5)).optional(),
-  villes: z.array(z.string().max(120)).optional(),
-  sources: z.array(z.string().max(100)).optional(),
-  importIds: z.array(z.string()).optional(),
-  scoreMin: z.number().int().min(0).max(100).optional(),
-  exclureDejaContactes: z.boolean().optional(),
-  exclureCampagneIds: z.array(z.string()).optional(),
-  recherche: z.string().max(200).optional(),
-});
+import { AudienceFilterSchema } from "@/lib/prospects/audience-schema";
 
 /**
  * POST /api/admin/campagnes/audience
@@ -32,7 +18,7 @@ export async function POST(req: NextRequest) {
     await requireCommercial();
 
     const body = await req.json().catch(() => ({}));
-    const parsed = FilterSchema.safeParse(body?.filtre ?? body ?? {});
+    const parsed = AudienceFilterSchema.safeParse(body?.filtre ?? body ?? {});
     if (!parsed.success) {
       return NextResponse.json({ error: "Filtre invalide", details: parsed.error.flatten() }, { status: 400 });
     }
