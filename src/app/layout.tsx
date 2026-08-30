@@ -31,8 +31,8 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://byspermis.fr";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "BYS Formation Permis — Stages agréés de récupération de points",
-    template: "%s | BYS Formation Permis",
+    default: "BYS Permis — Stages agréés de récupération de points",
+    template: "%s | BYS Permis",
   },
   description:
     "Trouvez et réservez votre stage de récupération de points du permis de conduire. Tous nos centres sont agréés Ministère de l'Intérieur. Récupérez jusqu'à 4 points en 2 jours.",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     "récupérer points permis",
     "stage sensibilisation sécurité routière",
     "stage agréé préfecture",
-    "BYS Formation Permis",
+    "BYS Permis",
   ],
   alternates: { canonical: "/" },
   // Sans ces directives, Google plafonne les extraits à ~160 caractères et
@@ -66,13 +66,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    siteName: "BYS Formation Permis",
+    siteName: "BYS Permis",
     url: APP_URL,
     images: [{ url: "/opengraph-image" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BYS Formation Permis — Stages agréés de récupération de points",
+    title: "BYS Permis — Stages agréés de récupération de points",
     description:
       "Trouvez et réservez votre stage de récupération de points du permis de conduire. Centres agréés Ministère de l'Intérieur.",
     images: ["/opengraph-image"],

@@ -1,6 +1,6 @@
-# Guide de recette — BYS Formation Permis
+# Guide de recette — BYS Permis
 
-> Document à l'attention de **Sébastien (BYS Formation)**
+> Document à l'attention de **Sébastien (BYS Permis)**
 > Préparé par Andrys MAGAR — Version du 20/05/2026
 >
 > **URL de test** : `https://bys-permis-git-staging.vercel.app`
@@ -24,7 +24,7 @@
 Vous êtes sur un **environnement de test**. Concrètement :
 
 - **Aucun paiement réel** ne sera effectué. Utilisez la carte de test ci-dessous.
-- Les emails de test sont envoyés depuis `noreply@bys-permis.fr`. Vérifiez aussi vos **spams**.
+- Les emails de test sont envoyés depuis `noreply@byspermis.fr`. Vérifiez aussi vos **spams**.
 - La base de données est **réinitialisable** : si vous cassez quelque chose, ce n'est pas grave.
 
 ### Carte bancaire de test Stripe
@@ -49,7 +49,7 @@ Vous testez le site **sans être connecté**. C'est ce que verra un nouveau visi
 
 ### 1.1 Page d'accueil
 - [ ] Ouvrir l'URL du site
-- [ ] Vérifier que le **logo BYS Formation** s'affiche en haut à gauche
+- [ ] Vérifier que le **logo BYS Permis** s'affiche en haut à gauche
 - [ ] Vérifier que le bandeau « Agréé Ministère de l'Intérieur » est visible
 - [ ] Lire le hero : « Récupérez vos points près de chez vous au meilleur prix »
 - [ ] Tester la **barre de recherche** : taper « Paris » dans Où ? → cliquer Rechercher
@@ -103,7 +103,7 @@ C'est le parcours le plus critique : un élève réserve un stage.
 Vérifier que vous recevez **2 emails** dans la minute qui suit :
 
 - [ ] Email **« Confirmation de réservation »**
-  - [ ] Logo BYS Formation visible en en-tête
+  - [ ] Logo BYS Permis visible en en-tête
   - [ ] Numéro de réservation affiché
   - [ ] **Facture PDF jointe** au mail
   - [ ] Ouvrir la facture → vérifier les infos (votre nom, montant, TVA 0%, SIRET BYS, IBAN BYS)
@@ -139,7 +139,7 @@ Vous testez l'expérience d'un centre de formation partenaire.
 ### 3.1 Inscription centre
 - [ ] Cliquer sur **« Espace Pro »** dans le menu
 - [ ] Cliquer sur **« Devenir centre partenaire »**
-- [ ] Remplir le formulaire (utilisez les vraies infos BYS Formation)
+- [ ] Remplir le formulaire (utilisez les vraies infos BYS Permis)
 - [ ] Valider → vous recevez un **email d'invitation** avec lien de connexion
 
 ### 3.2 Onboarding centre
@@ -157,7 +157,7 @@ Vous testez l'expérience d'un centre de formation partenaire.
 ### 3.3 Stripe Connect
 - [ ] Aller dans **Paramètres → Paiement**
 - [ ] Cliquer sur **« Connecter mon compte Stripe »**
-- [ ] Remplir le formulaire Stripe (RIB de BYS Formation, pièce d'identité)
+- [ ] Remplir le formulaire Stripe (RIB de BYS Permis, pièce d'identité)
 - [ ] Revenir sur le site → vérifier que **« Stripe connecté »** s'affiche en vert
 
 ### 3.4 Créer un stage
@@ -319,7 +319,7 @@ Une fois tous les tests effectués, signez ci-dessous pour valider le passage en
 
 _______________________
 
-Sébastien — BYS Formation
+Sébastien — BYS Permis
 
 
 ---

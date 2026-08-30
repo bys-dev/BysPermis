@@ -1,6 +1,6 @@
 # Guide Ads, SEO & Tracking — BYS Permis
 
-> Destinataire : Sébastien (BYS Formation) — questions techniques : Andrys (`andrys.developper@gmail.com`)
+> Destinataire : Sébastien (BYS Permis) — questions techniques : Andrys (`andrys.developper@gmail.com`)
 > Date : 2026-05-18 — V1 mise en place du tracking et du référencement
 
 Ce document décrit (1) ce qui est **déjà en place techniquement** dans le code, et (2) ce que **Sébastien doit fournir / configurer côté plateformes** (Google, Meta) pour que tout soit opérationnel.
@@ -62,22 +62,22 @@ Tous les scripts sont **chargés conditionnellement** : si la variable d'environ
 
 1. Aller sur https://analytics.google.com → **Administration**
 2. Créer une propriété "BYS Permis" (zone horaire Paris, devise EUR)
-3. Créer un flux de données **Web** pour `https://bys-permis.fr`
+3. Créer un flux de données **Web** pour `https://byspermis.fr`
 4. Copier l'**ID de mesure** (format `G-XXXXXXXXXX`)
 5. Me le transmettre — je le mettrai dans la variable `NEXT_PUBLIC_GA4_ID` sur Vercel
 
 ### 2.2 Google Search Console (SEO)
 
 1. Aller sur https://search.google.com/search-console
-2. Ajouter la propriété `bys-permis.fr` (méthode "préfixe d'URL")
+2. Ajouter la propriété `byspermis.fr` (méthode "préfixe d'URL")
 3. Choisir la méthode de vérification **balise HTML** : Google fournira un code du type `<meta name="google-site-verification" content="xxx" />`
 4. Me transmettre la valeur **xxx** → variable `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
-5. Une fois la propriété validée, soumettre le sitemap : `https://bys-permis.fr/sitemap.xml`
+5. Une fois la propriété validée, soumettre le sitemap : `https://byspermis.fr/sitemap.xml`
 
 ### 2.3 Bing Webmaster Tools (SEO Bing/DuckDuckGo)
 
 1. Aller sur https://www.bing.com/webmasters
-2. Ajouter `bys-permis.fr` (option : importer depuis Google Search Console pour gagner du temps)
+2. Ajouter `byspermis.fr` (option : importer depuis Google Search Console pour gagner du temps)
 3. Méthode meta tag : `<meta name="msvalidate.01" content="xxx" />`
 4. Me transmettre la valeur **xxx** → variable `NEXT_PUBLIC_BING_SITE_VERIFICATION`
 
@@ -85,7 +85,7 @@ Tous les scripts sont **chargés conditionnellement** : si la variable d'environ
 
 > Étape ouverte une fois Google Analytics opérationnel : lier les deux comptes.
 
-1. Créer un compte Google Ads sur https://ads.google.com (compte BYS Formation)
+1. Créer un compte Google Ads sur https://ads.google.com (compte BYS Permis)
 2. Menu **Outils & paramètres** → **Mesures** → **Conversions** → **+ Nouvelle action de conversion**
 3. Choisir **Site Web** → catégorie **Achat**
 4. Configuration : valeur dynamique (€), comptage "Une", fenêtre 30 jours
@@ -101,7 +101,7 @@ Tous les scripts sont **chargés conditionnellement** : si la variable d'environ
 2. Créer un pixel "BYS Permis"
 3. Copier l'**ID du pixel** (format numérique, 15-16 chiffres)
 4. Me le transmettre → variable `NEXT_PUBLIC_META_PIXEL_ID`
-5. **Vérification de domaine** : Business Manager → **Sécurité de la marque** → **Domaines** → ajouter `bys-permis.fr`
+5. **Vérification de domaine** : Business Manager → **Sécurité de la marque** → **Domaines** → ajouter `byspermis.fr`
 6. Méthode "Balise meta" → Meta fournit `<meta name="facebook-domain-verification" content="xxx" />`
 7. Me transmettre **xxx** → variable `NEXT_PUBLIC_META_DOMAIN_VERIFICATION`
 
@@ -137,7 +137,7 @@ Pour **chaque centre BYS** (Osny, etc.) :
 - Forums automobile (`caradisiac`, `auto-moto`)
 - Associations de victimes de la route (partenariats potentiels)
 - Annuaires SEO France (`pages-jaunes`, `kompass`)
-- Mention sur le site BYS Formation historique avec lien vers le nouveau site
+- Mention sur le site BYS Permis historique avec lien vers le nouveau site
 
 ---
 
@@ -149,7 +149,7 @@ Une fois les variables configurées et le site déployé :
 2. **Google Tag Assistant** (extension Chrome) — sur n'importe quelle page, doit lister GA4 + Google Ads
 3. **Meta Pixel Helper** (extension Chrome) — doit afficher l'ID + l'événement PageView
 4. **Rich Results Test** (https://search.google.com/test/rich-results) — coller une URL `/formations/xxx` doit afficher un schéma `Course` valide
-5. **Google Search Console** > Sitemaps : sitemap `https://bys-permis.fr/sitemap.xml` accepté, X URLs détectées
+5. **Google Search Console** > Sitemaps : sitemap `https://byspermis.fr/sitemap.xml` accepté, X URLs détectées
 
 ---
 

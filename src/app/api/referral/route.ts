@@ -37,7 +37,7 @@ export async function GET() {
       referralCode: dbUser.referralCode,
       referralCount,
       totalReferralPoints,
-      shareUrl: `https://bysformation.com/inscription?ref=${dbUser.referralCode}`,
+      shareUrl: `https://byspermis.fr/inscription?ref=${dbUser.referralCode}`,
     });
   } catch (err) {
     console.error("[GET /api/referral] DB error:", err);

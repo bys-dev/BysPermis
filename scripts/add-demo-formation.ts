@@ -5,11 +5,11 @@ const SLUG = "stage-recuperation-points-test-bys-demo";
 
 async function main() {
   const centre = await prisma.centre.findFirst({
-    where: { nom: { contains: "BYS Formation", mode: "insensitive" }, statut: "ACTIF" },
+    where: { nom: { contains: "BYS Permis", mode: "insensitive" }, statut: "ACTIF" },
     orderBy: { nom: "asc" },
     select: { id: true, nom: true, ville: true },
   });
-  if (!centre) throw new Error("Centre BYS Formation introuvable");
+  if (!centre) throw new Error("Centre BYS Permis introuvable");
 
   const categorie = await prisma.categorie.findFirst({
     where: { nom: { contains: "récup", mode: "insensitive" } },
@@ -33,7 +33,7 @@ async function main() {
       titre: "Stage de récupération de points - Test démo",
       slug: SLUG,
       description:
-        "Formation de démonstration BYS Formation. Stage de sensibilisation à la sécurité routière sur 2 jours (14 h) permettant de récupérer jusqu'à 4 points.",
+        "Formation de démonstration BYS Permis. Stage de sensibilisation à la sécurité routière sur 2 jours (14 h) permettant de récupérer jusqu'à 4 points.",
       objectifs: "Récupérer jusqu'à 4 points. Comprendre les causes des infractions. Adopter une conduite responsable.",
       programme: "Jour 1 : accueil, analyse des infractions, vitesse et distances. Jour 2 : alcool/stupéfiants, vigilance, bilan.",
       prerequis: "Permis de conduire en cours de validité, au moins 1 point.",

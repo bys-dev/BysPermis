@@ -18,9 +18,9 @@ import { logEmail } from "@/lib/email-log";
 import type { Prisma, ProspectStatus } from "@/generated/prisma/client";
 import { renderCampaignEmail, unsubscribeUrl, type TemplateProspect } from "./template";
 
-const RAW_FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const RAW_FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 
-/** Extrait « noreply@byspermis.fr » de « BYS Formations <noreply@byspermis.fr> ». */
+/** Extrait « noreply@byspermis.fr » de « BYS Permis <noreply@byspermis.fr> ». */
 function fromAddress(): string {
   const match = RAW_FROM.match(/<([^>]+)>/);
   return (match ? match[1] : RAW_FROM).trim();

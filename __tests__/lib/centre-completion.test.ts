@@ -22,7 +22,7 @@ describe("calculateCentreCompletion", () => {
   // ─── Informations de base uniquement (25%) ───────────────
   it("retourne 25% avec seulement les informations de base completes", () => {
     const centre: CentreCompletionData = {
-      nom: "BYS Formation Osny",
+      nom: "BYS Permis Osny",
       description:
         "Centre de formation specialise en securite routiere et transport professionnel",
       adresse: "9 Chaussee Jules Cesar",
@@ -42,14 +42,14 @@ describe("calculateCentreCompletion", () => {
   // ─── Informations de base + Contact (40%) ────────────────
   it("retourne 40% avec informations de base + contact", () => {
     const centre: CentreCompletionData = {
-      nom: "BYS Formation Osny",
+      nom: "BYS Permis Osny",
       description:
         "Centre de formation specialise en securite routiere et transport professionnel",
       adresse: "9 Chaussee Jules Cesar",
       codePostal: "95520",
       ville: "Osny",
       telephone: "0134256789",
-      email: "contact@bys-formation.fr",
+      email: "contact@byspermis.fr",
     };
 
     const result = calculateCentreCompletion(centre);
@@ -63,14 +63,14 @@ describe("calculateCentreCompletion", () => {
   // ─── Centre complet (100%) ───────────────────────────────
   it("retourne 100% avec toutes les donnees completes", () => {
     const centre: CentreCompletionData = {
-      nom: "BYS Formation Osny",
+      nom: "BYS Permis Osny",
       description:
         "Centre de formation specialise en securite routiere et transport professionnel",
       adresse: "9 Chaussee Jules Cesar",
       codePostal: "95520",
       ville: "Osny",
       telephone: "0134256789",
-      email: "contact@bys-formation.fr",
+      email: "contact@byspermis.fr",
       presentationHtml:
         "<p>Notre centre de formation est un etablissement reconnu avec plus de 10 ans d'experience dans le domaine de la securite routiere.</p>",
       stripeOnboardingDone: true,
@@ -163,7 +163,7 @@ describe("calculateCentreCompletion", () => {
   // ─── Champs partiellement remplis ────────────────────────
   it("calcule un score partiel pour les informations de base (3/5 champs)", () => {
     const centre: CentreCompletionData = {
-      nom: "BYS Formation",
+      nom: "BYS Permis",
       adresse: "9 Chaussee Jules Cesar",
       ville: "Osny",
       // description et codePostal manquants

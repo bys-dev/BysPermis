@@ -24,7 +24,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 export async function GET() {
   const villes = topVilles(40);
 
-  const body = `# BYS Formation Permis
+  const body = `# BYS Permis
 
 > Place de marché française des stages de récupération de points du permis de conduire.
 > Elle référence des centres de sensibilisation à la sécurité routière (CSSR) agréés par

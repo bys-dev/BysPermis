@@ -1,5 +1,5 @@
 # CDC.md — Cahier des Charges Technique
-# Plateforme BYS Formation — Version 3.0 — Mars 2026
+# Plateforme BYS Permis — Version 3.0 — Mars 2026
 # Document à partager dans Claude Code avec CLAUDE.md et PROMPT_CLAUDE_CODE_BYS.md
 
 ---
@@ -8,8 +8,8 @@
 
 | Champ | Valeur |
 |-------|--------|
-| **Nom du projet** | BYS Formation — Plateforme Marketplace |
-| **Client** | BYS Formation — SAS — SIRET : 987 512 381 00011 |
+| **Nom du projet** | BYS Permis — Plateforme Marketplace |
+| **Client** | BYS PERMIS — SAS au capital de 100 € — RCS Paris 107 056 327 — 33 rue de la Chaussée d'Antin, 75009 Paris |
 | **Adresse client** | Bât. 7, 9 Chaussée Jules César, 95520 Osny |
 | **Contact client** | Sébastien (dirigeant) — bysforma95@gmail.com |
 | **Contact client 2** | Bilal (collaborateur) |
@@ -27,7 +27,7 @@
 ## 🎯 VISION & OBJECTIFS
 
 ### Vision produit
-BYS Formation est la plateforme de référence en France pour les stages de récupération de points du permis de conduire (stages agréés Ministère de l'Intérieur, dits "stages de sensibilisation à la sécurité routière").
+BYS Permis est la plateforme de référence en France pour les stages de récupération de points du permis de conduire (stages agréés Ministère de l'Intérieur, dits "stages de sensibilisation à la sécurité routière").
 
 > **Scope V1 (mai 2026) :** la plateforme et ses partenaires onboardés ne proposent QUE des stages de récupération de points. Aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.) n'est proposée à ce stade. Le modèle de données reste extensible pour autoriser d'autres catégories dans le futur, mais aucun contenu, aucun seed, aucune page publique ne doit faire référence à ces produits hors-scope.
 
@@ -98,7 +98,7 @@ Elle résout 3 problèmes :
 ### Structure des dossiers
 
 ```
-bys-formation/
+bys-permis/
 ├── prisma/
 │   ├── schema.prisma              # Schéma BDD (12 tables)
 │   ├── migrations/                # Historique migrations
@@ -445,7 +445,7 @@ API séquence :
 Contenu obligatoire :
 ```
 EN-TÊTE
-- Logo BYS Formation + mention "CONVOCATION OFFICIELLE"
+- Logo BYS Permis + mention "CONVOCATION OFFICIELLE"
 - "Stage de sensibilisation à la sécurité routière et de prévention des risques"
 - Arrêté du [date] — N° d'agrément préfectoral : [numéro]
 
@@ -471,7 +471,7 @@ MENTIONS LÉGALES
 - Code QR de vérification
 
 PIED DE PAGE
-- "BYS Formation — SIRET : 987 512 381 00011"
+- "BYS PERMIS — RCS Paris 107 056 327"
 - Date de génération
 ```
 
@@ -786,7 +786,7 @@ const montantCentreCentimes = Math.round(montantTTC * 100) - commissionCentimes
 |-----|-----|-----|--------|-------|
 | **Développement** | localhost:3000 | Supabase dev | Mode test | Tenant dev |
 | **Preview** | [branch].vercel.app | Supabase dev | Mode test | Tenant dev |
-| **Production** | bys-formation.fr | Supabase prod | Mode live | Tenant prod |
+| **Production** | byspermis.fr | Supabase prod | Mode live | Tenant prod |
 
 ### Variables d'environnement
 
@@ -796,7 +796,7 @@ DATABASE_URL=""           # postgresql://...
 
 # Auth0
 AUTH0_SECRET=""           # openssl rand -base64 32
-AUTH0_BASE_URL=""         # https://bys-formation.fr en prod
+AUTH0_BASE_URL=""         # https://byspermis.fr en prod
 AUTH0_ISSUER_BASE_URL=""  # https://[tenant].auth0.com
 AUTH0_CLIENT_ID=""
 AUTH0_CLIENT_SECRET=""
@@ -810,10 +810,10 @@ STRIPE_WEBHOOK_SECRET=""                # whsec_...
 
 # Email
 RESEND_API_KEY=""
-EMAIL_FROM="noreply@bys-formation.fr"
+EMAIL_FROM="noreply@byspermis.fr"
 
 # App
-NEXT_PUBLIC_APP_URL=""   # https://bys-formation.fr
+NEXT_PUBLIC_APP_URL=""   # https://byspermis.fr
 COMMISSION_RATE="0.10"   # 10% par défaut (modifiable via admin)
 ```
 
@@ -894,5 +894,5 @@ Desktop : 1024px → 1440px (grille 3-4 cols, sidebar fixe 256px)
 
 ---
 
-*CDC v3.0 — Andrys MAGAR pour BYS Formation — Mars 2026*
+*CDC v3.0 — Andrys MAGAR pour BYS Permis — Mars 2026*
 *Ce document est confidentiel. Usage interne uniquement.*

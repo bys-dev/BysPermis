@@ -4,9 +4,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité — BYS Formation",
+  title: "Politique de confidentialité",
   description:
-    "Politique de confidentialité et protection des données personnelles (RGPD) du site BYS Formation.",
+    "Politique de confidentialité et protection des données personnelles (RGPD) du site BYS Permis.",
 };
 
 export default function PolitiqueDeConfidentialitePage() {
@@ -20,7 +20,7 @@ export default function PolitiqueDeConfidentialitePage() {
           </h1>
 
           <p className="leading-relaxed text-gray-700 mb-10">
-            BYS Formation (ci-après « nous ») accorde une grande importance à la
+            BYS Permis (ci-après « nous ») accorde une grande importance à la
             protection de vos données personnelles. La présente politique de
             confidentialité décrit les données que nous collectons, les raisons
             pour lesquelles nous les collectons et la manière dont nous les
@@ -325,9 +325,9 @@ export default function PolitiqueDeConfidentialitePage() {
               </p>
               <ul className="list-none space-y-1 mt-3">
                 <li>
-                  <strong>BYS Formation</strong>
+                  <strong>BYS Permis</strong>
                 </li>
-                <li>Bât. 7, 9 Chaussée Jules César, 95520 Osny</li>
+                <li>33 rue de la Chaussée d&apos;Antin, 75009 Paris</li>
                 <li>
                   Email :{" "}
                   <a

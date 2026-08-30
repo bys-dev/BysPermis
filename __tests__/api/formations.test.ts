@@ -37,7 +37,7 @@ const mockFormations = [
     isCPF: false,
     isActive: true,
     centre: {
-      nom: "BYS Formation Osny",
+      nom: "BYS Permis Osny",
       ville: "Osny",
       codePostal: "95520",
       slug: "bys-osny",

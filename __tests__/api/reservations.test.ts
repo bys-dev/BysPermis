@@ -64,7 +64,7 @@ const mockReservation = {
       prix: 250,
       lieu: "Osny",
       duree: "2 jours",
-      centre: { nom: "BYS Formation Osny", ville: "Osny" },
+      centre: { nom: "BYS Permis Osny", ville: "Osny" },
     },
   },
 };

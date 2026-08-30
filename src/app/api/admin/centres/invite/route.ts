@@ -224,7 +224,7 @@ export async function POST(req: NextRequest) {
       // Create notification for the new centre owner
       await tx.notification.create({
         data: {
-          titre: "Bienvenue sur BYS Formation",
+          titre: "Bienvenue sur BYS Permis",
           contenu:
             "Votre espace centre a ete cree. Completez votre profil pour etre visible sur la marketplace.",
           userId,

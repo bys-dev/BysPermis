@@ -15,14 +15,14 @@ export default function Footer() {
             <div className="mb-6">
               <Image
                 src="/transparent-logo.svg"
-                alt="BYS Formation"
+                alt="BYS Permis"
                 width={200}
                 height={50}
                 className="h-12 w-auto brightness-0 invert"
               />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
-              BYS Formation Permis est la marketplace de référence pour les stages
+              BYS Permis est la marketplace de référence pour les stages
               agréés de récupération de points du permis de conduire. Les stages
               proposés sont dispensés par des centres agréés par le Ministère de
               l&apos;Intérieur.
@@ -222,8 +222,8 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="text-xs sm:text-sm text-gray-500 text-center lg:text-left">
-              © 2026 BYS Formation Permis — édité par BYS Formation SAS —
-              SIRET : 987 512 381 00011 — Bât. 7, 9 Chaussée Jules César, 95520 Osny
+              © 2026 BYS Permis — édité par BYS PERMIS SAS —
+              RCS Paris 107 056 327 — 33 rue de la Chaussée d&apos;Antin, 75009 Paris
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-sm">
               <Link

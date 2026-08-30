@@ -42,10 +42,10 @@ export default function Header() {
           <div className="flex items-center justify-between gap-3 sm:gap-4">
             {/* Logo + Nav — fully static */}
             <div className="flex items-center space-x-6 lg:space-x-12 min-w-0">
-              <Link href="/" className="flex items-center shrink-0" aria-label="BYS Formation — accueil">
+              <Link href="/" className="flex items-center shrink-0" aria-label="BYS Permis — accueil">
                 <Image
                   src="/colored-logo.svg"
-                  alt="BYS Formation"
+                  alt="BYS Permis"
                   width={280}
                   height={72}
                   priority

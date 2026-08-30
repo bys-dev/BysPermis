@@ -3,10 +3,10 @@ import { prisma } from "../src/lib/prisma";
 
 async function main() {
   const centre = await prisma.centre.findFirst({
-    where: { nom: { contains: "BYS Formation Osny", mode: "insensitive" } },
+    where: { nom: { contains: "BYS Permis Osny", mode: "insensitive" } },
     select: { id: true, nom: true, ville: true },
   });
-  if (!centre) throw new Error("BYS Formation Osny introuvable");
+  if (!centre) throw new Error("BYS Permis Osny introuvable");
 
   const categorie = await prisma.categorie.findFirst({
     where: { nom: { contains: "récup", mode: "insensitive" } },

@@ -22,7 +22,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = pageMetadata({
   title: "Contact — Support stages & partenariats",
   description:
-    "Contactez BYS Formation Permis pour vos questions sur les stages de récupération de points, le partenariat centre ou le support technique. Réponse sous 24h ouvrées.",
+    "Contactez BYS Permis pour vos questions sur les stages de récupération de points, le partenariat centre ou le support technique. Réponse sous 24h ouvrées.",
   path: "/contact",
 });
 
@@ -138,7 +138,7 @@ export default function ContactPage() {
                     </div>
                     <h3 className="font-display font-bold text-lg mb-2">Vous êtes un centre ?</h3>
                     <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                      Rejoignez le réseau BYS Formation. Remplissez vos sessions et recevez 90% de
+                      Rejoignez le réseau BYS Permis. Remplissez vos sessions et recevez 90% de
                       chaque réservation.
                     </p>
                     <Link

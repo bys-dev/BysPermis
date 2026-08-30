@@ -151,7 +151,7 @@ export const HOME_FAQ: FaqItem[] = [
   {
     question: "Combien coûte un stage de récupération de points ?",
     answer:
-      "Le prix varie entre 200 € et 300 € selon le centre et la région. Sur BYS Formation Permis, comparez les tarifs des centres agréés près de chez vous. Les stages ne sont pas remboursés par la Sécurité sociale ni éligibles CPF.",
+      "Le prix varie entre 200 € et 300 € selon le centre et la région. Sur BYS Permis, comparez les tarifs des centres agréés près de chez vous. Les stages ne sont pas remboursés par la Sécurité sociale ni éligibles CPF.",
   },
   {
     question: "Quels documents dois-je apporter le jour du stage ?",
@@ -191,14 +191,14 @@ export const HOME_FAQ: FaqItem[] = [
   {
     question: "Comment savoir si un centre est réellement agréé ?",
     answer:
-      "Un centre agréé détient un numéro d'agrément délivré par le préfet de son département (art. R223-5 du Code de la route). Tous les centres référencés sur BYS Formation Permis sont vérifiés : agrément, assurance et pièces administratives sont contrôlés avant mise en ligne.",
+      "Un centre agréé détient un numéro d'agrément délivré par le préfet de son département (art. R223-5 du Code de la route). Tous les centres référencés sur BYS Permis sont vérifiés : agrément, assurance et pièces administratives sont contrôlés avant mise en ligne.",
   },
 ];
 
 export const STAGE_CITY_FAQ = (city: string): FaqItem[] => [
   {
     question: `Où faire un stage de récupération de points à ${city} ?`,
-    answer: `BYS Formation Permis référence des centres agréés à ${city} et aux alentours. Comparez les dates, tarifs et réservez en ligne.`,
+    answer: `BYS Permis référence des centres agréés à ${city} et aux alentours. Comparez les dates, tarifs et réservez en ligne.`,
   },
   {
     question: `Combien de temps dure un stage à ${city} ?`,
@@ -227,7 +227,7 @@ export const STAGE_CITY_FAQ = (city: string): FaqItem[] => [
 export const STAGE_DEPT_FAQ = (dept: string, code: string): FaqItem[] => [
   {
     question: `Combien de centres agréés y a-t-il dans le ${dept} (${code}) ?`,
-    answer: `Les centres de sensibilisation à la sécurité routière sont agréés individuellement par le préfet du ${dept}. BYS Formation Permis affiche les centres partenaires du département ainsi que les sessions disponibles dans les départements limitrophes.`,
+    answer: `Les centres de sensibilisation à la sécurité routière sont agréés individuellement par le préfet du ${dept}. BYS Permis affiche les centres partenaires du département ainsi que les sessions disponibles dans les départements limitrophes.`,
   },
   {
     question: `Un stage suivi dans le ${dept} est-il valable dans toute la France ?`,
@@ -237,7 +237,7 @@ export const STAGE_DEPT_FAQ = (dept: string, code: string): FaqItem[] => [
   {
     question: `Quel est le prix moyen d'un stage dans le ${dept} ?`,
     answer:
-      "Le tarif est libre et fixé par chaque centre : il se situe généralement entre 200 € et 300 €. Le prix affiché sur BYS Formation Permis est le prix final, convocation et attestation comprises.",
+      "Le tarif est libre et fixé par chaque centre : il se situe généralement entre 200 € et 300 €. Le prix affiché sur BYS Permis est le prix final, convocation et attestation comprises.",
   },
   {
     question: `Que faire s'il n'y a aucune session disponible dans le ${dept} ?`,

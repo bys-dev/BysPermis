@@ -1,6 +1,6 @@
-# Demandes client — BYS Formation Permis
+# Demandes client — BYS Permis
 
-> Document à envoyer à **Sébastien / BYS Formation** pour compléter la plateforme avant mise en production.
+> Document à envoyer à **Sébastien / BYS Permis** pour compléter la plateforme avant mise en production.
 >
 > **Contact prestataire** : Andrys MAGAR — `andrys.developper@gmail.com`
 >
@@ -39,12 +39,12 @@ Checklist courte : [`CHECKLIST_CLIENT.md`](./CHECKLIST_CLIENT.md)
 
 | # | Question | Réponse client |
 |---|----------|----------------|
-| 11 | Raison sociale exacte (SAS, SARL, autre) ? | BYS Formation — SAS (à confirmer) |
-| 12 | SIRET (14 chiffres) ? | 987 512 381 00011 (à confirmer) |
+| 11 | Raison sociale exacte (SAS, SARL, autre) ? | BYS Permis — SAS (à confirmer) |
+| 12 | SIRET (14 chiffres) ? | ⚠️ à fournir — Kbis ne donne que le SIREN 107 056 327 (RCS Paris) |
 | 13 | N° TVA intracommunautaire ? | |
 | 14 | Code APE / NAF ? | |
-| 15 | Capital social ? | |
-| 16 | RCS + ville d'immatriculation ? | |
+| 15 | Capital social ? | 100,00 € |
+| 16 | RCS + ville d'immatriculation ? | RCS Paris 107 056 327 — immatriculée le 02/07/2026 |
 | 17 | Nom complet du **directeur de publication** ? | Sébastien (nom de famille ?) |
 | 18 | Nom complet du **DPO** ou contact RGPD ? | |
 
@@ -54,14 +54,14 @@ Checklist courte : [`CHECKLIST_CLIENT.md`](./CHECKLIST_CLIENT.md)
 
 | # | Question | Réponse client |
 |---|----------|----------------|
-| 19 | Domaine définitif confirmé (`bys-permis.fr` ?) | |
+| 19 | Domaine définitif confirmé (`byspermis.fr` ?) | |
 | 20 | Accès registrar DNS ou délégation technique ? | |
 | 21 | Logo vectoriel (SVG/AI) fond transparent ? | |
 | 22 | Favicon 512×512 ? | |
 | 23 | Charte couleurs validée (navy + rouge actuels OK ?) | |
 | 24 | Photo hero / bannière accueil (droits d'usage) ? | |
 | 25 | Signature email type (logo + texte légal) ? | |
-| 26 | Nom commercial exact : « BYS Formation », « BYS Permis », autre ? | |
+| 26 | Nom commercial exact : « BYS Permis », « BYS Permis », autre ? | |
 
 ---
 
@@ -178,8 +178,8 @@ Pour **chaque centre** (commencer par Osny, Cergy, Paris…) :
 
 | # | Question | Réponse client |
 |---|----------|----------------|
-| 85 | Adresse **expéditeur** emails (ex. `noreply@bys-permis.fr`) ? | |
-| 86 | Nom affiché expéditeur (« BYS Formation ») ? | |
+| 85 | Adresse **expéditeur** emails (ex. `noreply@byspermis.fr`) ? | |
+| 86 | Nom affiché expéditeur (« BYS Permis ») ? | |
 | 87 | Signature email (nom, téléphone, lien) ? | |
 | 88 | Valider texte email **confirmation réservation** ? | |
 | 89 | Valider texte email **convocation** + PDF joint ? | |
@@ -326,7 +326,7 @@ Pour **chaque centre** (commencer par Osny, Cergy, Paris…) :
 - [ ] Remplacer données démo (centres, blog, témoignages) par données réelles
 - [ ] Valider commission admin (plus de valeur en dur si client confirme autre taux)
 - [ ] Passer Stripe en **Live** avec clés production
-- [ ] Configurer domaine + emails `@bys-permis.fr`
+- [ ] Configurer domaine + emails `@byspermis.fr`
 - [ ] Rejouer guide recette [`GUIDE_RECETTE_CLIENT.md`](./GUIDE_RECETTE_CLIENT.md) sur prod
 
 ---

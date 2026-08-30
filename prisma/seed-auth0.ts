@@ -43,14 +43,14 @@ type DemoUser = {
 const DEMO_PASSWORD = "DemoByspermis2026!";
 
 const DEMO_USERS: DemoUser[] = [
-  { email: "sebastien@bys-formation.fr", firstName: "Sebastien", lastName: "BYS", role: "OWNER" },
-  { email: "admin@bys-formation.fr", firstName: "Admin", lastName: "BYS", role: "ADMIN" },
-  { email: "support@bys-formation.fr", firstName: "Support", lastName: "BYS", role: "SUPPORT" },
-  { email: "comptabilite@bys-formation.fr", firstName: "Comptable", lastName: "BYS", role: "COMPTABLE" },
-  { email: "commercial@bys-formation.fr", firstName: "Commercial", lastName: "BYS", role: "COMMERCIAL" },
-  { email: "contact@bys-formation.fr", firstName: "Centre", lastName: "BYS Cergy", role: "CENTRE_OWNER" },
-  { email: "gestion@bys-formation.fr", firstName: "Linh", lastName: "Nguyen", role: "CENTRE_ADMIN" },
-  { email: "formateur@bys-formation.fr", firstName: "Miguel", lastName: "Garcia", role: "CENTRE_FORMATEUR" },
+  { email: "sebastien@byspermis.fr", firstName: "Sebastien", lastName: "BYS", role: "OWNER" },
+  { email: "admin@byspermis.fr", firstName: "Admin", lastName: "BYS", role: "ADMIN" },
+  { email: "support@byspermis.fr", firstName: "Support", lastName: "BYS", role: "SUPPORT" },
+  { email: "comptabilite@byspermis.fr", firstName: "Comptable", lastName: "BYS", role: "COMPTABLE" },
+  { email: "commercial@byspermis.fr", firstName: "Commercial", lastName: "BYS", role: "COMMERCIAL" },
+  { email: "contact@byspermis.fr", firstName: "Centre", lastName: "BYS Cergy", role: "CENTRE_OWNER" },
+  { email: "gestion@byspermis.fr", firstName: "Linh", lastName: "Nguyen", role: "CENTRE_ADMIN" },
+  { email: "formateur@byspermis.fr", firstName: "Miguel", lastName: "Garcia", role: "CENTRE_FORMATEUR" },
   { email: "secretariat@autoecole-conduite-plus.fr", firstName: "Nathalie", lastName: "Petit", role: "CENTRE_SECRETAIRE" },
   { email: "marie.durand@outlook.fr", firstName: "Marie", lastName: "Durand", role: "ELEVE" },
 ];

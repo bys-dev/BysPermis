@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     "Retrouvez nos articles sur la sécurité routière, la réglementation du permis de conduire et les actualités de la formation professionnelle.",
   alternates: { canonical: "/blog" },
   openGraph: {
-    title: "Blog BYS Formation",
+    title: "Blog BYS Permis",
     description:
       "Actualités, conseils et réglementation pour les conducteurs et les centres de formation.",
     url: "/blog",
     type: "website",
     locale: "fr_FR",
-    siteName: "BYS Formation",
+    siteName: "BYS Permis",
   },
 };
 
@@ -93,7 +93,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm mb-6">
             <FontAwesomeIcon icon={faNewspaper} className="w-4 h-4" />
-            Blog BYS Formation
+            Blog BYS Permis
           </div>
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             Actualites &amp; Conseils
@@ -163,7 +163,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
-                          BYS Formation
+                          BYS Permis
                         </span>
                         <span className="flex items-center gap-1">
                           <FontAwesomeIcon icon={faCalendar} className="w-3 h-3" />

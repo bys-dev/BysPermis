@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import DesabonnementClient from "./DesabonnementClient";
 
 export const metadata: Metadata = {
-  title: "Désinscription — BYS Permis",
+  title: "Désinscription",
   description: "Gérez la réception de nos emails de prospection.",
   // Page à usage strictement individuel : elle ne doit pas être indexée.
   robots: { index: false, follow: false },

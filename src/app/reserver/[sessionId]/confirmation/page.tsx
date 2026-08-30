@@ -36,7 +36,7 @@ export default function ConfirmationPage() {
   }, [sessionId]);
 
   const titre = session?.formation.titre ?? "Stage de récupération de points";
-  const centre = session?.centre ?? "BYS Formation";
+  const centre = session?.centre ?? "BYS Permis";
   const adresse = session?.adresse ?? "";
   const dateStr = session
     ? `${new Date(session.dateDebut).toLocaleDateString("fr-FR")} — ${new Date(session.dateFin).toLocaleDateString("fr-FR")}`

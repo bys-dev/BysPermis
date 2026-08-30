@@ -54,7 +54,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     quote:
-      "Depuis notre inscription sur BYS Formation, nous avons augmenté notre taux de remplissage de 40%. La plateforme est simple d'utilisation et le support est très réactif.",
+      "Depuis notre inscription sur BYS Permis, nous avons augmenté notre taux de remplissage de 40%. La plateforme est simple d'utilisation et le support est très réactif.",
     author: "Marie D.",
     role: "Directrice de centre",
     location: "Lyon (69)",
@@ -84,7 +84,7 @@ const faqItems: FaqItem[] = [
   {
     question: "Y a-t-il des frais d'inscription ?",
     answer:
-      "Non, l'inscription sur BYS Formation est entièrement gratuite. Vous payez un abonnement mensuel et une commission réduite sur les réservations effectivement réalisées via la plateforme.",
+      "Non, l'inscription sur BYS Permis est entièrement gratuite. Vous payez un abonnement mensuel et une commission réduite sur les réservations effectivement réalisées via la plateforme.",
   },
   {
     question: "Comment sont calculées les commissions ?",
@@ -272,7 +272,7 @@ export default function TarifsPartenairesPage() {
               Tarifs centres partenaires
             </h1>
             <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Rejoignez le réseau BYS Formation et développez votre activité.
+              Rejoignez le réseau BYS Permis et développez votre activité.
               Choisissez le plan adapté à vos besoins avec une commission
               réduite.
             </p>
@@ -482,7 +482,7 @@ export default function TarifsPartenairesPage() {
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Découvrez les retours de nos centres partenaires sur leur
-                expérience avec BYS Formation.
+                expérience avec BYS Permis.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -572,7 +572,7 @@ export default function TarifsPartenairesPage() {
                   Prêt à développer votre activité ?
                 </h2>
                 <p className="text-blue-100 max-w-2xl mx-auto mb-8 text-lg">
-                  Rejoignez BYS Formation pour remplir vos sessions de stage.
+                  Rejoignez BYS Permis pour remplir vos sessions de stage.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link

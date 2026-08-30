@@ -4,9 +4,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Politique relative aux cookies — BYS Formation",
+  title: "Politique relative aux cookies",
   description:
-    "Politique relative aux cookies du site BYS Formation : types de cookies utilisés, durée de conservation et gestion de vos préférences.",
+    "Politique relative aux cookies du site BYS Permis : types de cookies utilisés, durée de conservation et gestion de vos préférences.",
 };
 
 export default function CookiesPage() {
@@ -142,7 +142,7 @@ export default function CookiesPage() {
                           cookie-consent
                         </td>
                         <td className="p-3 border-b border-brand-border">
-                          BYS Formation
+                          BYS Permis
                         </td>
                         <td className="p-3 border-b border-brand-border">
                           Mémorisation de vos choix en matière de cookies
@@ -156,7 +156,7 @@ export default function CookiesPage() {
                           user-preferences
                         </td>
                         <td className="p-3 border-b border-brand-border">
-                          BYS Formation
+                          BYS Permis
                         </td>
                         <td className="p-3 border-b border-brand-border">
                           Préférences de recherche et de navigation

@@ -3,9 +3,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Mentions légales — BYS Formation",
+  title: "Mentions légales",
   description:
-    "Mentions légales du site BYS Formation, marketplace de stages de récupération de points permis.",
+    "Mentions légales du site BYS Permis, marketplace de stages de récupération de points permis.",
 };
 
 export default function MentionsLegalesPage() {
@@ -25,19 +25,21 @@ export default function MentionsLegalesPage() {
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-1">
               <p>
-                La marketplace <strong>BYS Formation Permis</strong> (accessible
+                La marketplace <strong>BYS Permis</strong> (accessible
                 sur <strong>byspermis.fr</strong>) est une marque éditée par :
               </p>
               <ul className="list-none mt-3 space-y-1">
                 <li>
-                  <strong>Raison sociale :</strong> BYS Formation — SAS
+                  <strong>Raison sociale :</strong> BYS PERMIS — SAS au
+                  capital de 100 €
                 </li>
                 <li>
-                  <strong>SIRET :</strong> 987 512 381 00011
+                  <strong>RCS :</strong> Paris 107 056 327 (immatriculée le
+                  2 juillet 2026)
                 </li>
                 <li>
-                  <strong>Siège social :</strong> Bât. 7, 9 Chaussée Jules
-                  César, 95520 Osny
+                  <strong>Siège social :</strong> 33 rue de la Chaussée
+                  d&apos;Antin, 75009 Paris
                 </li>
                 <li>
                   <strong>Email :</strong>{" "}
@@ -59,8 +61,8 @@ export default function MentionsLegalesPage() {
             </h2>
             <p className="leading-relaxed text-gray-700">
               Le directeur de la publication est{" "}
-              <strong>Sébastien</strong>, en qualité de représentant légal de
-              BYS Formation.
+              <strong>Sébastien Ribes</strong>, en qualité de Président de BYS
+              Permis.
             </p>
           </section>
 
@@ -130,7 +132,7 @@ export default function MentionsLegalesPage() {
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>
-                L&apos;ensemble du contenu du site BYS Formation (textes,
+                L&apos;ensemble du contenu du site BYS Permis (textes,
                 images, graphismes, logo, icônes, logiciels, base de données)
                 est protégé par les lois françaises et internationales relatives
                 à la propriété intellectuelle.
@@ -139,7 +141,7 @@ export default function MentionsLegalesPage() {
                 Toute reproduction, représentation, modification, publication ou
                 adaptation de tout ou partie des éléments du site, quel que soit
                 le moyen ou le procédé utilisé, est interdite sans
-                l&apos;autorisation écrite préalable de BYS Formation.
+                l&apos;autorisation écrite préalable de BYS Permis.
               </p>
               <p>
                 Toute exploitation non autorisée du site ou de l&apos;un
@@ -158,7 +160,7 @@ export default function MentionsLegalesPage() {
             </h2>
             <div className="leading-relaxed text-gray-700 space-y-4">
               <p>
-                BYS Formation s&apos;efforce de fournir sur le site des
+                BYS Permis s&apos;efforce de fournir sur le site des
                 informations aussi précises que possible. Toutefois, elle ne
                 pourra être tenue responsable des omissions, des inexactitudes
                 ou des carences dans la mise à jour, qu&apos;elles soient de son
@@ -166,13 +168,13 @@ export default function MentionsLegalesPage() {
                 informations.
               </p>
               <p>
-                BYS Formation ne pourra être tenue responsable des dommages
+                BYS Permis ne pourra être tenue responsable des dommages
                 directs ou indirects résultant de l&apos;accès au site ou de
                 l&apos;utilisation du site et/ou des informations qui y sont
                 disponibles.
               </p>
               <p>
-                BYS Formation agit en qualité d&apos;intermédiaire entre les
+                BYS Permis agit en qualité d&apos;intermédiaire entre les
                 utilisateurs et les centres de formation partenaires. Elle ne
                 saurait être tenue responsable du contenu pédagogique des
                 formations dispensées par les centres partenaires.

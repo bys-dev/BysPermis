@@ -169,14 +169,14 @@ const reassurance = [
 
 export function BrochurePartenaire() {
   return (
-    <Document title="BYS Formation — Brochure centre partenaire" author="BYS Formation">
+    <Document title="BYS Permis — Brochure centre partenaire" author="BYS Permis">
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.logoBox}>
             <Text style={styles.logoText}>BF</Text>
           </View>
           <View>
-            <Text style={styles.brandName}>BYS Formation</Text>
+            <Text style={styles.brandName}>BYS Permis</Text>
             <Text style={styles.brandTagline}>Marketplace des stages de récupération de points</Text>
           </View>
         </View>
@@ -191,7 +191,7 @@ export function BrochurePartenaire() {
             Remplissez vos stages de{"\n"}récupération de <Text style={styles.heroAccent}>points</Text>
           </Text>
           <Text style={styles.heroSubtitle}>
-            BYS Formation connecte votre centre agréé aux conducteurs qui cherchent un stage près
+            BYS Permis connecte votre centre agréé aux conducteurs qui cherchent un stage près
             de chez eux. Vous gagnez en visibilité et en remplissage — nous nous occupons du reste.
           </Text>
 
@@ -217,7 +217,7 @@ export function BrochurePartenaire() {
 
         <View style={styles.body}>
           <Text style={styles.sectionLabel}>POURQUOI PASSER PAR NOUS</Text>
-          <Text style={styles.sectionTitle}>Ce que BYS Formation change pour votre centre</Text>
+          <Text style={styles.sectionTitle}>Ce que BYS Permis change pour votre centre</Text>
 
           <View style={styles.benefitsGrid}>
             {benefits.map((b) => (
@@ -230,7 +230,7 @@ export function BrochurePartenaire() {
         </View>
 
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>BYS Formation — byspermis.fr</Text>
+          <Text style={styles.footerText}>BYS Permis — byspermis.fr</Text>
           <Text style={styles.footerText} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
         </View>
       </Page>
@@ -328,7 +328,7 @@ export function BrochurePartenaire() {
         </View>
 
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>BYS Formation — byspermis.fr</Text>
+          <Text style={styles.footerText}>BYS Permis — byspermis.fr</Text>
           <Text style={styles.footerText} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
         </View>
       </Page>

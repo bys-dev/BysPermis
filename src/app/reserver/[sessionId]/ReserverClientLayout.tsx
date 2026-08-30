@@ -22,10 +22,10 @@ export default function ReserverClientLayout({ children }: { children: React.Rea
     <div className="min-h-screen bg-brand-bg">
       <header className="bg-navy-900 border-b border-white/8 px-4 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2" aria-label="BYS Formation — accueil">
+          <Link href="/" className="flex items-center gap-2" aria-label="BYS Permis — accueil">
             <Image
               src="/transparent-logo.svg"
-              alt="BYS Formation"
+              alt="BYS Permis"
               width={140}
               height={36}
               className="h-9 w-auto brightness-0 invert"

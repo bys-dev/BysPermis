@@ -24,10 +24,10 @@ describe('Footer', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
-  it('affiche le logo BYS Formation', () => {
+  it('affiche le logo BYS Permis', () => {
     render(<Footer />)
     // Logo SVG avec alt accessibilité
-    expect(screen.getAllByAltText('BYS Formation').length).toBeGreaterThan(0)
+    expect(screen.getAllByAltText('BYS Permis').length).toBeGreaterThan(0)
   })
 
   it('affiche le lien CGU', () => {

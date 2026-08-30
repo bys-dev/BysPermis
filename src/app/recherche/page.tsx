@@ -1036,7 +1036,7 @@ function RechercheInner() {
                           <div className="w-5 h-5 rounded bg-blue-600 flex items-center justify-center">
                             <span className="text-white text-[9px] font-bold">BYS</span>
                           </div>
-                          <span className="text-white text-xs font-bold">BYS Formation</span>
+                          <span className="text-white text-xs font-bold">BYS Permis</span>
                         </div>
                         <span className="text-[10px] text-blue-300 font-medium flex items-center gap-1">
                           <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-[9px]" />

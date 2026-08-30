@@ -42,12 +42,12 @@ const POLICE = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ari
 
 /** Identité affichée en pied de mail (source : /mentions-legales). */
 const SOCIETE = {
-  nom: "BYS Formation",
-  forme: "SAS",
-  adresse: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",
+  nom: "BYS PERMIS",
+  forme: "SAS au capital de 100 €",
+  adresse: "33 rue de la Chaussée d'Antin, 75009 Paris",
   email: "contact@byspermis.fr",
   site: "byspermis.fr",
-  siret: "987 512 381 00011",
+  rcs: "Paris 107 056 327",
 };
 
 /**
@@ -107,7 +107,7 @@ ${contenu.trimEnd()}
       <p style="margin:0;font-size:11px;line-height:1.65;color:${C.pied}">
         <strong style="color:${C.navy};letter-spacing:.3px">${SOCIETE.nom}</strong> — ${SOCIETE.forme} · ${SOCIETE.adresse}<br/>
         <a href="mailto:${SOCIETE.email}" style="color:${C.pied};text-decoration:none">${SOCIETE.email}</a> · <a href="https://${SOCIETE.site}" style="color:${C.pied};text-decoration:none">${SOCIETE.site}</a><br/>
-        <span style="color:${C.piedDoux}">SIRET ${SOCIETE.siret}</span>
+        <span style="color:${C.piedDoux}">RCS ${SOCIETE.rcs}</span>
       </p>
     </td>
   </tr>

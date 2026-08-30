@@ -58,7 +58,7 @@ const SAMPLE_DATA: Record<string, string> = {
   nom: "Dupont",
   email: "marie.dupont@example.com",
   formation: "Stage de récupération de points",
-  centre: "BYS Formation Osny",
+  centre: "BYS Permis Osny",
   dateDebut: "15 avril 2026",
   dateFin: "16 avril 2026",
   lieu: "Bât. 7, 9 Chaussée Jules César, 95520 Osny",

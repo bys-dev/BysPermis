@@ -30,7 +30,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = pageMetadata({
   title: "Devenir centre partenaire — Remplissez vos stages de récupération de points",
   description:
-    "Centres agréés : rejoignez BYS Formation et remplissez vos sessions de stage de récupération de points. Zéro frais d'inscription, visibilité nationale, paiements sécurisés. Recevez une proposition sous 48h.",
+    "Centres agréés : rejoignez BYS Permis et remplissez vos sessions de stage de récupération de points. Zéro frais d'inscription, visibilité nationale, paiements sécurisés. Recevez une proposition sous 48h.",
   path: "/devenir-partenaire",
   keywords: [
     "devenir centre partenaire",
@@ -192,7 +192,7 @@ export default function DevenirPartenairePage() {
               récupération de <span className="text-blue-400">points</span>
             </h1>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              BYS Formation connecte votre centre aux conducteurs qui cherchent un stage
+              BYS Permis connecte votre centre aux conducteurs qui cherchent un stage
               près de chez eux. Vous gagnez en visibilité et en remplissage —
               nous nous occupons du reste.
             </p>
@@ -258,7 +258,7 @@ export default function DevenirPartenairePage() {
                 Pourquoi passer par nous
               </span>
               <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Ce que BYS Formation change pour votre centre
+                Ce que BYS Permis change pour votre centre
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Vous êtes expert du stage de récupération de points. Notre métier, c&apos;est
@@ -411,7 +411,7 @@ export default function DevenirPartenairePage() {
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Ce que les gérants de centres agréés retiennent après avoir rejoint
-                BYS Formation.
+                BYS Permis.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">

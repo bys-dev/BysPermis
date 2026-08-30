@@ -56,10 +56,10 @@ export async function sendMail(
   });
 }
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Formations <noreply@byspermis.fr>";
+const FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 // Logo embed pour emails — PNG fiable sur tous les clients (Outlook compris).
-const LOGO_IMG = `<img src="${APP_URL}/colored-logo.png" alt="BYS Formation" height="48" style="display:block;height:48px;width:auto;margin:0 auto 12px"/>`;
+const LOGO_IMG = `<img src="${APP_URL}/colored-logo.png" alt="BYS Permis" height="48" style="display:block;height:48px;width:auto;margin:0 auto 12px"/>`;
 
 /**
  * Send confirmation email after reservation.
@@ -98,7 +98,7 @@ export async function sendConfirmationEmail(params: {
       <p style="margin:0 0 12px;font-size:14px;color:#78350F">Pour valider définitivement votre inscription, envoyez votre <strong>pièce d'identité</strong> et votre <strong>permis de conduire</strong> à votre centre depuis votre espace élève.</p>
       <a href="${APP_URL}/espace-eleve/documents" style="display:inline-block;background:#F59E0B;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;padding:10px 18px;border-radius:8px">Envoyer mes documents</a>
     </div>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation Permis</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
     ...(params.attachments && params.attachments.length > 0
@@ -145,7 +145,7 @@ export async function sendJustificatifRecuEmail(params: {
     <p style="text-align:center;margin:24px 0">
       <a href="${APP_URL}/espace-eleve/documents" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Voir mes documents</a>
     </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Formation Permis</p>
+    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
   </div>
 </div>`,
   }, params.context ?? { kind: EMAIL_KIND.JUSTIFICATIF_RECU });
@@ -186,7 +186,7 @@ export async function sendEleveEventEmail(params: {
     ${params.bodyHtml}
     ${cta}
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'équipe BYS Formation Permis
+      Cordialement,<br/>L'équipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -228,7 +228,7 @@ export async function sendCentreEventEmail(params: {
     ${params.bodyHtml}
     ${cta}
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'équipe BYS Formation Permis
+      Cordialement,<br/>L'équipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -274,7 +274,7 @@ export async function sendEleveCancellationEmail(params: {
       <a href="${APP_URL}/espace-eleve/reservations" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Voir mes réservations</a>
     </p>
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'équipe BYS Formation Permis
+      Cordialement,<br/>L'équipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -310,7 +310,7 @@ export async function sendCentreNotificationEmail(params: {
         <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Montant</td><td>${formattedAmount}</td></tr>
       </table>
       <p>Connectez-vous à votre espace pour gérer cette réservation.</p>
-      <p>Cordialement,<br/>L'équipe BYS Formation Permiss</p>
+      <p>Cordialement,<br/>L'équipe BYS Permis</p>
     `,
   });
 }
@@ -338,16 +338,16 @@ export async function sendCentreInvitationEmail(params: {
   await sendMail({
     from: FROM,
     to: params.to,
-    subject: `Bienvenue sur BYS Formation — Votre espace centre est pret`,
+    subject: `Bienvenue sur BYS Permis — Votre espace centre est pret`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Formation</h1>
+    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Votre espace centre est pret !</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour,</p>
-    <p>Nous avons le plaisir de vous informer que votre centre <strong>${params.centreName}</strong> a ete cree sur la plateforme <strong>BYS Formation</strong>.</p>
+    <p>Nous avons le plaisir de vous informer que votre centre <strong>${params.centreName}</strong> a ete cree sur la plateforme <strong>BYS Permis</strong>.</p>
     <p>Votre espace est pret — il ne reste plus qu'a completer votre profil pour etre visible sur notre marketplace et commencer a recevoir des reservations.</p>
 
     ${credentialsBlock}
@@ -367,7 +367,7 @@ export async function sendCentreInvitationEmail(params: {
 
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
       Si vous avez des questions, n'hesitez pas a contacter notre equipe support.<br/>
-      Cordialement,<br/>L'equipe BYS Formation
+      Cordialement,<br/>L'equipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -398,16 +398,16 @@ export async function sendDirecteurLieuInvitationEmail(params: {
   await sendMail({
     from: FROM,
     to: params.to,
-    subject: `BYS Formation — Votre acces directeur de lieu est pret`,
+    subject: `BYS Permis — Votre acces directeur de lieu est pret`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Formation</h1>
+    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Acces directeur de lieu</p>
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour ${params.prenom},</p>
-    <p>Un acces directeur de lieu a ete cree pour vous sur la plateforme <strong>BYS Formation</strong> pour le centre <strong>${params.centreName}</strong>.</p>
+    <p>Un acces directeur de lieu a ete cree pour vous sur la plateforme <strong>BYS Permis</strong> pour le centre <strong>${params.centreName}</strong>.</p>
     <p>En tant que directeur de lieu, vous pouvez gerer les formations, sessions, inscrits et l'emargement de votre lieu.</p>
 
     ${credentialsBlock}
@@ -418,7 +418,7 @@ export async function sendDirecteurLieuInvitationEmail(params: {
 
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
       Si vous avez des questions, contactez votre chef de centre ou notre equipe support.<br/>
-      Cordialement,<br/>L'equipe BYS Formation
+      Cordialement,<br/>L'equipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -436,7 +436,7 @@ export async function sendCentreActivationEmail(params: {
   await sendMail({
     from: FROM,
     to: params.to,
-    subject: `Votre centre est maintenant visible sur BYS Formation !`,
+    subject: `Votre centre est maintenant visible sur BYS Permis !`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
@@ -445,7 +445,7 @@ export async function sendCentreActivationEmail(params: {
   </div>
   <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
     <p>Bonjour,</p>
-    <p>Excellente nouvelle ! Votre centre <strong>${params.centreName}</strong> a ete valide par notre equipe et est desormais <strong>visible sur la marketplace BYS Formation</strong>.</p>
+    <p>Excellente nouvelle ! Votre centre <strong>${params.centreName}</strong> a ete valide par notre equipe et est desormais <strong>visible sur la marketplace BYS Permis</strong>.</p>
 
     <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:16px 20px;margin:20px 0;text-align:center">
       <p style="margin:0;color:#166534;font-size:15px;font-weight:bold">Votre centre est en ligne !</p>
@@ -465,7 +465,7 @@ export async function sendCentreActivationEmail(params: {
     </p>
 
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'equipe BYS Formation
+      Cordialement,<br/>L'equipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -514,7 +514,7 @@ export async function sendQuestionnaireEmail(params: {
     </p>
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
       Vous pouvez aussi répondre depuis votre espace élève → <strong>Mes avis</strong>.<br/>
-      Cordialement,<br/>L'équipe BYS Formation Permis
+      Cordialement,<br/>L'équipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -561,7 +561,7 @@ export async function sendDocumentEmail(params: {
     ${cta}
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
       Vous pouvez aussi retrouver vos documents depuis votre espace élève → <strong>Mes documents</strong>.<br/>
-      Cordialement,<br/>L'équipe BYS Formation Permis
+      Cordialement,<br/>L'équipe BYS Permis
     </p>
   </div>
 </div>`,
@@ -583,7 +583,7 @@ export async function sendCentreRejectionEmail(params: {
   await sendMail({
     from: FROM,
     to: params.to,
-    subject: `BYS Formation — Votre demande d'activation necessite des modifications`,
+    subject: `BYS Permis — Votre demande d'activation necessite des modifications`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
   <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
@@ -607,7 +607,7 @@ export async function sendCentreRejectionEmail(params: {
 
     <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
       Si vous avez des questions, n'hesitez pas a contacter notre equipe support.<br/>
-      Cordialement,<br/>L'equipe BYS Formation
+      Cordialement,<br/>L'equipe BYS Permis
     </p>
   </div>
 </div>`,

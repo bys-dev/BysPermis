@@ -3,7 +3,7 @@ import { prisma } from "../src/lib/prisma";
 
 async function main() {
   const centre = await prisma.centre.findFirst({
-    where: { nom: { contains: "BYS Formation Osny", mode: "insensitive" } },
+    where: { nom: { contains: "BYS Permis Osny", mode: "insensitive" } },
     select: {
       id: true, nom: true, ville: true, statut: true, slug: true,
       stripeAccountId: true, stripeOnboardingDone: true,
@@ -17,7 +17,7 @@ async function main() {
     },
   });
 
-  if (!centre) { console.log("BYS Formation Osny introuvable"); return; }
+  if (!centre) { console.log("BYS Permis Osny introuvable"); return; }
   console.log("Centre:", centre.nom, centre.ville, "| statut:", centre.statut, "| slug:", centre.slug);
   console.log("Stripe account:", centre.stripeAccountId ?? "—", "| onboarding done:", centre.stripeOnboardingDone);
   console.log("\nFormations:", centre.formations.length);

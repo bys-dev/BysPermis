@@ -14,7 +14,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = pageMetadata({
   title: "À propos — Marketplace stages permis agréés",
   description:
-    "BYS Formation Permis connecte les conducteurs aux centres agréés préfecture pour réserver un stage de récupération de points partout en France.",
+    "BYS Permis connecte les conducteurs aux centres agréés préfecture pour réserver un stage de récupération de points partout en France.",
   path: "/a-propos",
 });
 
@@ -58,7 +58,7 @@ export default function AProposPage() {
               <span className="text-gray-300">Notre histoire</span>
             </div>
             <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white">
-              À propos de BYS Formation
+              À propos de BYS Permis
             </h1>
             <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
               La plateforme de référence pour réserver un stage de récupération de points permis,
@@ -92,7 +92,7 @@ export default function AProposPage() {
                   Simplifier l&apos;accès aux stages de récupération de points
                 </h2>
                 <div className="space-y-4 text-gray-600 leading-relaxed text-sm">
-                  <p>BYS Formation est née d&apos;un constat simple : réserver un stage de récupération de points permis en France restait une démarche complexe, opaque et souvent stressante pour les conducteurs.</p>
+                  <p>BYS Permis est née d&apos;un constat simple : réserver un stage de récupération de points permis en France restait une démarche complexe, opaque et souvent stressante pour les conducteurs.</p>
                   <p>Face à des informations dispersées, des prix peu transparents et des démarches administratives lourdes, nous avons créé une plateforme unique qui centralise l&apos;offre de stages agréés et simplifie chaque étape du parcours.</p>
                   <p>Depuis notre création, nous accompagnons des milliers de conducteurs dans leur démarche de récupération de points, tout en aidant les centres de formation à développer leur activité.</p>
                 </div>
@@ -132,7 +132,7 @@ export default function AProposPage() {
             <div className="text-center mb-14">
               <span className="text-blue-600 font-semibold text-xs uppercase tracking-widest">Nos valeurs</span>
               <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">Ce qui nous guide au quotidien</h2>
-              <p className="text-gray-500 max-w-xl mx-auto text-sm">Quatre piliers fondamentaux qui façonnent l&apos;expérience BYS Formation.</p>
+              <p className="text-gray-500 max-w-xl mx-auto text-sm">Quatre piliers fondamentaux qui façonnent l&apos;expérience BYS Permis.</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {values.map((v) => (
@@ -153,7 +153,7 @@ export default function AProposPage() {
           <div className="max-w-[1440px] mx-auto text-center">
             <span className="text-blue-600 font-semibold text-xs uppercase tracking-widest">Notre équipe</span>
             <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">Une équipe passionnée par la sécurité routière</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto mb-12 text-sm">Derrière BYS Formation, une équipe pluridisciplinaire qui allie expertise en sécurité routière, technologie et service client.</p>
+            <p className="text-gray-500 max-w-2xl mx-auto mb-12 text-sm">Derrière BYS Permis, une équipe pluridisciplinaire qui allie expertise en sécurité routière, technologie et service client.</p>
             <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
                 { role: "Direction & Stratégie", description: "Pilotage de la vision produit et développement des partenariats avec les centres agréés.", icon: faBuilding },
@@ -178,7 +178,7 @@ export default function AProposPage() {
             <div className="text-center mb-14">
               <span className="text-blue-600 font-semibold text-xs uppercase tracking-widest">Nos garanties</span>
               <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">Certifications & partenaires</h2>
-              <p className="text-gray-500 max-w-xl mx-auto text-sm">BYS Formation travaille exclusivement avec des centres agréés et certifiés.</p>
+              <p className="text-gray-500 max-w-xl mx-auto text-sm">BYS Permis travaille exclusivement avec des centres agréés et certifiés.</p>
             </div>
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {[

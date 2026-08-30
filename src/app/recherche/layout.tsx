@@ -14,13 +14,13 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/recherche" },
   openGraph: {
-    title: "Rechercher un stage | BYS Formation",
+    title: "Rechercher un stage | BYS Permis",
     description:
       "Comparez les centres agréés préfecture et réservez votre stage en ligne.",
     url: "/recherche",
     type: "website",
     locale: "fr_FR",
-    siteName: "BYS Formation",
+    siteName: "BYS Permis",
   },
 };
 

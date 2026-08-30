@@ -6,7 +6,7 @@ const createJestConfig = nextJest({
 })
 
 const config: Config = {
-  displayName: 'bys-formation',
+  displayName: 'bys-permis',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {

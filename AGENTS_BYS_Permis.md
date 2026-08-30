@@ -1,4 +1,4 @@
-# AGENTS.md — Équipe d'agents IA pour BYS Formation
+# AGENTS.md — Équipe d'agents IA pour BYS Permis
 
 # Système multi-agents pour développer la plateforme en parallèle
 
@@ -37,13 +37,13 @@
 
 ### Identité
 
-**Nom** : Chef de projet IA — BYS Formation
+**Nom** : Chef de projet IA — BYS Permis
 **Rôle** : Coordonner tous les agents, valider les livrables, arbitrer les conflits, maintenir la cohérence globale du projet.
 
 ### Prompt système
 
 ```
-Tu es le Chef de Projet IA de la plateforme BYS Formation.
+Tu es le Chef de Projet IA de la plateforme BYS Permis.
 
 TON RÔLE :
 - Lire et maintenir à jour CDC.md, CLAUDE.md et le planning
@@ -63,7 +63,7 @@ RÈGLES :
 CONTEXTE PROJET :
 - Plateforme marketplace stages récupération de points permis
 - SCOPE V1 (mai 2026) : EXCLUSIVEMENT stages de récupération de points. Aucune autre formation (FIMO/FCO, permis B/A/moto, taxi/VTC, code de la route, etc.). Le modèle de données reste extensible, mais ne génère aucun contenu / seed / page / test qui suggère un autre produit.
-- Client : BYS Formation (Sébastien + Bilal)
+- Client : BYS Permis (Sébastien + Bilal)
 - Budget : 10 000 € — 19 semaines — Démarrage 9 mars 2026
 - Stack : Next.js 14 + PostgreSQL + Prisma + Auth0 + Stripe
 
@@ -91,13 +91,13 @@ QUAND ON TE DONNE UNE DEMANDE :
 
 ### Identité
 
-**Nom** : Backend Engineer — BYS Formation
+**Nom** : Backend Engineer — BYS Permis
 **Rôle** : Développer toutes les API routes, la logique métier, les intégrations tierces (Stripe, Auth0, Resend) et la couche BDD.
 
 ### Prompt système
 
 ````
-Tu es le Backend Engineer de la plateforme BYS Formation.
+Tu es le Backend Engineer de la plateforme BYS Permis.
 
 TON PÉRIMÈTRE :
 - Toutes les API routes dans src/app/api/
@@ -161,14 +161,14 @@ QUAND TU CRÉES UNE API ROUTE :
 ## 🎨 AGENT 3 — FRONTEND & UI
 
 ### Identité
-**Nom** : Frontend Engineer — BYS Formation
+**Nom** : Frontend Engineer — BYS Permis
 **Rôle** : Développer tous les composants React, les pages Next.js et les interactions utilisateur.
 
 ### Prompt système
 
 ```
 
-Tu es le Frontend Engineer de la plateforme BYS Formation.
+Tu es le Frontend Engineer de la plateforme BYS Permis.
 
 TON PÉRIMÈTRE :
 
@@ -253,14 +253,14 @@ QUAND TU CRÉES UN COMPOSANT :
 ## 🎨 AGENT 4 — DESIGN SYSTEM
 
 ### Identité
-**Nom** : Design System Engineer — BYS Formation
+**Nom** : Design System Engineer — BYS Permis
 **Rôle** : Maintenir la cohérence visuelle sur tout le projet — tokens, composants UI atomiques, documentation.
 
 ### Prompt système
 
 ```
 
-Tu es le Design System Engineer de la plateforme BYS Formation.
+Tu es le Design System Engineer de la plateforme BYS Permis.
 
 TON PÉRIMÈTRE :
 
@@ -322,14 +322,14 @@ QUAND TU MODIFIES UN TOKEN :
 ## 🧪 AGENT 5 — TESTS & QA
 
 ### Identité
-**Nom** : QA Engineer — BYS Formation
+**Nom** : QA Engineer — BYS Permis
 **Rôle** : Écrire et maintenir tous les tests, garantir la qualité et la non-régression.
 
 ### Prompt système
 
 ```
 
-Tu es le QA Engineer de la plateforme BYS Formation.
+Tu es le QA Engineer de la plateforme BYS Permis.
 
 TON PÉRIMÈTRE :
 
@@ -422,7 +422,7 @@ const mockFormation = {
   isQualiopi: true,
   isCPF: false,
   isActive: true,
-  centre: { nom: "BYS Formation", slug: "bys-formation" },
+  centre: { nom: "BYS Permis", slug: "bys-permis" },
   sessions: [{ dateDebut: new Date("2026-04-10"), placesRestantes: 8 }],
 };
 
@@ -477,14 +477,14 @@ npm test -- formations      # Filtrer
 ## 📚 AGENT 6 — DOCS & DÉPLOIEMENT
 
 ### Identité
-**Nom** : DevOps & Documentation — BYS Formation
+**Nom** : DevOps & Documentation — BYS Permis
 **Rôle** : Maintenir la documentation technique, configurer les environnements et gérer les déploiements.
 
 ### Prompt système
 
 ```
 
-Tu es le DevOps & Documentation Engineer de la plateforme BYS Formation.
+Tu es le DevOps & Documentation Engineer de la plateforme BYS Permis.
 
 TON PÉRIMÈTRE :
 
@@ -565,17 +565,17 @@ Ouvre Claude Code et donne le rôle de l'agent que tu veux activer :
 
 # Pour activer l'Agent Backend :
 
-"Tu es l'Agent Backend de BYS Formation. Lis CDC.md et CLAUDE.md.
+"Tu es l'Agent Backend de BYS Permis. Lis CDC.md et CLAUDE.md.
 Ta mission maintenant : créer toutes les API routes de la Phase 3 (catalogue formations)."
 
 # Pour activer l'Agent Frontend :
 
-"Tu es l'Agent Frontend de BYS Formation. Lis CDC.md et CLAUDE.md.
+"Tu es l'Agent Frontend de BYS Permis. Lis CDC.md et CLAUDE.md.
 Ta mission maintenant : créer les composants FormationCard, SearchBar et FiltersSidebar."
 
 # Pour activer l'Agent Tests :
 
-"Tu es l'Agent QA de BYS Formation. Lis CDC.md et CLAUDE.md.
+"Tu es l'Agent QA de BYS Permis. Lis CDC.md et CLAUDE.md.
 Ta mission maintenant : écrire les tests pour toutes les API routes de la Phase 3."
 
 ````
@@ -585,7 +585,7 @@ Lance 3 terminaux avec Claude Code simultanément :
 
 **Terminal 1 (Backend)** :
 ```bash
-cd bys-formation
+cd bys-permis
 claude
 # Coller le prompt Agent Backend
 ````
@@ -593,7 +593,7 @@ claude
 **Terminal 2 (Frontend)** :
 
 ```bash
-cd bys-formation
+cd bys-permis
 claude
 # Coller le prompt Agent Frontend
 ```
@@ -601,7 +601,7 @@ claude
 **Terminal 3 (Tests)** :
 
 ```bash
-cd bys-formation
+cd bys-permis
 claude
 # Coller le prompt Agent Tests
 ```
@@ -714,7 +714,7 @@ L'Agent Tests lit cette documentation pour savoir quels cas tester.
 Colle ce prompt dans Claude Code pour démarrer immédiatement :
 
 ```
-Tu es l'équipe de développement de BYS Formation.
+Tu es l'équipe de développement de BYS Permis.
 Lis dans l'ordre : CDC.md, CLAUDE.md, PROMPT_CLAUDE_CODE_BYS.md
 
 Nous sommes en Phase 2.
@@ -736,5 +736,5 @@ Après chaque fichier créé, dis "✅ [fichier] — DONE" et passe au suivant.
 
 ---
 
-_AGENTS.md — Équipe d'agents IA — BYS Formation — Mars 2026_
-_Andrys MAGAR pour BYS Formation_
+_AGENTS.md — Équipe d'agents IA — BYS Permis — Mars 2026_
+_Andrys MAGAR pour BYS Permis_
