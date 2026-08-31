@@ -668,16 +668,16 @@ function RechercheInner() {
       {detectedCity && !searchVille && !geoLat && (
         <div className="bg-blue-600/10 border-b border-blue-500/20 px-4 py-3">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-300 flex-wrap">
-              <FontAwesomeIcon icon={faLocationDot} className="text-blue-400 shrink-0" />
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-900 flex-wrap">
+              <FontAwesomeIcon icon={faLocationDot} className="text-blue-600 shrink-0" />
               <span>
                 Position détectée :{" "}
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-blue-950">
                   {detectedCity}
                   {detectedDept ? ` (${detectedDept})` : ""}
                 </span>
               </span>
-              <span className="text-blue-400/60 hidden sm:inline">— Afficher les stages à proximité ?</span>
+              <span className="text-blue-700 hidden sm:inline">— Afficher les stages à proximité ?</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
@@ -1080,11 +1080,13 @@ function RechercheInner() {
                       {/* Le centre qui anime le stage reste joignable depuis la carte. */}
                       <Link
                         href={stage.centreSlug ? `/centres/${stage.centreSlug}` : "/centres"}
-                        className="inline-flex items-center gap-1.5 text-sm text-gray-500 mb-3 hover:text-blue-600 transition-colors group/centre"
+                        className="group/centre block mb-3"
                       >
-                        <span className="truncate">{stage.centre}</span>
-                        <span className="shrink-0 text-xs font-medium text-blue-600 flex items-center gap-1 whitespace-nowrap">
-                          · Voir le centre
+                        <span className="block text-sm text-gray-500 group-hover/centre:text-blue-600 transition-colors">
+                          {stage.centre}
+                        </span>
+                        <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 group-hover/centre:underline">
+                          Voir la fiche du centre
                           <FontAwesomeIcon icon={faArrowRight} className="text-[9px]" />
                         </span>
                       </Link>
