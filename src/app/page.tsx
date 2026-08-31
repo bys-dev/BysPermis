@@ -298,7 +298,7 @@ interface LiveFormation {
   modalite: string;
   isQualiopi: boolean;
   categorie: { nom: string } | null;
-  centre: { nom: string; ville: string; logo: string | null };
+  centre: { nom: string; ville: string; logo: string | null; slug: string };
   sessions: { placesRestantes: number }[];
 }
 
@@ -325,7 +325,7 @@ async function fetchLiveFormations(): Promise<LiveFormation[]> {
       },
       include: {
         categorie: { select: { nom: true } },
-        centre: { select: { nom: true, ville: true, logo: true } },
+        centre: { select: { nom: true, ville: true, logo: true, slug: true } },
         sessions: {
           where: { status: "ACTIVE", dateDebut: { gte: new Date() }, placesRestantes: { gt: 0 } },
           orderBy: { dateDebut: "asc" },
@@ -364,6 +364,7 @@ export default async function Home() {
                 : "Hybride",
           centre: f.centre.nom,
           centreLogo: f.centre.logo,
+          centreSlug: f.centre.slug,
           ville: f.centre.ville,
           price: `${f.prix} €`,
           places: f.sessions[0]?.placesRestantes ?? 0,
@@ -374,6 +375,7 @@ export default async function Home() {
           id: c.title,
           slug: "",
           centreLogo: null as string | null,
+          centreSlug: "",
           ville: "Île-de-France",
         }));
 
@@ -758,7 +760,12 @@ export default async function Home() {
                       <p className="text-gray-500 text-sm mb-5 line-clamp-2">{course.desc}</p>
                     )}
 
-                    <div className="flex items-center space-x-2 mb-5">
+                    {/* Le centre reste joignable à tout moment : la carte mène au
+                        stage, ce bloc mène au profil du centre qui l'anime. */}
+                    <Link
+                      href={course.centreSlug ? `/centres/${course.centreSlug}` : "/centres"}
+                      className="flex items-center space-x-2 mb-5 -mx-2 px-2 py-1.5 rounded-lg hover:bg-blue-50 transition-colors duration-200 group/centre"
+                    >
                       <div className="w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
                         {course.centreLogo ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -777,14 +784,20 @@ export default async function Home() {
                           />
                         )}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-700">{course.centre}</span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-medium text-gray-700 group-hover/centre:text-blue-600 transition-colors duration-200 truncate">
+                          {course.centre}
+                        </span>
                         <span className="text-xs text-gray-400 flex items-center">
                           <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-1 text-[10px]" />
                           {course.ville}
                         </span>
                       </div>
-                    </div>
+                      <span className="ml-auto shrink-0 text-xs font-medium text-blue-600 flex items-center gap-1 whitespace-nowrap">
+                        Voir le centre
+                        <FontAwesomeIcon icon={faArrowRight} className="text-[9px]" />
+                      </span>
+                    </Link>
 
                     <div className="mb-5">
                       <div className="flex items-center justify-between text-xs mb-1.5">

@@ -43,6 +43,7 @@ interface StageCard {
   titre: string;
   type: string;
   centre: string;
+  centreSlug: string;
   ville: string;
   departement: string;
   dateProchaine: string;
@@ -408,7 +409,7 @@ function RechercheInner() {
             id: string; titre: string; slug: string; prix: number; isQualiopi: boolean; isCPF: boolean;
             modalite: string; duree: string;
             categorie?: { nom: string } | null;
-            centre: { nom: string; ville: string; codePostal?: string | null };
+            centre: { nom: string; ville: string; codePostal?: string | null; slug?: string | null };
             sessions: { id: string; dateDebut: string; dateFin: string; placesRestantes: number }[];
             distance?: number | null;
           }) => {
@@ -426,6 +427,7 @@ function RechercheInner() {
               titre: f.titre,
               type: f.categorie?.nom ?? "Stage",
               centre: f.centre.nom,
+              centreSlug: f.centre.slug ?? "",
               ville,
               departement: dept,
               dateProchaine: dateStr,
@@ -1075,7 +1077,17 @@ function RechercheInner() {
                       <h3 className="font-display font-semibold text-brand-text mb-1 leading-snug">
                         {stage.titre}
                       </h3>
-                      <p className="text-sm text-gray-500 mb-3">{stage.centre}</p>
+                      {/* Le centre qui anime le stage reste joignable depuis la carte. */}
+                      <Link
+                        href={stage.centreSlug ? `/centres/${stage.centreSlug}` : "/centres"}
+                        className="inline-flex items-center gap-1.5 text-sm text-gray-500 mb-3 hover:text-blue-600 transition-colors group/centre"
+                      >
+                        <span className="truncate">{stage.centre}</span>
+                        <span className="shrink-0 text-xs font-medium text-blue-600 flex items-center gap-1 whitespace-nowrap">
+                          · Voir le centre
+                          <FontAwesomeIcon icon={faArrowRight} className="text-[9px]" />
+                        </span>
+                      </Link>
 
                       {/* Details */}
                       <div className="space-y-2 text-sm text-gray-600 mb-4">
