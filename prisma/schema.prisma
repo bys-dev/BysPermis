@@ -317,6 +317,8 @@ model Centre {
   horaires          String?
   equipements       String[]
   certifications    String[]
+  // Galerie de la fiche publique : URLs des photos des locaux/salles.
+  photos            String[]
   reseauxSociaux    Json?
 
   // Facturation / juridique

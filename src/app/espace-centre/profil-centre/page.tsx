@@ -63,6 +63,7 @@ interface CentreProfile {
   horaires: string | null;
   equipements: string[];
   certifications: string[];
+  photos: string[];
   reseauxSociaux: ReseauxSociaux | null;
 }
 
@@ -230,6 +231,7 @@ export default function ProfilCentrePage() {
           horaires: form.horaires || null,
           equipements: form.equipements || [],
           certifications: form.certifications || [],
+          photos: form.photos || [],
           reseauxSociaux: form.reseauxSociaux || null,
           nomResponsable: form.nomResponsable || null,
         }),
@@ -243,6 +245,7 @@ export default function ProfilCentrePage() {
         ...updated,
         equipements: updated.equipements || [],
         certifications: updated.certifications || [],
+        photos: updated.photos || [],
         reseauxSociaux: updated.reseauxSociaux || {
           facebook: "",
           instagram: "",
@@ -734,7 +737,7 @@ export default function ProfilCentrePage() {
               currentUrl={form.logo}
               onUploaded={(url) => updateField("logo", url)}
               label="Logo (affiche en haut de la fiche publique et sur les contrats)"
-              hint="PNG ou JPEG recommandé (carre, max 1 MB) — affiché sur convocations et documents PDF"
+              hint="PNG ou JPEG recommandé (carre, max 8 Mo) — affiché sur convocations et documents PDF"
               previewClassName="h-32"
             />
           </div>
@@ -784,9 +787,64 @@ export default function ProfilCentrePage() {
               currentUrl={form.bannerImage}
               onUploaded={(url) => updateField("bannerImage", url)}
               label="Banniere (entete de la fiche publique)"
-              hint="Format recommande : 1200x400px, max 2MB"
+              hint="Format recommande : 1200x400px, max 8 Mo"
               previewClassName="h-40"
             />
+          </div>
+
+          {/* Galerie photos */}
+          <div className="rounded-xl p-6" style={cardStyle}>
+            <h2 className="font-semibold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+              <FontAwesomeIcon icon={faImage} className="text-blue-400 w-4 h-4" />
+              Galerie photos
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Jusqu&apos;a 12 photos de vos locaux et de vos salles, affichees sur
+              votre fiche publique.
+            </p>
+
+            {(form.photos ?? []).length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                {(form.photos ?? []).map((url) => (
+                  <div
+                    key={url}
+                    className="relative group rounded-lg overflow-hidden border border-white/10"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" className="h-24 w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateField(
+                          "photos",
+                          (form.photos ?? []).filter((p) => p !== url),
+                        )
+                      }
+                      className="absolute top-1 right-1 rounded-md bg-black/75 text-white text-[11px] px-2 py-1 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(form.photos ?? []).length < 12 ? (
+              <ImageUploadField
+                kind="photo"
+                currentUrl={null}
+                onUploaded={(url) =>
+                  updateField("photos", [...(form.photos ?? []), url])
+                }
+                label="Ajouter une photo"
+                hint="JPEG, PNG ou WEBP — 8 Mo maximum, 12 photos au total"
+                previewClassName="h-24"
+              />
+            ) : (
+              <p className="text-xs text-amber-400">
+                Limite de 12 photos atteinte — retirez-en une pour en ajouter une autre.
+              </p>
+            )}
           </div>
 
           {/* Live preview */}
