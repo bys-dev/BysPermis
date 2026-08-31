@@ -133,7 +133,7 @@ const benefits = [
   },
   {
     title: "Vous gardez la majorité",
-    text: "Aucun frais d'inscription. Une commission claire, prélevée uniquement sur les réservations réellement confirmées.",
+    text: "Aucun frais d'inscription, aucun abonnement. Vous conservez 85 % du prix du stage : 15 % de commission, prélevés uniquement sur les réservations réellement confirmées.",
   },
   {
     title: "Une visibilité locale et SEO",
@@ -152,13 +152,14 @@ const benefits = [
 const steps = [
   { num: "01", title: "Vous déposez votre demande", text: "Formulaire en 2 minutes sur byspermis.fr/devenir-partenaire. Nous vérifions votre agrément préfectoral." },
   { num: "02", title: "Vous publiez vos sessions", text: "Une fois validé, vous créez vos dates de stage en quelques clics : elles sont immédiatement visibles." },
-  { num: "03", title: "Vous encaissez, sereinement", text: "Les conducteurs réservent et paient en ligne. Vous êtes réglé automatiquement après chaque stage." },
+  { num: "03", title: "Vous encaissez, sereinement", text: "Les conducteurs réservent et paient en ligne. Vos revenus vous sont versés chaque semaine par virement automatique." },
 ];
 
-const plans = [
-  { nom: "Essentiel", prix: "49 €/mois", commission: "10 %", formations: "5" },
-  { nom: "Premium", prix: "99 €/mois", commission: "7 %", formations: "20" },
-  { nom: "Entreprise", prix: "199 €/mois", commission: "5 %", formations: "Illimité" },
+const modele = [
+  { label: "Frais d'inscription", value: "0 €" },
+  { label: "Abonnement mensuel", value: "Aucun" },
+  { label: "Commission", value: "15 % sur chaque vente" },
+  { label: "Versement de vos revenus", value: "Hebdomadaire" },
 ];
 
 const reassurance = [
@@ -250,50 +251,20 @@ export function BrochurePartenaire() {
             ))}
           </View>
 
-          <Text style={styles.sectionLabel}>NOS OFFRES</Text>
-          <Text style={styles.sectionTitle}>Un abonnement simple, une commission dégressive</Text>
+          <Text style={styles.sectionLabel}>NOTRE MODÈLE</Text>
+          <Text style={styles.sectionTitle}>Une commission unique, sans abonnement</Text>
 
           <View style={styles.table}>
-            <View style={styles.tRow}>
-              <View style={styles.tHeadLabelCell}>
-                <Text style={styles.tHeadText}> </Text>
-              </View>
-              {plans.map((p) => (
-                <View key={p.nom} style={styles.tHeadCell}>
-                  <Text style={styles.tHeadText}>{p.nom}</Text>
+            {modele.map((m, i) => (
+              <View key={m.label} style={i === modele.length - 1 ? styles.tRowLast : styles.tRow}>
+                <View style={styles.tLabelCell}>
+                  <Text style={styles.tLabelText}>{m.label}</Text>
                 </View>
-              ))}
-            </View>
-            <View style={styles.tRow}>
-              <View style={styles.tLabelCell}>
-                <Text style={styles.tLabelText}>Abonnement mensuel</Text>
-              </View>
-              {plans.map((p) => (
-                <View key={p.nom} style={styles.tCell}>
-                  <Text style={styles.tValueText}>{p.prix}</Text>
+                <View style={styles.tCell}>
+                  <Text style={styles.tValueText}>{m.value}</Text>
                 </View>
-              ))}
-            </View>
-            <View style={styles.tRow}>
-              <View style={styles.tLabelCell}>
-                <Text style={styles.tLabelText}>Commission</Text>
               </View>
-              {plans.map((p) => (
-                <View key={p.nom} style={styles.tCell}>
-                  <Text style={styles.tValueText}>{p.commission}</Text>
-                </View>
-              ))}
-            </View>
-            <View style={styles.tRowLast}>
-              <View style={styles.tLabelCell}>
-                <Text style={styles.tLabelText}>Formations max.</Text>
-              </View>
-              {plans.map((p) => (
-                <View key={p.nom} style={styles.tCell}>
-                  <Text style={styles.tValueText}>{p.formations}</Text>
-                </View>
-              ))}
-            </View>
+            ))}
           </View>
 
           <Text style={styles.sectionLabel}>EN TOUTE CONFIANCE</Text>

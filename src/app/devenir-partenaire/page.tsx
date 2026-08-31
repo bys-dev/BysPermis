@@ -56,7 +56,7 @@ const benefits = [
   {
     icon: faWallet,
     title: "Vous gardez la majorité",
-    text: "Aucun frais d'inscription. Une commission claire, prélevée uniquement sur les réservations réellement confirmées via la plateforme.",
+    text: "Aucun frais d'inscription, aucun abonnement. Vous conservez 85 % du prix du stage : 15 % de commission, prélevés uniquement sur les réservations confirmées via la plateforme.",
   },
   {
     icon: faMagnifyingGlassLocation,
@@ -171,6 +171,12 @@ export default function DevenirPartenairePage() {
           />
           <div className="absolute top-10 left-[8%] w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-10 right-[12%] w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="absolute top-0 left-0 right-0 h-1 flex">
+            <div className="flex-1 bg-blue-600" />
+            <div className="flex-1 bg-white" />
+            <div className="flex-1 bg-red-500" />
+          </div>
 
           <div className="absolute bottom-0 left-0 right-0 h-1 flex">
             <div className="flex-1 bg-blue-600" />
@@ -334,15 +340,15 @@ export default function DevenirPartenairePage() {
                     Un modèle clair, sans mauvaise surprise
                   </h2>
                   <p className="text-blue-100 leading-relaxed mb-6">
-                    Pas de frais cachés, pas d&apos;abonnement obligatoire pour démarrer.
-                    Vous ne payez une commission que sur les réservations réellement
-                    apportées et confirmées. Si nous ne vous remplissons pas, vous ne
-                    payez rien.
+                    Pas de frais cachés, aucun abonnement. Vous ne payez que 15 %
+                    de commission sur les réservations réellement apportées et
+                    confirmées, et vos revenus vous sont versés chaque semaine. Si
+                    nous ne vous remplissons pas, vous ne payez rien.
                   </p>
                   <ul className="space-y-3">
                     {[
                       "Inscription 100 % gratuite",
-                      "Commission uniquement sur réservations confirmées",
+                      "15 % de commission, uniquement sur réservations confirmées",
                       "Aucun engagement de durée — vous partez quand vous voulez",
                       "Paiements sécurisés et versés automatiquement",
                     ].map((item) => (

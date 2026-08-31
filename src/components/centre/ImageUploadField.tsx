@@ -32,7 +32,7 @@ export function ImageUploadField({
   onUploaded,
   label,
   hint,
-  accept = "image/png,image/jpeg,image/webp,image/svg+xml",
+  accept = "image/png,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml",
   previewClassName = "h-32",
 }: ImageUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -1,48 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
-  faXmark,
   faArrowRight,
   faBuilding,
   faChevronDown,
   faChevronUp,
   faQuoteLeft,
-  faCrown,
-  faGem,
-  faCubes,
-  faSpinner,
-  faInfinity,
 } from "@fortawesome/free-solid-svg-icons";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 // ─── TYPES ──────────────────────────────────────────────
-
-interface SubscriptionPlan {
-  id: string;
-  nom: string;
-  stripePriceId: string;
-  prix: number;
-  features: string[];
-  maxFormations: number;
-  isFeatured: boolean;
-  commissionRate: number;
-  ordre: number;
-}
-
-// ─── STATIC DATA ────────────────────────────────────────
-
-const planIcons: Record<string, IconDefinition> = {
-  Essentiel: faCubes,
-  Premium: faGem,
-  Entreprise: faCrown,
-};
 
 interface Testimonial {
   quote: string;
@@ -84,22 +56,22 @@ const faqItems: FaqItem[] = [
   {
     question: "Y a-t-il des frais d'inscription ?",
     answer:
-      "Non, l'inscription sur BYS Permis est entièrement gratuite. Vous payez un abonnement mensuel et une commission réduite sur les réservations effectivement réalisées via la plateforme.",
+      "Non. L'inscription, la publication de vos sessions et votre vitrine en ligne sont gratuites : aucun abonnement, aucun engagement de durée. Nous nous rémunérons uniquement via la commission sur les réservations confirmées.",
   },
   {
     question: "Comment sont calculées les commissions ?",
     answer:
-      "La commission est prélevée automatiquement sur chaque réservation confirmée. Elle est calculée sur le prix TTC du stage. Le taux dépend de votre plan d'abonnement : plus votre plan est élevé, plus la commission est réduite.",
+      "La commission est de 15 % du prix TTC du stage. Elle est prélevée automatiquement sur chaque réservation confirmée via la plateforme — jamais sur les inscriptions que vous réalisez de votre côté.",
   },
   {
     question: "Quand recevrai-je mes paiements ?",
     answer:
-      "Les paiements sont versés automatiquement sur votre compte bancaire via Stripe Connect, sous 7 jours ouvrés après la fin du stage. Vous pouvez suivre vos paiements en temps réel dans votre tableau de bord.",
+      "Vos revenus sont versés chaque semaine sur votre compte bancaire via Stripe Connect. Vous suivez vos encaissements et la commission prélevée en temps réel dans votre tableau de bord.",
   },
   {
-    question: "Puis-je changer de plan en cours de route ?",
+    question: "Suis-je engagé sur une durée ?",
     answer:
-      "Oui, vous pouvez upgrader ou downgrader votre plan à tout moment depuis votre espace centre. Le changement prend effet immédiatement et la facturation est ajustée au prorata.",
+      "Non. Vous restez libre de publier ou non des sessions, et de quitter la plateforme à tout moment depuis votre espace centre. Aucun préavis, aucun frais de résiliation.",
   },
   {
     question: "Quels documents sont nécessaires pour s'inscrire ?",
@@ -115,143 +87,8 @@ const faqItems: FaqItem[] = [
 
 // ─── COMPONENTS ─────────────────────────────────────────
 
-function PlanCard({
-  plan,
-  isPopular,
-  onSubscribe,
-  subscribing,
-}: {
-  plan: SubscriptionPlan;
-  isPopular: boolean;
-  onSubscribe: (planId: string) => void;
-  subscribing: string | null;
-}) {
-  const icon = planIcons[plan.nom] || faCubes;
-  const isLoading = subscribing === plan.id;
-
-  return (
-    <div
-      className={`relative bg-white rounded-2xl border ${
-        isPopular
-          ? "border-brand-accent shadow-xl shadow-blue-100 scale-105"
-          : "border-brand-border"
-      } p-8 flex flex-col hover:shadow-lg transition-all duration-300`}
-    >
-      {isPopular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-white text-xs font-bold px-4 py-1.5 rounded-full">
-          Le plus populaire
-        </div>
-      )}
-
-      <div className="text-center mb-6">
-        <div
-          className={`w-14 h-14 rounded-xl ${
-            isPopular
-              ? "bg-brand-accent text-white"
-              : "bg-blue-50 text-blue-600"
-          } flex items-center justify-center mx-auto mb-4`}
-        >
-          <FontAwesomeIcon icon={icon} className="text-xl" />
-        </div>
-        <h3 className="font-display font-bold text-xl text-brand-text">
-          {plan.nom}
-        </h3>
-      </div>
-
-      <div className="text-center mb-6 pb-6 border-b border-brand-border">
-        <div className="font-display font-bold text-4xl text-brand-text">
-          {plan.prix}&euro;
-        </div>
-        <div className="text-gray-500 text-sm mt-1">par mois</div>
-        <div className="mt-2 inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
-          Commission : {plan.commissionRate}%
-        </div>
-      </div>
-
-      <ul className="space-y-3 flex-1 mb-6">
-        <li className="flex items-center gap-3">
-          <FontAwesomeIcon icon={faCheck} className="flex-shrink-0 text-green-500" />
-          <span className="text-sm text-gray-700">
-            {plan.maxFormations >= 9999 ? (
-              <>
-                Formations illimitées{" "}
-                <FontAwesomeIcon icon={faInfinity} className="text-xs text-gray-400" />
-              </>
-            ) : (
-              `Jusqu'à ${plan.maxFormations} formations`
-            )}
-          </span>
-        </li>
-        {plan.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-3">
-            <FontAwesomeIcon icon={faCheck} className="flex-shrink-0 text-green-500" />
-            <span className="text-sm text-gray-700">{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      <button
-        onClick={() => onSubscribe(plan.id)}
-        disabled={isLoading || subscribing !== null}
-        className={`w-full text-center py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-          isPopular
-            ? "bg-brand-accent text-white hover:bg-brand-accent-hover disabled:opacity-50"
-            : "bg-gray-100 text-brand-text hover:bg-gray-200 disabled:opacity-50"
-        }`}
-      >
-        {isLoading && (
-          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-sm" />
-        )}
-        {isLoading ? "Redirection..." : `Choisir ${plan.nom}`}
-      </button>
-    </div>
-  );
-}
-
-// ─── PAGE ───────────────────────────────────────────────
-
 export default function TarifsPartenairesPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [loadingPlans, setLoadingPlans] = useState(true);
-  const [subscribing, setSubscribing] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/subscription-plans")
-      .then((r) => r.json())
-      .then((data: SubscriptionPlan[]) => {
-        if (Array.isArray(data)) setPlans(data);
-      })
-      .catch(() => null)
-      .finally(() => setLoadingPlans(false));
-  }, []);
-
-  const handleSubscribe = useCallback(async (planId: string) => {
-    setSubscribing(planId);
-    try {
-      const res = await fetch("/api/stripe/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId }),
-      });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        // If not authenticated, redirect to login
-        if (res.status === 500 && data.error === "Non authentifié") {
-          window.location.href = "/auth/login?returnTo=/tarifs-partenaires";
-        }
-      }
-    } catch {
-      // silently fail
-    }
-    setSubscribing(null);
-  }, []);
-
-  // Determine which plan is "popular" (Premium or the isFeatured one with lowest price)
-  const popularPlanId = plans.find((p) => p.nom === "Premium")?.id ?? plans.find((p) => p.isFeatured)?.id;
-
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <Header />
@@ -273,199 +110,61 @@ export default function TarifsPartenairesPage() {
             </h1>
             <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               Rejoignez le réseau BYS Permis et développez votre activité.
-              Choisissez le plan adapté à vos besoins avec une commission
-              réduite.
+              Sans abonnement ni engagement : 15 % de commission sur les
+              réservations confirmées, versées chaque semaine.
             </p>
           </div>
         </section>
 
-        {/* ─── Pricing Plans ─── */}
+        {/* ─── Notre modèle ─── */}
         <section className="section">
-          <div className="max-w-[1440px] mx-auto px-8">
-            <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
-                Nos offres
-              </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Choisissez le plan adapté à votre centre
-              </h2>
-              <p className="text-gray-500 max-w-2xl mx-auto">
-                Un abonnement mensuel simple avec une commission réduite sur les
-                réservations. Plus votre plan est élevé, plus la commission est
-                basse.
-              </p>
-            </div>
-
-            <div className="relative min-h-[280px]">
-              <div className={loadingPlans ? "opacity-40 pointer-events-none select-none" : ""}>
-                {loadingPlans ? (
-                  <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start animate-pulse">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-[420px] rounded-2xl bg-gray-100 border border-gray-200" />
-                    ))}
-                  </div>
-                ) : plans.length > 0 ? (
-                  <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
-                    {plans.map((plan) => (
-                      <PlanCard
-                        key={plan.id}
-                        plan={plan}
-                        isPopular={plan.id === popularPlanId}
-                        onSubscribe={handleSubscribe}
-                        subscribing={subscribing}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-500">
-                    Aucun plan disponible pour le moment.
-                  </p>
-                )}
-              </div>
-              <LoadingOverlay show={loadingPlans} label="Chargement des plans..." backdropOpacity={0.35} />
-            </div>
-          </div>
-        </section>
-
-        {/* ─── Feature Comparison Table ─── */}
-        <section className="section bg-white">
           <div className="max-w-5xl mx-auto px-8">
             <div className="text-center mb-14">
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mb-4">
-                Comparaison détaillée
+              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+                Notre modèle
+              </span>
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
+                Une commission unique, sans abonnement
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Retrouvez en détail toutes les fonctionnalités incluses dans
-                chaque plan.
+                Pas de forfait, pas d&apos;engagement de durée. Vous ne payez que
+                lorsque la plateforme vous apporte une réservation.
               </p>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-brand-border">
-                    <th className="text-left py-4 px-4 font-display font-semibold text-brand-text">
-                      Fonctionnalité
-                    </th>
-                    <th className="text-center py-4 px-4 font-display font-semibold text-brand-text">
-                      Essentiel
-                    </th>
-                    <th className="text-center py-4 px-4 font-display font-semibold text-brand-accent">
-                      Premium
-                    </th>
-                    <th className="text-center py-4 px-4 font-display font-semibold text-brand-text">
-                      Entreprise
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    {
-                      feature: "Abonnement mensuel",
-                      essentiel: "49\u00a0\u20ac",
-                      premium: "99\u00a0\u20ac",
-                      entreprise: "199\u00a0\u20ac",
-                    },
-                    {
-                      feature: "Commission",
-                      essentiel: "10%",
-                      premium: "7%",
-                      entreprise: "5%",
-                    },
-                    {
-                      feature: "Formations max",
-                      essentiel: "5",
-                      premium: "20",
-                      entreprise: "Illimité",
-                    },
-                    {
-                      feature: "Listing marketplace",
-                      essentiel: true,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Gestion des sessions",
-                      essentiel: true,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Convocations automatiques",
-                      essentiel: true,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Paiements automatiques",
-                      essentiel: true,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Mise en avant (listing premium)",
-                      essentiel: false,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Dashboard analytics",
-                      essentiel: false,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Support prioritaire",
-                      essentiel: false,
-                      premium: true,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Account manager dédié",
-                      essentiel: false,
-                      premium: false,
-                      entreprise: true,
-                    },
-                    {
-                      feature: "Accès API",
-                      essentiel: false,
-                      premium: false,
-                      entreprise: true,
-                    },
-                  ].map((row, index) => (
-                    <tr
-                      key={row.feature}
-                      className={`border-b border-brand-border ${
-                        index % 2 === 0 ? "bg-gray-50/50" : ""
-                      }`}
-                    >
-                      <td className="py-3.5 px-4 text-sm text-gray-700 font-medium">
-                        {row.feature}
-                      </td>
-                      {(["essentiel", "premium", "entreprise"] as const).map(
-                        (plan) => (
-                          <td key={plan} className="py-3.5 px-4 text-center">
-                            {typeof row[plan] === "boolean" ? (
-                              <FontAwesomeIcon
-                                icon={row[plan] ? faCheck : faXmark}
-                                className={
-                                  row[plan]
-                                    ? "text-green-500"
-                                    : "text-gray-300"
-                                }
-                              />
-                            ) : (
-                              <span className="text-sm font-semibold text-brand-text">
-                                {row[plan]}
-                              </span>
-                            )}
-                          </td>
-                        )
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              {[
+                { valeur: "0 €", titre: "Pour rejoindre", texte: "Inscription, publication de vos sessions et vitrine en ligne : entièrement gratuites." },
+                { valeur: "15 %", titre: "Sur chaque vente", texte: "Prélevés sur le prix TTC, uniquement sur les réservations confirmées via BYS Permis." },
+                { valeur: "7 j", titre: "Versement hebdomadaire", texte: "Vos revenus sont virés chaque semaine sur votre compte via Stripe Connect." },
+              ].map((c) => (
+                <div key={c.titre} className="rounded-2xl border border-brand-border bg-white p-8 text-center">
+                  <p className="font-display font-bold text-4xl text-brand-accent mb-2">{c.valeur}</p>
+                  <p className="font-display font-semibold text-brand-text mb-2">{c.titre}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{c.texte}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl bg-white border border-brand-border p-8">
+              <h3 className="font-display font-semibold text-lg text-brand-text mb-5">
+                Ce qui est inclus, sans supplément
+              </h3>
+              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+                {[
+                  "Fiche centre et pages ville optimisées SEO",
+                  "Publication illimitée de sessions",
+                  "Encaissement sécurisé Stripe",
+                  "Convocations et attestations automatiques",
+                  "Émargement numérique",
+                  "Tableau de bord et suivi des revenus",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3 text-sm text-gray-600">
+                    <FontAwesomeIcon icon={faCheck} className="text-brand-accent mt-1 shrink-0" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>
