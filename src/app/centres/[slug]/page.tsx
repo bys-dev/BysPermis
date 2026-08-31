@@ -100,6 +100,7 @@ interface Centre {
   horaires: string | null;
   equipements: string[];
   certifications: string[];
+  photos: string[];
   reseauxSociaux: ReseauxSociaux | null;
   formations: Formation[];
   _count: {
@@ -387,6 +388,27 @@ export default async function CentreDetailPage({
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── GALERIE ───────────────────────────────────────── */}
+      {centre.photos && centre.photos.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 py-10">
+          <h2 className="font-display font-bold text-2xl text-brand-text mb-6">
+            Le centre en images
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {centre.photos.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={url}
+                src={url}
+                alt={`${centre.nom} — photo ${i + 1}`}
+                loading="lazy"
+                className="h-44 w-full rounded-xl object-cover border border-brand-border"
+              />
+            ))}
           </div>
         </section>
       )}
