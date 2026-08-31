@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Tarifs partenaires — Devenir centre partenaire",
   description:
-    "Découvrez nos forfaits pour les centres de formation partenaires. Abonnement mensuel transparent, sans engagement, paiement sécurisé Stripe.",
+    "Rejoignez BYS Permis sans abonnement ni engagement : 15 % de commission sur les réservations confirmées et versement hebdomadaire via Stripe.",
   alternates: { canonical: "/tarifs-partenaires" },
   openGraph: {
     title: "Tarifs partenaires | BYS Permis",
     description:
-      "Forfaits transparents pour les centres de formation partenaires BYS.",
+      "Sans abonnement : 15 % de commission et versement hebdomadaire.",
     url: "/tarifs-partenaires",
     type: "website",
     locale: "fr_FR",

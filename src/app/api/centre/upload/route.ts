@@ -2,22 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreManagement } from "@/lib/auth0";
 import { getUserCentreId } from "@/lib/centre-utils";
-import { uploadFile, HAS_BLOB } from "@/lib/storage";
+import { uploadFile, DOCUMENT_MAX_BYTES } from "@/lib/storage";
 
 /**
  * POST /api/centre/upload — upload a centre image asset (logo, signature, banner).
  *
  * Body: multipart/form-data
- *   - file: File (image/png | image/jpeg | image/svg+xml | image/webp), max 2 MB
+ *   - file: File (png | jpeg | webp | avif | gif | svg), max 8 MB
  *   - kind: "logo" | "signature" | "bannerImage"
  */
-const MAX_BYTES = 2 * 1024 * 1024;
+// Aligne sur les autres routes d'upload (8 MB) : une photo de telephone
+// depasse regulierement 2 MB, ce qui faisait echouer l'envoi.
+const MAX_BYTES = DOCUMENT_MAX_BYTES;
 const ALLOWED_MIME: Record<string, string> = {
   "image/png": "png",
   "image/jpeg": "jpg",
   "image/svg+xml": "svg",
   "image/webp": "webp",
+  "image/avif": "avif",
+  "image/gif": "gif",
 };
+// Formats photo d'iPhone : refuses par les navigateurs a l'affichage, on
+// renvoie un message explicite plutot qu'un "type non supporte" opaque.
+const HEIC_MIME = new Set(["image/heic", "image/heif", "image/heic-sequence"]);
 const ALLOWED_KINDS = ["logo", "signature", "bannerImage"] as const;
 type UploadKind = (typeof ALLOWED_KINDS)[number];
 
@@ -41,17 +48,30 @@ export async function POST(req: NextRequest) {
 
     const ext = ALLOWED_MIME[file.type];
     if (!ext) {
-      return NextResponse.json({ error: "Type d'image non supporté" }, { status: 400 });
+      if (HEIC_MIME.has(file.type)) {
+        return NextResponse.json(
+          { error: "Photo iPhone (HEIC) non supportée. Exportez-la en JPEG ou PNG avant de l'envoyer." },
+          { status: 400 },
+        );
+      }
+      return NextResponse.json(
+        { error: "Type d'image non supporté (formats acceptés : PNG, JPEG, WEBP, AVIF, GIF, SVG)" },
+        { status: 400 },
+      );
     }
     if (file.size > MAX_BYTES) {
-      return NextResponse.json({ error: "Fichier trop volumineux (max 2 MB)" }, { status: 400 });
+      const mb = Math.round(MAX_BYTES / (1024 * 1024));
+      return NextResponse.json(
+        { error: `Fichier trop volumineux (${(file.size / (1024 * 1024)).toFixed(1)} MB) — maximum ${mb} MB` },
+        { status: 400 },
+      );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const timestamp = Date.now();
     const filename = `${kind}-${timestamp}.${ext}`;
 
-    const { url } = await uploadFile({
+    const { url, storage } = await uploadFile({
       pathPrefix: `centres/${centreId}`,
       filename,
       contentType: file.type,
@@ -68,7 +88,7 @@ export async function POST(req: NextRequest) {
       data: { [fieldMap[kind]]: url },
     });
 
-    return NextResponse.json({ url, kind, storage: HAS_BLOB ? "blob" : "local" });
+    return NextResponse.json({ url, kind, storage });
   } catch (err) {
     if (err instanceof Error && err.message === "Non authentifié") {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
