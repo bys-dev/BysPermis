@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { escapeHtml } from "@/lib/utils";
 import {
   sendCentreEventEmail,
   sendEleveCancellationEmail,
@@ -539,4 +540,100 @@ export async function notifyEleveSessionReminder(params: {
     "Rappel — votre stage approche",
     `Votre stage « ${params.formationTitle} » chez ${params.centreName} commence le ${params.sessionDate}. Pensez à imprimer votre convocation.`,
   );
+}
+
+// ─── Demandes de partenariat (page /devenir-partenaire) ────
+
+/** Destinataires des nouvelles demandes : comptes OWNER (repli ADMIN) + boîte contact. */
+async function resolvePartnerLeadRecipients() {
+  const owners = await prisma.user.findMany({
+    where: { role: "OWNER", isBlocked: false },
+    select: { id: true, email: true },
+  });
+  const users = owners.length
+    ? owners
+    : await prisma.user.findMany({
+        where: { role: "ADMIN", isBlocked: false },
+        select: { id: true, email: true },
+      });
+  const emails = new Set(users.map((u) => u.email?.trim().toLowerCase()).filter(Boolean) as string[]);
+  const inbox = process.env.PARTNER_LEADS_INBOX ?? "contact@byspermis.fr";
+  if (inbox) emails.add(inbox.toLowerCase());
+  return { userIds: users.map((u) => u.id), emails: [...emails] };
+}
+
+export async function notifyOwnersNewPartnerLead(lead: {
+  id: string;
+  centreNom: string;
+  contactNom: string;
+  contactEmail: string;
+  telephone: string;
+  ville: string;
+  agrementNumber: string | null;
+  agrementDepartement: string | null;
+  volumeMensuel: string | null;
+  message: string | null;
+}): Promise<void> {
+  const recipients = await resolvePartnerLeadRecipients();
+  await createInAppNotifications(
+    recipients.userIds,
+    "Nouvelle demande de partenariat",
+    `« ${lead.centreNom} » (${lead.ville}) demande à rejoindre BYS Permis. Agrément : ${lead.agrementNumber ?? "non renseigné"}.`,
+  );
+
+  const e = escapeHtml;
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:6px 16px 6px 0;font-weight:bold;color:#374151;vertical-align:top;white-space:nowrap">${label}</td><td style="padding:6px 0;color:#111827">${value}</td></tr>`;
+  const agrement = lead.agrementNumber
+    ? `${e(lead.agrementNumber)}${lead.agrementDepartement ? ` (dép. ${e(lead.agrementDepartement)})` : ""}`
+    : "<em style='color:#9ca3af'>non renseigné</em>";
+  const bodyHtml = `<p>Un centre souhaite rejoindre la plateforme. Vous pouvez accepter la demande (le compte propriétaire est créé automatiquement et ses accès lui sont envoyés) ou la refuser avec un motif.</p>
+    <table style="border-collapse:collapse;width:100%;margin:16px 0">
+      ${row("Centre", e(lead.centreNom))}
+      ${row("N° d'agrément", agrement)}
+      ${row("Contact", e(lead.contactNom))}
+      ${row("Email", `<a href="mailto:${e(lead.contactEmail)}">${e(lead.contactEmail)}</a>`)}
+      ${row("Téléphone", e(lead.telephone))}
+      ${row("Ville / dép.", e(lead.ville))}
+      ${lead.volumeMensuel ? row("Volume estimé", e(lead.volumeMensuel)) : ""}
+    </table>
+    ${lead.message ? `<div style="background:#f9fafb;border-left:4px solid #3b82f6;padding:12px 16px;border-radius:4px;line-height:1.6">${e(lead.message).replace(/\n/g, "<br/>")}</div>` : ""}`;
+
+  const results = await Promise.allSettled(
+    recipients.emails.map((to) =>
+      sendCentreEventEmail({
+        to,
+        subject: `[Partenaire BYS] Nouvelle demande — ${lead.centreNom}`,
+        title: "Nouvelle demande de partenariat",
+        bodyHtml,
+        ctaUrl: `${APP_URL}/admin/partenaires?demande=${lead.id}`,
+        ctaLabel: "Accepter ou refuser la demande",
+      }),
+    ),
+  );
+  const failed = results.filter((r) => r.status === "rejected");
+  if (failed.length === results.length && results.length > 0) {
+    throw (failed[0] as PromiseRejectedResult).reason;
+  }
+}
+
+export async function sendPartnerLeadRefusedEmail(params: {
+  to: string;
+  centreNom: string;
+  motif: string;
+}): Promise<void> {
+  await sendCentreEventEmail({
+    to: params.to,
+    subject: "BYS Permis — Votre demande de partenariat",
+    title: "Votre demande de partenariat",
+    bodyHtml: `<p>Bonjour,</p>
+      <p>Merci de l'intérêt que vous portez à BYS Permis. Après étude, nous ne pouvons pas donner suite à la demande de partenariat de <strong>${escapeHtml(params.centreNom)}</strong> pour le moment.</p>
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:16px 20px;margin:20px 0">
+        <p style="margin:0 0 8px;font-weight:bold;color:#991B1B;font-size:14px">Motif :</p>
+        <p style="margin:0;color:#7F1D1D;font-size:13px">${escapeHtml(params.motif).replace(/\n/g, "<br/>")}</p>
+      </div>
+      <p>Si votre situation évolue (par exemple l'obtention ou le renouvellement de votre agrément préfectoral), vous pouvez déposer une nouvelle demande.</p>`,
+    ctaUrl: `${APP_URL}/devenir-partenaire`,
+    ctaLabel: "Déposer une nouvelle demande",
+  });
 }

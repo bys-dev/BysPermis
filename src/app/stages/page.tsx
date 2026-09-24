@@ -108,70 +108,74 @@ export default function StagesIndexPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl space-y-14 px-6 py-12">
-          {/* Villes */}
-          <section aria-labelledby="villes">
-            <h2 id="villes" className="mb-2 font-display text-2xl font-bold text-gray-900">
-              Les {TOP_VILLES.length} villes les plus recherchées
-            </h2>
-            <p className="mb-6 text-sm text-gray-500">
-              {VILLES.length} communes couvertes au total — chaque page affiche les sessions
-              réservables sur place puis, par ordre de distance, celles des communes voisines.
-            </p>
-            <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-              {TOP_VILLES.map((v) => (
-                <li key={v.slug}>
-                  <Link
-                    href={`/stages/${v.slug}`}
-                    className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                  >
-                    <FontAwesomeIcon icon={faLocationDot} className="text-xs text-gray-400" />
-                    <span className="truncate">{v.nom}</span>
-                    <span className="ml-auto text-xs text-gray-400">{v.dept}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <div className="tricolore-rule" aria-hidden="true" />
+        <div className="relative overflow-hidden bg-section-tint-reverse">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+          <div className="relative mx-auto max-w-7xl space-y-14 px-6 py-12">
+            {/* Villes */}
+            <section aria-labelledby="villes">
+              <h2 id="villes" className="heading-accent mb-2 font-display text-2xl font-bold text-gray-900">
+                Les {TOP_VILLES.length} villes les plus recherchées
+              </h2>
+              <p className="mb-6 text-sm text-gray-500">
+                {VILLES.length} communes couvertes au total — chaque page affiche les sessions
+                réservables sur place puis, par ordre de distance, celles des communes voisines.
+              </p>
+              <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                {TOP_VILLES.map((v) => (
+                  <li key={v.slug}>
+                    <Link
+                      href={`/stages/${v.slug}`}
+                      className="chip-link group flex items-center gap-2 rounded-xl border border-blue-100 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
+                    >
+                      <FontAwesomeIcon icon={faLocationDot} className="text-xs text-blue-400 group-hover:text-blue-600" />
+                      <span className="truncate">{v.nom}</span>
+                      <span className="ml-auto rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">{v.dept}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-          {/* Départements par région */}
-          <section aria-labelledby="departements">
-            <h2 id="departements" className="mb-6 font-display text-2xl font-bold text-gray-900">
-              Tous les départements
-            </h2>
-            <div className="space-y-8">
-              {regions.map(({ region, departements }) => (
-                <div key={region}>
-                  <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
-                    {region}
-                  </h3>
-                  <ul className="flex flex-wrap gap-2">
-                    {departements.map((d) => (
-                      <li key={d.code}>
-                        <Link
-                          href={`/stages/departement/${d.slug}`}
-                          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                        >
-                          <span className="font-mono text-xs text-gray-400">{d.code}</span>
-                          {d.nom}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
+            {/* Départements par région */}
+            <section aria-labelledby="departements">
+              <h2 id="departements" className="heading-accent mb-6 font-display text-2xl font-bold text-gray-900">
+                Tous les départements
+              </h2>
+              <div className="grid gap-5 md:grid-cols-2">
+                {regions.map(({ region, departements }) => (
+                  <div key={region} className="card-lift card-accent-top p-5">
+                    <h3 className="mb-3 mt-1 text-sm font-bold uppercase tracking-wide text-blue-900">
+                      {region}
+                    </h3>
+                    <ul className="flex flex-wrap gap-2">
+                      {departements.map((d) => (
+                        <li key={d.code}>
+                          <Link
+                            href={`/stages/departement/${d.slug}`}
+                            className="chip-link inline-flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50/50 px-3 py-1.5 text-sm text-gray-700 hover:border-blue-300 hover:bg-white hover:text-blue-700"
+                          >
+                            <span className="font-mono text-xs font-semibold text-blue-600">{d.code}</span>
+                            {d.nom}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-          <FaitsCles lieu="France" />
+            <FaitsCles lieu="France" />
 
-          <EtapesStage lieu="proximité de chez vous" />
+            <EtapesStage lieu="proximité de chez vous" />
 
-          <BaremeRetraits />
+            <BaremeRetraits />
 
-          <Definitions />
+            <Definitions />
 
-          <FaqSection items={HOME_FAQ} titre="Questions fréquentes sur les stages de récupération de points" />
+            <FaqSection items={HOME_FAQ} titre="Questions fréquentes sur les stages de récupération de points" />
+          </div>
         </div>
       </main>
       <Footer />

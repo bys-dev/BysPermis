@@ -11,7 +11,31 @@ export async function GET(
 
     const centre = await prisma.centre.findUnique({
       where: { slug },
-      include: {
+      // select explicite : ni email ni téléphone (jamais exposés publiquement),
+      // ni données internes (SIRET, IBAN, Stripe…).
+      select: {
+        id: true,
+        nom: true,
+        slug: true,
+        description: true,
+        logo: true,
+        adresse: true,
+        codePostal: true,
+        ville: true,
+        siteWeb: true,
+        latitude: true,
+        longitude: true,
+        statut: true,
+        isActive: true,
+        bannerImage: true,
+        couleurPrimaire: true,
+        couleurSecondaire: true,
+        presentationHtml: true,
+        horaires: true,
+        equipements: true,
+        certifications: true,
+        photos: true,
+        reseauxSociaux: true,
         formations: {
           where: { isActive: true },
           include: {

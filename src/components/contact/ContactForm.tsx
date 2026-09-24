@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPaperPlane,
@@ -19,11 +19,25 @@ const subjectOptions = [
   { value: "autre", label: "Autre demande" },
 ];
 
+const noopSubscribe = () => () => {};
+
+/**
+ * `false` dans le HTML rendu côté serveur, `true` dès que React a hydraté le
+ * composant. Tant que ce n'est pas le cas, `onSubmit` n'est pas encore attaché :
+ * un clic (ou Entrée) déclenchait la soumission native du navigateur, c'est-à-dire
+ * un GET `/contact?nom=…&email=…&message=…` — la page se rechargeait vide, rien
+ * n'était envoyé et les données du visiteur atterrissaient dans l'URL.
+ */
+function useHydrated() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
+
 /**
  * Formulaire de contact (client-only).
  * Tout le reste de la page contact est rendu côté serveur.
  */
 export default function ContactForm() {
+  const hydrated = useHydrated();
   const [formData, setFormData] = useState({ nom: "", email: "", sujet: "", message: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -202,8 +216,10 @@ export default function ContactForm() {
             </p>
             <button
               type="submit"
-              disabled={sending}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-60 text-white font-semibold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30"
+              // Désactivé tant que React n'a pas hydraté le formulaire (cf. useHydrated).
+              disabled={sending || !hydrated}
+              aria-busy={sending}
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30"
             >
               {sending ? (
                 <>

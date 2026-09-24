@@ -46,6 +46,7 @@ export function organizationJsonLd() {
       {
         "@type": "ContactPoint",
         contactType: "customer support",
+        telephone: "+33189318203",
         email: "contact@byspermis.fr",
         availableLanguage: ["French"],
         areaServed: "FR",

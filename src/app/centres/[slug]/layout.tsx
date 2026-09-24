@@ -18,8 +18,8 @@ const SELECT = {
   adresse: true,
   ville: true,
   codePostal: true,
-  telephone: true,
-  email: true,
+  // Jamais de telephone/email : les coordonnées des centres ne sont pas
+  // publiques (visibles uniquement dans l'espace élève après réservation).
   latitude: true,
   longitude: true,
   logo: true,
@@ -88,8 +88,6 @@ export default async function CentreSlugLayout({ params, children }: Props) {
       address: centre.adresse,
       postalCode: centre.codePostal,
       city: centre.ville,
-      phone: centre.telephone ?? undefined,
-      email: centre.email ?? undefined,
       image: centre.logo ?? undefined,
       ...(lat != null && lng != null ? { latitude: lat, longitude: lng } : {}),
     }),

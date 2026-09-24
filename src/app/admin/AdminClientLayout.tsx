@@ -25,6 +25,7 @@ import {
   faStar,
   faBullseye,
   faEnvelopeOpenText,
+  faHandshake,
 } from "@fortawesome/free-solid-svg-icons";
 
 type UserRole = "ADMIN" | "OWNER";
@@ -38,6 +39,7 @@ interface AdminUser {
 const baseNavItems = [
   { href: "/admin/dashboard", icon: faGauge, label: "Dashboard" },
   { href: "/admin/centres", icon: faBuilding, label: "Centres" },
+  { href: "/admin/partenaires", icon: faHandshake, label: "Demandes partenaires" },
   { href: "/admin/prospects", icon: faBullseye, label: "Prospects" },
   { href: "/admin/campagnes", icon: faEnvelopeOpenText, label: "Campagnes" },
   { href: "/admin/utilisateurs", icon: faUsers, label: "Utilisateurs" },

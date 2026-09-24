@@ -329,7 +329,13 @@ function RechercheInner() {
       }
       // Keep page if > 1
       if (currentPage > 1 && !overrides?.page) params.set("page", String(currentPage));
-      router.replace(`/recherche?${params.toString()}`, { scroll: false });
+      const next = params.toString();
+      // URL déjà à jour : ne pas naviguer. Sinon router.replace produit un
+      // nouveau `searchParams`, l'effet de sync recrée `applied`, l'effet de
+      // fetch relance la requête et rappelle updateURL… en boucle (~2 appels/s
+      // à /api/formations observés).
+      if (next === window.location.search.slice(1)) return;
+      router.replace(`/recherche?${next}`, { scroll: false });
     },
     [applied, currentPage, router],
   );

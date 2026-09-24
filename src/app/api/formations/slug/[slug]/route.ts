@@ -10,8 +10,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ slu
       include: {
         centre: {
           select: {
-            id: true, nom: true, ville: true, adresse: true, codePostal: true,
-            telephone: true, email: true, slug: true,
+            // Pas de telephone/email : coordonnées des centres jamais publiques.
+            id: true, nom: true, ville: true, adresse: true, codePostal: true, slug: true,
           },
         },
         categorie: { select: { nom: true } },

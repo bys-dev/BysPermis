@@ -206,69 +206,73 @@ export default async function StagesVillePage({ params }: Props) {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl space-y-14 px-6 py-12">
-          <FormationsList formations={formations} lieu={ville.nom} />
+        <div className="tricolore-rule" aria-hidden="true" />
+        <div className="relative overflow-hidden bg-section-tint-reverse">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+          <div className="relative mx-auto max-w-7xl space-y-14 px-6 py-12">
+            <FormationsList formations={formations} lieu={ville.nom} />
 
-          <FaitsCles lieu={ville.nom} />
+            <FaitsCles lieu={ville.nom} />
 
-          <EtapesStage lieu={ville.nom} />
+            <EtapesStage lieu={ville.nom} />
 
-          {/* Contenu éditorial propre à la ville */}
-          <section aria-labelledby="contexte-local">
-            <h2 id="contexte-local" className="mb-4 font-display text-2xl font-bold text-gray-900">
-              Faire son stage à {ville.nom} : ce qu&apos;il faut savoir
-            </h2>
-            <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-8 text-gray-600">
-              <p>
-                Les centres de sensibilisation à la sécurité routière de {ville.nom} sont agréés
-                individuellement par le préfet {dept ? `du ${dept.nom} (${dept.code})` : "du département"}.
-                Cet agrément est la seule condition pour qu&apos;un stage ouvre droit à la
-                récupération de 4 points : ni le label du centre, ni son ancienneté, ni son
-                prix n&apos;entrent en compte.
-              </p>
-              <p>
-                L&apos;agrément est départemental, la récupération de points est nationale.
-                Autrement dit, vous n&apos;êtes pas tenu de suivre votre stage à {ville.nom} parce
-                que vous y résidez, ni parce que l&apos;infraction y a été commise : un stage
-                effectué dans n&apos;importe quel centre agréé de France produit exactement le
-                même effet sur votre solde de points.
-              </p>
-              <p>
-                {prix ? (
-                  <>
-                    Les sessions actuellement réservables autour de {ville.nom} se situent entre{" "}
-                    <strong>{prix.min} €</strong> et <strong>{prix.max} €</strong>. Le prix
-                    affiché est le prix final : convocation, support pédagogique et attestation
-                    de suivi sont inclus, sans frais de dossier ajoutés au paiement.
-                  </>
-                ) : (
-                  <>
-                    Le tarif d&apos;un stage est libre : chaque centre fixe le sien, dans une
-                    fourchette généralement comprise entre 200 € et 300 €. Le prix affiché sur
-                    BYS Permis est le prix final, convocation et attestation de suivi
-                    comprises.
-                  </>
-                )}
-              </p>
-              <p>
-                Attention au calendrier si vous avez reçu une lettre 48N : le stage doit être
-                effectué dans les 4 mois suivant sa réception. Les places partant vite sur les
-                périodes chargées, réservez plutôt 2 à 3 semaines à l&apos;avance.
-              </p>
-            </div>
-          </section>
+            {/* Contenu éditorial propre à la ville */}
+            <section aria-labelledby="contexte-local">
+              <h2 id="contexte-local" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
+                Faire son stage à {ville.nom} : ce qu&apos;il faut savoir
+              </h2>
+              <div className="space-y-4 rounded-2xl border border-blue-100 border-l-4 border-l-blue-600 bg-white p-6 sm:p-8 text-gray-600 shadow-sm">
+                <p>
+                  Les centres de sensibilisation à la sécurité routière de {ville.nom} sont agréés
+                  individuellement par le préfet {dept ? `du ${dept.nom} (${dept.code})` : "du département"}.
+                  Cet agrément est la seule condition pour qu&apos;un stage ouvre droit à la
+                  récupération de 4 points : ni le label du centre, ni son ancienneté, ni son
+                  prix n&apos;entrent en compte.
+                </p>
+                <p>
+                  L&apos;agrément est départemental, la récupération de points est nationale.
+                  Autrement dit, vous n&apos;êtes pas tenu de suivre votre stage à {ville.nom} parce
+                  que vous y résidez, ni parce que l&apos;infraction y a été commise : un stage
+                  effectué dans n&apos;importe quel centre agréé de France produit exactement le
+                  même effet sur votre solde de points.
+                </p>
+                <p>
+                  {prix ? (
+                    <>
+                      Les sessions actuellement réservables autour de {ville.nom} se situent entre{" "}
+                      <strong>{prix.min} €</strong> et <strong>{prix.max} €</strong>. Le prix
+                      affiché est le prix final : convocation, support pédagogique et attestation
+                      de suivi sont inclus, sans frais de dossier ajoutés au paiement.
+                    </>
+                  ) : (
+                    <>
+                      Le tarif d&apos;un stage est libre : chaque centre fixe le sien, dans une
+                      fourchette généralement comprise entre 200 € et 300 €. Le prix affiché sur
+                      BYS Permis est le prix final, convocation et attestation de suivi
+                      comprises.
+                    </>
+                  )}
+                </p>
+                <p>
+                  Attention au calendrier si vous avez reçu une lettre 48N : le stage doit être
+                  effectué dans les 4 mois suivant sa réception. Les places partant vite sur les
+                  périodes chargées, réservez plutôt 2 à 3 semaines à l&apos;avance.
+                </p>
+              </div>
+            </section>
 
-          <BaremeRetraits />
+            <BaremeRetraits />
 
-          <Definitions />
+            <Definitions />
 
-          <FaqSection items={faq} titre={`Questions fréquentes sur les stages à ${ville.nom}`} />
+            <FaqSection items={faq} titre={`Questions fréquentes sur les stages à ${ville.nom}`} />
 
-          <MaillageGeo
-            villes={proches}
-            departement={dept}
-            titre={`Stages de récupération de points près de ${ville.nom}`}
-          />
+            <MaillageGeo
+              villes={proches}
+              departement={dept}
+              titre={`Stages de récupération de points près de ${ville.nom}`}
+            />
+          </div>
         </div>
       </main>
       <Footer />

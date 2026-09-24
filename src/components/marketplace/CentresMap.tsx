@@ -36,13 +36,21 @@ function MapPlaceholder() {
   );
 }
 
+// Exécuté une fois au chargement du module — côté client uniquement, ce
+// composant étant importé via next/dynamic avec ssr:false.
+fixLeafletIcons();
+
 export default function CentresMap({ centres }: { centres: MapCentre[] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    fixLeafletIcons();
     setMounted(true);
   }, []);
+
+  // Leaflet plante (« Cannot read properties of undefined (reading 'createIcon') »)
+  // dès qu'un Marker reçoit `icon={undefined}` : la valeur écrase l'icône par
+  // défaut héritée du prototype. Chaque marqueur reçoit donc une icône explicite.
+  const defaultIcon = useMemo(() => new L.Icon.Default(), []);
 
   const bysIcon = useMemo(
     () =>
@@ -90,7 +98,7 @@ export default function CentresMap({ centres }: { centres: MapCentre[] }) {
           <Marker
             key={c.id}
             position={[c.latitude, c.longitude]}
-            icon={c.isBYS ? bysIcon : undefined}
+            icon={c.isBYS ? bysIcon : defaultIcon}
           >
             <Popup>
               <div className="text-sm">

@@ -475,18 +475,18 @@ export default async function Home() {
         </section>
 
         {/* ═══ 2. KEY NUMBERS BAR ═══ */}
-        <section className="py-6 px-4 sm:px-8 bg-red-600">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="relative py-6 px-4 sm:px-8 bg-gradient-to-r from-red-700 via-red-600 to-red-700 overflow-hidden">
+          <div className="absolute inset-0 bg-dots-white opacity-60" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-5 lg:gap-8">
               {keyStats.map((stat) => (
                 <div
                   key={stat.label}
                   className="flex flex-col sm:flex-row items-center sm:justify-center text-center sm:text-left gap-1 sm:gap-3 text-white min-w-0"
                 >
-                  <FontAwesomeIcon
-                    icon={stat.icon}
-                    className="text-white/80 text-base sm:text-lg shrink-0"
-                  />
+                  <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/15 ring-1 ring-white/25 flex items-center justify-center shrink-0">
+                    <FontAwesomeIcon icon={stat.icon} className="text-white text-sm sm:text-base" />
+                  </span>
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5 min-w-0">
                     <span className="text-xl sm:text-2xl font-display font-bold whitespace-nowrap leading-tight">
                       {stat.value}
@@ -502,11 +502,17 @@ export default async function Home() {
         </section>
 
         {/* ═══ 4. LES 4 TYPES DE STAGES ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-white">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="relative py-20 px-4 sm:px-8 bg-section-tint overflow-hidden">
+          <div className="halo halo-blue w-[28rem] h-[28rem] top-1/4 -right-56" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 h-64 bg-dots-blue mask-fade-radial opacity-70" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
             <div className="text-center mb-14">
+              <span className="eyebrow mb-4">
+                <FontAwesomeIcon icon={faShieldHalved} className="text-[11px]" />
+                Stages agréés préfecture
+              </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Quel stage est fait pour vous ?
+                Quel stage est fait <span className="title-mark">pour vous</span> ?
               </h2>
               <p className="text-lg text-gray-500">4 cas différents selon votre situation</p>
             </div>
@@ -515,14 +521,11 @@ export default async function Home() {
               {stageTypes.map((stage) => (
                 <div
                   key={stage.name}
-                  className="bg-white rounded-2xl border border-brand-border p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group flex flex-col"
+                  className="card-lift card-accent-top p-6 group flex flex-col"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center group-hover:bg-gradient-to-br group-hover:from-blue-600 group-hover:to-indigo-600 transition-all duration-200">
-                      <FontAwesomeIcon
-                        icon={stage.icon}
-                        className="text-blue-600 text-lg group-hover:text-white transition-colors duration-200"
-                      />
+                  <div className="flex items-center justify-between mb-5 mt-1">
+                    <div className="icon-tile w-12 h-12 rounded-xl">
+                      <FontAwesomeIcon icon={stage.icon} className="text-lg" />
                     </div>
                     <span
                       className={`text-xs font-semibold px-2.5 py-1 rounded-full ${stage.badgeStyle}`}
@@ -535,8 +538,8 @@ export default async function Home() {
                   </h3>
                   <p className="text-xs font-medium text-blue-600 mb-3">{stage.subtitle}</p>
                   <p className="text-gray-500 text-sm mb-5 flex-1">{stage.desc}</p>
-                  <div className="pt-4 border-t border-brand-border">
-                    <p className="text-sm font-semibold text-brand-text mb-3">{stage.price}</p>
+                  <div className="pt-4 border-t border-blue-100">
+                    <p className="text-sm font-bold text-blue-900 mb-3">{stage.price}</p>
                     <Link
                       href={stage.href}
                       className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
@@ -555,11 +558,16 @@ export default async function Home() {
         </section>
 
         {/* ═══ 5. ÉLIGIBILITÉ ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-gray-50">
-          <div className="max-w-5xl mx-auto">
+        <section className="relative py-20 px-4 sm:px-8 bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-grid-blue mask-fade-y" aria-hidden="true" />
+          <div className="relative max-w-5xl mx-auto">
             <div className="text-center mb-14">
+              <span className="eyebrow mb-4">
+                <FontAwesomeIcon icon={faCircleCheck} className="text-[11px]" />
+                Conditions
+              </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Êtes-vous éligible au stage ?
+                Êtes-vous <span className="title-mark">éligible</span> au stage ?
               </h2>
               <p className="text-lg text-gray-500">
                 Vérifiez rapidement votre situation avant de réserver
@@ -567,10 +575,10 @@ export default async function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-2xl border border-brand-border p-8">
+              <div className="card-lift card-accent-left p-8 shadow-lg shadow-blue-900/5">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
-                    <FontAwesomeIcon icon={faCheck} className="text-blue-600" />
+                  <div className="icon-tile w-11 h-11 rounded-xl">
+                    <FontAwesomeIcon icon={faCheck} />
                   </div>
                   <h3 className="font-display font-semibold text-lg text-brand-text">
                     Vous POUVEZ faire le stage si...
@@ -579,17 +587,19 @@ export default async function Home() {
                 <ul className="space-y-4">
                   {canDoStage.map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <FontAwesomeIcon icon={faCheck} className="text-blue-600 mt-1 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{item}</span>
+                      <span className="w-5 h-5 mt-0.5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <FontAwesomeIcon icon={faCheck} className="text-blue-700 text-[10px]" />
+                      </span>
+                      <span className="text-gray-700 text-sm">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-white rounded-2xl border border-brand-border p-8">
+              <div className="card-lift card-accent-left-red p-8 shadow-lg shadow-blue-900/5">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
-                    <FontAwesomeIcon icon={faXmark} className="text-red-400" />
+                  <div className="icon-tile-red w-11 h-11 rounded-xl">
+                    <FontAwesomeIcon icon={faXmark} />
                   </div>
                   <h3 className="font-display font-semibold text-lg text-brand-text">
                     Vous NE POUVEZ PAS si...
@@ -598,8 +608,10 @@ export default async function Home() {
                 <ul className="space-y-4">
                   {cannotDoStage.map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <FontAwesomeIcon icon={faXmark} className="text-red-400 mt-1 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm">{item}</span>
+                      <span className="w-5 h-5 mt-0.5 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                        <FontAwesomeIcon icon={faXmark} className="text-red-500 text-[10px]" />
+                      </span>
+                      <span className="text-gray-700 text-sm">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -607,13 +619,13 @@ export default async function Home() {
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-400">
+              <p className="inline-block text-sm text-gray-500 bg-blue-50/80 border border-blue-100 rounded-2xl px-5 py-2.5">
                 Vérifiez votre solde de points sur{" "}
                 <a
                   href="https://mespoints.permisdeconduire.gouv.fr"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-700 font-semibold hover:underline"
                 >
                   mespoints.permisdeconduire.gouv.fr
                 </a>{" "}
@@ -624,22 +636,33 @@ export default async function Home() {
         </section>
 
         {/* ═══ 6. COMMENT ÇA MARCHE ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-white">
-          <div className="max-w-5xl mx-auto">
+        <section className="relative py-20 px-4 sm:px-8 bg-section-blue overflow-hidden">
+          <div className="halo halo-blue w-96 h-96 top-1/3 -left-56" aria-hidden="true" />
+          <div className="relative max-w-6xl mx-auto">
             <div className="text-center mb-14">
+              <span className="eyebrow mb-4">
+                <FontAwesomeIcon icon={faBolt} className="text-[11px]" />
+                Simple et rapide
+              </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Comment ça marche ?
+                Comment ça <span className="title-mark">marche</span> ?
               </h2>
               <p className="text-base text-gray-500">Réservez votre stage en 4 étapes simples</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {steps.map((step) => (
-                <div key={step.number} className="text-center">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <FontAwesomeIcon icon={step.icon} className="text-white text-lg" />
+                <div key={step.number} className="card-lift group relative text-center px-5 pt-6 pb-7">
+                  <span
+                    className="number-gradient absolute top-3 right-4 text-5xl opacity-30 select-none"
+                    aria-hidden="true"
+                  >
+                    {step.number}
+                  </span>
+                  <div className="icon-tile w-16 h-16 rounded-2xl mx-auto mb-4">
+                    <FontAwesomeIcon icon={step.icon} className="text-xl" />
                   </div>
-                  <div className="text-xs font-semibold text-blue-600 mb-2">
+                  <div className="inline-block text-[11px] font-bold tracking-wider text-blue-700 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-0.5 mb-2">
                     ÉTAPE {step.number}
                   </div>
                   <h3 className="font-display font-semibold text-lg text-brand-text mb-2">
@@ -653,11 +676,16 @@ export default async function Home() {
         </section>
 
         {/* ═══ 7. DÉROULÉ DU STAGE ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-gray-50">
-          <div className="max-w-5xl mx-auto">
+        <section className="relative py-20 px-4 sm:px-8 bg-white overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-72 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+          <div className="relative max-w-5xl mx-auto">
             <div className="text-center mb-14">
+              <span className="eyebrow mb-4">
+                <FontAwesomeIcon icon={faCalendarCheck} className="text-[11px]" />
+                Programme officiel
+              </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Comment se déroule un stage ?
+                Comment se déroule <span className="title-mark">un stage</span> ?
               </h2>
               <p className="text-lg text-gray-500">
                 2 jours de sensibilisation à la sécurité routière (14 heures)
@@ -668,21 +696,21 @@ export default async function Home() {
               {stageProgram.map((day) => (
                 <div
                   key={day.day}
-                  className="bg-white rounded-2xl border border-brand-border overflow-hidden"
+                  className="card-lift group overflow-hidden"
                 >
-                  <div className="h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
-                  <div className="p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                        <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-blue-600">{day.day}</div>
-                        <h3 className="font-display font-semibold text-lg text-brand-text">
-                          {day.title}
-                        </h3>
-                      </div>
+                  <div className="relative flex items-center gap-4 px-8 py-5 bg-gradient-to-r from-brand-navy to-brand-navy-soft overflow-hidden">
+                    <div className="absolute inset-0 bg-dots-white" aria-hidden="true" />
+                    <div className="icon-tile relative w-11 h-11 rounded-xl">
+                      <FontAwesomeIcon icon={faClipboardList} className="text-sm" />
                     </div>
+                    <div className="relative">
+                      <div className="text-xs font-bold uppercase tracking-wider text-blue-200">{day.day}</div>
+                      <h3 className="font-display font-semibold text-lg text-white">
+                        {day.title}
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="p-8">
                     <ul className="space-y-3">
                       {day.items.map((item) => (
                         <li key={item} className="flex items-start gap-3">
@@ -699,8 +727,8 @@ export default async function Home() {
               ))}
             </div>
 
-            <div className="mt-8 bg-white rounded-2xl border border-brand-border p-6 text-center">
-              <p className="text-sm text-gray-500">
+            <div className="mt-8 bg-gradient-to-r from-blue-50 via-white to-blue-50 rounded-2xl border border-blue-100 p-6 text-center">
+              <p className="text-sm text-gray-600">
                 Animé par{" "}
                 <span className="font-medium text-brand-text">
                   1 psychologue + 1 animateur BAFM agréés
@@ -712,12 +740,17 @@ export default async function Home() {
         </section>
 
         {/* ═══ 8. FORMATIONS VEDETTES ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-white">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+        <section className="relative py-20 px-4 sm:px-8 bg-section-tint overflow-hidden">
+          <div className="halo halo-blue w-[30rem] h-[30rem] top-1/4 -left-64" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
               <div>
+                <span className="eyebrow mb-4">
+                  <FontAwesomeIcon icon={faStar} className="text-[11px]" />
+                  Places disponibles
+                </span>
                 <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-2">
-                  Stages et formations à la une
+                  Stages et formations <span className="title-mark">à la une</span>
                 </h2>
                 <p className="text-lg text-gray-500">
                   Les prochains stages disponibles près de chez vous
@@ -725,7 +758,7 @@ export default async function Home() {
               </div>
               <Link
                 href="/recherche"
-                className="flex items-center space-x-2 text-blue-600 font-medium hover:underline"
+                className="flex items-center space-x-2 text-blue-700 font-semibold bg-white border border-blue-200 rounded-full px-5 py-2.5 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-colors"
               >
                 <span>Voir tous les stages</span>
                 <FontAwesomeIcon icon={faArrowRight} />
@@ -736,13 +769,13 @@ export default async function Home() {
               {courses.map((course) => (
                 <div
                   key={course.id}
-                  className="bg-white rounded-2xl border border-brand-border overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer flex flex-col"
+                  className="card-lift group cursor-pointer flex flex-col overflow-hidden"
                 >
-                  <div className="h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
+                  <div className="h-1.5 bg-gradient-to-r from-blue-500 to-brand-navy" />
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FontAwesomeIcon icon={course.icon} className="text-blue-600 text-sm" />
+                      <div className="icon-tile w-9 h-9 rounded-lg">
+                        <FontAwesomeIcon icon={course.icon} className="text-sm" />
                       </div>
                       <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
                         {course.tag}
@@ -809,14 +842,14 @@ export default async function Home() {
                       </div>
                       <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500"
+                          className="h-full bg-gradient-to-r from-blue-400 to-blue-700 rounded-full transition-all duration-500"
                           style={{ width: `${Math.max(100 - (course.places / 15) * 100, 15)}%` }}
                         />
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-brand-border mt-auto">
-                      <div className="text-2xl font-display font-bold text-brand-text">
+                      <div className="text-2xl font-display font-bold text-blue-900">
                         {course.price}
                       </div>
                       <Link
@@ -835,22 +868,29 @@ export default async function Home() {
         </section>
 
         {/* ═══ 9. VILLES POPULAIRES ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-gray-50">
-          <div className="max-w-5xl mx-auto">
+        <section className="relative py-20 px-4 sm:px-8 bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-dots-blue mask-fade-radial opacity-50" aria-hidden="true" />
+          <div className="relative max-w-5xl mx-auto">
             <div className="text-center mb-14">
+              <span className="eyebrow mb-4">
+                <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[11px]" />
+                Partout en France
+              </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Trouvez un stage près de chez vous
+                Trouvez un stage <span className="title-mark">près de chez vous</span>
               </h2>
               <p className="text-lg text-gray-500">
                 Stages de récupération de points dans toute la France
               </p>
             </div>
 
-            <div className="space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {cityGroups.map((group) => (
-                <div key={group.region}>
-                  <h3 className="font-display font-semibold text-lg text-brand-text mb-4 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-blue-600 text-sm" />
+                <div key={group.region} className="card-lift card-accent-top p-6 sm:p-7">
+                  <h3 className="font-display font-semibold text-lg text-brand-text mb-5 flex items-center gap-3">
+                    <span className="icon-tile w-9 h-9 rounded-lg">
+                      <FontAwesomeIcon icon={faMapMarkerAlt} className="text-sm" />
+                    </span>
                     {group.region}
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -858,7 +898,7 @@ export default async function Home() {
                       <Link
                         key={city}
                         href={`/recherche?ville=${citySlug(city)}`}
-                        className="px-4 py-2 bg-white border border-brand-border rounded-full text-sm text-gray-600 hover:text-blue-600 hover:border-blue-600 transition-all duration-200"
+                        className="chip-link px-4 py-2 bg-blue-50/70 border border-blue-100 rounded-full text-sm font-medium text-blue-900 hover:bg-blue-600 hover:text-white hover:border-blue-600"
                       >
                         {city}
                       </Link>
@@ -871,11 +911,14 @@ export default async function Home() {
         </section>
 
         {/* ═══ 10. ESPACE PRO CTA ═══ */}
-        <section className="py-24 px-4 sm:px-8 bg-brand-navy">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="relative py-24 px-4 sm:px-8 bg-gradient-to-br from-brand-navy-deep via-brand-navy to-brand-navy-soft overflow-hidden">
+          <div className="absolute inset-0 bg-grid-white mask-fade-radial" aria-hidden="true" />
+          <div className="halo halo-blue-strong w-[34rem] h-[34rem] -top-40 right-0" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 tricolore-rule opacity-90" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
-                <div className="inline-flex items-center px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6">
+                <div className="inline-flex items-center px-4 py-2 bg-white/10 border border-blue-300/30 rounded-full mb-6">
                   <FontAwesomeIcon icon={faBuilding} className="text-blue-300 mr-2" />
                   <span className="text-sm font-medium text-blue-100/85">
                     Pour les centres de formation
@@ -919,10 +962,10 @@ export default async function Home() {
               </div>
 
               <div className="relative">
-                <div className="bg-white/[0.04] backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
+                <div className="animate-float-slow bg-white/[0.07] backdrop-blur-sm rounded-2xl border border-white/15 p-6 shadow-2xl shadow-blue-950/40">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
                         <span className="text-white text-xs font-bold">B</span>
                       </div>
                       <div>
@@ -960,7 +1003,7 @@ export default async function Home() {
                           className="flex-1 rounded-t"
                           style={{
                             height: `${h}%`,
-                            backgroundColor: i === 5 ? "#2563EB" : "rgba(37,99,235,0.2)",
+                            backgroundColor: i === 5 ? "#3B82F6" : "rgba(96,165,250,0.3)",
                           }}
                         />
                       ))}
@@ -1007,18 +1050,20 @@ export default async function Home() {
         </section>
 
         {/* ═══ 11. TRUST BADGES ═══ */}
-        <section className="py-8 px-4 sm:px-8 bg-gray-50 border-y border-brand-border">
+        <section className="py-10 px-4 sm:px-8 bg-section-blue border-b border-blue-100">
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
               {trustBadges.map((badge) => (
                 <div
                   key={badge.title}
-                  className="flex items-center gap-3 justify-center sm:justify-start"
+                  className="flex items-center gap-4 bg-white rounded-2xl border border-blue-100 px-5 py-4 shadow-sm"
                 >
-                  <FontAwesomeIcon icon={badge.icon} className="text-blue-600 text-lg flex-shrink-0" />
+                  <span className="icon-tile w-11 h-11 rounded-xl">
+                    <FontAwesomeIcon icon={badge.icon} />
+                  </span>
                   <div>
                     <div className="text-sm font-semibold text-brand-text">{badge.title}</div>
-                    <div className="text-xs text-gray-400">{badge.desc}</div>
+                    <div className="text-xs text-gray-500">{badge.desc}</div>
                   </div>
                 </div>
               ))}
@@ -1027,11 +1072,13 @@ export default async function Home() {
         </section>
 
         {/* ═══ 11 bis. STAGES PAR VILLE ═══ */}
-        <section className="py-20 px-4 sm:px-8 bg-brand-bg">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="relative py-20 px-4 sm:px-8 bg-section-tint overflow-hidden">
+          <div className="halo halo-blue w-96 h-96 top-1/4 -right-56" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
             <div className="text-center mb-12">
+              <span className="tricolore-rule-short mb-5" aria-hidden="true" />
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Stage de récupération de points près de chez vous
+                Stage de récupération de points <span className="title-mark">près de chez vous</span>
               </h2>
               <p className="text-lg text-gray-500 max-w-3xl mx-auto">
                 Un stage suivi dans n&apos;importe quel centre agréé est valable partout en
@@ -1045,9 +1092,9 @@ export default async function Home() {
                 <li key={v.slug}>
                   <Link
                     href={`/stages/${v.slug}`}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-gray-200 text-sm text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                    className="chip-link group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-blue-100 text-sm font-medium text-gray-700 shadow-sm hover:border-blue-300 hover:text-blue-700"
                   >
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-xs text-gray-400" />
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-xs text-blue-400 group-hover:text-blue-600" />
                     <span className="truncate">{v.nom}</span>
                   </Link>
                 </li>
@@ -1055,7 +1102,10 @@ export default async function Home() {
             </ul>
 
             <div className="text-center mt-10">
-              <Link href="/stages" className="text-blue-600 font-semibold hover:underline">
+              <Link
+                href="/stages"
+                className="inline-flex items-center rounded-full bg-blue-600 text-white font-semibold px-6 py-3 shadow-lg shadow-blue-600/25 hover:bg-blue-700 transition-colors"
+              >
                 Voir les {VILLES.length} villes et les {DEPARTEMENTS.length} départements
                 <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
               </Link>
@@ -1064,11 +1114,16 @@ export default async function Home() {
         </section>
 
         {/* ═══ 12. FAQ ═══ */}
-        <section className="py-24 px-4 sm:px-8 bg-white">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="relative py-24 px-4 sm:px-8 bg-white overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-80 bg-grid-blue mask-fade-radial" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
             <div className="text-center mb-16">
+              <span className="eyebrow mb-4">
+                <FontAwesomeIcon icon={faClipboardList} className="text-[11px]" />
+                FAQ
+              </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-text mb-4">
-                Questions fréquentes
+                Questions <span className="title-mark">fréquentes</span>
               </h2>
               <p className="text-lg text-gray-500">
                 Tout ce que vous devez savoir sur les stages de récupération de points
@@ -1089,8 +1144,9 @@ export default async function Home() {
         </section>
 
         {/* ═══ 13. NEWSLETTER ═══ */}
-        <section className="py-12 px-4 sm:px-8 bg-brand-navy">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="relative py-12 px-4 sm:px-8 bg-gradient-to-r from-brand-navy-deep via-brand-navy to-brand-navy-soft overflow-hidden">
+          <div className="absolute inset-0 bg-dots-white" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="text-center lg:text-left">
                 <h3 className="font-display font-bold text-xl text-white mb-1">
@@ -1108,7 +1164,7 @@ export default async function Home() {
                 />
                 <button
                   type="submit"
-                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 whitespace-nowrap"
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg shadow-blue-900/40 hover:from-blue-600 hover:to-blue-800 transition-all duration-200 whitespace-nowrap"
                 >
                   S&apos;inscrire
                 </button>

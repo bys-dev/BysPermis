@@ -188,8 +188,18 @@ export default function FaqPage() {
       <Header />
 
       {/* Hero (statique côté serveur) */}
-      <section className="bg-brand-navy text-white py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative overflow-hidden bg-gradient-to-br from-brand-navy-deep via-brand-navy to-brand-navy-soft text-white pt-16 pb-20 px-4">
+        <div className="absolute inset-0 bg-grid-white mask-fade-radial" aria-hidden="true" />
+        <div className="halo halo-blue-strong w-[28rem] h-[28rem] -top-24 left-1/2 -translate-x-1/2" aria-hidden="true" />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <span className="eyebrow-dark mb-5">
+            <span className="inline-flex rounded-sm overflow-hidden" aria-hidden="true">
+              <span className="w-1.5 h-3 bg-blue-500" />
+              <span className="w-1.5 h-3 bg-white" />
+              <span className="w-1.5 h-3 bg-red-500" />
+            </span>
+            Aide &amp; réponses
+          </span>
           <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl mb-4">
             Questions fréquentes
           </h1>
@@ -204,10 +214,14 @@ export default function FaqPage() {
       <FaqContent categories={faqCategories} />
 
       {/* CTA */}
-      <section className="bg-white border-t border-brand-border py-16 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="relative overflow-hidden bg-section-tint border-t border-blue-100 py-16 px-4">
+        <div className="absolute inset-0 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <div className="icon-tile w-14 h-14 rounded-2xl mx-auto mb-5">
+            <FontAwesomeIcon icon={faEnvelope} className="text-xl" />
+          </div>
           <h2 className="font-display font-bold text-2xl md:text-3xl text-brand-text mb-4">
-            Vous n&apos;avez pas trouvé la réponse à votre question ?
+            Vous n&apos;avez pas trouvé <span className="title-mark">la réponse à votre question</span> ?
           </h2>
           <p className="text-gray-500 text-lg mb-8">
             Notre équipe est disponible du lundi au vendredi de 9h à 18h pour répondre à toutes vos
@@ -223,11 +237,11 @@ export default function FaqPage() {
               <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
             </Link>
             <a
-              href="tel:+33100000000"
+              href="tel:+33189318203"
               className="btn-secondary px-8 py-3.5 rounded-lg inline-flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faPhone} />
-              01 00 00 00 00
+              01 89 31 82 03
             </a>
           </div>
         </div>

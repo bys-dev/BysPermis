@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { sendMail } from "@/lib/email";
+import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
-import { escapeHtml } from "@/lib/utils";
+import { notifyOwnersNewPartnerLead } from "@/lib/event-notifications";
 
 const volumeLabels: Record<string, string> = {
   "1-4": "1 à 4 stages / mois",
@@ -11,89 +11,89 @@ const volumeLabels: Record<string, string> = {
   ne_sait_pas: "Ne sait pas encore",
 };
 
+/** N° d'agrément préfectoral CSSR, ex. « R 13 095 0001 0 » ou « R1309500010 ». */
+const AGREMENT_REGEX = /^[A-Z0-9][A-Z0-9 ./-]{4,39}$/;
+
 const PartnerLeadSchema = z.object({
-  centre: z.string().min(1, "Nom du centre requis"),
-  contact: z.string().min(1, "Nom du contact requis"),
-  email: z.string().email("Email invalide"),
-  telephone: z.string().min(6, "Téléphone requis"),
-  ville: z.string().min(1, "Ville / département requis"),
+  centre: z.string().trim().min(1, "Nom du centre requis").max(200),
+  contact: z.string().trim().min(1, "Nom du contact requis").max(150),
+  email: z.string().trim().toLowerCase().email("Email invalide").max(200),
+  telephone: z.string().trim().min(6, "Téléphone requis").max(30),
+  ville: z.string().trim().min(1, "Ville / département requis").max(120),
+  agrement: z
+    .string()
+    .trim()
+    .transform((v) => v.toUpperCase().replace(/\s+/g, " "))
+    .refine((v) => AGREMENT_REGEX.test(v), "Numéro d'agrément invalide"),
+  agrementDepartement: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^(\d{2,3}|2A|2B)?$/, "Département invalide")
+    .optional()
+    .default(""),
   volume: z.string().optional().default(""),
-  message: z.string().optional().default(""),
-  consent: z.boolean().refine((v) => v === true, {
-    message: "Consentement requis",
-  }),
+  message: z.string().max(3000).optional().default(""),
+  consent: z.boolean().refine((v) => v === true, { message: "Consentement requis" }),
 });
 
-const FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
-const TO = "contact@byspermis.fr";
+/** « Osny (95) » → { ville: "Osny", dep: "95" } */
+function splitVille(raw: string): { ville: string; dep: string | null } {
+  const m = raw.match(/^(.*?)\s*\(\s*(\d{2,3}|2A|2B)\s*\)\s*$/i);
+  return m ? { ville: m[1].trim() || raw, dep: m[2].toUpperCase() } : { ville: raw, dep: null };
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = rateLimit(req, {
-      max: 5,
-      windowMs: 60 * 1000,
-      keyPrefix: "partenaires",
-    });
+    const limited = rateLimit(req, { max: 5, windowMs: 60 * 1000, keyPrefix: "partenaires" });
     if (limited) return limited;
 
-    const body = await req.json();
-    const parsed = PartnerLeadSchema.safeParse(body);
-
+    const parsed = PartnerLeadSchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Données invalides", details: parsed.error.flatten() },
         { status: 400 },
       );
     }
+    const d = parsed.data;
+    const { ville, dep } = splitVille(d.ville);
 
-    const { centre, contact, email, telephone, ville, volume, message } = parsed.data;
-
-    // Escape all user inputs avant injection HTML (XSS prevention)
-    const safeCentre = escapeHtml(centre);
-    const safeContact = escapeHtml(contact);
-    const safeEmail = escapeHtml(email);
-    const safeTel = escapeHtml(telephone);
-    const safeVille = escapeHtml(ville);
-    const safeVolume = escapeHtml(volumeLabels[volume] ?? volume ?? "—");
-    const safeMessage = message
-      ? escapeHtml(message).replace(/\n/g, "<br/>")
-      : "<em style='color:#9ca3af'>Aucun message</em>";
-
-    const row = (label: string, value: string) => `
-      <tr>
-        <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151;width:140px;vertical-align:top">${label}</td>
-        <td style="padding:8px 0;color:#111827">${value}</td>
-      </tr>`;
-
-    await sendMail({
-      from: FROM,
-      to: TO,
-      replyTo: email,
-      subject: `[Partenaire BYS] Nouvelle demande — ${centre}`,
-      html: `
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-          <h2 style="color:#1e3a5f">Nouvelle demande de partenariat centre</h2>
-          <p style="color:#6b7280;font-size:14px">
-            Un centre agréé souhaite rejoindre la plateforme BYS Permis.
-          </p>
-          <table style="border-collapse:collapse;width:100%;margin:16px 0">
-            ${row("Centre", safeCentre)}
-            ${row("Contact", safeContact)}
-            ${row("Email", `<a href="mailto:${safeEmail}">${safeEmail}</a>`)}
-            ${row("Téléphone", `<a href="tel:${safeTel.replace(/\s/g, "")}">${safeTel}</a>`)}
-            ${row("Ville / dép.", safeVille)}
-            ${row("Volume estimé", safeVolume)}
-          </table>
-          <h3 style="color:#374151">Message</h3>
-          <div style="background:#f9fafb;border-left:4px solid #3b82f6;padding:16px;border-radius:4px;color:#111827;line-height:1.6">
-            ${safeMessage}
-          </div>
-          <p style="color:#9ca3af;font-size:12px;margin-top:24px">
-            Envoyé depuis la page « Devenir partenaire » — BYS Permis
-          </p>
-        </div>
-      `,
+    const lead = await prisma.partnerLead.create({
+      data: {
+        centreNom: d.centre,
+        agrementNumber: d.agrement,
+        agrementDepartement: d.agrementDepartement || dep,
+        ville,
+        telephone: d.telephone,
+        email: d.email,
+        contactNom: d.contact,
+        contactEmail: d.email,
+        contactTelephone: d.telephone,
+        volumeMensuel: d.volume || null,
+        message: d.message.trim() || null,
+        consentIp: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
+        source: "devenir-partenaire",
+      },
     });
+
+    // La demande est enregistrée : un échec d'email ne doit pas la faire échouer
+    // (elle reste visible dans /admin/partenaires).
+    try {
+      await notifyOwnersNewPartnerLead({
+        id: lead.id,
+        centreNom: lead.centreNom,
+        contactNom: lead.contactNom,
+        contactEmail: lead.contactEmail,
+        telephone: lead.telephone,
+        ville: d.ville,
+        agrementNumber: lead.agrementNumber,
+        agrementDepartement: lead.agrementDepartement,
+        volumeMensuel: d.volume ? (volumeLabels[d.volume] ?? d.volume) : null,
+        message: lead.message,
+      });
+    } catch (notifyErr) {
+      console.error("[POST /api/partenaires] notification owner:", notifyErr);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
