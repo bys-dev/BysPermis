@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BRAND_NAVY } from "@/lib/brand-colors";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -9,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     background_color: "#FFFFFF",
-    theme_color: "#0A1628",
+    theme_color: BRAND_NAVY,
     orientation: "portrait",
     lang: "fr",
     categories: ["education", "business"],

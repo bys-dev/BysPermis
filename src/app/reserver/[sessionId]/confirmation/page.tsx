@@ -175,7 +175,7 @@ export default function ConfirmationPage() {
       </div>
 
       {/* Contact */}
-      <div className="bg-[#0A1628] rounded-2xl p-6 mb-8 flex items-center justify-between gap-4">
+      <div className="bg-brand-navy rounded-2xl p-6 mb-8 flex items-center justify-between gap-4">
         <div>
           <p className="text-white font-semibold mb-1">Une question ?</p>
           <p className="text-gray-400 text-sm">Notre équipe répond sous 24h ouvrées.</p>
@@ -185,7 +185,7 @@ export default function ConfirmationPage() {
             <FontAwesomeIcon icon={faEnvelope} className="text-xs" />
             Email
           </a>
-          <a href="tel:+33123456789" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-colors" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
+          <a href="tel:+33189318203" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-colors" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
             <FontAwesomeIcon icon={faPhone} className="text-xs" />
             Appeler
           </a>

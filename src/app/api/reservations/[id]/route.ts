@@ -52,6 +52,18 @@ export async function GET(
       );
     }
 
+    // Règle métier : l'email et le téléphone du centre ne sont communiqués
+    // qu'à l'élève propriétaire (vérifié ci-dessus) d'une réservation payée
+    // (CONFIRMEE ou TERMINEE). Jamais pour une réservation en attente,
+    // annulée ou remboursée.
+    const { telephone: centreTelephone, email: centreEmail, ...centreSansContact } =
+      reservation.session.formation.centre;
+    const contactVisible =
+      reservation.status === "CONFIRMEE" || reservation.status === "TERMINEE";
+    const centre = contactVisible
+      ? { ...centreSansContact, telephone: centreTelephone, email: centreEmail }
+      : { ...centreSansContact, telephone: null, email: null };
+
     // Flatten response
     const result = {
       id: reservation.id,
@@ -89,7 +101,7 @@ export async function GET(
           lieu: reservation.session.formation.lieu,
           isQualiopi: reservation.session.formation.isQualiopi,
           isCPF: reservation.session.formation.isCPF,
-          centre: reservation.session.formation.centre,
+          centre,
         },
       },
     };

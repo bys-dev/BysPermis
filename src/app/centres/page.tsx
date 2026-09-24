@@ -516,12 +516,12 @@ function CentresInner() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-[#0A1628] text-white py-12 px-4">
+      <section className="bg-brand-navy text-white py-12 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="font-display font-bold text-3xl md:text-5xl mb-3">
             Nos centres partenaires agréés
           </h1>
-          <p className="text-gray-300 text-base md:text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-blue-100/85 text-base md:text-lg mb-8 max-w-2xl mx-auto">
             Centres de formation agréés Ministère de l&apos;Intérieur pour les stages de récupération de points.
           </p>
 
@@ -765,7 +765,7 @@ function CentresInner() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0A1628] text-white py-16 px-4">
+      <section className="bg-brand-navy text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-sm text-blue-300 mb-6">
             <FontAwesomeIcon icon={faHandshake} />
@@ -774,7 +774,7 @@ function CentresInner() {
           <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">
             Vous êtes un centre de formation ?
           </h2>
-          <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-blue-100/85 text-lg mb-8 max-w-2xl mx-auto">
             Rejoignez notre réseau de centres partenaires et développez votre activité.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto mb-10">

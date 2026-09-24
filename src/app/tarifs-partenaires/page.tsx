@@ -81,7 +81,7 @@ const faqItems: FaqItem[] = [
   {
     question: "Combien de temps faut-il pour être référencé ?",
     answer:
-      "Après soumission de votre dossier, notre équipe vérifie vos documents sous 48 heures ouvrées. Une fois validé, votre profil est visible immédiatement sur la marketplace.",
+      "Après soumission de votre dossier, notre équipe vérifie vos documents sous 24 heures ouvrées. Une fois validé, votre profil est visible immédiatement sur la marketplace.",
   },
 ];
 
@@ -95,11 +95,13 @@ export default function TarifsPartenairesPage() {
 
       <main>
         {/* ─── Hero ─── */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 lg:py-28">
-          <div className="absolute inset-0 opacity-10">
+        <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-brand-navy-soft to-brand-navy text-white py-20 lg:py-28">
+          <div className="absolute inset-0 bg-grid-white mask-fade-radial" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-20">
             <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-            <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-300 rounded-full blur-3xl" />
+            <div className="absolute bottom-10 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl" />
           </div>
+          <div className="absolute inset-x-0 bottom-0 tricolore-rule" aria-hidden="true" />
           <div className="relative max-w-[1440px] mx-auto px-8 text-center">
             <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <FontAwesomeIcon icon={faBuilding} className="text-blue-200" />
@@ -117,14 +119,16 @@ export default function TarifsPartenairesPage() {
         </section>
 
         {/* ─── Notre modèle ─── */}
-        <section className="section">
-          <div className="max-w-5xl mx-auto px-8">
+        <section className="section relative bg-section-tint overflow-hidden">
+          <div className="halo halo-blue w-[28rem] h-[28rem] top-1/4 -right-56" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 h-72 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+          <div className="relative max-w-5xl mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 Notre modèle
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Une commission unique, sans abonnement
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Une commission unique, <span className="title-mark">sans abonnement</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Pas de forfait, pas d&apos;engagement de durée. Vous ne payez que
@@ -138,15 +142,15 @@ export default function TarifsPartenairesPage() {
                 { valeur: "15 %", titre: "Sur chaque vente", texte: "Prélevés sur le prix TTC, uniquement sur les réservations confirmées via BYS Permis." },
                 { valeur: "7 j", titre: "Versement hebdomadaire", texte: "Vos revenus sont virés chaque semaine sur votre compte via Stripe Connect." },
               ].map((c) => (
-                <div key={c.titre} className="rounded-2xl border border-brand-border bg-white p-8 text-center">
-                  <p className="font-display font-bold text-4xl text-brand-accent mb-2">{c.valeur}</p>
+                <div key={c.titre} className="card-lift card-accent-top p-8 text-center">
+                  <p className="number-gradient text-5xl mb-3 mt-1">{c.valeur}</p>
                   <p className="font-display font-semibold text-brand-text mb-2">{c.titre}</p>
                   <p className="text-sm text-gray-500 leading-relaxed">{c.texte}</p>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-2xl bg-white border border-brand-border p-8">
+            <div className="rounded-2xl bg-white border border-blue-100 border-l-4 border-l-blue-600 p-6 sm:p-8 shadow-lg shadow-blue-900/5">
               <h3 className="font-display font-semibold text-lg text-brand-text mb-5">
                 Ce qui est inclus, sans supplément
               </h3>
@@ -159,8 +163,10 @@ export default function TarifsPartenairesPage() {
                   "Émargement numérique",
                   "Tableau de bord et suivi des revenus",
                 ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-gray-600">
-                    <FontAwesomeIcon icon={faCheck} className="text-brand-accent mt-1 shrink-0" />
+                  <li key={f} className="flex items-start gap-3 text-sm text-gray-700">
+                    <span className="w-5 h-5 mt-0.5 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                      <FontAwesomeIcon icon={faCheck} className="text-blue-700 text-[10px]" />
+                    </span>
                     <span>{f}</span>
                   </li>
                 ))}
@@ -170,14 +176,15 @@ export default function TarifsPartenairesPage() {
         </section>
 
         {/* ─── Testimonials ─── */}
-        <section className="section">
-          <div className="max-w-[1440px] mx-auto px-8">
+        <section className="section relative bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-grid-blue mask-fade-y" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 Témoignages
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Ils nous font confiance
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Ils nous font <span className="title-mark">confiance</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Découvrez les retours de nos centres partenaires sur leur
@@ -188,17 +195,17 @@ export default function TarifsPartenairesPage() {
               {testimonials.map((t) => (
                 <div
                   key={t.author}
-                  className="bg-white rounded-2xl border border-brand-border p-8 hover:shadow-lg transition-all duration-300"
+                  className="card-lift card-accent-top p-8"
                 >
                   <FontAwesomeIcon
                     icon={faQuoteLeft}
-                    className="text-2xl text-blue-100 mb-4"
+                    className="text-3xl text-blue-200 mb-4 mt-1"
                   />
-                  <p className="text-gray-600 leading-relaxed mb-6 text-sm">
+                  <p className="text-gray-700 leading-relaxed mb-6 text-sm">
                     {t.quote}
                   </p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-brand-border">
-                    <div className="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center text-white font-bold text-sm">
+                  <div className="flex items-center gap-3 pt-4 border-t border-blue-100">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-brand-navy flex items-center justify-center text-white font-bold text-sm ring-2 ring-blue-100">
                       {t.author.charAt(0)}
                     </div>
                     <div>
@@ -217,21 +224,22 @@ export default function TarifsPartenairesPage() {
         </section>
 
         {/* ─── FAQ ─── */}
-        <section className="section bg-white">
-          <div className="max-w-3xl mx-auto px-8">
+        <section className="section relative bg-section-blue overflow-hidden">
+          <div className="halo halo-blue w-96 h-96 top-1/4 -left-56" aria-hidden="true" />
+          <div className="relative max-w-3xl mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 FAQ partenaires
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Questions fréquentes
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Questions <span className="title-mark">fréquentes</span>
               </h2>
             </div>
             <div className="space-y-3">
               {faqItems.map((item, index) => (
                 <div
                   key={index}
-                  className="bg-[#F9FAFB] rounded-xl border border-brand-border overflow-hidden"
+                  className={`rounded-xl border overflow-hidden transition-colors ${openFaq === index ? "bg-white border-blue-200 shadow-md shadow-blue-900/5" : "bg-white border-blue-100 hover:border-blue-200"}`}
                 >
                   <button
                     onClick={() =>
@@ -244,11 +252,11 @@ export default function TarifsPartenairesPage() {
                     </span>
                     <FontAwesomeIcon
                       icon={openFaq === index ? faChevronUp : faChevronDown}
-                      className="text-gray-400 flex-shrink-0"
+                      className="text-blue-500 flex-shrink-0"
                     />
                   </button>
                   {openFaq === index && (
-                    <div className="px-5 pb-5 text-gray-500 leading-relaxed">
+                    <div className="px-5 pb-5 text-gray-600 leading-relaxed">
                       {item.answer}
                     </div>
                   )}
@@ -260,11 +268,13 @@ export default function TarifsPartenairesPage() {
 
         {/* ─── CTA ─── */}
         <section className="py-16">
-          <div className="max-w-[1440px] mx-auto px-8">
-            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-10 lg:p-16 text-center text-white relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-brand-navy rounded-3xl p-8 sm:p-10 lg:p-16 text-center text-white relative overflow-hidden shadow-2xl shadow-blue-900/25">
+              <div className="absolute inset-0 bg-dots-white" aria-hidden="true" />
+              <div className="absolute inset-x-0 top-0 tricolore-rule" aria-hidden="true" />
+              <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-300 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-300 rounded-full blur-3xl" />
               </div>
               <div className="relative">
                 <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { prepareCampaign, sendCampaignBatch, BATCH_SIZE } from "@/lib/prospects/campaign";
+import { rapprocherProspectsInscrits } from "@/lib/prospects/inscrits";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -8,6 +9,7 @@ const CRON_SECRET = process.env.CRON_SECRET;
  * GET /api/cron/campagnes
  *
  * Fait avancer les campagnes de démarchage :
+ *   - sort des listes les prospects qui ont créé leur compte entre-temps ;
  *   - démarre celles dont l'heure de programmation est passée ;
  *   - expédie un lot pour chaque campagne EN_COURS.
  *
@@ -34,6 +36,16 @@ export async function GET(req: NextRequest) {
       restant: number;
       termine: boolean;
     }[] = [];
+
+    // ── 0. Centres inscrits depuis le dernier passage ──
+    // Un échec ici ne doit pas bloquer les envois : le filtre de dernière
+    // seconde de `sendCampaignBatch` revérifie chaque fiche de toute façon.
+    let rapprochement = { marques: 0 };
+    try {
+      rapprochement = await rapprocherProspectsInscrits();
+    } catch (err) {
+      console.error("[cron/campagnes] rapprochement prospects inscrits:", err);
+    }
 
     // ── 1. Démarrage des campagnes programmées ──
     const aDemarrer = await prisma.emailCampaign.findMany({
@@ -81,6 +93,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
+      prospectsInscrits: rapprochement.marques,
       demarrees: aDemarrer.length,
       campagnesTraitees: traitees.length,
       detail: traitees,

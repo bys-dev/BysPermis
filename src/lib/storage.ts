@@ -77,15 +77,25 @@ export async function uploadFile(opts: {
   if (HAS_CELLAR) {
     const client = await getCellarClient();
     const { PutObjectCommand } = await import("@aws-sdk/client-s3");
-    await client.send(
-      new PutObjectCommand({
-        Bucket: CELLAR_BUCKET,
-        Key: key,
-        Body: buffer,
-        ContentType: contentType,
-        ACL: "public-read",
-      }),
-    );
+    try {
+      await client.send(
+        new PutObjectCommand({
+          Bucket: CELLAR_BUCKET,
+          Key: key,
+          Body: buffer,
+          ContentType: contentType,
+          ACL: "public-read",
+        }),
+      );
+    } catch (err) {
+      // Un bucket mal nomme renvoie NoSuchBucket. Sans ce contexte, l appelant
+      // ne voit qu un "Erreur upload" generique, impossible a diagnostiquer.
+      const code = (err as { Code?: string; name?: string }).Code ?? (err as Error).name;
+      throw new Error(
+        `Stockage Cellar indisponible (bucket "${CELLAR_BUCKET}") : ${code}`,
+        { cause: err },
+      );
+    }
     return { url: cellarPublicUrl(key), storage: "cellar" };
   }
 

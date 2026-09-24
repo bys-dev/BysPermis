@@ -42,18 +42,21 @@ export function FormationsList({
 }) {
   if (formations.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center">
-        <FontAwesomeIcon icon={faMagnifyingGlass} className="mb-4 text-4xl text-gray-300" />
-        <h2 className="mb-2 text-xl font-semibold text-gray-700">
+      <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-b from-white to-blue-50 p-10 text-center shadow-sm">
+        <div className="absolute inset-0 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+        <div className="icon-tile relative mx-auto mb-5 h-16 w-16 rounded-2xl">
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="text-2xl" />
+        </div>
+        <h2 className="relative mb-2 text-xl font-semibold text-gray-800">
           Aucune session programmée à {lieu} pour le moment
         </h2>
-        <p className="mx-auto mb-6 max-w-xl text-gray-500">
+        <p className="relative mx-auto mb-6 max-w-xl text-gray-600">
           Un stage suivi dans n&apos;importe quel centre agréé de France est valable
           partout : élargissez la recherche pour trouver une date proche.
         </p>
         <Link
           href="/recherche"
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+          className="relative inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white shadow-lg shadow-blue-600/25 transition-colors hover:bg-blue-700"
         >
           <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
           Voir toutes les sessions
@@ -69,7 +72,7 @@ export function FormationsList({
     <div className="space-y-10">
       {surPlace.length > 0 && (
         <div>
-          <h2 className="mb-6 font-display text-2xl font-bold text-gray-900">
+          <h2 className="heading-accent mb-6 font-display text-2xl font-bold text-gray-900">
             {surPlace.length} centre{surPlace.length > 1 ? "s" : ""} agréé
             {surPlace.length > 1 ? "s" : ""} à {lieu}
           </h2>
@@ -83,7 +86,7 @@ export function FormationsList({
 
       {alentours.length > 0 && (
         <div>
-          <h2 className="mb-2 font-display text-2xl font-bold text-gray-900">
+          <h2 className="heading-accent mb-2 font-display text-2xl font-bold text-gray-900">
             {surPlace.length > 0 ? `Autres sessions près de ${lieu}` : `Sessions les plus proches de ${lieu}`}
           </h2>
           <p className="mb-6 text-sm text-gray-500">
@@ -103,7 +106,7 @@ export function FormationsList({
 
 function FormationCard({ formation: f }: { formation: FormationProche }) {
   return (
-    <article className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+    <article className="card-lift card-accent-left p-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -146,7 +149,7 @@ function FormationCard({ formation: f }: { formation: FormationProche }) {
                 <Link
                   key={sess.id}
                   href={`/reserver/${sess.id}`}
-                  className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  className="chip-link inline-flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
                 >
                   <FontAwesomeIcon icon={faCalendarDays} className="text-[10px]" />
                   {new Date(sess.dateDebut).toLocaleDateString("fr-FR", {
@@ -167,12 +170,12 @@ function FormationCard({ formation: f }: { formation: FormationProche }) {
 
         <div className="flex shrink-0 flex-col items-end gap-3">
           <div className="text-right">
-            <p className="text-2xl font-bold text-gray-900">{f.prix} €</p>
+            <p className="font-display text-2xl font-bold text-blue-900">{f.prix} €</p>
             <p className="text-xs text-gray-500">TVA incluse</p>
           </div>
           <Link
             href={`/formations/${f.slug}`}
-            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700"
+            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-colors hover:bg-red-700"
           >
             Voir les dates
             <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
@@ -193,21 +196,21 @@ function FormationCard({ formation: f }: { formation: FormationProche }) {
 export function FaitsCles({ lieu }: { lieu: string }) {
   return (
     <section aria-labelledby="faits-cles">
-      <h2 id="faits-cles" className="mb-4 font-display text-2xl font-bold text-gray-900">
+      <h2 id="faits-cles" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
         L&apos;essentiel du stage de récupération de points à {lieu}
       </h2>
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+      <div className="card-accent-top relative overflow-x-auto rounded-2xl border border-blue-100 bg-white shadow-sm">
         <table className="w-full text-sm">
           <caption className="sr-only">
             Caractéristiques réglementaires d&apos;un stage de récupération de points
           </caption>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-blue-50">
             {STAGE_FACTS.map((f) => (
-              <tr key={f.label}>
-                <th scope="row" className="w-56 px-5 py-3 text-left font-medium text-gray-500">
+              <tr key={f.label} className="transition-colors hover:bg-blue-50/40">
+                <th scope="row" className="w-56 bg-blue-50/60 px-5 py-3.5 text-left font-semibold text-blue-900">
                   {f.label}
                 </th>
-                <td className="px-5 py-3 text-gray-900">
+                <td className="px-5 py-3.5 text-gray-900">
                   {f.value}
                   {f.source && (
                     <span className="ml-2 text-xs text-gray-400">({f.source})</span>
@@ -227,13 +230,13 @@ export function FaitsCles({ lieu }: { lieu: string }) {
 export function EtapesStage({ lieu }: { lieu: string }) {
   return (
     <section aria-labelledby="etapes">
-      <h2 id="etapes" className="mb-4 font-display text-2xl font-bold text-gray-900">
+      <h2 id="etapes" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
         Comment récupérer 4 points à {lieu}, étape par étape
       </h2>
       <ol className="space-y-4">
         {STAGE_STEPS.map((step, i) => (
-          <li key={step.name} className="flex gap-4 rounded-xl border border-gray-200 bg-white p-5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+          <li key={step.name} className="card-lift group flex gap-4 p-5">
+            <span className="icon-tile h-10 w-10 rounded-xl font-display text-base font-bold">
               {i + 1}
             </span>
             <div>
@@ -252,26 +255,28 @@ export function EtapesStage({ lieu }: { lieu: string }) {
 export function BaremeRetraits() {
   return (
     <section aria-labelledby="bareme">
-      <h2 id="bareme" className="mb-4 font-display text-2xl font-bold text-gray-900">
+      <h2 id="bareme" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
         Combien de points perd-on selon l&apos;infraction ?
       </h2>
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-blue-100 bg-white shadow-sm">
         <table className="w-full text-sm">
           <caption className="sr-only">
             Barème des retraits de points par infraction au Code de la route
           </caption>
-          <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+          <thead className="bg-gradient-to-r from-brand-navy to-brand-navy-soft text-left text-xs uppercase tracking-wide text-blue-100">
             <tr>
               <th scope="col" className="px-5 py-3 font-medium">Infraction</th>
               <th scope="col" className="px-5 py-3 text-right font-medium">Points retirés</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-blue-50">
             {BAREME_RETRAITS.map((b) => (
-              <tr key={b.infraction}>
+              <tr key={b.infraction} className="transition-colors odd:bg-white even:bg-blue-50/40 hover:bg-blue-50">
                 <td className="px-5 py-3 text-gray-700">{b.infraction}</td>
-                <td className="px-5 py-3 text-right font-semibold text-gray-900">
-                  −{b.points}
+                <td className="px-5 py-3 text-right">
+                  <span className="inline-flex min-w-10 justify-center rounded-full bg-red-50 px-2.5 py-0.5 font-semibold text-red-600">
+                    −{b.points}
+                  </span>
                 </td>
               </tr>
             ))}
@@ -291,13 +296,13 @@ export function BaremeRetraits() {
 export function Definitions() {
   return (
     <section aria-labelledby="definitions">
-      <h2 id="definitions" className="mb-4 font-display text-2xl font-bold text-gray-900">
+      <h2 id="definitions" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
         Les termes à connaître
       </h2>
       <dl className="grid gap-4 md:grid-cols-2">
         {STAGE_DEFINITIONS.map((d) => (
-          <div key={d.terme} className="rounded-xl border border-gray-200 bg-white p-5">
-            <dt className="mb-1 font-semibold text-gray-900">{d.terme}</dt>
+          <div key={d.terme} className="card-lift card-accent-left p-5">
+            <dt className="mb-1 font-semibold text-blue-900">{d.terme}</dt>
             <dd className="text-sm text-gray-600">{d.definition}</dd>
           </div>
         ))}
@@ -311,17 +316,23 @@ export function Definitions() {
 export function FaqSection({ items, titre }: { items: FaqItem[]; titre: string }) {
   return (
     <section aria-labelledby="faq">
-      <h2 id="faq" className="mb-4 font-display text-2xl font-bold text-gray-900">
+      <h2 id="faq" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
         {titre}
       </h2>
       <div className="space-y-3">
         {items.map((item) => (
           <details
             key={item.question}
-            className="group rounded-xl border border-gray-200 bg-white p-5 open:shadow-sm"
+            className="group rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-blue-200 open:border-blue-200 open:bg-gradient-to-b open:from-blue-50/60 open:to-white open:shadow-md open:shadow-blue-900/5"
           >
-            <summary className="cursor-pointer list-none font-semibold text-gray-900 marker:content-none">
+            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-semibold text-gray-900 marker:content-none [&::-webkit-details-marker]:hidden">
               <h3 className="inline">{item.question}</h3>
+              <span
+                aria-hidden="true"
+                className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-600 transition-transform duration-200 group-open:rotate-45 group-open:bg-blue-600 group-open:text-white motion-reduce:transition-none"
+              >
+                +
+              </span>
             </summary>
             <p className="mt-3 text-sm leading-relaxed text-gray-600">{item.answer}</p>
           </details>
@@ -346,14 +357,14 @@ export function MaillageGeo({
 
   return (
     <section aria-labelledby="maillage">
-      <h2 id="maillage" className="mb-4 font-display text-2xl font-bold text-gray-900">
+      <h2 id="maillage" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
         {titre}
       </h2>
       <div className="flex flex-wrap gap-2">
         {departement && (
           <Link
             href={`/stages/departement/${departement.slug}`}
-            className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100"
+            className="chip-link inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
             <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
             Tout le {departement.nom} ({departement.code})
@@ -363,7 +374,7 @@ export function MaillageGeo({
           <Link
             key={v.slug}
             href={`/stages/${v.slug}`}
-            className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            className="chip-link inline-flex items-center rounded-lg border border-blue-100 bg-white px-4 py-2 text-sm text-gray-700 hover:border-blue-300 hover:text-blue-700"
           >
             Stage à {v.nom}
           </Link>

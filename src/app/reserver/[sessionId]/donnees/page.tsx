@@ -302,7 +302,7 @@ export default function DonneesPage() {
         </div>
 
         {/* Total */}
-        <div className="bg-[#0A1628] rounded-2xl p-5 text-white">
+        <div className="bg-brand-navy rounded-2xl p-5 text-white">
           <div className="flex items-center justify-between mb-3">
             <span className="text-gray-400 text-sm">Montant du stage</span>
             <span className="font-semibold">{s.prix} €</span>

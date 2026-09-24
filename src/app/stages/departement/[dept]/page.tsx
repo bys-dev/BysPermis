@@ -125,9 +125,9 @@ export default async function StagesDepartementPage({ params }: Props) {
       <JsonLd id={`ld-dept-${dept.slug}`} data={jsonLd} />
       <Header />
       <main className="min-h-screen bg-brand-bg">
-        <section className="bg-navy-900 py-16 text-white">
+        <section className="bg-brand-navy py-16 text-white">
           <div className="mx-auto max-w-7xl px-6">
-            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-blue-100/70">
               <Link href="/" className="transition-colors hover:text-white">Accueil</Link>
               <span aria-hidden>/</span>
               <Link href="/stages" className="transition-colors hover:text-white">Stages par ville</Link>
@@ -139,7 +139,7 @@ export default async function StagesDepartementPage({ params }: Props) {
               Stage de récupération de points dans le {dept.nom} ({dept.code})
             </h1>
 
-            <p className="max-w-3xl text-lg text-gray-300">
+            <p className="max-w-3xl text-lg text-blue-100/85">
               Dans le {dept.nom}, les stages de récupération de points sont dispensés par des
               centres agréés par le préfet, dont la préfecture siège à {dept.prefecture}. Le
               stage dure 2 jours (14 heures) et restitue{" "}
@@ -152,16 +152,16 @@ export default async function StagesDepartementPage({ params }: Props) {
                 <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
                 {dept.region}
               </span>
-              <span className="text-gray-600" aria-hidden>|</span>
-              <span className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-white/30" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-blue-100/85">
                 <FontAwesomeIcon icon={faCalendarDays} className="text-xs" />
                 {formations.length === 0
                   ? "Aucune session programmée"
                   : `${formations.length} session${formations.length > 1 ? "s" : ""} réservable${formations.length > 1 ? "s" : ""}`}
                 {dansLeDept > 0 && ` — dont ${dansLeDept} dans le département`}
               </span>
-              <span className="text-gray-600" aria-hidden>|</span>
-              <span className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-white/30" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-blue-100/85">
                 <FontAwesomeIcon icon={faShieldHalved} className="text-xs" />
                 Agrément préfectoral vérifié
               </span>
@@ -169,55 +169,59 @@ export default async function StagesDepartementPage({ params }: Props) {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl space-y-14 px-6 py-12">
-          <FormationsList formations={formations} lieu={`dans le ${dept.nom}`} />
+        <div className="tricolore-rule" aria-hidden="true" />
+        <div className="relative overflow-hidden bg-section-tint-reverse">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+          <div className="relative mx-auto max-w-7xl space-y-14 px-6 py-12">
+            <FormationsList formations={formations} lieu={`dans le ${dept.nom}`} />
 
-          <FaitsCles lieu={`dans le ${dept.nom}`} />
+            <FaitsCles lieu={`dans le ${dept.nom}`} />
 
-          <section aria-labelledby="contexte-dept">
-            <h2 id="contexte-dept" className="mb-4 font-display text-2xl font-bold text-gray-900">
-              L&apos;agrément préfectoral dans le {dept.nom}
-            </h2>
-            <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-8 text-gray-600">
-              <p>
-                Chaque centre de sensibilisation à la sécurité routière exerçant dans le{" "}
-                {dept.nom} détient un agrément nominatif délivré par la préfecture de{" "}
-                {dept.prefecture}, renouvelable et assorti d&apos;un numéro. C&apos;est cet
-                agrément — et lui seul — qui donne au stage sa valeur juridique au regard de
-                l&apos;article R223-5 du Code de la route.
-              </p>
-              <p>
-                BYS Permis contrôle l&apos;agrément, l&apos;assurance responsabilité
-                civile professionnelle et les pièces administratives de chaque centre avant sa
-                mise en ligne. Un centre dont l&apos;agrément arrive à expiration est retiré de
-                la marketplace tant que le renouvellement n&apos;est pas justifié.
-              </p>
-              <p>
-                Le stage restant valable sur tout le territoire, les sessions ci-dessus incluent
-                les départements limitrophes lorsque l&apos;offre locale est réduite —
-                souvent à moins d&apos;une heure de route, et parfois sur des dates plus proches.
-              </p>
-            </div>
-          </section>
+            <section aria-labelledby="contexte-dept">
+              <h2 id="contexte-dept" className="heading-accent mb-5 font-display text-2xl font-bold text-gray-900">
+                L&apos;agrément préfectoral dans le {dept.nom}
+              </h2>
+              <div className="space-y-4 rounded-2xl border border-blue-100 border-l-4 border-l-blue-600 bg-white p-6 sm:p-8 text-gray-600 shadow-sm">
+                <p>
+                  Chaque centre de sensibilisation à la sécurité routière exerçant dans le{" "}
+                  {dept.nom} détient un agrément nominatif délivré par la préfecture de{" "}
+                  {dept.prefecture}, renouvelable et assorti d&apos;un numéro. C&apos;est cet
+                  agrément — et lui seul — qui donne au stage sa valeur juridique au regard de
+                  l&apos;article R223-5 du Code de la route.
+                </p>
+                <p>
+                  BYS Permis contrôle l&apos;agrément, l&apos;assurance responsabilité
+                  civile professionnelle et les pièces administratives de chaque centre avant sa
+                  mise en ligne. Un centre dont l&apos;agrément arrive à expiration est retiré de
+                  la marketplace tant que le renouvellement n&apos;est pas justifié.
+                </p>
+                <p>
+                  Le stage restant valable sur tout le territoire, les sessions ci-dessus incluent
+                  les départements limitrophes lorsque l&apos;offre locale est réduite —
+                  souvent à moins d&apos;une heure de route, et parfois sur des dates plus proches.
+                </p>
+              </div>
+            </section>
 
-          <EtapesStage lieu={`dans le ${dept.nom}`} />
+            <EtapesStage lieu={`dans le ${dept.nom}`} />
 
-          <BaremeRetraits />
+            <BaremeRetraits />
 
-          <Definitions />
+            <Definitions />
 
-          <FaqSection items={faq} titre={`Questions fréquentes — ${dept.nom} (${dept.code})`} />
+            <FaqSection items={faq} titre={`Questions fréquentes — ${dept.nom} (${dept.code})`} />
 
-          <MaillageGeo
-            villes={villes}
-            titre={`Stages de récupération de points par ville dans le ${dept.nom}`}
-          />
+            <MaillageGeo
+              villes={villes}
+              titre={`Stages de récupération de points par ville dans le ${dept.nom}`}
+            />
 
-          <p className="text-sm text-gray-500">
-            <Link href="/stages" className="text-blue-600 hover:underline">
-              ← Voir tous les départements et toutes les villes
-            </Link>
-          </p>
+            <p className="text-sm text-gray-500">
+              <Link href="/stages" className="text-blue-600 hover:underline">
+                ← Voir tous les départements et toutes les villes
+              </Link>
+            </p>
+          </div>
         </div>
       </main>
       <Footer />

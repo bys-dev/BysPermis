@@ -18,6 +18,7 @@ const centreSelect = {
   bannerImage: true, logo: true, couleurPrimaire: true, couleurSecondaire: true,
   presentationHtml: true, horaires: true,
   equipements: true, certifications: true, reseauxSociaux: true,
+  photos: true,
   // Billing / juridique
   raisonSociale: true, tva: true, ape: true, iban: true, bic: true,
   mentionsLegales: true, cgv: true, nomResponsable: true, signatureUrl: true,
@@ -25,6 +26,38 @@ const centreSelect = {
 } as const;
 
 // GET /api/centre/me
+/**
+ * Rend une ZodError lisible par un humain : l'UI affichait "[object Object]"
+ * parce qu'on lui renvoyait le tableau d'issues brut.
+ */
+function zodMessage(err: z.ZodError): string {
+  return err.issues
+    .map((i) => {
+      const champ = i.path.join(".");
+      return champ ? `${champ} : ${i.message}` : i.message;
+    })
+    .join(" · ");
+}
+
+/** Accepte #abc comme #aabbcc, avec ou sans dièse, et normalise en 6 caractères. */
+const couleurHex = z.preprocess((v) => {
+  if (typeof v !== "string") return v;
+  const brut = v.trim().replace(/^#/, "");
+  if (/^[0-9A-Fa-f]{3}$/.test(brut)) {
+    return "#" + brut.split("").map((c) => c + c).join("").toUpperCase();
+  }
+  if (/^[0-9A-Fa-f]{6}$/.test(brut)) return "#" + brut.toUpperCase();
+  return v;
+}, z.string().regex(/^#[0-9A-Fa-f]{6}$/, "couleur invalide (ex : #1E40AF)").optional().nullable());
+
+/** URL absolue (Cellar/Blob) ou chemin relatif (/uploads/... en stockage local). */
+const cheminImage = z
+  .string()
+  .max(500)
+  .refine((v) => v.startsWith("https://") || v.startsWith("http://") || v.startsWith("/"), "url d'image invalide")
+  .optional()
+  .nullable();
+
 export async function GET() {
   let user;
   try {
@@ -124,7 +157,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ ...updated, profilCompletionPct: percentage, isActive: newIsActive });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });
+    if (err instanceof z.ZodError) return NextResponse.json({ error: zodMessage(err), details: err.issues }, { status: 400 });
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -141,13 +174,16 @@ const profileSchema = z.object({
   email: z.string().email().optional().nullable(),
   siteWeb: z.string().max(300).optional().nullable(),
   // Personnalisation
-  bannerImage: z.string().url().max(500).optional().nullable(),
-  couleurPrimaire: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional().nullable(),
-  couleurSecondaire: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional().nullable(),
+  logo: cheminImage,
+  bannerImage: cheminImage,
+  couleurPrimaire: couleurHex,
+  couleurSecondaire: couleurHex,
   presentationHtml: z.string().max(10000).optional().nullable(),
   horaires: z.string().max(1000).optional().nullable(),
   equipements: z.array(z.string().max(100)).max(20).optional(),
   certifications: z.array(z.string().max(100)).max(20).optional(),
+  // Galerie publique : au plus 12 photos, chemin relatif ou URL absolue.
+  photos: z.array(z.string().max(500)).max(12).optional(),
   reseauxSociaux: z.object({
     facebook: z.string().url().optional().or(z.literal("")),
     instagram: z.string().url().optional().or(z.literal("")),
@@ -210,7 +246,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ ...updated, profilCompletionPct: percentage, isActive: newIsActive });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });
+    if (err instanceof z.ZodError) return NextResponse.json({ error: zodMessage(err), details: err.issues }, { status: 400 });
     console.error("[PUT /api/centre/me]", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

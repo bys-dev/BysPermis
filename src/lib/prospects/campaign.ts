@@ -17,6 +17,7 @@ import { resend } from "@/lib/email";
 import { logEmail } from "@/lib/email-log";
 import type { Prisma, ProspectStatus } from "@/generated/prisma/client";
 import { renderCampaignEmail, unsubscribeUrl, type TemplateProspect } from "./template";
+import { rapprocherProspectsInscrits } from "./inscrits";
 
 const RAW_FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 
@@ -78,6 +79,13 @@ export interface AudienceFilter {
 }
 
 /**
+ * Statuts qu'aucune campagne ne peut viser, quel que soit le ciblage :
+ * opposition au démarchage, adresse morte, et centre déjà inscrit sur le site
+ * (cf. lib/prospects/inscrits.ts) — on ne relance pas un partenaire.
+ */
+export const STATUTS_JAMAIS_CIBLES: ProspectStatus[] = ["DESABONNE", "INJOIGNABLE", "INSCRIT"];
+
+/**
  * Construit le `where` Prisma du ciblage.
  *
  * Les quatre premières conditions ne sont pas négociables et ne dépendent
@@ -91,7 +99,7 @@ export function buildAudienceWhere(filter: AudienceFilter = {}): Prisma.Prospect
     email: { not: null },
     emailValide: true,
     unsubscribedAt: null,
-    statut: { notIn: ["DESABONNE", "INJOIGNABLE"] },
+    statut: { notIn: STATUTS_JAMAIS_CIBLES },
   };
 
   // Liste nominative : les critères de ciblage n'ont plus de sens et ne sont
@@ -104,8 +112,8 @@ export function buildAudienceWhere(filter: AudienceFilter = {}): Prisma.Prospect
 
   if (filter.statuts?.length) {
     // On intersecte avec l'exclusion obligatoire ci-dessus.
-    const allowed = filter.statuts.filter((s) => s !== "DESABONNE" && s !== "INJOIGNABLE");
-    where.statut = allowed.length ? { in: allowed } : { notIn: ["DESABONNE", "INJOIGNABLE"] };
+    const allowed = filter.statuts.filter((s) => !STATUTS_JAMAIS_CIBLES.includes(s));
+    where.statut = allowed.length ? { in: allowed } : { notIn: STATUTS_JAMAIS_CIBLES };
   }
   if (filter.departements?.length) where.departement = { in: filter.departements };
   if (filter.villes?.length) where.ville = { in: filter.villes };
@@ -160,6 +168,10 @@ export async function prepareCampaign(campaignId: string): Promise<{ totalCibles
     select: { id: true, filtre: true },
   });
   if (!campaign) throw new Error("Campagne introuvable.");
+
+  // Avant de figer la liste, on sort les centres qui ont créé leur compte
+  // depuis le dernier passage : ils ne doivent pas y entrer.
+  await rapprocherProspectsInscrits();
 
   const filter = (campaign.filtre ?? {}) as AudienceFilter;
   const where = buildAudienceWhere(filter);
@@ -316,17 +328,25 @@ export async function sendCampaignBatch(
   }
 
   // ── Filtre de dernière seconde ──
-  // Un prospect peut s'être désinscrit entre la préparation et l'envoi : on
-  // revérifie systématiquement plutôt que de faire confiance à la liste figée.
+  // Un prospect peut s'être désinscrit — ou avoir créé son compte — entre la
+  // préparation et l'envoi : on revérifie systématiquement plutôt que de faire
+  // confiance à la liste figée.
   const sendable: typeof pending = [];
   let ignores = 0;
   for (const recipient of pending) {
     const p = recipient.prospect;
-    const bloque = !p.email || !p.emailValide || p.unsubscribedAt !== null || p.statut === "DESABONNE" || p.statut === "INJOIGNABLE";
+    const bloque =
+      !p.email || !p.emailValide || p.unsubscribedAt !== null || STATUTS_JAMAIS_CIBLES.includes(p.statut);
     if (bloque) {
       await prisma.campaignRecipient.update({
         where: { id: recipient.id },
-        data: { status: "IGNORE", error: "Désinscrit ou email invalide au moment de l'envoi" },
+        data: {
+          status: "IGNORE",
+          error:
+            p.statut === "INSCRIT"
+              ? "Inscrit sur le site au moment de l'envoi"
+              : "Désinscrit ou email invalide au moment de l'envoi",
+        },
       });
       ignores++;
       continue;

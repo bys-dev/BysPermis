@@ -64,6 +64,29 @@ export async function GET() {
   }
 }
 
+/**
+ * Réponse client du POST : uniquement les champs utiles de la réservation.
+ * Le centre complet (SIRET, IBAN, Stripe, contacts…) n'est jamais renvoyé ;
+ * l'élève retrouve les coordonnées du centre dans son espace élève.
+ */
+function toClientReservation(r: {
+  id: string;
+  numero: string;
+  status: string;
+  montant: number;
+  sessionId: string;
+  createdAt: Date;
+}) {
+  return {
+    id: r.id,
+    numero: r.numero,
+    status: r.status,
+    montant: r.montant,
+    sessionId: r.sessionId,
+    createdAt: r.createdAt,
+  };
+}
+
 // ─── POST /api/reservations ─────────────────────────────────────────
 // Finalise une réservation déjà créée en EN_ATTENTE_PAIEMENT par
 // /api/stripe/create-payment-intent (anti race-condition).
@@ -111,7 +134,7 @@ export async function POST(req: NextRequest) {
 
     // Si déjà confirmée → idempotent : retourner la résa actuelle
     if (placeholder.status === "CONFIRMEE") {
-      return NextResponse.json(placeholder, { status: 200 });
+      return NextResponse.json(toClientReservation(placeholder), { status: 200 });
     }
 
     if (placeholder.status !== "EN_ATTENTE_PAIEMENT") {
@@ -303,7 +326,7 @@ export async function POST(req: NextRequest) {
     //    de sécurité si cette route échoue après encaissement. Idempotent.
     await fulfillReservation(result.reservation.id, { source: "api/reservations" });
 
-    return NextResponse.json(result.reservation, { status: 200 });
+    return NextResponse.json(toClientReservation(result.reservation), { status: 200 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues }, { status: 400 });
     if (err instanceof Error && err.message === "Non authentifié") {

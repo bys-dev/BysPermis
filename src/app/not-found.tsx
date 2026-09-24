@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main className="min-h-[70vh] bg-[#0A1628] flex items-center justify-center px-4">
+      <main className="min-h-[70vh] bg-brand-navy flex items-center justify-center px-4">
         <div className="text-center max-w-lg">
           {/* Illustration 404 */}
           <div className="mb-8">

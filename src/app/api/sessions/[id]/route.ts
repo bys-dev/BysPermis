@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
             isQualiopi: true,
             isCPF: true,
             centre: {
-              select: { nom: true, ville: true, adresse: true, codePostal: true, telephone: true },
+              select: { nom: true, ville: true, adresse: true, codePostal: true },
             },
           },
         },

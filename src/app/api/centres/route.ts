@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth0";
+import { requireAdmin, getCurrentUser, PLATFORM_ROLES } from "@/lib/auth0";
 import { geocodeAddress, haversineDistance } from "@/lib/geocoding";
 import { mapAuthError } from "@/lib/auth0";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 
 // GET /api/centres — liste publique des centres actifs
 export async function GET(req: NextRequest) {
@@ -14,8 +15,17 @@ export async function GET(req: NextRequest) {
     const lng = searchParams.get("lng");
     const rayon = Number(searchParams.get("rayon") ?? 50);
 
+    // Règle métier : l'email et le téléphone d'un centre ne sont jamais
+    // renvoyés au public. Seul le staff plateforme (espace /plateforme) les
+    // reçoit, et lui seul peut lister les centres non actifs.
+    const currentUser = await getCurrentUser().catch(() => null);
+    const isPlatformStaff =
+      !!currentUser && (PLATFORM_ROLES as readonly string[]).includes(currentUser.role);
+
     const validStatuts = ["ACTIF", "EN_ATTENTE", "SUSPENDU"];
-    const statutFilter = statut && validStatuts.includes(statut)
+    const statutFilter = !isPlatformStaff
+      ? { statut: "ACTIF" as const, isActive: true, ville: { not: "" } }
+      : statut && validStatuts.includes(statut)
       ? { statut: statut as "ACTIF" | "EN_ATTENTE" | "SUSPENDU" }
       : statut === "all"
         ? {}
@@ -29,7 +39,21 @@ export async function GET(req: NextRequest) {
           ? { formations: { some: { isActive: true } } }
           : {}),
       },
-      include: {
+      select: {
+        id: true,
+        nom: true,
+        slug: true,
+        description: true,
+        logo: true,
+        adresse: true,
+        codePostal: true,
+        ville: true,
+        latitude: true,
+        longitude: true,
+        statut: true,
+        isActive: true,
+        createdAt: true,
+        ...(isPlatformStaff ? { email: true, telephone: true } : {}),
         formations: {
           where: { isActive: true },
           select: { id: true, titre: true, prix: true, isQualiopi: true },
@@ -121,9 +145,19 @@ export async function POST(req: NextRequest) {
         latitude,
         longitude,
       },
+      include: { user: { select: { email: true } } },
     });
 
-    return NextResponse.json(centre, { status: 201 });
+    // Fiche de prospection éventuelle de ce centre : hors relance.
+    await marquerProspectsInscrits({
+      emails: [centre.email, centre.user?.email],
+      sirets: [centre.siret],
+      centreId: centre.id,
+    }).catch((err) => console.error("[POST /api/centres] rapprochement prospects:", err));
+
+    const { user: _owner, ...centreSansOwner } = centre;
+    void _owner;
+    return NextResponse.json(centreSansOwner, { status: 201 });
   } catch (err) {
     const authRes = mapAuthError(err);
     if (authRes) return authRes;

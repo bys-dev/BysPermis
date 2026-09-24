@@ -5,8 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronRight,
   faLocationDot,
-  faPhone,
-  faEnvelope,
+  faLock,
   faGlobe,
   faBookOpen,
   faCalendarDays,
@@ -87,8 +86,6 @@ interface Centre {
   adresse: string;
   codePostal: string;
   ville: string;
-  telephone: string | null;
-  email: string | null;
   siteWeb: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -100,6 +97,7 @@ interface Centre {
   horaires: string | null;
   equipements: string[];
   certifications: string[];
+  photos: string[];
   reseauxSociaux: ReseauxSociaux | null;
   formations: Formation[];
   _count: {
@@ -136,9 +134,30 @@ export default async function CentreDetailPage({
 }) {
   const { slug } = await params;
 
+  // select explicite : ni telephone ni email (jamais exposés publiquement).
   const centreDb = await prisma.centre.findUnique({
     where: { slug },
-    include: {
+    select: {
+      id: true,
+      nom: true,
+      slug: true,
+      description: true,
+      adresse: true,
+      codePostal: true,
+      ville: true,
+      siteWeb: true,
+      latitude: true,
+      longitude: true,
+      isActive: true,
+      bannerImage: true,
+      couleurPrimaire: true,
+      couleurSecondaire: true,
+      presentationHtml: true,
+      horaires: true,
+      equipements: true,
+      certifications: true,
+      photos: true,
+      reseauxSociaux: true,
       formations: {
         where: { isActive: true },
         include: {
@@ -183,8 +202,8 @@ export default async function CentreDetailPage({
         className="text-white py-14 px-4 bg-cover bg-center"
         style={{
           background: centre.bannerImage
-            ? `linear-gradient(rgba(10,22,40,0.85), rgba(10,22,40,0.95)), url(${centre.bannerImage}) center/cover`
-            : "#0A1628",
+            ? `linear-gradient(rgba(20,48,107,0.85), rgba(20,48,107,0.93)), url(${centre.bannerImage}) center/cover`
+            : "var(--color-brand-navy)",
         }}
       >
         <div className="max-w-5xl mx-auto">
@@ -269,47 +288,23 @@ export default async function CentreDetailPage({
       {/* ─── CONTACT ───────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {centre.telephone && (
-            <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: `${accentColor}15` }}
-              >
-                <FontAwesomeIcon icon={faPhone} style={{ color: accentColor }} />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 font-medium mb-1">Téléphone</p>
-                <a
-                  href={`tel:${centre.telephone}`}
-                  className="text-sm font-semibold hover:underline"
-                  style={{ color: accentColor }}
-                >
-                  {centre.telephone}
-                </a>
-              </div>
+          {/* Règle métier : téléphone et email du centre ne sont jamais publics.
+              Ils sont communiqués à l'élève dans son espace après réservation. */}
+          <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm md:col-span-2">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: `${accentColor}15` }}
+            >
+              <FontAwesomeIcon icon={faLock} style={{ color: accentColor }} />
             </div>
-          )}
-
-          {centre.email && (
-            <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: `${accentColor}15` }}
-              >
-                <FontAwesomeIcon icon={faEnvelope} style={{ color: accentColor }} />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 font-medium mb-1">Email</p>
-                <a
-                  href={`mailto:${centre.email}`}
-                  className="text-sm font-semibold hover:underline break-all"
-                  style={{ color: accentColor }}
-                >
-                  {centre.email}
-                </a>
-              </div>
+            <div>
+              <p className="text-xs text-gray-400 font-medium mb-1">Coordonnées du centre</p>
+              <p className="text-sm text-gray-600">
+                Le téléphone et l&apos;email du centre vous sont communiqués dans votre
+                espace élève dès la confirmation de votre réservation.
+              </p>
             </div>
-          )}
+          </div>
 
           {centre.siteWeb && (
             <div className="bg-white border border-brand-border rounded-xl p-5 flex items-start gap-3 shadow-sm">
@@ -387,6 +382,27 @@ export default async function CentreDetailPage({
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── GALERIE ───────────────────────────────────────── */}
+      {centre.photos && centre.photos.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 py-10">
+          <h2 className="font-display font-bold text-2xl text-brand-text mb-6">
+            Le centre en images
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {centre.photos.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={url}
+                src={url}
+                alt={`${centre.nom} — photo ${i + 1}`}
+                loading="lazy"
+                className="h-44 w-full rounded-xl object-cover border border-brand-border"
+              />
+            ))}
           </div>
         </section>
       )}

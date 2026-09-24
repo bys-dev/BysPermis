@@ -2,6 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
+import { BRAND_NAVY } from "@/lib/brand-colors";
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -22,7 +23,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0A1628",
+          background: BRAND_NAVY,
           color: "#FFFFFF",
           fontFamily: "system-ui, -apple-system, sans-serif",
           padding: "16px",

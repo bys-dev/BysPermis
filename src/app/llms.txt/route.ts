@@ -77,6 +77,7 @@ La liste complète est accessible depuis ${BASE_URL}/stages.
 ## Contact
 
 - E-mail : contact@byspermis.fr
+- Téléphone : 01 89 31 82 03
 - Formulaire : ${BASE_URL}/contact
 
 ## Notes d'usage

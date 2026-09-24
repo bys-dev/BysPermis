@@ -7,7 +7,7 @@ import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-text text-gray-300 pt-12 sm:pt-16 pb-8 px-4 sm:px-8">
+    <footer className="bg-brand-navy-deep text-blue-100/80 pt-12 sm:pt-16 pb-8 px-4 sm:px-8">
       <div className="max-w-[1440px] mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 mb-10 sm:mb-12">
           {/* Brand */}
@@ -21,7 +21,7 @@ export default function Footer() {
                 className="h-12 w-auto brightness-0 invert"
               />
             </div>
-            <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
+            <p className="text-blue-100/60 mb-6 leading-relaxed max-w-md">
               BYS Permis est la marketplace de référence pour les stages
               agréés de récupération de points du permis de conduire. Les stages
               proposés sont dispensés par des centres agréés par le Ministère de
@@ -29,7 +29,7 @@ export default function Footer() {
             </p>
 
             {/* Contact info */}
-            <div className="flex flex-col gap-2 mb-6 text-sm text-gray-400">
+            <div className="flex flex-col gap-2 mb-6 text-sm text-blue-100/60">
               <a
                 href="mailto:contact@byspermis.fr"
                 className="flex items-center gap-2 hover:text-white transition-colors"
@@ -48,14 +48,14 @@ export default function Footer() {
               <a
                 href="#"
                 aria-label="Facebook"
-                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-brand-accent transition-colors"
+                className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-brand-accent transition-colors"
               >
                 <FontAwesomeIcon icon={faFacebookF} className="w-4 h-4" />
               </a>
               <a
                 href="#"
                 aria-label="Instagram"
-                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-brand-accent transition-colors"
+                className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-brand-accent transition-colors"
               >
                 <FontAwesomeIcon icon={faInstagram} className="w-4 h-4" />
               </a>
@@ -219,9 +219,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 pt-8">
+        <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div className="text-xs sm:text-sm text-gray-500 text-center lg:text-left">
+            <div className="text-xs sm:text-sm text-blue-100/50 text-center lg:text-left">
               © 2026 BYS Permis — édité par BYS PERMIS SAS —
               RCS Paris 107 056 327 — 33 rue de la Chaussée d&apos;Antin, 75009 Paris
             </div>
@@ -254,7 +254,7 @@ export default function Footer() {
           </div>
 
           {/* Signature prestataire — Magar Développement */}
-          <div className="mt-8 pt-6 border-t border-gray-800/50 flex flex-col items-center gap-2">
+          <div className="mt-8 pt-6 border-t border-white/5 flex flex-col items-center gap-2">
             <a
               href="https://magar-developpement.fr"
               target="_blank"
@@ -262,7 +262,7 @@ export default function Footer() {
               className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity"
               aria-label="Site développé par Magar Développement"
             >
-              <span className="text-[11px] text-gray-500 uppercase tracking-wider">
+              <span className="text-[11px] text-blue-100/50 uppercase tracking-wider">
                 Conçu et développé par
               </span>
               <Image

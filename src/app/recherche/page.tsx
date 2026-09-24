@@ -329,7 +329,13 @@ function RechercheInner() {
       }
       // Keep page if > 1
       if (currentPage > 1 && !overrides?.page) params.set("page", String(currentPage));
-      router.replace(`/recherche?${params.toString()}`, { scroll: false });
+      const next = params.toString();
+      // URL déjà à jour : ne pas naviguer. Sinon router.replace produit un
+      // nouveau `searchParams`, l'effet de sync recrée `applied`, l'effet de
+      // fetch relance la requête et rappelle updateURL… en boucle (~2 appels/s
+      // à /api/formations observés).
+      if (next === window.location.search.slice(1)) return;
+      router.replace(`/recherche?${next}`, { scroll: false });
     },
     [applied, currentPage, router],
   );
@@ -551,12 +557,12 @@ function RechercheInner() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-navy-900 text-white py-16 px-4">
+      <section className="bg-brand-navy text-white py-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl mb-4">
             Trouvez votre stage près de chez vous
           </h1>
-          <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-blue-100/85 text-lg mb-8 max-w-2xl mx-auto">
             Comparez les prix, consultez les avis et réservez votre stage en quelques clics.
             Tous nos centres sont agréés par la Préfecture.
           </p>
@@ -1033,7 +1039,7 @@ function RechercheInner() {
                   >
                     {/* BYS header banner */}
                     {stage.isBYS ? (
-                      <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #0A1628 0%, #0f2044 100%)" }}>
+                      <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, var(--color-brand-navy-deep) 0%, var(--color-brand-navy-soft) 100%)" }}>
                         <div className="flex items-center gap-2">
                           <div className="w-5 h-5 rounded bg-blue-600 flex items-center justify-center">
                             <span className="text-white text-[9px] font-bold">BYS</span>

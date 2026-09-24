@@ -59,7 +59,7 @@ const steps: Step[] = [
     description:
       "Choisissez votre session parmi les dates disponibles et réservez en quelques clics. Paiement 100% sécurisé par carte bancaire via Stripe.",
     icon: faCreditCard,
-    color: "from-green-500 to-green-600",
+    color: "from-blue-600 to-blue-800",
   },
   {
     number: "03",
@@ -68,7 +68,7 @@ const steps: Step[] = [
     description:
       "Dès votre réservation confirmée, recevez votre convocation par email avec toutes les informations pratiques : adresse du centre, horaires, documents à apporter.",
     icon: faEnvelopeOpenText,
-    color: "from-amber-500 to-amber-600",
+    color: "from-blue-700 to-brand-navy",
   },
   {
     number: "04",
@@ -77,7 +77,7 @@ const steps: Step[] = [
     description:
       "Suivez le stage sur 2 jours consécutifs (14 heures) dans votre centre agréé. À l'issue du stage, récupérez jusqu'à 4 points sur votre permis de conduire.",
     icon: faIdCard,
-    color: "from-red-500 to-red-600",
+    color: "from-brand-navy-soft to-brand-navy-deep",
   },
 ];
 
@@ -150,11 +150,13 @@ export default function CommentCaMarchePage() {
 
       <main>
         {/* ─── Hero ─── */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 lg:py-28">
-          <div className="absolute inset-0 opacity-10">
+        <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-brand-navy-soft to-brand-navy text-white py-20 lg:py-28">
+          <div className="absolute inset-0 bg-grid-white mask-fade-radial" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-20">
             <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-            <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-300 rounded-full blur-3xl" />
+            <div className="absolute bottom-10 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl" />
           </div>
+          <div className="absolute inset-x-0 bottom-0 tricolore-rule" aria-hidden="true" />
           <div className="relative max-w-[1440px] mx-auto px-8 text-center">
             <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <FontAwesomeIcon icon={faIdCard} className="text-blue-200" />
@@ -171,14 +173,16 @@ export default function CommentCaMarchePage() {
         </section>
 
         {/* ─── Steps ─── */}
-        <section className="section">
-          <div className="max-w-[1440px] mx-auto px-8">
+        <section className="section relative bg-section-tint overflow-hidden">
+          <div className="halo halo-blue w-[28rem] h-[28rem] top-1/4 -right-56" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 h-72 bg-dots-blue mask-fade-radial opacity-60" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-16">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 4 étapes simples
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                De la recherche à la récupération de points
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                De la recherche à <span className="title-mark">la récupération de points</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Un parcours simplifié pour vous accompagner à chaque étape de
@@ -190,19 +194,25 @@ export default function CommentCaMarchePage() {
               {steps.map((step, index) => (
                 <div
                   key={step.number}
-                  className="bg-white rounded-2xl border border-brand-border p-8 lg:p-10 flex flex-col lg:flex-row gap-8 items-center hover:shadow-lg transition-all duration-300"
+                  className="card-lift card-accent-left group relative p-6 sm:p-8 lg:p-10 flex flex-col lg:flex-row gap-8 items-center overflow-hidden"
                 >
+                  <span
+                    className="number-gradient pointer-events-none absolute -top-2 right-4 text-8xl opacity-15 select-none"
+                    aria-hidden="true"
+                  >
+                    {step.number}
+                  </span>
                   {/* Number + Icon */}
                   <div className="flex-shrink-0 text-center">
                     <div
-                      className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg`}
+                      className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg shadow-blue-900/25 ring-4 ring-blue-100 transition-transform duration-200 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100`}
                     >
                       <FontAwesomeIcon
                         icon={step.icon}
                         className="text-white text-2xl"
                       />
                     </div>
-                    <div className="font-display font-bold text-sm text-gray-300 mt-3">
+                    <div className="inline-block font-display font-bold text-xs tracking-wider text-blue-700 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-0.5 mt-3">
                       ÉTAPE {step.number}
                     </div>
                   </div>
@@ -222,7 +232,7 @@ export default function CommentCaMarchePage() {
 
                   {/* Arrow (desktop) */}
                   {index < steps.length - 1 && (
-                    <div className="hidden lg:block text-gray-200">
+                    <div className="hidden lg:block text-blue-200">
                       <FontAwesomeIcon
                         icon={faArrowRight}
                         className="text-xl"
@@ -247,15 +257,16 @@ export default function CommentCaMarchePage() {
         </section>
 
         {/* ─── For Training Centers ─── */}
-        <section className="section bg-white">
-          <div className="max-w-[1440px] mx-auto px-8">
+        <section className="section relative bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-grid-blue mask-fade-y" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+                <span className="eyebrow">
                   Espace partenaire
                 </span>
-                <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-6">
-                  Pour les centres de formation
+                <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-6">
+                  Pour les <span className="title-mark">centres de formation</span>
                 </h2>
                 <p className="text-gray-500 leading-relaxed mb-8">
                   Vous êtes un centre de formation agréé préfecture ? Rejoignez
@@ -286,7 +297,7 @@ export default function CommentCaMarchePage() {
                     },
                   ].map((item) => (
                     <div key={item.title} className="flex gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <div className="icon-tile w-10 h-10 rounded-lg">
                         <FontAwesomeIcon icon={item.icon} />
                       </div>
                       <div>
@@ -310,14 +321,16 @@ export default function CommentCaMarchePage() {
               </div>
 
               {/* Visual card */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-10 border border-blue-100">
-                <div className="space-y-6">
+              <div className="relative overflow-hidden rounded-2xl p-6 sm:p-10 shadow-2xl shadow-blue-900/25" style={{ background: "linear-gradient(135deg, var(--color-brand-navy-deep) 0%, var(--color-brand-navy-soft) 100%)" }}>
+                <div className="absolute inset-0 bg-dots-white" aria-hidden="true" />
+                <div className="absolute -top-16 -right-16 w-64 h-64 bg-blue-400/25 rounded-full blur-3xl" aria-hidden="true" />
+                <div className="absolute inset-x-0 top-0 tricolore-rule" aria-hidden="true" />
+                <div className="relative space-y-6">
                   <div className="text-center mb-8">
-                    <FontAwesomeIcon
-                      icon={faBuilding}
-                      className="text-brand-accent text-4xl mb-4"
-                    />
-                    <h3 className="font-display font-bold text-xl text-brand-text">
+                    <div className="icon-tile w-16 h-16 rounded-2xl mx-auto mb-4">
+                      <FontAwesomeIcon icon={faBuilding} className="text-2xl" />
+                    </div>
+                    <h3 className="font-display font-bold text-xl text-white">
                       Pourquoi nous rejoindre ?
                     </h3>
                   </div>
@@ -330,11 +343,11 @@ export default function CommentCaMarchePage() {
                   ].map((text) => (
                     <div
                       key={text}
-                      className="flex items-center gap-3 bg-white rounded-xl p-4 border border-brand-border"
+                      className="flex items-center gap-3 bg-white rounded-xl p-4 border border-white/20 shadow-sm"
                     >
                       <FontAwesomeIcon
                         icon={faCheckCircle}
-                        className="text-green-500 flex-shrink-0"
+                        className="text-blue-600 flex-shrink-0"
                       />
                       <span className="text-gray-700 text-sm font-medium">
                         {text}
@@ -348,23 +361,24 @@ export default function CommentCaMarchePage() {
         </section>
 
         {/* ─── Guarantees ─── */}
-        <section className="section">
-          <div className="max-w-[1440px] mx-auto px-8">
+        <section className="section relative bg-section-blue overflow-hidden">
+          <div className="halo halo-blue w-96 h-96 top-1/4 -left-56" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 Nos garanties
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Réservez en toute confiance
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Réservez <span className="title-mark">en toute confiance</span>
               </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {guarantees.map((g) => (
                 <div
                   key={g.title}
-                  className="bg-white rounded-2xl border border-brand-border p-8 text-center hover:shadow-lg transition-all duration-300"
+                  className="card-lift card-accent-top group p-8 text-center"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-5">
+                  <div className="icon-tile w-16 h-16 rounded-2xl mx-auto mb-5 mt-1">
                     <FontAwesomeIcon icon={g.icon} className="text-2xl" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-brand-text mb-3">
@@ -380,14 +394,15 @@ export default function CommentCaMarchePage() {
         </section>
 
         {/* ─── FAQ ─── */}
-        <section className="section bg-white">
-          <div className="max-w-3xl mx-auto px-8">
+        <section className="section relative bg-white overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-72 bg-grid-blue mask-fade-radial" aria-hidden="true" />
+          <div className="relative max-w-3xl mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 FAQ
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Questions fréquentes
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Questions <span className="title-mark">fréquentes</span>
               </h2>
             </div>
             <HomeFaq items={faqItems} />
@@ -396,11 +411,13 @@ export default function CommentCaMarchePage() {
 
         {/* ─── CTA ─── */}
         <section className="py-16">
-          <div className="max-w-[1440px] mx-auto px-8">
-            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-10 lg:p-16 text-center text-white relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-brand-navy rounded-3xl p-8 sm:p-10 lg:p-16 text-center text-white relative overflow-hidden shadow-2xl shadow-blue-900/25">
+              <div className="absolute inset-0 bg-dots-white" aria-hidden="true" />
+              <div className="absolute inset-x-0 top-0 tricolore-rule" aria-hidden="true" />
+              <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-300 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-300 rounded-full blur-3xl" />
               </div>
               <div className="relative">
                 <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">

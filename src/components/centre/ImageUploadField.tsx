@@ -9,7 +9,7 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 
-export type ImageUploadKind = "logo" | "signature" | "bannerImage";
+export type ImageUploadKind = "logo" | "signature" | "bannerImage" | "photo";
 
 interface ImageUploadFieldProps {
   kind: ImageUploadKind;

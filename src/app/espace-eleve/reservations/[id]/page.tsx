@@ -16,6 +16,7 @@ import {
   faLocationDot,
   faClock,
   faPhone,
+  faEnvelope,
   faBuilding,
   faCreditCard,
   faGraduationCap,
@@ -563,17 +564,43 @@ export default function ReservationDetailPage() {
                 {centre.adresse}, {centre.codePostal} {centre.ville}
               </p>
             </div>
+            {/* Coordonnées du centre : fournies par l'API uniquement pour une
+                réservation CONFIRMEE/TERMINEE de l'élève connecté. */}
             {centre.telephone && (
               <div>
                 <p className="text-gray-500 text-xs">Téléphone</p>
-                <p className="text-white flex items-center gap-1.5">
+                <a
+                  href={`tel:${centre.telephone.replace(/\s+/g, "")}`}
+                  className="text-white flex items-center gap-1.5 hover:underline"
+                >
                   <FontAwesomeIcon
                     icon={faPhone}
                     className="w-3 h-3 text-gray-500"
                   />
                   {centre.telephone}
-                </p>
+                </a>
               </div>
+            )}
+            {centre.email && (
+              <div>
+                <p className="text-gray-500 text-xs">Email</p>
+                <a
+                  href={`mailto:${centre.email}`}
+                  className="text-white flex items-center gap-1.5 hover:underline break-all"
+                >
+                  <FontAwesomeIcon
+                    icon={faEnvelope}
+                    className="w-3 h-3 text-gray-500"
+                  />
+                  {centre.email}
+                </a>
+              </div>
+            )}
+            {!centre.telephone && !centre.email && !isCancelled &&
+              reservation.status !== "CONFIRMEE" && reservation.status !== "TERMINEE" && (
+              <p className="text-gray-500 text-xs">
+                Les coordonnées du centre seront visibles ici dès la confirmation de votre réservation.
+              </p>
             )}
           </div>
         </div>

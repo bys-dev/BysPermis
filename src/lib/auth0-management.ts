@@ -156,3 +156,79 @@ export async function resolveAuth0Role(
 
   return fetchAuth0UserRole(auth0Id)
 }
+
+// ─── Création / rattachement de comptes (staff plateforme) ───
+
+export class Auth0ManagementError extends Error {
+  constructor(
+    public code: "NOT_CONFIGURED" | "EMAIL_EXISTS" | "API_ERROR",
+    message?: string,
+  ) {
+    super(message ?? code)
+    this.name = "Auth0ManagementError"
+  }
+}
+
+async function managementRequest(path: string, init: RequestInit): Promise<Response> {
+  const cfg = getManagementConfig()
+  const token = await getManagementToken()
+  if (!cfg || !token) throw new Auth0ManagementError("NOT_CONFIGURED", "Auth0 Management API non configurée")
+  return fetchWithTimeout(`https://${cfg.domain}/api/v2${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(init.headers ?? {}),
+    },
+  })
+}
+
+/** Id Auth0 d'un compte existant pour cet email (connexion base de données ou sociale), sinon null. */
+export async function findAuth0UserIdByEmail(email: string): Promise<string | null> {
+  const res = await managementRequest(
+    `/users-by-email?email=${encodeURIComponent(email.trim().toLowerCase())}`,
+    { method: "GET" },
+  )
+  if (!res.ok) throw new Auth0ManagementError("API_ERROR", `users-by-email HTTP ${res.status}`)
+  const users = (await res.json()) as { user_id: string; identities?: { connection?: string }[] }[]
+  const dbUser = users.find((u) =>
+    u.identities?.some((i) => i.connection === "Username-Password-Authentication"),
+  )
+  return (dbUser ?? users[0])?.user_id ?? null
+}
+
+/** Crée un compte email + mot de passe avec le rôle applicatif donné. */
+export async function createAuth0PasswordUser(params: {
+  email: string
+  password: string
+  name: string
+  role: AppRole
+}): Promise<string> {
+  const res = await managementRequest("/users", {
+    method: "POST",
+    body: JSON.stringify({
+      email: params.email.trim().toLowerCase(),
+      password: params.password,
+      name: params.name,
+      connection: "Username-Password-Authentication",
+      email_verified: false,
+      app_metadata: { role: params.role },
+    }),
+  })
+  if (res.status === 409) throw new Auth0ManagementError("EMAIL_EXISTS")
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string }
+    throw new Auth0ManagementError("API_ERROR", err.message ?? `create user HTTP ${res.status}`)
+  }
+  const user = (await res.json()) as { user_id: string }
+  return user.user_id
+}
+
+/** Positionne app_metadata.role sur un compte Auth0 existant. */
+export async function setAuth0UserRole(auth0Id: string, role: AppRole): Promise<void> {
+  const res = await managementRequest(`/users/${encodeURIComponent(auth0Id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ app_metadata: { role } }),
+  })
+  if (!res.ok) throw new Auth0ManagementError("API_ERROR", `patch user HTTP ${res.status}`)
+}

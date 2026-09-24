@@ -30,7 +30,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = pageMetadata({
   title: "Devenir centre partenaire — Remplissez vos stages de récupération de points",
   description:
-    "Centres agréés : rejoignez BYS Permis et remplissez vos sessions de stage de récupération de points. Zéro frais d'inscription, visibilité nationale, paiements sécurisés. Recevez une proposition sous 48h.",
+    "Centres agréés : rejoignez BYS Permis et remplissez vos sessions de stage de récupération de points. Zéro frais d'inscription, visibilité nationale, paiements sécurisés. Recevez une proposition sous 24h.",
   path: "/devenir-partenaire",
   keywords: [
     "devenir centre partenaire",
@@ -80,7 +80,7 @@ const steps = [
     num: "01",
     icon: faFileSignature,
     title: "Vous déposez votre demande",
-    text: "Vous remplissez le formulaire ci-dessous. Notre équipe vérifie votre agrément préfectoral et vous recontacte sous 48h ouvrées.",
+    text: "Vous remplissez le formulaire ci-dessous. Notre équipe vérifie votre agrément préfectoral et vous recontacte sous 24h ouvrées.",
   },
   {
     num: "02",
@@ -97,10 +97,10 @@ const steps = [
 ];
 
 const transparency = [
+  { value: "15 %", label: "de commission fixe, c'est tout" },
   { value: "0 €", label: "de frais d'inscription" },
-  { value: "48h", label: "pour être recontacté" },
+  { value: "24h", label: "pour être recontacté" },
   { value: "Sans", label: "engagement de durée" },
-  { value: "100%", label: "paiements sécurisés Stripe" },
 ];
 
 const trustBadges = [
@@ -161,16 +161,17 @@ export default function DevenirPartenairePage() {
 
       <main>
         {/* ─── Hero ─── */}
-        <section className="relative overflow-hidden bg-[#0A1628] text-white py-20 lg:py-28 px-4">
+        <section className="relative overflow-hidden bg-brand-navy text-white py-20 lg:py-28 px-4">
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "radial-gradient(ellipse 60% 50% at 50% 35%, rgba(37,99,235,0.16) 0%, transparent 70%)",
+                "radial-gradient(ellipse 60% 50% at 50% 35%, rgba(96,165,250,0.30) 0%, transparent 70%)",
             }}
           />
-          <div className="absolute top-10 left-[8%] w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-10 right-[12%] w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-10 left-[8%] w-72 h-72 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-[12%] w-64 h-64 bg-blue-300/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute inset-0 bg-grid-white mask-fade-radial pointer-events-none" aria-hidden="true" />
 
           <div className="absolute top-0 left-0 right-0 h-1 flex">
             <div className="flex-1 bg-blue-600" />
@@ -190,18 +191,23 @@ export default function DevenirPartenairePage() {
               style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)" }}
             >
               <FontAwesomeIcon icon={faHandshake} className="text-blue-400 text-xs" />
-              <span className="text-gray-300">Espace partenaires — Centres agréés</span>
+              <span className="text-blue-50">Espace partenaires — Centres agréés</span>
             </div>
             <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white leading-tight">
               Remplissez vos stages de
               <br className="hidden md:block" />{" "}
               récupération de <span className="text-blue-400">points</span>
             </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-blue-100/80 max-w-2xl mx-auto leading-relaxed">
               BYS Permis connecte votre centre aux conducteurs qui cherchent un stage
               près de chez eux. Vous gagnez en visibilité et en remplissage —
               nous nous occupons du reste.
             </p>
+
+            <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-6 px-5 py-2.5 rounded-2xl bg-white/10 border border-blue-300/30 ring-4 ring-blue-400/10 text-sm sm:text-base">
+              <span className="font-display font-bold text-white text-lg sm:text-xl">Commission fixe de 15 %</span>
+              <span className="text-blue-100/85">sur les réservations confirmées. Pas d&apos;abonnement, pas de frais cachés.</span>
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
               <a
@@ -223,19 +229,22 @@ export default function DevenirPartenairePage() {
               href="/api/brochure-partenaire"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm font-medium mt-6 transition-colors"
+              className="inline-flex items-center gap-2 text-blue-100/80 hover:text-white text-sm font-medium mt-6 transition-colors"
             >
               <FontAwesomeIcon icon={faFileArrowDown} className="text-xs" />
               Télécharger la brochure partenaire (PDF)
             </a>
 
-            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mt-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto mt-12">
               {transparency.map((t) => (
-                <div key={t.label} className="text-center">
-                  <div className="font-display font-bold text-2xl md:text-3xl text-white">
+                <div
+                  key={t.label}
+                  className="text-center rounded-2xl bg-white/[0.07] border border-white/15 px-3 py-4 sm:py-5 backdrop-blur-sm"
+                >
+                  <div className="number-gradient-light text-2xl md:text-3xl">
                     {t.value}
                   </div>
-                  <div className="text-gray-400 text-xs md:text-sm mt-0.5">{t.label}</div>
+                  <div className="text-blue-100/85 text-xs md:text-sm mt-1.5 leading-snug">{t.label}</div>
                 </div>
               ))}
             </div>
@@ -243,13 +252,15 @@ export default function DevenirPartenairePage() {
         </section>
 
         {/* ─── Trust strip ─── */}
-        <section className="border-b border-brand-border bg-white">
+        <section className="border-b border-blue-100 bg-white">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-6">
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
               {trustBadges.map((b) => (
-                <div key={b.label} className="flex items-center gap-2.5 text-gray-600">
-                  <FontAwesomeIcon icon={b.icon} className="text-blue-600 w-4 h-4" />
-                  <span className="text-sm font-medium">{b.label}</span>
+                <div key={b.label} className="flex items-center gap-3 text-gray-700">
+                  <span className="icon-tile-soft w-9 h-9 rounded-lg">
+                    <FontAwesomeIcon icon={b.icon} className="w-4 h-4" />
+                  </span>
+                  <span className="text-sm font-semibold">{b.label}</span>
                 </div>
               ))}
             </div>
@@ -257,14 +268,16 @@ export default function DevenirPartenairePage() {
         </section>
 
         {/* ─── Benefits ─── */}
-        <section className="section">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        <section className="section relative bg-section-tint overflow-hidden">
+          <div className="halo halo-blue w-[28rem] h-[28rem] top-1/4 -right-56" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 h-72 bg-dots-blue mask-fade-radial opacity-70" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 Pourquoi passer par nous
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Ce que BYS Permis change pour votre centre
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Ce que BYS Permis change <span className="title-mark">pour votre centre</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Vous êtes expert du stage de récupération de points. Notre métier, c&apos;est
@@ -276,10 +289,10 @@ export default function DevenirPartenairePage() {
               {benefits.map((b) => (
                 <div
                   key={b.title}
-                  className="bg-white rounded-2xl border border-brand-border p-7 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  className="card-lift card-accent-top group p-7"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5">
-                    <FontAwesomeIcon icon={b.icon} className="text-blue-600 text-lg" />
+                  <div className="icon-tile w-12 h-12 rounded-xl mb-5 mt-1">
+                    <FontAwesomeIcon icon={b.icon} className="text-lg" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-brand-text mb-2">
                     {b.title}
@@ -292,14 +305,15 @@ export default function DevenirPartenairePage() {
         </section>
 
         {/* ─── How it works ─── */}
-        <section id="comment" className="section bg-white scroll-mt-20">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        <section id="comment" className="section relative bg-white scroll-mt-20 overflow-hidden">
+          <div className="absolute inset-0 bg-grid-blue mask-fade-y" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 Un parcours transparent
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                De la demande à votre premier stage rempli
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                De la demande à <span className="title-mark">votre premier stage</span> rempli
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Trois étapes simples, aucune surprise. Vous savez à chaque instant ce qui
@@ -307,14 +321,14 @@ export default function DevenirPartenairePage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {steps.map((s) => (
-                <div key={s.num} className="relative">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#0A1628] text-white flex items-center justify-center shrink-0">
-                      <FontAwesomeIcon icon={s.icon} className="text-blue-400" />
+                <div key={s.num} className="card-lift group relative p-7">
+                  <div className="flex items-center justify-between gap-4 mb-5">
+                    <div className="icon-tile w-12 h-12 rounded-xl">
+                      <FontAwesomeIcon icon={s.icon} />
                     </div>
-                    <span className="font-display font-bold text-4xl text-blue-100">
+                    <span className="number-gradient text-5xl" aria-hidden="true">
                       {s.num}
                     </span>
                   </div>
@@ -331,9 +345,11 @@ export default function DevenirPartenairePage() {
         {/* ─── Transparency band ─── */}
         <section className="py-16 px-4 sm:px-8">
           <div className="max-w-[1440px] mx-auto">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-10 lg:p-14 text-white relative overflow-hidden">
+            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-brand-navy rounded-3xl p-6 sm:p-10 lg:p-14 text-white relative overflow-hidden shadow-2xl shadow-blue-900/25">
+              <div className="absolute inset-0 bg-dots-white" aria-hidden="true" />
               <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-300/10 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-300/15 rounded-full blur-3xl" />
+              <div className="absolute inset-x-0 top-0 tricolore-rule" aria-hidden="true" />
               <div className="relative grid lg:grid-cols-2 gap-10 items-center">
                 <div>
                   <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">
@@ -359,13 +375,13 @@ export default function DevenirPartenairePage() {
                     ))}
                   </ul>
                 </div>
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-2 gap-3 sm:gap-5">
                   {transparency.map((t) => (
                     <div
                       key={t.label}
-                      className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 text-center"
+                      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 sm:p-6 text-center transition-transform duration-200 hover:-translate-y-1 motion-reduce:hover:translate-y-0"
                     >
-                      <div className="font-display font-bold text-3xl mb-1">{t.value}</div>
+                      <div className="number-gradient-light text-3xl sm:text-4xl mb-1.5">{t.value}</div>
                       <div className="text-blue-100 text-xs leading-snug">{t.label}</div>
                     </div>
                   ))}
@@ -376,24 +392,24 @@ export default function DevenirPartenairePage() {
         </section>
 
         {/* ─── Reassurance ─── */}
-        <section className="section bg-white">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        <section className="section relative bg-white overflow-hidden">
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 En toute confiance
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Un partenaire sérieux et exigeant
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Un partenaire <span className="title-mark">sérieux et exigeant</span>
               </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {reassurance.map((r) => (
                 <div
                   key={r.title}
-                  className="bg-[#F9FAFB] rounded-2xl border border-brand-border p-7"
+                  className="card-lift card-accent-left group p-7 bg-gradient-to-br from-white to-blue-50/70"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white border border-brand-border flex items-center justify-center mb-5">
-                    <FontAwesomeIcon icon={r.icon} className="text-blue-600 text-lg" />
+                  <div className="icon-tile w-12 h-12 rounded-xl mb-5">
+                    <FontAwesomeIcon icon={r.icon} className="text-lg" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-brand-text mb-2">
                     {r.title}
@@ -406,14 +422,15 @@ export default function DevenirPartenairePage() {
         </section>
 
         {/* ─── Testimonials ─── */}
-        <section className="section">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        <section className="section relative bg-section-blue overflow-hidden">
+          <div className="halo halo-blue w-96 h-96 top-1/4 -left-56" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="text-center mb-14">
-              <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="eyebrow">
                 Ils l&apos;ont fait
               </span>
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                Des centres partenaires qui remplissent leurs stages
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                Des centres partenaires qui <span className="title-mark">remplissent leurs stages</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Ce que les gérants de centres agréés retiennent après avoir rejoint
@@ -424,19 +441,19 @@ export default function DevenirPartenairePage() {
               {testimonials.map((t) => (
                 <div
                   key={t.author}
-                  className="bg-white rounded-2xl border border-brand-border p-7 flex flex-col hover:shadow-lg transition-all duration-300"
+                  className="card-lift card-accent-top p-7 flex flex-col"
                 >
-                  <div className="flex items-center gap-1 mb-4 text-amber-400">
+                  <div className="flex items-center gap-1 mb-4 mt-1 text-blue-500">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <FontAwesomeIcon key={i} icon={faStar} className="w-3.5 h-3.5" />
                     ))}
                   </div>
-                  <FontAwesomeIcon icon={faQuoteLeft} className="text-2xl text-blue-100 mb-3" />
-                  <p className="text-gray-600 leading-relaxed mb-6 text-sm flex-1">
+                  <FontAwesomeIcon icon={faQuoteLeft} className="text-3xl text-blue-200 mb-3" />
+                  <p className="text-gray-700 leading-relaxed mb-6 text-sm flex-1">
                     {t.quote}
                   </p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-brand-border">
-                    <div className="w-10 h-10 rounded-full bg-[#0A1628] flex items-center justify-center text-white font-bold text-sm">
+                  <div className="flex items-center gap-3 pt-4 border-t border-blue-100">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-brand-navy flex items-center justify-center text-white font-bold text-sm ring-2 ring-blue-100">
                       {t.author.charAt(0)}
                     </div>
                     <div>
@@ -449,26 +466,28 @@ export default function DevenirPartenairePage() {
                 </div>
               ))}
             </div>
-            <p className="text-center text-gray-400 text-xs mt-8">
+            <p className="text-center text-gray-500 text-xs mt-8">
               Témoignages représentatifs de centres partenaires. Certains prénoms ont été modifiés.
             </p>
           </div>
         </section>
 
         {/* ─── Form ─── */}
-        <section id="formulaire" className="section bg-white scroll-mt-20">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        <section id="formulaire" className="section relative bg-section-tint scroll-mt-20 overflow-hidden">
+          <div className="absolute inset-x-0 top-0 tricolore-rule-light" aria-hidden="true" />
+          <div className="halo halo-blue w-[30rem] h-[30rem] top-1/4 -right-64" aria-hidden="true" />
+          <div className="relative max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="grid lg:grid-cols-5 gap-10 items-start">
               <div className="lg:col-span-2">
-                <span className="text-brand-accent font-semibold text-sm uppercase tracking-wider">
+                <span className="eyebrow">
                   Rejoignez le réseau
                 </span>
-                <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-2 mb-4">
-                  Parlons de votre centre
+                <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-text mt-4 mb-4">
+                  Parlons de <span className="title-mark">votre centre</span>
                 </h2>
                 <p className="text-gray-500 leading-relaxed mb-8">
                   Laissez-nous vos coordonnées : notre équipe partenariats vérifie votre
-                  agrément et revient vers vous sous 48h ouvrées avec une proposition
+                  agrément et revient vers vous sous 24h ouvrées avec une proposition
                   adaptée à votre volume et votre zone.
                 </p>
 
@@ -490,9 +509,9 @@ export default function DevenirPartenairePage() {
                       text: "Votre centre devient visible et vos dates réservables.",
                     },
                   ].map((step) => (
-                    <div key={step.title} className="flex gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                        <FontAwesomeIcon icon={step.icon} className="text-blue-600 w-4 h-4" />
+                    <div key={step.title} className="flex gap-4 bg-white/80 border border-blue-100 rounded-2xl p-4 shadow-sm">
+                      <div className="icon-tile w-10 h-10 rounded-xl">
+                        <FontAwesomeIcon icon={step.icon} className="w-4 h-4" />
                       </div>
                       <div>
                         <p className="font-semibold text-brand-text text-sm">{step.title}</p>
@@ -503,7 +522,7 @@ export default function DevenirPartenairePage() {
                 </div>
               </div>
 
-              <div className="lg:col-span-3">
+              <div className="lg:col-span-3 rounded-3xl shadow-2xl shadow-blue-900/10">
                 <PartnerLeadForm />
               </div>
             </div>

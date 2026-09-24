@@ -202,7 +202,7 @@ export function BrochurePartenaire() {
               <Text style={styles.statLabel}>Frais d&apos;inscription</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>48h</Text>
+              <Text style={styles.statValue}>24h</Text>
               <Text style={styles.statLabel}>Pour être recontacté</Text>
             </View>
             <View style={styles.statBox}>
@@ -283,7 +283,7 @@ export function BrochurePartenaire() {
             <Text style={styles.ctaTitle}>Prêt à remplir vos prochaines sessions ?</Text>
             <Text style={styles.ctaText}>
               Déposez votre demande en 2 minutes : notre équipe partenariats vérifie votre agrément
-              et revient vers vous sous 48h ouvrées avec une proposition adaptée à votre volume.
+              et revient vers vous sous 24h ouvrées avec une proposition adaptée à votre volume.
             </Text>
             <View style={styles.ctaRow}>
               <View>

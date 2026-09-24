@@ -27,7 +27,7 @@ export default function Header() {
       </div>
 
       {/* Top bar */}
-      <div className="bg-gray-900 text-gray-300 text-[10px] sm:text-[11px] tracking-wide text-center py-1.5 px-3 sm:px-4 flex items-center justify-center gap-2 overflow-hidden">
+      <div className="bg-brand-navy-deep text-blue-100/85 text-[10px] sm:text-[11px] tracking-wide text-center py-1.5 px-3 sm:px-4 flex items-center justify-center gap-2 overflow-hidden">
         <span className="inline-flex rounded overflow-hidden mr-1">
           <span className="w-1 h-3 bg-blue-500" />
           <span className="w-1 h-3 bg-white" />

@@ -32,6 +32,8 @@ export default function PartnerLeadForm() {
     email: "",
     telephone: "",
     ville: "",
+    agrement: "",
+    agrementDepartement: "",
     volume: "",
     message: "",
     consent: false,
@@ -70,12 +72,24 @@ export default function PartnerLeadForm() {
           email: "",
           telephone: "",
           ville: "",
+          agrement: "",
+          agrementDepartement: "",
           volume: "",
           message: "",
           consent: false,
         });
       } else {
-        setError("Une erreur est survenue. Vérifiez vos informations et réessayez.");
+        if (res.status === 429) {
+          const secondes = Number(res.headers.get("Retry-After")) || 60;
+          setError(
+            `Trop de demandes envoyées coup sur coup. Réessayez dans ${secondes} seconde${secondes > 1 ? "s" : ""}.`,
+          );
+        } else {
+          const data = await res.json().catch(() => null);
+          const fieldErrors = data?.details?.fieldErrors as Record<string, string[]> | undefined;
+          const first = fieldErrors ? Object.values(fieldErrors).flat()[0] : undefined;
+          setError(first ?? "Une erreur est survenue. Vérifiez vos informations et réessayez.");
+        }
       }
     } catch {
       setError("Impossible d'envoyer la demande. Réessayez dans un instant.");
@@ -96,7 +110,7 @@ export default function PartnerLeadForm() {
           </h3>
           <p className="text-gray-500 max-w-md mx-auto mb-8 text-sm leading-relaxed">
             Merci. Notre équipe partenariats étudie votre centre et vous recontacte
-            sous 48h ouvrées pour organiser votre référencement.
+            sous 24h ouvrées pour organiser votre référencement.
           </p>
           <button
             onClick={() => setSent(false)}
@@ -120,7 +134,7 @@ export default function PartnerLeadForm() {
             Recevoir une proposition
           </h2>
           <p className="text-gray-500 text-sm mt-1">
-            Sans engagement — réponse sous 48h ouvrées.
+            Sans engagement — réponse sous 24h ouvrées.
           </p>
         </div>
       </div>
@@ -187,6 +201,47 @@ export default function PartnerLeadForm() {
               onChange={handleChange}
               required
               placeholder="06 12 34 56 78"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          <div className="md:col-span-2">
+            <label htmlFor="agrement" className="block text-sm font-semibold text-gray-700 mb-2">
+              N° d&apos;agrément préfectoral <span className="text-blue-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="agrement"
+              name="agrement"
+              value={formData.agrement}
+              onChange={handleChange}
+              required
+              minLength={5}
+              maxLength={40}
+              autoComplete="off"
+              placeholder="Ex. R 13 095 0001 0"
+              className={`${inputClass} uppercase placeholder:normal-case`}
+            />
+            <p className="text-xs text-gray-400 mt-1.5">
+              Numéro figurant sur l&apos;arrêté d&apos;agrément de votre centre (CSSR).
+            </p>
+          </div>
+          <div>
+            <label htmlFor="agrementDepartement" className="block text-sm font-semibold text-gray-700 mb-2">
+              Département
+            </label>
+            <input
+              type="text"
+              id="agrementDepartement"
+              name="agrementDepartement"
+              value={formData.agrementDepartement}
+              onChange={handleChange}
+              maxLength={3}
+              pattern="[0-9]{2,3}|2[ABab]"
+              title="Numéro de département, ex. 95, 2A ou 974"
+              placeholder="Ex. 95"
               className={inputClass}
             />
           </div>

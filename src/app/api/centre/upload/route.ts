@@ -9,7 +9,7 @@ import { uploadFile, DOCUMENT_MAX_BYTES } from "@/lib/storage";
  *
  * Body: multipart/form-data
  *   - file: File (png | jpeg | webp | avif | gif | svg), max 8 MB
- *   - kind: "logo" | "signature" | "bannerImage"
+ *   - kind: "logo" | "signature" | "bannerImage" | "photo"
  */
 // Aligne sur les autres routes d'upload (8 MB) : une photo de telephone
 // depasse regulierement 2 MB, ce qui faisait echouer l'envoi.
@@ -25,7 +25,9 @@ const ALLOWED_MIME: Record<string, string> = {
 // Formats photo d'iPhone : refuses par les navigateurs a l'affichage, on
 // renvoie un message explicite plutot qu'un "type non supporte" opaque.
 const HEIC_MIME = new Set(["image/heic", "image/heif", "image/heic-sequence"]);
-const ALLOWED_KINDS = ["logo", "signature", "bannerImage"] as const;
+// "photo" alimente la galerie : le fichier est stocke et son URL renvoyee au
+// client, qui l'ajoute au tableau `photos` puis enregistre le profil.
+const ALLOWED_KINDS = ["logo", "signature", "bannerImage", "photo"] as const;
 type UploadKind = (typeof ALLOWED_KINDS)[number];
 
 export async function POST(req: NextRequest) {
@@ -78,15 +80,19 @@ export async function POST(req: NextRequest) {
       buffer,
     });
 
-    const fieldMap: Record<UploadKind, "logo" | "signatureUrl" | "bannerImage"> = {
-      logo: "logo",
-      signature: "signatureUrl",
-      bannerImage: "bannerImage",
-    };
-    await prisma.centre.update({
-      where: { id: centreId },
-      data: { [fieldMap[kind]]: url },
-    });
+    // La galerie est un tableau gere cote profil : on se contente de renvoyer
+    // l'URL, sans ecraser de champ unique.
+    if (kind !== "photo") {
+      const fieldMap: Record<Exclude<UploadKind, "photo">, "logo" | "signatureUrl" | "bannerImage"> = {
+        logo: "logo",
+        signature: "signatureUrl",
+        bannerImage: "bannerImage",
+      };
+      await prisma.centre.update({
+        where: { id: centreId },
+        data: { [fieldMap[kind]]: url },
+      });
+    }
 
     return NextResponse.json({ url, kind, storage });
   } catch (err) {
