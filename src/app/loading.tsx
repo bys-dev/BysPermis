@@ -2,7 +2,7 @@ import LoadingOverlay, { KpiGridSkeleton, PageHeaderSkeleton } from "@/component
 
 export default function Loading() {
   return (
-    <div className="relative min-h-screen bg-[#0A1628]">
+    <div className="relative min-h-screen bg-brand-navy">
       <div className="p-6 sm:p-8 max-w-7xl mx-auto opacity-30 pointer-events-none">
         <PageHeaderSkeleton />
         <KpiGridSkeleton />

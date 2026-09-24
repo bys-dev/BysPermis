@@ -293,7 +293,7 @@ export default function EligibilitePage() {
           </div>
         </div>
 
-        <div className="bg-[#0A1628] rounded-2xl p-5 text-white">
+        <div className="bg-brand-navy rounded-2xl p-5 text-white">
           <div className="flex items-center justify-between">
             <span className="font-bold text-lg">Total TTC</span>
             <span className="font-bold text-2xl">{s.prix} €</span>

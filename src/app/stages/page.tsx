@@ -82,9 +82,9 @@ export default function StagesIndexPage() {
       <JsonLd id="ld-stages-index" data={jsonLd} />
       <Header />
       <main className="min-h-screen bg-brand-bg">
-        <section className="bg-navy-900 py-16 text-white">
+        <section className="bg-brand-navy py-16 text-white">
           <div className="mx-auto max-w-7xl px-6">
-            <nav aria-label="Fil d'Ariane" className="mb-4 flex items-center gap-2 text-sm text-gray-400">
+            <nav aria-label="Fil d'Ariane" className="mb-4 flex items-center gap-2 text-sm text-blue-100/70">
               <Link href="/" className="transition-colors hover:text-white">Accueil</Link>
               <span aria-hidden>/</span>
               <span className="text-white">Stages par ville</span>
@@ -92,7 +92,7 @@ export default function StagesIndexPage() {
             <h1 className="mb-4 font-display text-3xl font-bold md:text-4xl">
               Stage de récupération de points : toutes les villes et départements
             </h1>
-            <p className="max-w-3xl text-lg text-gray-300">
+            <p className="max-w-3xl text-lg text-blue-100/85">
               Le stage de sensibilisation à la sécurité routière permet de récupérer{" "}
               <strong className="text-white">4 points</strong> en 2 jours (14 heures), dans un
               centre agréé par la préfecture. Un stage suivi dans n&apos;importe quel département

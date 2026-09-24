@@ -125,9 +125,9 @@ export default async function StagesDepartementPage({ params }: Props) {
       <JsonLd id={`ld-dept-${dept.slug}`} data={jsonLd} />
       <Header />
       <main className="min-h-screen bg-brand-bg">
-        <section className="bg-navy-900 py-16 text-white">
+        <section className="bg-brand-navy py-16 text-white">
           <div className="mx-auto max-w-7xl px-6">
-            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-blue-100/70">
               <Link href="/" className="transition-colors hover:text-white">Accueil</Link>
               <span aria-hidden>/</span>
               <Link href="/stages" className="transition-colors hover:text-white">Stages par ville</Link>
@@ -139,7 +139,7 @@ export default async function StagesDepartementPage({ params }: Props) {
               Stage de récupération de points dans le {dept.nom} ({dept.code})
             </h1>
 
-            <p className="max-w-3xl text-lg text-gray-300">
+            <p className="max-w-3xl text-lg text-blue-100/85">
               Dans le {dept.nom}, les stages de récupération de points sont dispensés par des
               centres agréés par le préfet, dont la préfecture siège à {dept.prefecture}. Le
               stage dure 2 jours (14 heures) et restitue{" "}
@@ -152,16 +152,16 @@ export default async function StagesDepartementPage({ params }: Props) {
                 <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
                 {dept.region}
               </span>
-              <span className="text-gray-600" aria-hidden>|</span>
-              <span className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-white/30" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-blue-100/85">
                 <FontAwesomeIcon icon={faCalendarDays} className="text-xs" />
                 {formations.length === 0
                   ? "Aucune session programmée"
                   : `${formations.length} session${formations.length > 1 ? "s" : ""} réservable${formations.length > 1 ? "s" : ""}`}
                 {dansLeDept > 0 && ` — dont ${dansLeDept} dans le département`}
               </span>
-              <span className="text-gray-600" aria-hidden>|</span>
-              <span className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-white/30" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-blue-100/85">
                 <FontAwesomeIcon icon={faShieldHalved} className="text-xs" />
                 Agrément préfectoral vérifié
               </span>

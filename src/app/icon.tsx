@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { BRAND_NAVY } from "@/lib/brand-colors";
 
 // 512 px : taille reelle declaree dans manifest.ts (l'icone PWA etait upscalee depuis 64).
 export const size = { width: 512, height: 512 };
@@ -23,7 +24,7 @@ export default function Icon() {
         style={{
           width: "100%",
           height: "100%",
-          background: "#0A1628",
+          background: BRAND_NAVY,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

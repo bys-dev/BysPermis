@@ -175,7 +175,7 @@ export default function ConfirmationPage() {
       </div>
 
       {/* Contact */}
-      <div className="bg-[#0A1628] rounded-2xl p-6 mb-8 flex items-center justify-between gap-4">
+      <div className="bg-brand-navy rounded-2xl p-6 mb-8 flex items-center justify-between gap-4">
         <div>
           <p className="text-white font-semibold mb-1">Une question ?</p>
           <p className="text-gray-400 text-sm">Notre équipe répond sous 24h ouvrées.</p>

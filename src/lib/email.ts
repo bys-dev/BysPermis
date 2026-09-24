@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { logEmail, EMAIL_KIND, type EmailLogContext } from "@/lib/email-log";
+import { BRAND_NAVY } from "@/lib/brand-colors";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -79,7 +80,7 @@ export async function sendConfirmationEmail(params: {
     to: params.to,
     subject: `Confirmation de réservation ${params.reservationNumber}`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Réservation confirmée</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Numéro : ${params.reservationNumber}</p>
@@ -131,7 +132,7 @@ export async function sendJustificatifRecuEmail(params: {
     to: params.to,
     subject: `Justificatif bien reçu — ${params.documentLabel}`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Justificatif bien reçu</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Réservation ${params.reservationNumber}</p>
@@ -178,7 +179,7 @@ export async function sendEleveEventEmail(params: {
     to: params.to,
     subject: params.subject,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">${params.title}</h1>
   </div>
@@ -220,7 +221,7 @@ export async function sendCentreEventEmail(params: {
     to: params.to,
     subject: params.subject,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">${params.title}</h1>
   </div>
@@ -261,7 +262,7 @@ export async function sendEleveCancellationEmail(params: {
     to: params.to,
     subject: `Annulation de votre réservation ${params.reservationNumber}`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Réservation annulée</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Réf. ${params.reservationNumber}</p>
@@ -340,7 +341,7 @@ export async function sendCentreInvitationEmail(params: {
     to: params.to,
     subject: `Bienvenue sur BYS Permis — Votre espace centre est pret`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Votre espace centre est pret !</p>
@@ -400,7 +401,7 @@ export async function sendDirecteurLieuInvitationEmail(params: {
     to: params.to,
     subject: `BYS Permis — Votre acces directeur de lieu est pret`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Acces directeur de lieu</p>
@@ -438,7 +439,7 @@ export async function sendCentreActivationEmail(params: {
     to: params.to,
     subject: `Votre centre est maintenant visible sur BYS Permis !`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Felicitations !</h1>
     <p style="color:#4ADE80;margin:8px 0 0;font-size:14px;font-weight:bold">Votre centre est maintenant actif</p>
@@ -492,7 +493,7 @@ export async function sendQuestionnaireEmail(params: {
     to: params.to,
     subject: `Votre avis compte — ${params.formationTitle}`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Questionnaire satisfaction</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">${params.formationTitle}</p>
@@ -551,7 +552,7 @@ export async function sendDocumentEmail(params: {
     to: params.to,
     subject: params.sujet,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">${params.sujet}</h1>
   </div>
@@ -585,7 +586,7 @@ export async function sendCentreRejectionEmail(params: {
     to: params.to,
     subject: `BYS Permis — Votre demande d'activation necessite des modifications`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:#0A1628;padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
+  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
     ${LOGO_IMG}
     <h1 style="color:#fff;margin:0;font-size:22px">Modifications requises</h1>
     <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">${params.centreName}</p>

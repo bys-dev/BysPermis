@@ -435,7 +435,7 @@ export default function PaiementPage() {
           </div>
         </div>
 
-        <div className="bg-[#0A1628] rounded-2xl p-5 text-white">
+        <div className="bg-brand-navy rounded-2xl p-5 text-white">
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-400 text-sm">Stage</span>
             <span>{s.prix} €</span>

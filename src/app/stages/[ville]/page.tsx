@@ -149,9 +149,9 @@ export default async function StagesVillePage({ params }: Props) {
       <Header />
       <main className="min-h-screen bg-brand-bg">
         {/* Hero */}
-        <section className="bg-navy-900 py-16 text-white">
+        <section className="bg-brand-navy py-16 text-white">
           <div className="mx-auto max-w-7xl px-6">
-            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+            <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-blue-100/70">
               <Link href="/" className="transition-colors hover:text-white">Accueil</Link>
               <span aria-hidden>/</span>
               <Link href="/stages" className="transition-colors hover:text-white">Stages par ville</Link>
@@ -176,7 +176,7 @@ export default async function StagesVillePage({ params }: Props) {
 
             {/* Réponse directe : c'est ce paragraphe que les moteurs de réponse
                 reprennent en extrait, il doit tenir seul hors contexte. */}
-            <p className="max-w-3xl text-lg text-gray-300">
+            <p className="max-w-3xl text-lg text-blue-100/85">
               Un stage de récupération de points à {ville.nom} dure 2 jours consécutifs
               (14 heures) et permet de récupérer <strong className="text-white">4 points</strong>{" "}
               sur votre permis de conduire, crédités le lendemain du second jour. Il est
@@ -189,16 +189,16 @@ export default async function StagesVillePage({ params }: Props) {
                 <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
                 {ville.nom} ({ville.cp})
               </span>
-              <span className="text-gray-600" aria-hidden>|</span>
-              <span className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-white/30" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-blue-100/85">
                 <FontAwesomeIcon icon={faCalendarDays} className="text-xs" />
                 {formations.length === 0
                   ? "Aucune session programmée"
                   : `${formations.length} session${formations.length > 1 ? "s" : ""} réservable${formations.length > 1 ? "s" : ""}`}
                 {surPlace > 0 && ` — dont ${surPlace} à ${ville.nom}`}
               </span>
-              <span className="text-gray-600" aria-hidden>|</span>
-              <span className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-white/30" aria-hidden>|</span>
+              <span className="inline-flex items-center gap-2 text-blue-100/85">
                 <FontAwesomeIcon icon={faShieldHalved} className="text-xs" />
                 Centres agréés préfecture
               </span>

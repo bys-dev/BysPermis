@@ -184,8 +184,8 @@ export default async function CentreDetailPage({
         className="text-white py-14 px-4 bg-cover bg-center"
         style={{
           background: centre.bannerImage
-            ? `linear-gradient(rgba(10,22,40,0.85), rgba(10,22,40,0.95)), url(${centre.bannerImage}) center/cover`
-            : "#0A1628",
+            ? `linear-gradient(rgba(20,48,107,0.85), rgba(20,48,107,0.93)), url(${centre.bannerImage}) center/cover`
+            : "var(--color-brand-navy)",
         }}
       >
         <div className="max-w-5xl mx-auto">

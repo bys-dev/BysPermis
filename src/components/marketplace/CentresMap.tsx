@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
+import { BRAND_NAVY } from "@/lib/brand-colors";
 
 export interface MapCentre {
   id: string;
@@ -47,7 +48,7 @@ export default function CentresMap({ centres }: { centres: MapCentre[] }) {
     () =>
       new L.DivIcon({
         className: "bys-map-marker",
-        html: `<div style="background:#0A1628;color:white;border-radius:9999px;border:3px solid #DC2626;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;box-shadow:0 4px 10px rgba(0,0,0,.3)">BYS</div>`,
+        html: `<div style="background:${BRAND_NAVY};color:white;border-radius:9999px;border:3px solid #DC2626;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;box-shadow:0 4px 10px rgba(0,0,0,.3)">BYS</div>`,
         iconSize: [32, 32],
         iconAnchor: [16, 16],
       }),

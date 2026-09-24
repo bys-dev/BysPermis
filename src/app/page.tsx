@@ -412,7 +412,7 @@ export default async function Home() {
       <Header />
       <main>
         {/* ═══ 1. HERO ═══ */}
-        <section className="relative bg-navy-900 pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 min-h-[520px] sm:min-h-[720px] flex items-center overflow-hidden">
+        <section className="relative bg-brand-navy pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 min-h-[520px] sm:min-h-[720px] flex items-center overflow-hidden">
           <div className="absolute inset-0 z-0" aria-hidden="true">
             <Image
               src="/hero-radar-permis.jpg"
@@ -422,14 +422,14 @@ export default async function Home() {
               sizes="100vw"
               className="object-cover scale-105 opacity-95"
             />
-            <div className="absolute inset-0 bg-navy-900/20" />
+            <div className="absolute inset-0 bg-brand-navy/20" />
           </div>
           <TricoloreParticles />
 
           <div className="max-w-[1440px] mx-auto w-full relative z-10">
             <div className="flex flex-col items-center">
               <div className="max-w-4xl mx-auto text-center flex-1 w-full">
-                <div className="rounded-2xl bg-navy-900/55 backdrop-blur-md border border-white/15 px-5 py-8 sm:px-10 sm:py-10 mb-6 sm:mb-8 shadow-2xl">
+                <div className="rounded-2xl bg-brand-navy/55 backdrop-blur-md border border-white/15 px-5 py-8 sm:px-10 sm:py-10 mb-6 sm:mb-8 shadow-2xl">
                   <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-full mb-5 sm:mb-6 max-w-full">
                     <span className="inline-flex mr-2 rounded overflow-hidden shrink-0">
                       <span className="w-1.5 h-4 bg-blue-500" />
@@ -454,7 +454,7 @@ export default async function Home() {
 
                 <HeroSearchForm />
 
-                <div className="mt-8 rounded-xl bg-navy-900/90 border border-white/10 px-4 py-4 sm:px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-medium text-white">
+                <div className="mt-8 rounded-xl bg-brand-navy/90 border border-white/10 px-4 py-4 sm:px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-medium text-white">
                   <span className="flex items-center gap-2">
                     <svg className="inline-block w-5 h-3.5 rounded-sm overflow-hidden shrink-0" viewBox="0 0 30 20">
                       <rect width="10" height="20" x="0" fill="#002395" />
@@ -871,13 +871,13 @@ export default async function Home() {
         </section>
 
         {/* ═══ 10. ESPACE PRO CTA ═══ */}
-        <section className="py-24 px-4 sm:px-8 bg-[#0A1628]">
+        <section className="py-24 px-4 sm:px-8 bg-brand-navy">
           <div className="max-w-[1440px] mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
                 <div className="inline-flex items-center px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6">
                   <FontAwesomeIcon icon={faBuilding} className="text-blue-300 mr-2" />
-                  <span className="text-sm font-medium text-gray-300">
+                  <span className="text-sm font-medium text-blue-100/85">
                     Pour les centres de formation
                   </span>
                 </div>
@@ -885,7 +885,7 @@ export default async function Home() {
                   Vous êtes centre de formation ?{" "}
                   <span className="text-blue-300">Rejoignez le réseau BYS</span>
                 </h2>
-                <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                <p className="text-xl text-blue-100/85 mb-8 leading-relaxed">
                   Ouvrez votre boutique en ligne et accédez à des milliers de conducteurs qui
                   cherchent un stage.
                 </p>
@@ -898,7 +898,7 @@ export default async function Home() {
                   ].map((item) => (
                     <li key={item} className="flex items-start">
                       <FontAwesomeIcon icon={faCircleCheck} className="text-blue-300 text-lg mr-3 mt-1" />
-                      <span className="text-gray-300">{item}</span>
+                      <span className="text-blue-100/85">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -911,7 +911,7 @@ export default async function Home() {
                   </Link>
                   <Link
                     href="/a-propos"
-                    className="border border-white/20 text-gray-300 px-8 py-4 rounded-lg font-semibold hover:bg-white/5 transition-colors duration-200"
+                    className="border border-white/20 text-blue-100/85 px-8 py-4 rounded-lg font-semibold hover:bg-white/5 transition-colors duration-200"
                   >
                     En savoir plus
                   </Link>
@@ -927,7 +927,7 @@ export default async function Home() {
                       </div>
                       <div>
                         <div className="text-sm font-semibold text-white">BYS Dashboard</div>
-                        <div className="text-xs text-gray-500">Centre de formation</div>
+                        <div className="text-xs text-blue-100/50">Centre de formation</div>
                       </div>
                     </div>
                     <div className="flex gap-1.5">
@@ -947,12 +947,12 @@ export default async function Home() {
                         className="bg-white/[0.06] border border-white/10 rounded-xl p-3 text-center"
                       >
                         <div className="text-lg font-display font-bold text-white">{s.val}</div>
-                        <div className="text-[10px] text-gray-500">{s.lbl}</div>
+                        <div className="text-[10px] text-blue-100/50">{s.lbl}</div>
                       </div>
                     ))}
                   </div>
                   <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-4">
-                    <div className="text-xs text-gray-500 mb-3">Réservations (7 derniers jours)</div>
+                    <div className="text-xs text-blue-100/50 mb-3">Réservations (7 derniers jours)</div>
                     <div className="flex items-end gap-2 h-20">
                       {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
                         <div
@@ -965,7 +965,7 @@ export default async function Home() {
                         />
                       ))}
                     </div>
-                    <div className="flex justify-between mt-2 text-[10px] text-gray-600">
+                    <div className="flex justify-between mt-2 text-[10px] text-blue-100/40">
                       <span>Lun</span>
                       <span>Mar</span>
                       <span>Mer</span>
@@ -990,10 +990,10 @@ export default async function Home() {
                               {r.name.charAt(0)}
                             </span>
                           </div>
-                          <span className="text-xs text-gray-300">{r.name}</span>
+                          <span className="text-xs text-blue-100/85">{r.name}</span>
                         </div>
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full ${r.status === "Confirmée" ? "bg-blue-600/20 text-blue-300" : "bg-white/10 text-gray-400"}`}
+                          className={`text-[10px] px-2 py-0.5 rounded-full ${r.status === "Confirmée" ? "bg-blue-600/20 text-blue-300" : "bg-white/10 text-blue-100/70"}`}
                         >
                           {r.status}
                         </span>
@@ -1089,14 +1089,14 @@ export default async function Home() {
         </section>
 
         {/* ═══ 13. NEWSLETTER ═══ */}
-        <section className="py-12 px-4 sm:px-8 bg-[#0A1628]">
+        <section className="py-12 px-4 sm:px-8 bg-brand-navy">
           <div className="max-w-[1440px] mx-auto">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="text-center lg:text-left">
                 <h3 className="font-display font-bold text-xl text-white mb-1">
                   Restez informé des prochains stages près de chez vous
                 </h3>
-                <p className="text-gray-300 text-sm">
+                <p className="text-blue-100/85 text-sm">
                   Recevez les alertes de nouveaux stages et formations dans votre région.
                 </p>
               </div>
@@ -1104,7 +1104,7 @@ export default async function Home() {
                 <input
                   type="email"
                   placeholder="Votre adresse email"
-                  className="w-full sm:w-72 px-5 py-3 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-white placeholder-gray-400 transition-all duration-200"
+                  className="w-full sm:w-72 px-5 py-3 bg-white/10 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-white placeholder-blue-100/50 transition-all duration-200"
                 />
                 <button
                   type="submit"
@@ -1113,7 +1113,7 @@ export default async function Home() {
                   S&apos;inscrire
                 </button>
               </form>
-              <p className="text-gray-600 text-xs flex items-center gap-1 lg:hidden">
+              <p className="text-blue-100/50 text-xs flex items-center gap-1 lg:hidden">
                 <FontAwesomeIcon icon={faLock} />
                 Données protégées. Désinscription à tout moment.
               </p>

@@ -161,16 +161,16 @@ export default function DevenirPartenairePage() {
 
       <main>
         {/* ─── Hero ─── */}
-        <section className="relative overflow-hidden bg-[#0A1628] text-white py-20 lg:py-28 px-4">
+        <section className="relative overflow-hidden bg-brand-navy text-white py-20 lg:py-28 px-4">
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "radial-gradient(ellipse 60% 50% at 50% 35%, rgba(37,99,235,0.16) 0%, transparent 70%)",
+                "radial-gradient(ellipse 60% 50% at 50% 35%, rgba(96,165,250,0.30) 0%, transparent 70%)",
             }}
           />
-          <div className="absolute top-10 left-[8%] w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-10 right-[12%] w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-10 left-[8%] w-72 h-72 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-[12%] w-64 h-64 bg-blue-300/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="absolute top-0 left-0 right-0 h-1 flex">
             <div className="flex-1 bg-blue-600" />
@@ -190,14 +190,14 @@ export default function DevenirPartenairePage() {
               style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)" }}
             >
               <FontAwesomeIcon icon={faHandshake} className="text-blue-400 text-xs" />
-              <span className="text-gray-300">Espace partenaires — Centres agréés</span>
+              <span className="text-blue-50">Espace partenaires — Centres agréés</span>
             </div>
             <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white leading-tight">
               Remplissez vos stages de
               <br className="hidden md:block" />{" "}
               récupération de <span className="text-blue-400">points</span>
             </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-blue-100/80 max-w-2xl mx-auto leading-relaxed">
               BYS Permis connecte votre centre aux conducteurs qui cherchent un stage
               près de chez eux. Vous gagnez en visibilité et en remplissage —
               nous nous occupons du reste.
@@ -223,7 +223,7 @@ export default function DevenirPartenairePage() {
               href="/api/brochure-partenaire"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm font-medium mt-6 transition-colors"
+              className="inline-flex items-center gap-2 text-blue-100/80 hover:text-white text-sm font-medium mt-6 transition-colors"
             >
               <FontAwesomeIcon icon={faFileArrowDown} className="text-xs" />
               Télécharger la brochure partenaire (PDF)
@@ -235,7 +235,7 @@ export default function DevenirPartenairePage() {
                   <div className="font-display font-bold text-2xl md:text-3xl text-white">
                     {t.value}
                   </div>
-                  <div className="text-gray-400 text-xs md:text-sm mt-0.5">{t.label}</div>
+                  <div className="text-blue-100/80 text-xs md:text-sm mt-0.5">{t.label}</div>
                 </div>
               ))}
             </div>
@@ -311,7 +311,7 @@ export default function DevenirPartenairePage() {
               {steps.map((s) => (
                 <div key={s.num} className="relative">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#0A1628] text-white flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-brand-navy text-white flex items-center justify-center shrink-0">
                       <FontAwesomeIcon icon={s.icon} className="text-blue-400" />
                     </div>
                     <span className="font-display font-bold text-4xl text-blue-100">
@@ -436,7 +436,7 @@ export default function DevenirPartenairePage() {
                     {t.quote}
                   </p>
                   <div className="flex items-center gap-3 pt-4 border-t border-brand-border">
-                    <div className="w-10 h-10 rounded-full bg-[#0A1628] flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-brand-navy flex items-center justify-center text-white font-bold text-sm">
                       {t.author.charAt(0)}
                     </div>
                     <div>

@@ -54,7 +54,7 @@ export default function ContactPage() {
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[#0A1628] text-white py-20 lg:py-28 px-4">
+        <section className="relative overflow-hidden bg-brand-navy text-white py-20 lg:py-28 px-4">
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -62,8 +62,8 @@ export default function ContactPage() {
                 "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.15) 0%, transparent 70%)",
             }}
           />
-          <div className="absolute top-10 left-[10%] w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-10 right-[15%] w-56 h-56 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-10 left-[10%] w-72 h-72 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-[15%] w-56 h-56 bg-blue-300/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="absolute bottom-0 left-0 right-0 h-1 flex">
             <div className="flex-1 bg-blue-600" />
@@ -77,12 +77,12 @@ export default function ContactPage() {
               style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)" }}
             >
               <FontAwesomeIcon icon={faHeadset} className="text-blue-400 text-xs" />
-              <span className="text-gray-300">Contact &amp; Support</span>
+              <span className="text-blue-50">Contact &amp; Support</span>
             </div>
             <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white">
               Contactez-nous
             </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-blue-100/80 max-w-2xl mx-auto leading-relaxed">
               Une question sur un stage, un partenariat ou besoin d&apos;aide ?<br />
               Notre équipe répond sous 24h ouvrées.
             </p>
@@ -101,11 +101,11 @@ export default function ContactPage() {
                     <FontAwesomeIcon icon={info.icon} className="text-blue-400 w-3.5 h-3.5" />
                   </div>
                   {info.href ? (
-                    <a href={info.href} className="text-gray-300 hover:text-white transition-colors">
+                    <a href={info.href} className="text-blue-50 hover:text-white transition-colors">
                       {info.value}
                     </a>
                   ) : (
-                    <span className="text-gray-300">{info.value}</span>
+                    <span className="text-blue-50">{info.value}</span>
                   )}
                 </div>
               ))}
@@ -126,7 +126,7 @@ export default function ContactPage() {
                 <div
                   className="rounded-2xl p-7 text-white relative overflow-hidden"
                   style={{
-                    background: "linear-gradient(135deg, #0A1628 0%, #0f2044 100%)",
+                    background: "linear-gradient(135deg, var(--color-brand-navy-deep) 0%, var(--color-brand-navy-soft) 100%)",
                     border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >

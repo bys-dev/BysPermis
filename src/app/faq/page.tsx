@@ -188,12 +188,12 @@ export default function FaqPage() {
       <Header />
 
       {/* Hero (statique côté serveur) */}
-      <section className="bg-[#0A1628] text-white py-16 px-4">
+      <section className="bg-brand-navy text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl mb-4">
             Questions fréquentes
           </h1>
-          <p className="text-gray-300 text-lg mb-0 max-w-2xl mx-auto">
+          <p className="text-blue-100/85 text-lg mb-0 max-w-2xl mx-auto">
             Retrouvez toutes les réponses à vos questions sur les stages de récupération de points,
             l&apos;inscription, le paiement et le déroulement du stage.
           </p>

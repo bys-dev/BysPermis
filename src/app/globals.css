@@ -47,6 +47,15 @@
   --font-body: "DM Sans", "Inter", system-ui, sans-serif;
 }
 
+/* ─── Navy des sections sombres publiques (hero, CTA, bandeaux, pages système) ───
+   `static` : variables toujours émises dans :root, car aussi lues en style inline via var(--color-brand-navy-*).
+   Les surfaces hors DOM (emails, icône, image OG, manifest) lisent src/lib/brand-colors.ts. */
+@theme static {
+  --color-brand-navy: #14306B;
+  --color-brand-navy-deep: #0F2557;
+  --color-brand-navy-soft: #1B3D85;
+}
+
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar {
   display: none;

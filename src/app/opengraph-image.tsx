@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { BRAND_NAVY, BRAND_NAVY_DEEP } from "@/lib/brand-colors";
 
 export const alt = "BYS Permis — Stages agréés de récupération de points";
 export const size = { width: 1200, height: 630 };
@@ -24,7 +25,7 @@ export default function OpenGraphImage() {
           width: "100%",
           height: "100%",
           background:
-            "linear-gradient(135deg, #0A1628 0%, #1E3A8A 60%, #2563EB 100%)",
+            `linear-gradient(135deg, ${BRAND_NAVY_DEEP} 0%, #1E3A8A 60%, #2563EB 100%)`,
           color: "#FFFFFF",
           display: "flex",
           flexDirection: "column",
@@ -57,7 +58,7 @@ export default function OpenGraphImage() {
                 width: 64,
                 height: 64,
                 background: "#FFFFFF",
-                color: "#0A1628",
+                color: BRAND_NAVY,
                 borderRadius: 12,
                 display: "flex",
                 alignItems: "center",

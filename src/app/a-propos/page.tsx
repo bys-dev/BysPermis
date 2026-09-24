@@ -43,7 +43,7 @@ export default function AProposPage() {
 
       <main>
         {/* ─── Hero dark navy ─── */}
-        <section className="relative overflow-hidden bg-[#0A1628] text-white py-24 lg:py-32 px-4">
+        <section className="relative overflow-hidden bg-brand-navy text-white py-24 lg:py-32 px-4">
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,99,235,0.12) 0%, transparent 70%)" }} />
           <div className="absolute bottom-0 left-0 right-0 h-1 flex">
             <div className="flex-1 bg-blue-600" />
@@ -55,12 +55,12 @@ export default function AProposPage() {
               <span className="inline-flex rounded overflow-hidden mr-1">
                 <span className="w-1.5 h-3 bg-blue-500" /><span className="w-1.5 h-3 bg-white" /><span className="w-1.5 h-3 bg-red-500" />
               </span>
-              <span className="text-gray-300">Notre histoire</span>
+              <span className="text-blue-50">Notre histoire</span>
             </div>
             <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl mb-6 text-white">
               À propos de BYS Permis
             </h1>
-            <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-blue-100/80 max-w-3xl mx-auto leading-relaxed">
               La plateforme de référence pour réserver un stage de récupération de points permis,
               simplement et en toute confiance.
             </p>
@@ -99,7 +99,7 @@ export default function AProposPage() {
               </div>
 
               {/* Carte mission dark */}
-              <div className="rounded-2xl p-8 lg:p-10 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0A1628 0%, #0f2044 100%)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="rounded-2xl p-8 lg:p-10 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, var(--color-brand-navy-deep) 0%, var(--color-brand-navy-soft) 100%)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl" />
                 <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center mb-5 border border-blue-500/30">
                   <FontAwesomeIcon icon={faGraduationCap} className="text-blue-400 text-xl" />
@@ -160,7 +160,7 @@ export default function AProposPage() {
                 { role: "Technologie & Produit", description: "Conception et développement de la plateforme pour une expérience de réservation fluide et sécurisée.", icon: faGraduationCap },
                 { role: "Support & Relation Client", description: "Accompagnement des stagiaires et des centres partenaires, du lundi au vendredi de 9h à 18h.", icon: faUsers },
               ].map((t) => (
-                <div key={t.role} className="rounded-2xl p-8 text-left hover:shadow-lg transition-all duration-200" style={{ background: "linear-gradient(135deg, #0A1628 0%, #0f2044 100%)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={t.role} className="rounded-2xl p-8 text-left hover:shadow-lg transition-all duration-200" style={{ background: "linear-gradient(135deg, var(--color-brand-navy-deep) 0%, var(--color-brand-navy-soft) 100%)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center mb-5 border border-blue-500/30">
                     <FontAwesomeIcon icon={t.icon} className="text-blue-400 text-lg" />
                   </div>
@@ -199,7 +199,7 @@ export default function AProposPage() {
         </section>
 
         {/* ─── CTA dark ─── */}
-        <section className="py-20 px-4 sm:px-8 bg-[#0A1628]">
+        <section className="py-20 px-4 sm:px-8 bg-brand-navy">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex justify-center mb-6">
               <div className="flex rounded overflow-hidden">
@@ -211,7 +211,7 @@ export default function AProposPage() {
             <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-4">
               Rejoignez notre réseau de centres partenaires
             </h2>
-            <p className="text-gray-400 mb-8 text-sm leading-relaxed max-w-xl mx-auto">
+            <p className="text-blue-100/80 mb-8 text-sm leading-relaxed max-w-xl mx-auto">
               Vous êtes un centre de formation agréé ? Développez votre activité et bénéficiez d&apos;une visibilité accrue auprès de milliers de conducteurs.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

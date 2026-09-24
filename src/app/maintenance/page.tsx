@@ -18,7 +18,7 @@ export default async function MaintenancePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#0A1628" }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "var(--color-brand-navy)" }}>
       <div className="w-full max-w-md text-center">
         {/* Logo */}
         <Image
