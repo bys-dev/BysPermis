@@ -38,6 +38,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       include: {
         owner: { select: { id: true, prenom: true, nom: true, email: true } },
         import: { select: { id: true, filename: true, createdAt: true, source: true } },
+        centre: { select: { id: true, nom: true, slug: true, statut: true } },
         recipients: {
           orderBy: { createdAt: "desc" },
           take: 50,

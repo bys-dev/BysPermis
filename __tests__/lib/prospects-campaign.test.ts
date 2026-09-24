@@ -39,12 +39,23 @@ const campaign = {
 // ─── Ciblage ──────────────────────────────────────────────────
 
 describe("buildAudienceWhere — garde-fous non négociables", () => {
-  it("exclut toujours les fiches sans email, invalides ou opposées au démarchage", () => {
+  it("exclut toujours les fiches sans email, invalides, opposées au démarchage ou déjà inscrites", () => {
     const where = buildAudienceWhere({});
     expect(where.email).toEqual({ not: null });
     expect(where.emailValide).toBe(true);
     expect(where.unsubscribedAt).toBeNull();
-    expect(where.statut).toEqual({ notIn: ["DESABONNE", "INJOIGNABLE"] });
+    expect(where.statut).toEqual({ notIn: ["DESABONNE", "INJOIGNABLE", "INSCRIT"] });
+  });
+
+  it("ne cible jamais un centre inscrit sur le site, même demandé explicitement", () => {
+    // Un ciblage qui ne retient que des statuts interdits retombe sur l'exclusion.
+    expect(buildAudienceWhere({ statuts: ["INSCRIT"] }).statut).toEqual({
+      notIn: ["DESABONNE", "INJOIGNABLE", "INSCRIT"],
+    });
+    // Mélangé à des statuts licites, INSCRIT est simplement retiré.
+    expect(buildAudienceWhere({ statuts: ["INSCRIT", "NOUVEAU", "RELANCE"] }).statut).toEqual({
+      in: ["NOUVEAU", "RELANCE"],
+    });
   });
 
   it("applique les critères en mode filtre", () => {
@@ -71,7 +82,7 @@ describe("buildAudienceWhere — sélection nominative", () => {
     const where = buildAudienceWhere({ mode: "SELECTION", prospectIds: ["p1"] });
     expect(where.emailValide).toBe(true);
     expect(where.unsubscribedAt).toBeNull();
-    expect(where.statut).toEqual({ notIn: ["DESABONNE", "INJOIGNABLE"] });
+    expect(where.statut).toEqual({ notIn: ["DESABONNE", "INJOIGNABLE", "INSCRIT"] });
   });
 
   it("ignore les critères de ciblage, qui n'ont plus de sens", () => {

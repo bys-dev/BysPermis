@@ -642,8 +642,8 @@ export default function CampaignEditor({
             seul et personnalisé avec ses données. Aucun destinataire n&apos;est en copie et personne ne
             voit les autres adresses.
             <br />
-            Les prospects sans email, avec une adresse invalide ou opposés au démarchage sont toujours
-            exclus, quel que soit le ciblage.
+            Les prospects sans email, avec une adresse invalide, opposés au démarchage ou déjà inscrits
+            sur le site sont toujours exclus, quel que soit le ciblage.
           </p>
         </div>
       </div>

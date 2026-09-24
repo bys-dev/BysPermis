@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAdmin, requireOwner } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 
 const ALL_ROLES = ["ELEVE", "CENTRE_OWNER", "CENTRE_ADMIN", "CENTRE_FORMATEUR", "CENTRE_SECRETAIRE", "SUPPORT", "COMPTABLE", "COMMERCIAL", "ADMIN", "OWNER"] as const;
 const DEFAULT_PAGE_SIZE = 25;
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
     // Si rôle centre, créer un Centre automatiquement
     if (data.role === "CENTRE_OWNER") {
       const slug = slugify(`${data.prenom}-${data.nom}`) + "-" + Date.now().toString(36);
-      await prisma.centre.create({
+      const centre = await prisma.centre.create({
         data: {
           userId: user.id,
           nom: `Centre de ${data.prenom} ${data.nom}`,
@@ -172,7 +173,12 @@ export async function POST(req: NextRequest) {
           codePostal: "",
           ville: "",
         },
+        select: { id: true },
       });
+      // Fiche de prospection éventuelle de ce centre : hors relance.
+      await marquerProspectsInscrits({ emails: [data.email], centreId: centre.id }).catch((err) =>
+        console.error("[admin/users POST] rapprochement prospects:", err),
+      );
     }
 
     return NextResponse.json(user, { status: 201 });

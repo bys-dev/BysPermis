@@ -15,6 +15,7 @@ import {
   faTriangleExclamation,
   faBan,
   faUserSlash,
+  faUserCheck,
   faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import ImportPanel from "./ImportPanel";
@@ -54,9 +55,25 @@ interface Prospect {
   nbClics: number;
   lastContactedAt: string | null;
   unsubscribedAt: string | null;
+  /** Date du rapprochement automatique avec un compte du site. */
+  inscritAt: string | null;
   createdAt: string;
   owner: { id: string; prenom: string; nom: string } | null;
+  /** Centre du site rattaché à cette fiche (démarchage stoppé). */
+  centre: { id: string; nom: string; slug: string } | null;
 }
+
+/**
+ * Fiche qu'aucune campagne ne peut viser — même règle que `buildAudienceWhere`
+ * côté serveur : sans email valide, opposée au démarchage, ou déjà inscrite.
+ */
+const horsCampagne = (p: Prospect) =>
+  !p.email ||
+  !p.emailValide ||
+  Boolean(p.unsubscribedAt) ||
+  p.statut === "DESABONNE" ||
+  p.statut === "INJOIGNABLE" ||
+  p.statut === "INSCRIT";
 
 interface Facettes {
   departements: { valeur: string; nb: number }[];
@@ -230,10 +247,7 @@ export default function AdminProspectsPage() {
     router.push(`/admin/campagnes?selection=${[...selection].join(",")}`);
   };
 
-  const contactables = useMemo(
-    () => prospects.filter((p) => p.email && p.emailValide && !p.unsubscribedAt).length,
-    [prospects],
-  );
+  const contactables = useMemo(() => prospects.filter((p) => !horsCampagne(p)).length, [prospects]);
 
   return (
     <div className="space-y-6">
@@ -469,7 +483,7 @@ export default function AdminProspectsPage() {
               <tbody>
                 {prospects.map((p) => {
                   const meta = statutMeta(p.statut);
-                  const bloque = !p.email || !p.emailValide || p.unsubscribedAt;
+                  const bloque = horsCampagne(p);
                   return (
                     <tr key={p.id} className="border-t border-white/5 hover:bg-white/[0.02]">
                       <td className="px-3 py-3">
@@ -537,6 +551,28 @@ export default function AdminProspectsPage() {
                         {p.unsubscribedAt && (
                           <p className="text-gray-500 text-[10px] mt-1 flex items-center gap-1">
                             <FontAwesomeIcon icon={faUserSlash} /> opposition enregistrée
+                          </p>
+                        )}
+                        {p.statut === "INSCRIT" && (p.inscritAt || p.centre) && (
+                          <p
+                            className="text-green-400/80 text-[10px] mt-1 flex items-center gap-1"
+                            title="Détecté automatiquement : ce centre a un compte sur le site, il ne reçoit plus de relance."
+                          >
+                            <FontAwesomeIcon icon={faUserCheck} />
+                            compte sur le site
+                            {p.inscritAt && ` depuis le ${new Date(p.inscritAt).toLocaleDateString("fr-FR")}`}
+                            {p.centre && (
+                              <>
+                                {" · "}
+                                <a
+                                  href={`/admin/centres/${p.centre.id}`}
+                                  className="underline decoration-dotted hover:text-green-300"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {p.centre.nom}
+                                </a>
+                              </>
+                            )}
                           </p>
                         )}
                       </td>

@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
 import { sendCentreInvitationEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 import { z } from "zod";
 
 const schema = z.object({
@@ -74,6 +75,11 @@ export async function POST(
 
       return centre;
     });
+
+    // Fiche de prospection éventuelle du chef de centre : hors relance.
+    await marquerProspectsInscrits({ emails: [existingCentre.user.email], centreId: nouveau.id }).catch((err) =>
+      console.error("[add-lieu] rapprochement prospects:", err),
+    );
 
     // Email: notify the chef de centre of the new location
     try {

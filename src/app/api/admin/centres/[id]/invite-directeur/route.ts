@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth0";
 import { sendDirecteurLieuInvitationEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 import { z } from "zod";
 
 const schema = z.object({
@@ -140,6 +141,11 @@ export async function POST(
         });
       });
 
+      // Ce contact a désormais un accès au site : hors relance.
+      await marquerProspectsInscrits({ emails: [email], centreId }).catch((err) =>
+        console.error("[invite-directeur] rapprochement prospects:", err),
+      );
+
       return NextResponse.json(
         { success: true, message: "Directeur ajouté au lieu.", user: { id: existingUser.id, email } },
         { status: 201 }
@@ -193,6 +199,11 @@ export async function POST(
 
       return user;
     });
+
+    // Ce contact a désormais un accès au site : hors relance.
+    await marquerProspectsInscrits({ emails: [email], centreId }).catch((err) =>
+      console.error("[invite-directeur] rapprochement prospects:", err),
+    );
 
     // Send invitation email
     try {

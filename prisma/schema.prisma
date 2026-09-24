@@ -364,6 +364,8 @@ model Centre {
   emailLogs              EmailLog[]
   verificationDocuments  CentreVerificationDocument[]
   partnerLead            PartnerLead?
+  /// Fiches de prospection rapprochées de ce centre (démarchage stoppé).
+  prospectsRapproches    Prospect[]                   @relation("ProspectsRapproches")
 
   @@map("centres")
 }
@@ -526,6 +528,15 @@ model Prospect {
 
   // ── Conversion ──
   partnerLeadId String? @unique
+  /// Compte du site rapproché de cette fiche (même email ou même SIRET qu'un
+  /// centre). Posé automatiquement : un centre inscrit sort des listes de
+  /// relance (cf. lib/prospects/inscrits.ts).
+  centreId  String?
+  centre    Centre?   @relation("ProspectsRapproches", fields: [centreId], references: [id], onDelete: SetNull)
+  /// Date du rapprochement automatique. Sert aussi de marqueur « déjà évalué » :
+  /// une fiche rouverte à la main par le staff n'est pas re-basculée au passage
+  /// suivant du cron.
+  inscritAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -535,6 +546,7 @@ model Prospect {
   @@index([statut, createdAt])
   @@index([departement])
   @@index([email])
+  @@index([centreId])
   @@map("prospects")
 }
 

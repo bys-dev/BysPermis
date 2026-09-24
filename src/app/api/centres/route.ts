@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, getCurrentUser, PLATFORM_ROLES } from "@/lib/auth0";
 import { geocodeAddress, haversineDistance } from "@/lib/geocoding";
 import { mapAuthError } from "@/lib/auth0";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 
 // GET /api/centres — liste publique des centres actifs
 export async function GET(req: NextRequest) {
@@ -144,9 +145,19 @@ export async function POST(req: NextRequest) {
         latitude,
         longitude,
       },
+      include: { user: { select: { email: true } } },
     });
 
-    return NextResponse.json(centre, { status: 201 });
+    // Fiche de prospection éventuelle de ce centre : hors relance.
+    await marquerProspectsInscrits({
+      emails: [centre.email, centre.user?.email],
+      sirets: [centre.siret],
+      centreId: centre.id,
+    }).catch((err) => console.error("[POST /api/centres] rapprochement prospects:", err));
+
+    const { user: _owner, ...centreSansOwner } = centre;
+    void _owner;
+    return NextResponse.json(centreSansOwner, { status: 201 });
   } catch (err) {
     const authRes = mapAuthError(err);
     if (authRes) return authRes;

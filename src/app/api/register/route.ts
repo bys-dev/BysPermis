@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { rateLimit } from "@/lib/rate-limit";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 import { z } from "zod";
 
 // ─── Auth0 Management API helper ─────────────────────────
@@ -161,7 +162,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Créer en BDD (transaction) ────────────────────────
-    await prisma.$transaction(async (tx) => {
+    const { centreId } = await prisma.$transaction(async (tx) => {
       const generatedRefCode = `BYS-${firstName.toUpperCase().slice(0, 4).replace(/[^A-Z]/g, "X")}${Math.floor(Math.random() * 100)}`;
 
       const user = await tx.user.create({
@@ -179,6 +180,7 @@ export async function POST(req: NextRequest) {
       // Pour les comptes "centre" : créer le Centre en EN_ATTENTE (statut
       // par défaut) et le rattacher au user. Le user reste ELEVE jusqu'à
       // la validation admin qui passera son rôle en CENTRE_OWNER.
+      let centreId: string | null = null;
       if (accountType === "centre" && centreName) {
         const slug = slugify(centreName) + "-" + Date.now().toString(36);
         const centre = await tx.centre.create({
@@ -195,10 +197,19 @@ export async function POST(req: NextRequest) {
           where: { id: user.id },
           data: { activeCentreId: centre.id },
         });
+        centreId = centre.id;
       }
 
-      return user;
+      return { user, centreId };
     });
+
+    // Un centre démarché qui vient de créer son compte sort des listes de
+    // relance. Hors transaction et sans bloquer : le compte existe déjà.
+    if (centreId) {
+      await marquerProspectsInscrits({ emails: [email], centreId }).catch((err) =>
+        console.error("[register] rapprochement prospects:", err),
+      );
+    }
 
     return GENERIC_OK;
 

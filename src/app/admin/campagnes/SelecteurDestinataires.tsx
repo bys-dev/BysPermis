@@ -9,8 +9,9 @@
  * moment qui recevra le message.
  *
  * La sélection vit ici sous forme d'identifiants ; l'API ne renvoie que les
- * fiches réellement contactables (email valide, sans opposition), si bien qu'un
- * centre désinscrit ne peut pas être coché par inadvertance.
+ * fiches réellement contactables (email valide, sans opposition, pas encore
+ * inscrites sur le site), si bien qu'un centre désinscrit ou déjà partenaire
+ * ne peut pas être coché par inadvertance.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

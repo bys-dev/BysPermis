@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import { notifyOwnersNewPartnerLead } from "@/lib/event-notifications";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 
 const volumeLabels: Record<string, string> = {
   "1-4": "1 à 4 stages / mois",
@@ -75,6 +76,14 @@ export async function POST(req: NextRequest) {
         source: "devenir-partenaire",
       },
     });
+
+    // Un centre démarché qui dépose une demande a répondu : on arrête de le
+    // relancer. Best-effort, la demande est déjà enregistrée.
+    await marquerProspectsInscrits({
+      emails: [lead.email, lead.contactEmail],
+      sirets: [lead.siret],
+      partnerLeadId: lead.id,
+    }).catch((err) => console.error("[POST /api/partenaires] rapprochement prospects:", err));
 
     // La demande est enregistrée : un échec d'email ne doit pas la faire échouer
     // (elle reste visible dans /admin/partenaires).

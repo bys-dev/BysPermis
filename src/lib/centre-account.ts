@@ -7,6 +7,7 @@ import {
   findAuth0UserIdByEmail,
   setAuth0UserRole,
 } from "@/lib/auth0-management";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 
 /**
  * Création d'un compte CENTRE_OWNER + de son centre par le staff plateforme.
@@ -207,6 +208,14 @@ export async function createCentreOwnerAccount(input: CentreAccountInput): Promi
 
     return { userId, centreId: centre.id, centreSlug: centre.slug };
   });
+
+  // Le centre a maintenant un compte : sa fiche de prospection, si elle
+  // existe, sort des listes de relance. Best-effort, le compte est déjà créé.
+  await marquerProspectsInscrits({
+    emails: [email, input.centre.email],
+    sirets: [input.centre.siret],
+    centreId: result.centreId,
+  }).catch((err) => console.error("[centre-account] rapprochement prospects:", err));
 
   return { ...result, tempPassword, reusedExistingAccount: Boolean(existingUser) || !tempPassword };
 }

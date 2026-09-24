@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCentreOwner } from "@/lib/auth0";
 import { slugify } from "@/lib/utils";
+import { marquerProspectsInscrits } from "@/lib/prospects/inscrits";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -43,6 +44,11 @@ export async function POST(req: NextRequest) {
       where: { id: user.id },
       data: { activeCentreId: centre.id },
     });
+
+    // Fiche de prospection éventuelle du propriétaire : hors relance.
+    await marquerProspectsInscrits({ emails: [user.email], centreId: centre.id }).catch((err) =>
+      console.error("[centre/create] rapprochement prospects:", err),
+    );
 
     return NextResponse.json(
       {
