@@ -208,7 +208,8 @@ export default function PolitiqueDeConfidentialitePage() {
                   transactionnelles)
                 </li>
                 <li>
-                  <strong>Vercel :</strong> hébergement de la plateforme
+                  <strong>Clever Cloud :</strong> hébergement de la plateforme
+                  (serveurs situés en France)
                 </li>
                 <li>
                   <strong>Resend :</strong> envoi d&apos;emails transactionnels

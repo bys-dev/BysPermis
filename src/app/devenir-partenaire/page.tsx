@@ -198,7 +198,7 @@ export default function DevenirPartenairePage() {
               <br className="hidden md:block" />{" "}
               récupération de <span className="text-blue-400">points</span>
             </h1>
-            <p className="text-lg text-blue-100/80 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-blue-50 max-w-2xl mx-auto leading-relaxed">
               BYS Permis connecte votre centre aux conducteurs qui cherchent un stage
               près de chez eux. Vous gagnez en visibilité et en remplissage —
               nous nous occupons du reste.
@@ -206,7 +206,7 @@ export default function DevenirPartenairePage() {
 
             <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-6 px-5 py-2.5 rounded-2xl bg-white/10 border border-blue-300/30 ring-4 ring-blue-400/10 text-sm sm:text-base">
               <span className="font-display font-bold text-white text-lg sm:text-xl">Commission fixe de 15 %</span>
-              <span className="text-blue-100/85">sur les réservations confirmées. Pas d&apos;abonnement, pas de frais cachés.</span>
+              <span className="text-blue-50">sur les réservations confirmées. Pas d&apos;abonnement, pas de frais cachés.</span>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
@@ -229,7 +229,7 @@ export default function DevenirPartenairePage() {
               href="/api/brochure-partenaire"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-100/80 hover:text-white text-sm font-medium mt-6 transition-colors"
+              className="inline-flex items-center gap-2 text-blue-50 hover:text-white text-sm font-medium mt-6 transition-colors"
             >
               <FontAwesomeIcon icon={faFileArrowDown} className="text-xs" />
               Télécharger la brochure partenaire (PDF)
@@ -244,7 +244,7 @@ export default function DevenirPartenairePage() {
                   <div className="number-gradient-light text-2xl md:text-3xl">
                     {t.value}
                   </div>
-                  <div className="text-blue-100/85 text-xs md:text-sm mt-1.5 leading-snug">{t.label}</div>
+                  <div className="text-blue-50 text-xs md:text-sm mt-1.5 leading-snug">{t.label}</div>
                 </div>
               ))}
             </div>
