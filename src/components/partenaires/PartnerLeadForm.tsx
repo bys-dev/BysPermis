@@ -75,7 +75,14 @@ export default function PartnerLeadForm() {
           consent: false,
         });
       } else {
-        setError("Une erreur est survenue. Vérifiez vos informations et réessayez.");
+        if (res.status === 429) {
+          const secondes = Number(res.headers.get("Retry-After")) || 60;
+          setError(
+            `Trop de demandes envoyées coup sur coup. Réessayez dans ${secondes} seconde${secondes > 1 ? "s" : ""}.`,
+          );
+        } else {
+          setError("Une erreur est survenue. Vérifiez vos informations et réessayez.");
+        }
       }
     } catch {
       setError("Impossible d'envoyer la demande. Réessayez dans un instant.");
