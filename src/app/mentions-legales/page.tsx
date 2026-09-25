@@ -104,21 +104,27 @@ export default function MentionsLegalesPage() {
             <div className="leading-relaxed text-gray-700 space-y-1">
               <ul className="list-none space-y-1">
                 <li>
-                  <strong>Raison sociale :</strong> Vercel Inc.
+                  <strong>Raison sociale :</strong> Clever Cloud SAS
                 </li>
                 <li>
-                  <strong>Adresse :</strong> 340 S Lemon Ave #4133, Walnut, CA
-                  91789, USA
+                  <strong>Capital social :</strong> 22 952 €
+                </li>
+                <li>
+                  <strong>RCS :</strong> Nantes B 524 172 699
+                </li>
+                <li>
+                  <strong>Adresse :</strong> 4 rue Voltaire, 44000 Nantes,
+                  France
                 </li>
                 <li>
                   <strong>Site web :</strong>{" "}
                   <a
-                    href="https://vercel.com"
+                    href="https://clever.cloud"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-brand-accent hover:text-brand-accent-hover underline"
                   >
-                    https://vercel.com
+                    https://clever.cloud
                   </a>
                 </li>
               </ul>

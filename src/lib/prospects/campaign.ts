@@ -76,6 +76,13 @@ export interface AudienceFilter {
   exclureCampagneIds?: string[];
   /** Recherche libre sur nom / ville / email. */
   recherche?: string;
+  /**
+   * Adresses saisies à la main dans l'éditeur, sous forme de fiches prospect
+   * (retrouvées par email ou créées avec la source « manuel », cf.
+   * `lib/prospects/ajouts-manuels.ts`). Elles s'ajoutent au ciblage, quel que
+   * soit le mode, et restent soumises aux exclusions obligatoires.
+   */
+  ajoutsManuels?: string[];
 }
 
 /**
@@ -95,6 +102,25 @@ export const STATUTS_JAMAIS_CIBLES: ProspectStatus[] = ["DESABONNE", "INJOIGNABL
  * y compris quand le staff a coché la fiche à la main.
  */
 export function buildAudienceWhere(filter: AudienceFilter = {}): Prisma.ProspectWhereInput {
+  const where = ciblageSansAjouts(filter);
+  const ajouts = (filter.ajoutsManuels ?? []).filter(Boolean);
+  if (ajouts.length === 0) return where;
+
+  // Les adresses ajoutées à la main complètent le ciblage (OU), mais les
+  // exclusions obligatoires restent au niveau supérieur (ET) : une adresse
+  // désinscrite ne reçoit rien, même saisie explicitement.
+  const { email, emailValide, unsubscribedAt, statut, ...criteres } = where;
+  return {
+    email,
+    emailValide,
+    unsubscribedAt,
+    statut: { notIn: STATUTS_JAMAIS_CIBLES },
+    OR: [{ statut, ...criteres }, { id: { in: ajouts } }],
+  };
+}
+
+/** Ciblage par critères ou par sélection nominative, hors ajouts manuels. */
+function ciblageSansAjouts(filter: AudienceFilter): Prisma.ProspectWhereInput {
   const where: Prisma.ProspectWhereInput = {
     email: { not: null },
     emailValide: true,
@@ -210,13 +236,43 @@ export async function prepareCampaign(campaignId: string): Promise<{ totalCibles
 
 // ─── Envoi ───────────────────────────────────────────────
 
+/**
+ * Une adresse ne doit désigner qu'un seul destinataire.
+ *
+ * Une virgule, un point-virgule, une espace ou des chevrons y glisseraient une
+ * seconde adresse, que le fournisseur expédierait comme destinataire à part
+ * entière : deux centres démarchés découvriraient alors leurs coordonnées
+ * mutuelles. L'import de prospects ne validant pas le format des adresses, on
+ * vérifie ici plutôt que de faire confiance à ce qui est en base.
+ */
+export function estAdresseUnique(email: string): boolean {
+  const adresse = email.trim();
+  // Espaces, tabulations et caractères de contrôle : une adresse propre n'en
+  // contient aucun une fois les bords retirés.
+  if (adresse.split("").some((c) => c.charCodeAt(0) <= 32)) return false;
+  // Séparateurs d'adresses, et syntaxe "Nom <adresse>" qui en masque une.
+  if ([",", ";", "<", ">"].some((c) => adresse.includes(c))) return false;
+  const parts = adresse.split("@");
+  if (parts.length !== 2) return false;
+  const [local, domaine] = parts;
+  return (
+    local.length > 0 &&
+    domaine.includes(".") &&
+    !domaine.startsWith(".") &&
+    !domaine.endsWith(".")
+  );
+}
+
 /** Un message de campagne, tel qu'il est remis au fournisseur d'envoi. */
 export interface CampaignMessage {
   from: string;
   /** Adresse unique : un message par destinataire, jamais une liste. */
   to: string;
   subject: string;
+  /** Document HTML complet (gabarit BYS Permis). */
   html: string;
+  /** Version texte brut du même message. */
+  text: string;
   replyTo?: string;
   headers: Record<string, string>;
 }
@@ -235,6 +291,15 @@ export function buildCampaignMessage(params: {
   email: string;
   prospect: TemplateProspect;
 }): CampaignMessage {
+  // Dernier rempart : même si le filtrage amont était contourné, on refuse
+  // d'expédier un message dont le champ `to` pourrait désigner plusieurs
+  // personnes.
+  if (!estAdresseUnique(params.email)) {
+    throw new Error(
+      "Adresse de prospect invalide ou désignant plusieurs destinataires : envoi refusé.",
+    );
+  }
+
   const rendu = renderCampaignEmail({
     sujet: params.campaign.sujet,
     contenu: params.campaign.contenu,
@@ -247,6 +312,7 @@ export function buildCampaignMessage(params: {
     to: params.email,
     subject: rendu.subject,
     html: rendu.html,
+    text: rendu.text,
     ...(params.campaign.replyTo ? { replyTo: params.campaign.replyTo } : {}),
     headers: {
       // En-tête standard : certains clients affichent un bouton natif de
@@ -331,19 +397,30 @@ export async function sendCampaignBatch(
   // Un prospect peut s'être désinscrit — ou avoir créé son compte — entre la
   // préparation et l'envoi : on revérifie systématiquement plutôt que de faire
   // confiance à la liste figée.
+  // L'opposition vaut pour l'adresse, pas seulement pour la fiche : une même
+  // adresse peut figurer sur plusieurs fiches (import + ajout manuel).
+  const adressesOpposees = await adressesDesinscrites(pending.map((r) => r.email));
+
   const sendable: typeof pending = [];
   let ignores = 0;
   for (const recipient of pending) {
     const p = recipient.prospect;
+    const adresseSuspecte = !!p.email && !estAdresseUnique(p.email);
     const bloque =
-      !p.email || !p.emailValide || p.unsubscribedAt !== null || STATUTS_JAMAIS_CIBLES.includes(p.statut);
+      !p.email ||
+      !p.emailValide ||
+      adresseSuspecte ||
+      p.unsubscribedAt !== null ||
+      adressesOpposees.has(recipient.email.trim().toLowerCase()) ||
+      STATUTS_JAMAIS_CIBLES.includes(p.statut);
     if (bloque) {
       await prisma.campaignRecipient.update({
         where: { id: recipient.id },
         data: {
           status: "IGNORE",
-          error:
-            p.statut === "INSCRIT"
+          error: adresseSuspecte
+            ? "Adresse invalide ou désignant plusieurs destinataires"
+            : p.statut === "INSCRIT"
               ? "Inscrit sur le site au moment de l'envoi"
               : "Désinscrit ou email invalide au moment de l'envoi",
         },
@@ -443,6 +520,20 @@ export async function sendCampaignBatch(
   return { envoyes, echecs, ignores, restant, termine };
 }
 
+/** Adresses (en minuscules) désinscrites sur au moins une fiche prospect. */
+async function adressesDesinscrites(emails: string[]): Promise<Set<string>> {
+  const adresses = [...new Set(emails.map((e) => e.trim().toLowerCase()).filter(Boolean))];
+  if (adresses.length === 0) return new Set();
+  const fiches = await prisma.prospect.findMany({
+    where: {
+      email: { in: adresses, mode: "insensitive" },
+      OR: [{ unsubscribedAt: { not: null } }, { statut: "DESABONNE" }],
+    },
+    select: { email: true },
+  });
+  return new Set(fiches.map((f) => (f.email ?? "").trim().toLowerCase()));
+}
+
 async function finalizeIfDone(campaignId: string): Promise<void> {
   const restant = await prisma.campaignRecipient.count({ where: { campaignId, status: "EN_ATTENTE" } });
   if (restant > 0) return;
@@ -501,6 +592,7 @@ export async function sendCampaignTest(params: {
     to: params.to,
     subject: `[TEST] ${email.subject}`,
     html: email.html,
+    text: email.text,
     ...(campaign.replyTo ? { replyTo: campaign.replyTo } : {}),
   });
   if (error) throw new Error(`Resend: ${error.message ?? error.name}`);

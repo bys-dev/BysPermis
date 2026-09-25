@@ -45,7 +45,7 @@ const statutBadge: Record<LeadStatut, { label: string; cls: string }> = {
   EN_COURS: { label: "En cours", cls: "bg-yellow-400/10 text-yellow-300 border-yellow-400/20" },
   COMPTE_CREE: { label: "Acceptée", cls: "bg-green-400/10 text-green-400 border-green-500/20" },
   REFUSE: { label: "Refusée", cls: "bg-red-400/10 text-red-400 border-red-500/20" },
-  ARCHIVE: { label: "Archivée", cls: "bg-white/5 text-gray-400 border-white/10" },
+  ARCHIVE: { label: "Archivée", cls: "bg-white/5 text-slate-300 border-white/10" },
 };
 
 const volumeLabels: Record<string, string> = {
@@ -66,7 +66,7 @@ function ModalShell({ children, onClose }: { children: React.ReactNode; onClose:
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-md mx-4 rounded-xl p-6 shadow-2xl"
-        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+        style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}
       >
         {children}
       </div>
@@ -112,10 +112,10 @@ function AcceptModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
           </div>
           <div>
             <h2 className="text-white font-semibold text-lg">Accepter la demande</h2>
-            <p className="text-gray-400 text-xs">{lead.centreNom}</p>
+            <p className="text-slate-300 text-xs">{lead.centreNom}</p>
           </div>
         </div>
-        <button onClick={onClose} className="text-gray-500 hover:text-white" aria-label="Fermer">
+        <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Fermer">
           <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
         </button>
       </div>
@@ -128,7 +128,7 @@ function AcceptModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
         </p>
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">N° d&apos;agrément</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">N° d&apos;agrément</label>
             <input
               value={agrement}
               onChange={(e) => setAgrement(e.target.value)}
@@ -137,7 +137,7 @@ function AcceptModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Département</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">Département</label>
             <input
               value={dep}
               onChange={(e) => setDep(e.target.value)}
@@ -147,7 +147,7 @@ function AcceptModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
             />
           </div>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-slate-400">
           Vérifiez le numéro auprès de la préfecture avant d&apos;accepter.
         </p>
 
@@ -156,7 +156,7 @@ function AcceptModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
         )}
 
         <div className="flex gap-3 pt-1">
-          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white border border-white/10 hover:border-white/20">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white border border-white/10 hover:border-white/20">
             Annuler
           </button>
           <button
@@ -208,16 +208,16 @@ function RefuseModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
           </div>
           <div>
             <h2 className="text-white font-semibold text-lg">Refuser la demande</h2>
-            <p className="text-gray-400 text-xs">{lead.centreNom}</p>
+            <p className="text-slate-300 text-xs">{lead.centreNom}</p>
           </div>
         </div>
-        <button onClick={onClose} className="text-gray-500 hover:text-white" aria-label="Fermer">
+        <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Fermer">
           <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
         </button>
       </div>
       <form onSubmit={submit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1.5">Motif du refus *</label>
+          <label className="block text-xs font-medium text-slate-300 mb-1.5">Motif du refus *</label>
           <textarea
             value={motif}
             onChange={(e) => setMotif(e.target.value)}
@@ -236,7 +236,7 @@ function RefuseModal({ lead, onClose, onDone }: { lead: Lead; onClose: () => voi
           <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
         )}
         <div className="flex gap-3 pt-1">
-          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white border border-white/10 hover:border-white/20">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white border border-white/10 hover:border-white/20">
             Annuler
           </button>
           <button
@@ -326,7 +326,7 @@ function PartenairesContent() {
             <FontAwesomeIcon icon={faHandshake} className="text-blue-400 w-6 h-6" />
             Demandes de partenariat
           </h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Centres ayant rempli le formulaire « Devenir partenaire ». Acceptez pour créer leur compte automatiquement.
           </p>
         </div>
@@ -350,7 +350,7 @@ function PartenairesContent() {
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
                 tab === t.key
                   ? "bg-white/10 text-white border-white/20"
-                  : "text-gray-400 border-white/10 hover:text-white hover:border-white/20"
+                  : "text-slate-300 border-white/10 hover:text-white hover:border-white/20"
               }`}
             >
               {t.label}
@@ -359,13 +359,13 @@ function PartenairesContent() {
           ))}
         </div>
         <div className="relative lg:w-80">
-          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" />
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Centre, ville, email, agrément..."
-            className="w-full pl-9 pr-4 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
+            className="w-full pl-9 pr-4 py-2.5 bg-[#1C2D4F] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
           />
         </div>
       </div>
@@ -378,11 +378,11 @@ function PartenairesContent() {
       )}
 
       {loading && leads.length === 0 ? (
-        <div className="flex items-center justify-center py-20 text-gray-400">
+        <div className="flex items-center justify-center py-20 text-slate-300">
           <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" /> Chargement...
         </div>
       ) : visible.length === 0 ? (
-        <div className="text-center py-20 rounded-xl border border-white/10 bg-[#0A1628] text-gray-400 text-sm">
+        <div className="text-center py-20 rounded-xl border border-white/10 bg-[#1C2D4F] text-slate-300 text-sm">
           Aucune demande dans cet onglet.
         </div>
       ) : (
@@ -394,14 +394,14 @@ function PartenairesContent() {
               <div
                 key={l.id}
                 id={`lead-${l.id}`}
-                className={`rounded-xl border p-5 bg-[#0A1628] ${
+                className={`rounded-xl border p-5 bg-[#1C2D4F] ${
                   l.id === highlightId ? "border-blue-500/60 ring-1 ring-blue-500/40" : "border-white/10"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="min-w-0">
                     <h2 className="text-white font-semibold text-lg truncate">{l.centreNom}</h2>
-                    <p className="text-gray-500 text-xs flex items-center gap-1.5 mt-0.5">
+                    <p className="text-slate-400 text-xs flex items-center gap-1.5 mt-0.5">
                       <FontAwesomeIcon icon={faCalendarDay} className="w-3 h-3" />
                       Reçue le {formatDate(l.createdAt)}
                     </p>
@@ -412,35 +412,35 @@ function PartenairesContent() {
                 <div className="rounded-lg bg-white/[0.04] border border-white/10 px-4 py-3 mb-4 flex items-center gap-3">
                   <FontAwesomeIcon icon={faAward} className="text-blue-400 w-4 h-4" />
                   <div>
-                    <div className="text-[11px] uppercase tracking-wide text-gray-500">N° d&apos;agrément préfectoral</div>
+                    <div className="text-[11px] uppercase tracking-wide text-slate-400">N° d&apos;agrément préfectoral</div>
                     <div className="text-white font-mono text-sm">
                       {l.agrementNumber ?? <span className="text-yellow-300 font-sans">Non renseigné</span>}
-                      {l.agrementDepartement && <span className="text-gray-400 font-sans"> · dép. {l.agrementDepartement}</span>}
+                      {l.agrementDepartement && <span className="text-slate-300 font-sans"> · dép. {l.agrementDepartement}</span>}
                     </div>
                   </div>
                 </div>
 
                 <dl className="grid sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                   <div className="flex items-center gap-2 text-gray-300 min-w-0">
-                    <FontAwesomeIcon icon={faUserTie} className="text-gray-500 w-3.5 h-3.5 shrink-0" />
+                    <FontAwesomeIcon icon={faUserTie} className="text-slate-400 w-3.5 h-3.5 shrink-0" />
                     <span className="truncate">{l.contactNom}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-300 min-w-0">
-                    <FontAwesomeIcon icon={faLocationDot} className="text-gray-500 w-3.5 h-3.5 shrink-0" />
+                    <FontAwesomeIcon icon={faLocationDot} className="text-slate-400 w-3.5 h-3.5 shrink-0" />
                     <span className="truncate">{l.ville}</span>
                   </div>
                   <a href={`mailto:${l.contactEmail}`} className="flex items-center gap-2 text-blue-300 hover:text-blue-200 min-w-0">
-                    <FontAwesomeIcon icon={faEnvelope} className="text-gray-500 w-3.5 h-3.5 shrink-0" />
+                    <FontAwesomeIcon icon={faEnvelope} className="text-slate-400 w-3.5 h-3.5 shrink-0" />
                     <span className="truncate">{l.contactEmail}</span>
                   </a>
                   <a href={`tel:${l.telephone.replace(/\s/g, "")}`} className="flex items-center gap-2 text-blue-300 hover:text-blue-200 min-w-0">
-                    <FontAwesomeIcon icon={faPhone} className="text-gray-500 w-3.5 h-3.5 shrink-0" />
+                    <FontAwesomeIcon icon={faPhone} className="text-slate-400 w-3.5 h-3.5 shrink-0" />
                     <span className="truncate">{l.telephone}</span>
                   </a>
                 </dl>
 
                 {l.volumeMensuel && (
-                  <p className="text-xs text-gray-400 mt-3">Volume estimé : {volumeLabels[l.volumeMensuel] ?? l.volumeMensuel}</p>
+                  <p className="text-xs text-slate-300 mt-3">Volume estimé : {volumeLabels[l.volumeMensuel] ?? l.volumeMensuel}</p>
                 )}
                 {l.message && (
                   <p className="mt-3 text-sm text-gray-300 bg-white/[0.03] border-l-2 border-blue-500/50 px-3 py-2 rounded whitespace-pre-line">
@@ -453,7 +453,7 @@ function PartenairesContent() {
                   </p>
                 )}
                 {l.traiteAt && l.traitePar && (
-                  <p className="mt-3 text-xs text-gray-500">
+                  <p className="mt-3 text-xs text-slate-400">
                     Traitée le {formatDate(l.traiteAt)} par {[l.traitePar.prenom, l.traitePar.nom].filter(Boolean).join(" ") || l.traitePar.email}
                   </p>
                 )}

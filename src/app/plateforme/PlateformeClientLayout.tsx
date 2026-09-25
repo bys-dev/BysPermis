@@ -83,7 +83,7 @@ export default function PlateformeClientLayout({ children }: { children: React.R
   const roleLabel = userRole ? (roleLabelMap[userRole] ?? userRole) : "Staff";
 
   return (
-    <div className="min-h-screen flex bg-[#060E1A]">
+    <div className="min-h-screen flex bg-[#16243F]">
       {/* Overlay mobile */}
       {sidebarOpen && (
         <div
@@ -95,7 +95,7 @@ export default function PlateformeClientLayout({ children }: { children: React.R
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-full w-64 bg-navy-900 border-r border-white/8 flex flex-col z-40 transform transition-transform duration-200
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:z-auto`}
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:self-start lg:shrink-0 lg:z-auto overflow-y-auto`}
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-white/8">
@@ -109,7 +109,7 @@ export default function PlateformeClientLayout({ children }: { children: React.R
             </p>
           </div>
           <button
-            className="ml-auto lg:hidden text-gray-400 hover:text-white"
+            className="ml-auto lg:hidden text-slate-300 hover:text-white"
             onClick={() => setSidebarOpen(false)}
           >
             <FontAwesomeIcon icon={faXmark} />
@@ -137,7 +137,7 @@ export default function PlateformeClientLayout({ children }: { children: React.R
                     ${
                       active
                         ? "bg-blue-600/15 text-blue-400 border border-blue-500/20"
-                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                        : "text-slate-300 hover:text-white hover:bg-white/5"
                     }`}
                 >
                   <FontAwesomeIcon icon={item.icon} className="w-4 h-4 shrink-0" />
@@ -154,20 +154,20 @@ export default function PlateformeClientLayout({ children }: { children: React.R
         <div className="px-3 pb-4 border-t border-white/8 pt-4 space-y-1">
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-gray-300 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-3 h-3" />
             Voir le site public
           </Link>
           <a
             href="/auth/logout"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:text-red-400 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-red-400 transition-colors"
           >
             <FontAwesomeIcon icon={faRightFromBracket} className="w-3 h-3" />
             Se deconnecter
           </a>
           <div className="px-3 py-2">
-            <p className="text-[10px] text-gray-600 leading-relaxed">
+            <p className="text-[10px] text-slate-400 leading-relaxed">
               Connecte en tant que {roleLabel.toLowerCase()}
             </p>
           </div>

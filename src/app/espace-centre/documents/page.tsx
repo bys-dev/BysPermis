@@ -49,11 +49,11 @@ export default function CentreDocumentsPage() {
     <div>
       <div className="mb-6">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Documents</h1>
-        <p className="text-gray-400 text-sm">Modèles envoyés automatiquement et échanges avec vos stagiaires.</p>
+        <p className="text-slate-300 text-sm">Modèles envoyés automatiquement et échanges avec vos stagiaires.</p>
       </div>
       <div className="flex gap-1 p-1 rounded-lg w-fit mb-6" style={cardStyle}>
         {([["modeles", "Modèles"], ["stagiaires", "Par stagiaire"]] as const).map(([k, label]) => (
-          <button key={k} onClick={() => setTab(k)} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${tab === k ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"}`}>{label}</button>
+          <button key={k} onClick={() => setTab(k)} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${tab === k ? "bg-blue-600 text-white" : "text-slate-300 hover:text-white"}`}>{label}</button>
         ))}
       </div>
       {tab === "modeles" ? <ModelesTab /> : <StagiairesTab />}
@@ -123,12 +123,12 @@ function ModelesTab() {
         <h2 className="font-semibold text-white text-sm flex items-center gap-2"><FontAwesomeIcon icon={faPlus} className="text-blue-400" /> Nouveau modèle</h2>
         <input value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} placeholder="Nom (ex : Règlement intérieur)" className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none" style={inputStyle} />
         <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} className="w-full px-3 py-2 rounded-lg text-sm text-white focus:outline-none" style={inputStyle}>
-          {KIND_OPTIONS.map((k) => <option key={k.value} value={k.value} className="bg-[#0D1D3A]">{k.label}</option>)}
+          {KIND_OPTIONS.map((k) => <option key={k.value} value={k.value} className="bg-[#24385E]">{k.label}</option>)}
         </select>
         <textarea value={form.contenu} onChange={(e) => setForm({ ...form, contenu: e.target.value })} placeholder="Texte du document (pour un bon d'accord sans fichier)" rows={4} className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none" style={inputStyle} />
         <div>
-          <label className="text-xs text-gray-400 block mb-1">Ou joindre un fichier (PDF / image, max 8 MB)</label>
-          <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
+          <label className="text-xs text-slate-300 block mb-1">Ou joindre un fichier (PDF / image, max 8 MB)</label>
+          <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
           <input type="checkbox" checked={form.autoSend} onChange={(e) => setForm({ ...form, autoSend: e.target.checked })} className="accent-blue-600" />
@@ -153,8 +153,8 @@ function ModelesTab() {
         <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         {!loading && templates.length === 0 ? (
           <div className="rounded-xl p-8 text-center" style={cardStyle}>
-            <FontAwesomeIcon icon={faFileLines} className="text-2xl text-gray-500 mb-2" />
-            <p className="text-sm text-gray-400">Aucun modèle. Créez-en un pour l&apos;envoyer automatiquement aux stagiaires.</p>
+            <FontAwesomeIcon icon={faFileLines} className="text-2xl text-slate-400 mb-2" />
+            <p className="text-sm text-slate-300">Aucun modèle. Créez-en un pour l&apos;envoyer automatiquement aux stagiaires.</p>
           </div>
         ) : templates.map((t) => (
           <div key={t.id} className="rounded-xl p-4" style={cardStyle}>
@@ -167,18 +167,18 @@ function ModelesTab() {
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {t.autoSend && <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-400/10 text-green-400">Auto-envoi</span>}
                   {t.requiresAck && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400">Bon d&apos;accord</span>}
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${t.actif ? "bg-blue-400/10 text-blue-400" : "bg-gray-400/10 text-gray-400"}`}>{t.actif ? "Actif" : "Inactif"}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${t.actif ? "bg-blue-400/10 text-blue-400" : "bg-gray-400/10 text-slate-300"}`}>{t.actif ? "Actif" : "Inactif"}</span>
                   {t.blobUrl && <a href={t.blobUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-300"><FontAwesomeIcon icon={faDownload} /> Fichier</a>}
                 </div>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <button onClick={() => toggleActif(t)} title={t.actif ? "Désactiver" : "Activer"} className="text-gray-400 hover:text-white">
+                <button onClick={() => toggleActif(t)} title={t.actif ? "Désactiver" : "Activer"} className="text-slate-300 hover:text-white">
                   <FontAwesomeIcon icon={t.actif ? faToggleOn : faToggleOff} className={t.actif ? "text-green-400" : ""} />
                 </button>
-                <button onClick={() => remove(t.id)} title="Supprimer" className="text-gray-400 hover:text-red-400"><FontAwesomeIcon icon={faTrash} className="text-xs" /></button>
+                <button onClick={() => remove(t.id)} title="Supprimer" className="text-slate-300 hover:text-red-400"><FontAwesomeIcon icon={faTrash} className="text-xs" /></button>
               </div>
             </div>
-            {t.contenu && <p className="text-xs text-gray-400 mt-2 line-clamp-2">{t.contenu}</p>}
+            {t.contenu && <p className="text-xs text-slate-300 mt-2 line-clamp-2">{t.contenu}</p>}
           </div>
         ))}
         {loading && (
@@ -289,17 +289,17 @@ function StagiairesTab() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row gap-3">
         <select value={sessionId} onChange={(e) => { setSessionId(e.target.value); setResa(null); setDocs([]); }} className="px-3 py-2 rounded-lg text-sm text-white focus:outline-none" style={inputStyle}>
-          {sessions.length === 0 && <option className="bg-[#0D1D3A]">Aucune session</option>}
-          {sessions.map((s) => <option key={s.id} value={s.id} className="bg-[#0D1D3A]">{s.formation} — {new Date(s.dateDebut).toLocaleDateString("fr-FR")}</option>)}
+          {sessions.length === 0 && <option className="bg-[#24385E]">Aucune session</option>}
+          {sessions.map((s) => <option key={s.id} value={s.id} className="bg-[#24385E]">{s.formation} — {new Date(s.dateDebut).toLocaleDateString("fr-FR")}</option>)}
         </select>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
         {/* Stagiaires */}
         <div className="rounded-xl p-4" style={cardStyle}>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Stagiaires</p>
+          <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Stagiaires</p>
           {!session || session.stagiaires.length === 0 ? (
-            <p className="text-xs text-gray-500">Aucun stagiaire confirmé.</p>
+            <p className="text-xs text-slate-400">Aucun stagiaire confirmé.</p>
           ) : (
             <div className="space-y-1.5">
               {session.stagiaires.map((s) => (
@@ -315,16 +315,16 @@ function StagiairesTab() {
         {/* Documents + envoi */}
         <div className="lg:col-span-2 rounded-xl p-4" style={cardStyle}>
           {!resa ? (
-            <p className="text-sm text-gray-500">Sélectionnez un stagiaire pour voir et envoyer des documents.</p>
+            <p className="text-sm text-slate-400">Sélectionnez un stagiaire pour voir et envoyer des documents.</p>
           ) : (
             <>
               <p className="text-sm font-semibold text-white mb-3">{resa.prenom} {resa.nom}</p>
               {msg && <p className={`text-sm mb-3 flex items-center gap-2 ${msg.type === "ok" ? "text-green-400" : "text-red-400"}`}><FontAwesomeIcon icon={msg.type === "ok" ? faCircleCheck : faTriangleExclamation} className="text-xs" />{msg.text}</p>}
 
               <form onSubmit={send} className="flex flex-col gap-2 mb-4 p-3 rounded-lg" style={{ background: "rgba(255,255,255,0.03)" }}>
-                <p className="text-xs font-semibold text-gray-400 flex items-center gap-2"><FontAwesomeIcon icon={faPaperPlane} className="text-blue-400" /> Envoyer un document</p>
+                <p className="text-xs font-semibold text-slate-300 flex items-center gap-2"><FontAwesomeIcon icon={faPaperPlane} className="text-blue-400" /> Envoyer un document</p>
                 <input value={sendForm.nom} onChange={(e) => setSendForm({ ...sendForm, nom: e.target.value })} placeholder="Nom du document" className="px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none" style={inputStyle} />
-                <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
+                <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
                 <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer">
                   <input type="checkbox" checked={sendForm.requiresAck} onChange={(e) => setSendForm({ ...sendForm, requiresAck: e.target.checked })} className="accent-blue-600" />
                   Bon d&apos;accord (l&apos;élève doit accepter)
@@ -337,7 +337,7 @@ function StagiairesTab() {
               <div className="relative min-h-[80px]">
                 <div className={loadingDocs ? "opacity-40 pointer-events-none select-none" : ""}>
                 <div className="space-y-2">
-                  {docs.length === 0 && <p className="text-xs text-gray-500">Aucun document échangé.</p>}
+                  {docs.length === 0 && <p className="text-xs text-slate-400">Aucun document échangé.</p>}
                   {docs.map((d) => {
                     const recu = d.direction === "ELEVE_VERS_CENTRE";
                     const href = d.blobUrl ?? (d.kind === "EMARGEMENT" && resa ? `/api/emargement/${resa.reservationId}` : null);
@@ -353,11 +353,11 @@ function StagiairesTab() {
                     else statut = d.status === "ACCEPTE" ? "envoyé · accepté" : "envoyé";
 
                     const statutColor = d.purgedAt
-                      ? "text-gray-500"
+                      ? "text-slate-400"
                       : statut === "validé" ? "text-green-400"
                       : statut === "refusé" ? "text-red-400"
                       : statut === "à vérifier" ? "text-amber-400"
-                      : "text-gray-500";
+                      : "text-slate-400";
 
                     return (
                       <div key={d.id} className="p-2.5 rounded-lg" style={cardStyle}>
@@ -365,7 +365,7 @@ function StagiairesTab() {
                           <div className="min-w-0 flex items-center gap-2">
                             <FontAwesomeIcon
                               icon={d.purgedAt ? faShieldHalved : recu ? faFileArrowUp : faFileArrowDown}
-                              className={`text-xs shrink-0 ${d.purgedAt ? "text-gray-500" : recu ? "text-amber-400" : "text-green-400"}`}
+                              className={`text-xs shrink-0 ${d.purgedAt ? "text-slate-400" : recu ? "text-amber-400" : "text-green-400"}`}
                             />
                             <div className="min-w-0">
                               <span className="text-sm text-white truncate block">{d.nom}</span>
@@ -408,7 +408,7 @@ function StagiairesTab() {
                           <p className="mt-1.5 text-[11px] text-red-300/90 pl-6">Motif du refus : {d.motifRefus}</p>
                         )}
                         {d.purgedAt && (
-                          <p className="mt-1.5 text-[11px] text-gray-500 pl-6">
+                          <p className="mt-1.5 text-[11px] text-slate-400 pl-6">
                             Fichier détruit le {new Date(d.purgedAt).toLocaleDateString("fr-FR")} — conservation légale de 45 jours écoulée.
                           </p>
                         )}

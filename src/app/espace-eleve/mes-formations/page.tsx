@@ -89,7 +89,7 @@ function StarRatingInput({
         >
           <FontAwesomeIcon
             icon={star <= value ? faStarSolid : faStarRegular}
-            className={`text-lg ${star <= value ? "text-yellow-400" : "text-gray-600"}`}
+            className={`text-lg ${star <= value ? "text-yellow-400" : "text-slate-400"}`}
           />
         </button>
       ))}
@@ -151,34 +151,34 @@ function ReviewModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
       <div
         className="w-full max-w-md rounded-2xl border p-6"
-        style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.1)" }}
+        style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.1)" }}
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display font-bold text-lg text-white">Laisser un avis</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
           </button>
         </div>
 
-        <p className="text-sm text-gray-400 mb-5">
+        <p className="text-sm text-slate-300 mb-5">
           Comment s&apos;est passée votre formation <span className="text-white font-medium">{formationTitre}</span> ?
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-2">Votre note</p>
+            <p className="text-xs text-slate-400 mb-2">Votre note</p>
             <StarRatingInput value={note} onChange={setNote} />
           </div>
 
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Commentaire (optionnel)</label>
+            <label className="block text-xs text-slate-300 mb-1">Commentaire (optionnel)</label>
             <textarea
               value={commentaire}
               onChange={(e) => setCommentaire(e.target.value)}
               placeholder="Partagez votre expérience..."
               rows={3}
               maxLength={1000}
-              className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-600 border focus:outline-none focus:border-blue-500 transition-colors resize-none"
+              className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-slate-400 border focus:outline-none focus:border-blue-500 transition-colors resize-none"
               style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.1)" }}
             />
           </div>
@@ -372,14 +372,14 @@ export default function MesFormationsPage() {
       <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes formations</h1>
-        <p className="text-gray-500 text-sm">Suivez l&apos;avancement de vos formations</p>
+        <p className="text-slate-400 text-sm">Suivez l&apos;avancement de vos formations</p>
       </div>
 
       {!loading && error ? (
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -402,7 +402,7 @@ export default function MesFormationsPage() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.key
                     ? "bg-blue-600 text-white"
-                    : "text-gray-400 hover:text-white"
+                    : "text-slate-300 hover:text-white"
                 }`}
                 style={activeTab !== tab.key ? { background: "rgba(255,255,255,0.05)" } : undefined}
               >
@@ -420,13 +420,13 @@ export default function MesFormationsPage() {
           {/* Formation Cards */}
           {filteredGroups.length === 0 ? (
             <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-              <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
+              <FontAwesomeIcon icon={faSearch} className="text-3xl text-slate-400 mb-3" />
               <p className="text-white font-medium mb-1">
                 {activeTab === "en_cours" && "Aucune formation en cours"}
                 {activeTab === "terminee" && "Aucune formation terminée"}
                 {activeTab === "annulee" && "Aucune formation annulée"}
               </p>
-              <p className="text-gray-500 text-sm mb-6">
+              <p className="text-slate-400 text-sm mb-6">
                 {activeTab === "en_cours"
                   ? "Réservez un stage pour le voir ici."
                   : "Rien à afficher pour le moment."}
@@ -457,7 +457,7 @@ export default function MesFormationsPage() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-white text-sm mb-1">{group.formationTitre}</h3>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400 mb-3">
                         <span className="flex items-center gap-1">
                           <FontAwesomeIcon icon={faLocationDot} className="w-3 h-3" />
                           {group.centre.nom} — {group.centre.ville}
@@ -473,9 +473,9 @@ export default function MesFormationsPage() {
                       {group.reservations.slice(0, 2).map((r) => (
                         <div
                           key={r.id}
-                          className="flex items-center gap-2 text-xs text-gray-400 mb-1"
+                          className="flex items-center gap-2 text-xs text-slate-300 mb-1"
                         >
-                          <FontAwesomeIcon icon={faCalendarDays} className="w-3 h-3 text-gray-600" />
+                          <FontAwesomeIcon icon={faCalendarDays} className="w-3 h-3 text-slate-400" />
                           <span>
                             {formatDate(r.session.dateDebut)} — {formatDate(r.session.dateFin)}
                           </span>
@@ -483,7 +483,7 @@ export default function MesFormationsPage() {
                             r.status === "CONFIRMEE"
                               ? "bg-green-400/10 text-green-400"
                               : r.status === "TERMINEE"
-                              ? "bg-gray-400/10 text-gray-400"
+                              ? "bg-gray-400/10 text-slate-300"
                               : "bg-red-400/10 text-red-400"
                           }`}>
                             {r.status === "CONFIRMEE" ? "Confirmée" : r.status === "TERMINEE" ? "Terminée" : r.status === "ANNULEE" ? "Annulée" : "Remboursée"}
@@ -551,7 +551,7 @@ export default function MesFormationsPage() {
                       )}
                       <Link
                         href={`/formations/${group.formationSlug}`}
-                        className="text-xs text-gray-500 hover:text-white transition-colors"
+                        className="text-xs text-slate-400 hover:text-white transition-colors"
                       >
                         Voir la fiche
                       </Link>
@@ -568,7 +568,7 @@ export default function MesFormationsPage() {
               className="mt-10 text-center rounded-xl p-8 border"
               style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}
             >
-              <p className="text-gray-400 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
+              <p className="text-slate-300 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
               <Link
                 href="/recherche"
                 className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"

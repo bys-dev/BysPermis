@@ -33,7 +33,7 @@ export default function AvisEnAttentePage() {
         ) : (
           <>
             <h1 className="font-display font-bold text-2xl text-white mb-2">Questionnaires satisfaction</h1>
-            <p className="text-sm text-gray-400 mb-8">
+            <p className="text-sm text-slate-300 mb-8">
               Après votre stage, partagez votre avis sur le centre (5 questions) puis sur la plateforme BYS Permis (5 questions).
               Notes de 1 à 5, demi-étoiles possibles.
             </p>
@@ -45,8 +45,8 @@ export default function AvisEnAttentePage() {
             className="rounded-xl border p-8 text-center"
             style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}
           >
-            <FontAwesomeIcon icon={faClipboardList} className="text-3xl text-gray-600 mb-3" />
-            <p className="text-gray-400">Aucun questionnaire en attente pour le moment.</p>
+            <FontAwesomeIcon icon={faClipboardList} className="text-3xl text-slate-400 mb-3" />
+            <p className="text-slate-300">Aucun questionnaire en attente pour le moment.</p>
             <Link href="/espace-eleve/mes-formations" className="text-blue-400 text-sm mt-3 inline-block hover:underline">
               Voir mes formations
             </Link>
@@ -61,7 +61,7 @@ export default function AvisEnAttentePage() {
               >
                 <div>
                   <p className="font-semibold text-white">{item.formationTitre}</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-slate-300">
                     {item.centre.nom} — {item.centre.ville}
                   </p>
                   <p className="text-xs text-yellow-400/90 mt-1">

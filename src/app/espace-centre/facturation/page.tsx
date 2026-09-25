@@ -178,7 +178,7 @@ export default function FacturationPage() {
       {/* Header */}
       <div>
         <h1 className="font-display font-bold text-2xl text-white mb-1">Facturation</h1>
-        <p className="text-gray-500 text-sm">Suivi de vos paiements, commissions et abonnement</p>
+        <p className="text-slate-400 text-sm">Suivi de vos paiements, commissions et abonnement</p>
       </div>
 
       {/* Recap commission (toujours visible) */}
@@ -193,7 +193,7 @@ export default function FacturationPage() {
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               activeTab === tab.key
                 ? "bg-blue-600/20 text-blue-400 border border-blue-500/20"
-                : "text-gray-400 hover:text-white hover:bg-white/5"
+                : "text-slate-300 hover:text-white hover:bg-white/5"
             }`}
           >
             {tab.label}
@@ -277,22 +277,22 @@ function OverviewTab({
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {kpis.map((k) => (
-          <div key={k.label} className={`rounded-xl p-5 border bg-[#0A1628] ${k.border}`}>
+          <div key={k.label} className={`rounded-xl p-5 border bg-[#1C2D4F] ${k.border}`}>
             <div className="flex items-start justify-between mb-4">
               <div className={`w-10 h-10 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
               </div>
             </div>
             <p className="text-xl font-bold text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
+            <p className="text-xs text-slate-400 mt-1">{k.label}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{k.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Subscription info */}
       {subscription?.plan && (
-        <div className="rounded-xl p-5 border border-white/8 bg-[#0A1628]">
+        <div className="rounded-xl p-5 border border-white/8 bg-[#1C2D4F]">
           <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
             <FontAwesomeIcon icon={faCrown} className="text-blue-300 w-4 h-4" />
             Abonnement en cours
@@ -300,16 +300,16 @@ function OverviewTab({
           <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)" }}>
             <div>
               <p className="text-sm font-semibold text-white">Plan {subscription.plan.nom}</p>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-slate-300 mt-0.5">
                 {subscription.plan.prix}&euro;/mois &middot; Commission {subscription.plan.commissionRate}%
               </p>
             </div>
             <div className="text-right">
-              <span className={`text-xs font-semibold ${SUB_STATUS_LABELS[subscription.status || ""]?.color || "text-gray-400"}`}>
+              <span className={`text-xs font-semibold ${SUB_STATUS_LABELS[subscription.status || ""]?.color || "text-slate-300"}`}>
                 {SUB_STATUS_LABELS[subscription.status || ""]?.label || subscription.status || "Inconnu"}
               </span>
               {subscription.currentPeriodEnd && (
-                <p className="text-[11px] text-gray-500 mt-0.5">
+                <p className="text-[11px] text-slate-400 mt-0.5">
                   {subscription.cancelAtPeriodEnd ? "Fin le " : "Renouvellement le "}
                   {new Date(subscription.currentPeriodEnd).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                 </p>
@@ -320,7 +320,7 @@ function OverviewTab({
       )}
 
       {/* Recent payments */}
-      <div className="relative min-h-[120px] rounded-xl p-5 border border-white/8 bg-[#0A1628]">
+      <div className="relative min-h-[120px] rounded-xl p-5 border border-white/8 bg-[#1C2D4F]">
         <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
           <FontAwesomeIcon icon={faReceipt} className="text-blue-400 w-4 h-4" />
@@ -329,24 +329,24 @@ function OverviewTab({
         {!loading && !data?.payments.length ? (
           <div className="text-center py-8">
             <FontAwesomeIcon icon={faReceipt} className="text-gray-700 text-2xl mb-3" />
-            <p className="text-gray-500 text-sm">Aucun paiement enregistre</p>
+            <p className="text-slate-400 text-sm">Aucun paiement enregistre</p>
           </div>
         ) : data?.payments.length ? (
           <div className="space-y-2">
             {data.payments.slice(0, 5).map((p) => (
               <div key={p.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/3 transition-colors" style={{ background: "rgba(255,255,255,0.02)" }}>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_LABELS[p.type]?.bg ?? "bg-gray-400/10"} ${TYPE_LABELS[p.type]?.color ?? "text-gray-400"}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_LABELS[p.type]?.bg ?? "bg-gray-400/10"} ${TYPE_LABELS[p.type]?.color ?? "text-slate-300"}`}>
                     {TYPE_LABELS[p.type]?.label ?? p.type}
                   </span>
                   <div>
                     <p className="text-sm text-white">{p.description}</p>
-                    <p className="text-[11px] text-gray-500">{formatDate(p.createdAt)}</p>
+                    <p className="text-[11px] text-slate-400">{formatDate(p.createdAt)}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-white">{formatPrice(p.montant)}</p>
-                  <span className={`text-[11px] font-medium ${STATUS_LABELS[p.status]?.color ?? "text-gray-400"}`}>
+                  <span className={`text-[11px] font-medium ${STATUS_LABELS[p.status]?.color ?? "text-slate-300"}`}>
                     {STATUS_LABELS[p.status]?.label ?? p.status}
                   </span>
                 </div>
@@ -391,7 +391,7 @@ function HistoryTab({
       {/* Filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faFilter} className="text-gray-500 w-3 h-3" />
+          <FontAwesomeIcon icon={faFilter} className="text-slate-400 w-3 h-3" />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
@@ -417,7 +417,7 @@ function HistoryTab({
           <button
             disabled
             title="Disponible prochainement"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-500 text-sm font-medium border border-white/10 disabled:opacity-50 cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-slate-400 text-sm font-medium border border-white/10 disabled:opacity-50 cursor-not-allowed"
           >
             <FontAwesomeIcon icon={faFilePdf} className="text-xs" />
             Telecharger releve PDF
@@ -426,38 +426,38 @@ function HistoryTab({
       </div>
 
       {/* Table */}
-      <div className="relative min-h-[200px] rounded-xl border border-white/8 bg-[#0A1628] overflow-hidden">
+      <div className="relative min-h-[200px] rounded-xl border border-white/8 bg-[#1C2D4F] overflow-hidden">
         <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         {!loading && !data?.payments.length ? (
           <div className="text-center py-12">
             <FontAwesomeIcon icon={faReceipt} className="text-gray-700 text-2xl mb-3" />
-            <p className="text-gray-500 text-sm">Aucun paiement trouve</p>
+            <p className="text-slate-400 text-sm">Aucun paiement trouve</p>
           </div>
         ) : data?.payments.length ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left border-b border-white/8">
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Date</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Type</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Description</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3 text-right">Montant</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3 text-right">Statut</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Date</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Type</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Description</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3 text-right">Montant</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3 text-right">Statut</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {data.payments.map((p) => (
                   <tr key={p.id} className="hover:bg-white/3 transition-colors">
-                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{formatDate(p.createdAt, "short")}</td>
+                    <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{formatDate(p.createdAt, "short")}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_LABELS[p.type]?.bg ?? "bg-gray-400/10"} ${TYPE_LABELS[p.type]?.color ?? "text-gray-400"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_LABELS[p.type]?.bg ?? "bg-gray-400/10"} ${TYPE_LABELS[p.type]?.color ?? "text-slate-300"}`}>
                         {TYPE_LABELS[p.type]?.label ?? p.type}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-white">{p.description}</td>
                     <td className="px-4 py-3 text-white font-semibold text-right">{formatPrice(p.montant)}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABELS[p.status]?.bg ?? "bg-gray-400/10"} ${STATUS_LABELS[p.status]?.color ?? "text-gray-400"} ${STATUS_LABELS[p.status]?.border ?? ""}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABELS[p.status]?.bg ?? "bg-gray-400/10"} ${STATUS_LABELS[p.status]?.color ?? "text-slate-300"} ${STATUS_LABELS[p.status]?.border ?? ""}`}>
                         {STATUS_LABELS[p.status]?.label ?? p.status}
                       </span>
                     </td>
@@ -480,21 +480,21 @@ function HistoryTab({
         {/* Pagination */}
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-white/8">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-400">
               Page {data.page} sur {data.totalPages} ({data.total} resultats)
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1 rounded-lg text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
+                className="px-3 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
               >
                 Precedent
               </button>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page >= (data?.totalPages ?? 1)}
-                className="px-3 py-1 rounded-lg text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
+                className="px-3 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
               >
                 Suivant
               </button>
@@ -524,11 +524,11 @@ function SubscriptionTab({
 }) {
   if (!loadingSub && !subscription?.plan) {
     return (
-      <div className="rounded-xl p-6 border border-white/8 bg-[#0A1628]">
+      <div className="rounded-xl p-6 border border-white/8 bg-[#1C2D4F]">
         <div className="text-center py-8">
-          <FontAwesomeIcon icon={faCrown} className="text-gray-600 text-3xl mb-4" />
+          <FontAwesomeIcon icon={faCrown} className="text-slate-400 text-3xl mb-4" />
           <h3 className="text-white font-semibold mb-2">Aucun abonnement actif</h3>
-          <p className="text-gray-500 text-sm mb-6 max-w-md mx-auto">
+          <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
             Souscrivez un abonnement pour beneficier de commissions reduites et referencer votre centre sur la marketplace.
           </p>
           <Link
@@ -551,7 +551,7 @@ function SubscriptionTab({
       ) : subscription?.plan ? (
     <div className="space-y-6">
       {/* Plan details */}
-      <div className="rounded-xl p-6 border border-white/8 bg-[#0A1628]">
+      <div className="rounded-xl p-6 border border-white/8 bg-[#1C2D4F]">
         <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
           <FontAwesomeIcon icon={faCrown} className="text-blue-300 w-4 h-4" />
           Votre plan
@@ -560,12 +560,12 @@ function SubscriptionTab({
         <div className="flex items-center justify-between p-4 rounded-lg mb-5" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)" }}>
           <div>
             <p className="text-lg font-bold text-white">Plan {subscription.plan.nom}</p>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <p className="text-sm text-slate-300 mt-0.5">
               {subscription.plan.prix}&euro;/mois &middot; Commission {subscription.plan.commissionRate}%
             </p>
           </div>
           <div className="text-right">
-            <span className={`text-sm font-semibold ${SUB_STATUS_LABELS[subscription.status || ""]?.color || "text-gray-400"}`}>
+            <span className={`text-sm font-semibold ${SUB_STATUS_LABELS[subscription.status || ""]?.color || "text-slate-300"}`}>
               {SUB_STATUS_LABELS[subscription.status || ""]?.label || subscription.status || "Inconnu"}
             </span>
           </div>
@@ -585,7 +585,7 @@ function SubscriptionTab({
 
         {/* Billing date */}
         {subscription.currentPeriodEnd && (
-          <div className="flex items-center gap-3 text-sm text-gray-400 mb-5 p-3 rounded-lg" style={{ background: "rgba(255,255,255,0.03)" }}>
+          <div className="flex items-center gap-3 text-sm text-slate-300 mb-5 p-3 rounded-lg" style={{ background: "rgba(255,255,255,0.03)" }}>
             <FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5" />
             <span>
               {subscription.cancelAtPeriodEnd ? "Fin de l'abonnement le " : "Prochain renouvellement le "}
@@ -679,7 +679,7 @@ function CommissionRecap({ data, loading }: { data: PaymentData | null; loading:
   ];
 
   return (
-    <div className="rounded-xl p-5 border border-white/8 bg-[#0A1628]">
+    <div className="rounded-xl p-5 border border-white/8 bg-[#1C2D4F]">
       <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
         <FontAwesomeIcon icon={faChartLine} className="text-blue-400 w-4 h-4" />
         Recap commission
@@ -691,11 +691,11 @@ function CommissionRecap({ data, loading }: { data: PaymentData | null; loading:
             className="rounded-lg p-3 border border-white/8"
             style={{ background: "rgba(255,255,255,0.03)" }}
           >
-            <p className="text-[11px] text-gray-500 mb-1">{c.label}</p>
+            <p className="text-[11px] text-slate-400 mb-1">{c.label}</p>
             <p className="text-lg font-bold text-white">
               {loading ? "..." : formatPrice(c.value)}
             </p>
-            <p className="text-[10px] text-gray-600 mt-0.5">{c.hint}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">{c.hint}</p>
           </div>
         ))}
       </div>

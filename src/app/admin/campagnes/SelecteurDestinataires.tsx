@@ -275,7 +275,7 @@ export default function SelecteurDestinataires({
           />
           <span className="text-gray-300 text-xs">Uniquement les centres jamais contactés</span>
         </label>
-        <span className="text-gray-600 text-[11px]">
+        <span className="text-slate-400 text-[11px]">
           {total} centre(s) contactable(s) correspondent à cette recherche
         </span>
         <button
@@ -301,14 +301,14 @@ export default function SelecteurDestinataires({
             <FontAwesomeIcon icon={faSpinner} spin className="text-blue-400" />
           </div>
         ) : lignes.length === 0 ? (
-          <p className="p-8 text-center text-gray-500 text-xs">
+          <p className="p-8 text-center text-slate-400 text-xs">
             Aucun centre contactable ne correspond à cette recherche.
           </p>
         ) : (
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full text-sm">
               <thead className="bg-white/5 sticky top-0">
-                <tr className="text-gray-400 text-left text-xs">
+                <tr className="text-slate-300 text-left text-xs">
                   <th className="px-3 py-2.5 w-10">
                     <input
                       type="checkbox"
@@ -349,17 +349,17 @@ export default function SelecteurDestinataires({
                       <td className="px-3 py-2.5">
                         <p className="text-white text-xs font-medium">{d.nom}</p>
                         {(d.contactPrenom || d.contactNom) && (
-                          <p className="text-gray-500 text-[11px]">
+                          <p className="text-slate-400 text-[11px]">
                             {[d.contactPrenom, d.contactNom].filter(Boolean).join(" ")}
                           </p>
                         )}
                       </td>
                       <td className="px-3 py-2.5 text-gray-300 text-xs">{d.email}</td>
-                      <td className="px-3 py-2.5 text-gray-400 text-xs">
+                      <td className="px-3 py-2.5 text-slate-300 text-xs">
                         {d.ville ?? "—"}
-                        {d.departement && <span className="text-gray-600"> ({d.departement})</span>}
+                        {d.departement && <span className="text-slate-400"> ({d.departement})</span>}
                       </td>
-                      <td className="px-3 py-2.5 text-gray-400 text-xs">{d.nbEmailsEnvoyes}</td>
+                      <td className="px-3 py-2.5 text-slate-300 text-xs">{d.nbEmailsEnvoyes}</td>
                       <td className="px-3 py-2.5 text-right">
                         {onApercu && (
                           <button
@@ -369,7 +369,7 @@ export default function SelecteurDestinataires({
                               onApercu(d.id);
                             }}
                             title={`Voir l'email que recevra ${d.nom}`}
-                            className="px-2 py-1 rounded-md border border-white/10 text-gray-400 text-[11px] hover:border-blue-500 hover:text-white transition-colors"
+                            className="px-2 py-1 rounded-md border border-white/10 text-slate-300 text-[11px] hover:border-blue-500 hover:text-white transition-colors"
                           >
                             <FontAwesomeIcon icon={faEye} />
                           </button>
@@ -385,7 +385,7 @@ export default function SelecteurDestinataires({
 
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-3 py-2 border-t border-white/10">
-            <p className="text-gray-500 text-[11px]">
+            <p className="text-slate-400 text-[11px]">
               Page {page} sur {totalPages}
             </p>
             <div className="flex gap-2">
@@ -421,14 +421,14 @@ export default function SelecteurDestinataires({
             <button
               type="button"
               onClick={() => appliquer([])}
-              className="text-gray-400 text-[11px] hover:text-white transition-colors"
+              className="text-slate-300 text-[11px] hover:text-white transition-colors"
             >
               Tout retirer
             </button>
           )}
         </div>
         {selection.length === 0 ? (
-          <p className="text-gray-500 text-[11px]">
+          <p className="text-slate-400 text-[11px]">
             Cochez les centres à contacter. Chacun recevra un email nominatif, personnalisé avec ses
             propres données.
           </p>
@@ -451,7 +451,7 @@ export default function SelecteurDestinataires({
               </span>
             ))}
             {selection.length > choisis.length && !chargementChoisis && (
-              <span className="text-gray-500 text-[11px] px-2 py-1">
+              <span className="text-slate-400 text-[11px] px-2 py-1">
                 + {selection.length - choisis.length} autre(s)
               </span>
             )}

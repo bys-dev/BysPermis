@@ -34,7 +34,7 @@ const statusLabels: Record<string, { label: string; color: string; bg: string }>
   ACTIVE:   { label: "Active",   color: "text-green-400",  bg: "bg-green-400/10" },
   ANNULEE:  { label: "Annulée",  color: "text-red-400",    bg: "bg-red-400/10"   },
   COMPLETE: { label: "Complète", color: "text-blue-400",   bg: "bg-blue-400/10"  },
-  PASSEE:   { label: "Terminée", color: "text-gray-400",   bg: "bg-gray-400/10"  },
+  PASSEE:   { label: "Terminée", color: "text-slate-300",   bg: "bg-gray-400/10"  },
 };
 
 export default function SessionsCentrePage() {
@@ -190,7 +190,7 @@ export default function SessionsCentrePage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Mes sessions</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-slate-400 text-sm">
             {loading ? "Chargement..." : `${actives.length} session${actives.length > 1 ? "s" : ""} active${actives.length > 1 ? "s" : ""}`}
           </p>
         </div>
@@ -206,7 +206,7 @@ export default function SessionsCentrePage() {
 
       {/* Error state */}
       {error && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
           <p className="text-sm text-red-400">{error}</p>
           <button onClick={loadSessions} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
@@ -215,7 +215,7 @@ export default function SessionsCentrePage() {
 
       {/* Empty state */}
       {!loading && !error && sessions.length === 0 && (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-slate-400">
           <FontAwesomeIcon icon={faCalendarDays} className="text-3xl mb-3" />
           <p className="font-medium text-gray-300 mb-1">Aucune session</p>
           <p className="text-sm">Créez votre première session en cliquant sur &quot;Nouvelle session&quot;.</p>
@@ -252,7 +252,7 @@ export default function SessionsCentrePage() {
                       )}
                     </div>
 
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-4">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400 mb-4">
                       <span className="flex items-center gap-1">
                         <FontAwesomeIcon icon={faClock} className="w-3 h-3" />
                         {formatDate(new Date(s.dateDebut))} &rarr; {formatDate(new Date(s.dateFin))}
@@ -269,7 +269,7 @@ export default function SessionsCentrePage() {
 
                     {/* Progress bar */}
                     <div>
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+                      <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
                         <span className="flex items-center gap-1">
                           <FontAwesomeIcon icon={faUsers} className="w-3 h-3" />
                           {placesOccupees}/{s.placesTotal} places
@@ -307,7 +307,7 @@ export default function SessionsCentrePage() {
                       <>
                       <button
                         onClick={() => openEditModal(s)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-gray-900 transition-colors"
                         style={{ background: "rgba(0,0,0,0.05)" }}
                       >
                         <FontAwesomeIcon icon={faPen} className="w-3 h-3" />
@@ -323,7 +323,7 @@ export default function SessionsCentrePage() {
                           </button>
                           <button
                             onClick={() => setCancellingId(null)}
-                            className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                            className="px-2 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-gray-900 transition-colors"
                             style={{ background: "rgba(0,0,0,0.05)" }}
                           >
                             <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
@@ -352,14 +352,14 @@ export default function SessionsCentrePage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)" }}>
-          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-display font-bold text-lg text-white">
                 {editingSession ? "Modifier la session" : "Nouvelle session"}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-slate-300 hover:text-white transition-colors"
               >
                 <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
               </button>
@@ -463,7 +463,7 @@ export default function SessionsCentrePage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors"
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 >
                   Annuler

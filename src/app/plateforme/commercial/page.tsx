@@ -113,7 +113,7 @@ export default function PlateformeCommercialPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Espace commercial</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Suivi des centres partenaires et des prospects
           </p>
         </div>
@@ -136,39 +136,39 @@ export default function PlateformeCommercialPage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {kpis.map((k) => (
-          <div key={k.label} className={`rounded-xl p-5 border bg-[#0A1628] ${k.border}`}>
+          <div key={k.label} className={`rounded-xl p-5 border bg-[#1C2D4F] ${k.border}`}>
             <div className="flex items-start justify-between mb-4">
               <div className={`w-10 h-10 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
               </div>
             </div>
             <p className="text-2xl font-bold text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
+            <p className="text-xs text-slate-400 mt-1">{k.label}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{k.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Liste des centres */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-5">Tous les centres</h2>
         {loading ? (
           <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : centres.length === 0 ? (
           <div className="text-center py-8">
-            <FontAwesomeIcon icon={faBuilding} className="text-gray-600 text-3xl mb-3" />
-            <p className="text-gray-500 text-sm">Aucun centre inscrit</p>
+            <FontAwesomeIcon icon={faBuilding} className="text-slate-400 text-3xl mb-3" />
+            <p className="text-slate-400 text-sm">Aucun centre inscrit</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Ville</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Statut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Contact</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Inscription</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Centre</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Ville</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Statut</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Contact</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3">Inscription</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -179,7 +179,7 @@ export default function PlateformeCommercialPage() {
                       <td className="py-3 pr-4">
                         <p className="text-white font-medium">{c.nom}</p>
                       </td>
-                      <td className="py-3 pr-4 text-gray-400">{c.ville}</td>
+                      <td className="py-3 pr-4 text-slate-300">{c.ville}</td>
                       <td className="py-3 pr-4">
                         <span className="flex items-center gap-1.5">
                           <FontAwesomeIcon icon={faCircle} className={`text-[6px] ${sc.dot}`} />
@@ -191,11 +191,11 @@ export default function PlateformeCommercialPage() {
                       <td className="py-3 pr-4">
                         <div className="flex items-center gap-3">
                           {c.email && (
-                            <span className="text-gray-400 text-xs">{c.email}</span>
+                            <span className="text-slate-300 text-xs">{c.email}</span>
                           )}
                         </div>
                       </td>
-                      <td className="py-3 text-gray-400 text-xs">
+                      <td className="py-3 text-slate-300 text-xs">
                         {new Date(c.createdAt).toLocaleDateString("fr-FR")}
                       </td>
                     </tr>
@@ -208,7 +208,7 @@ export default function PlateformeCommercialPage() {
       </div>
 
       {/* Prospects - Centres en attente */}
-      <div className="bg-[#0A1628] rounded-xl border border-yellow-500/20 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-yellow-500/20 p-5">
         <div className="flex items-center gap-2 mb-5">
           <FontAwesomeIcon icon={faClock} className="text-yellow-400 text-sm" />
           <h2 className="text-white font-semibold text-sm">Prospects &mdash; Centres en attente</h2>
@@ -221,7 +221,7 @@ export default function PlateformeCommercialPage() {
         ) : prospects.length === 0 ? (
           <div className="text-center py-6">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-400 text-2xl mb-2" />
-            <p className="text-gray-500 text-sm">Aucun prospect en attente</p>
+            <p className="text-slate-400 text-sm">Aucun prospect en attente</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -232,22 +232,22 @@ export default function PlateformeCommercialPage() {
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-medium text-sm">{p.nom}</p>
-                  <p className="text-gray-500 text-xs mt-0.5">{p.ville}</p>
+                  <p className="text-slate-400 text-xs mt-0.5">{p.ville}</p>
                   <div className="flex items-center gap-4 mt-2">
                     {p.email && (
-                      <span className="flex items-center gap-1.5 text-gray-400 text-xs">
+                      <span className="flex items-center gap-1.5 text-slate-300 text-xs">
                         <FontAwesomeIcon icon={faEnvelope} className="text-[10px]" />
                         {p.email}
                       </span>
                     )}
                     {p.telephone && (
-                      <span className="flex items-center gap-1.5 text-gray-400 text-xs">
+                      <span className="flex items-center gap-1.5 text-slate-300 text-xs">
                         <FontAwesomeIcon icon={faPhone} className="text-[10px]" />
                         {p.telephone}
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 text-[11px] mt-1">
+                  <p className="text-slate-400 text-[11px] mt-1">
                     Inscrit le {new Date(p.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
                 </div>

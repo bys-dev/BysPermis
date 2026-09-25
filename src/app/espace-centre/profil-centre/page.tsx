@@ -264,7 +264,7 @@ export default function ProfilCentrePage() {
 
   if (!loading && !form) {
     return (
-      <div className="text-center py-24 text-gray-500">
+      <div className="text-center py-24 text-slate-400">
         <p>Impossible de charger le profil du centre.</p>
       </div>
     );
@@ -288,7 +288,7 @@ export default function ProfilCentrePage() {
         <h1 className="font-display font-bold text-2xl text-white mb-1">
           Profil du centre
         </h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-slate-400 text-sm">
           Personnalisez l&apos;apparence et les informations de votre page publique
         </p>
       </div>
@@ -315,7 +315,7 @@ export default function ProfilCentrePage() {
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.id
                 ? "bg-blue-600 text-white"
-                : "text-gray-400 hover:text-white hover:bg-white/5"
+                : "text-slate-300 hover:text-white hover:bg-white/5"
             }`}
           >
             <FontAwesomeIcon icon={tab.icon} className="w-3.5 h-3.5" />
@@ -333,7 +333,7 @@ export default function ProfilCentrePage() {
           </h2>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Nom du centre
             </label>
             <input
@@ -346,7 +346,7 @@ export default function ProfilCentrePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Description courte
             </label>
             <textarea
@@ -360,13 +360,13 @@ export default function ProfilCentrePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Adresse
             </label>
             <div className="relative">
               <FontAwesomeIcon
                 icon={faLocationDot}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
               />
               <input
                 type="text"
@@ -380,7 +380,7 @@ export default function ProfilCentrePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Code postal
               </label>
               <input
@@ -392,7 +392,7 @@ export default function ProfilCentrePage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Ville
               </label>
               <input
@@ -407,13 +407,13 @@ export default function ProfilCentrePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Telephone
               </label>
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPhone}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                 />
                 <input
                   type="tel"
@@ -425,13 +425,13 @@ export default function ProfilCentrePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Email
               </label>
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faEnvelope}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                 />
                 <input
                   type="email"
@@ -445,13 +445,13 @@ export default function ProfilCentrePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Site web
             </label>
             <div className="relative">
               <FontAwesomeIcon
                 icon={faGlobe}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
               />
               <input
                 type="url"
@@ -475,7 +475,7 @@ export default function ProfilCentrePage() {
               <FontAwesomeIcon icon={faFileLines} className="text-blue-400 w-4 h-4" />
               Presentation detaillee
             </h2>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-slate-400 mb-3">
               Redigez une presentation riche de votre centre. Le HTML basique est supporte (gras, italique, listes, liens).
             </p>
             <textarea
@@ -488,7 +488,7 @@ export default function ProfilCentrePage() {
             />
             {form.presentationHtml && (
               <div className="mt-4">
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-1.5">
+                <p className="text-xs text-slate-400 mb-2 flex items-center gap-1.5">
                   <FontAwesomeIcon icon={faEye} className="w-3 h-3" />
                   Apercu
                 </p>
@@ -570,7 +570,7 @@ export default function ProfilCentrePage() {
                 <button
                   key={s}
                   onClick={() => addChip("equipements", s, setNewEquipement)}
-                  className="px-2.5 py-1 rounded-full text-[11px] text-gray-500 border border-dashed border-gray-700 hover:border-blue-500 hover:text-blue-400 transition-all"
+                  className="px-2.5 py-1 rounded-full text-[11px] text-slate-400 border border-dashed border-gray-700 hover:border-blue-500 hover:text-blue-400 transition-all"
                 >
                   + {s}
                 </button>
@@ -642,7 +642,7 @@ export default function ProfilCentrePage() {
                   onClick={() =>
                     addChip("certifications", s, setNewCertification)
                   }
-                  className="px-2.5 py-1 rounded-full text-[11px] text-gray-500 border border-dashed border-gray-700 hover:border-amber-500 hover:text-amber-400 transition-all"
+                  className="px-2.5 py-1 rounded-full text-[11px] text-slate-400 border border-dashed border-gray-700 hover:border-amber-500 hover:text-amber-400 transition-all"
                 >
                   + {s}
                 </button>
@@ -663,7 +663,7 @@ export default function ProfilCentrePage() {
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   Couleur primaire
                 </label>
                 <div className="flex items-center gap-3">
@@ -688,7 +688,7 @@ export default function ProfilCentrePage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   Couleur secondaire
                 </label>
                 <div className="flex items-center gap-3">
@@ -719,7 +719,7 @@ export default function ProfilCentrePage() {
                   updateField("couleurPrimaire", null);
                   updateField("couleurSecondaire", null);
                 }}
-                className="mt-3 text-xs text-gray-500 hover:text-red-400 transition-colors"
+                className="mt-3 text-xs text-slate-400 hover:text-red-400 transition-colors"
               >
                 Reinitialiser les couleurs par defaut
               </button>
@@ -748,12 +748,12 @@ export default function ProfilCentrePage() {
               <FontAwesomeIcon icon={faStamp} className="text-blue-400 w-4 h-4" />
               Cachet numérique
             </h2>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-slate-400 mb-4">
               Votre cachet apparaît sur les convocations, attestations, contrats et feuilles
               d&apos;émargement lorsqu&apos;il est disponible.
             </p>
             <div className="mb-4">
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Nom du responsable (optionnel)
               </label>
               <input
@@ -798,7 +798,7 @@ export default function ProfilCentrePage() {
               <FontAwesomeIcon icon={faImage} className="text-blue-400 w-4 h-4" />
               Galerie photos
             </h2>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-slate-400 mb-4">
               Jusqu&apos;a 12 photos de vos locaux et de vos salles, affichees sur
               votre fiche publique.
             </p>
@@ -860,7 +860,7 @@ export default function ProfilCentrePage() {
                 style={{
                   background: form.bannerImage
                     ? `linear-gradient(rgba(10,22,40,0.8), rgba(10,22,40,0.9)), url(${form.bannerImage}) center/cover`
-                    : "#0A1628",
+                    : "#1C2D4F",
                 }}
               >
                 <div className="flex items-center gap-4">
@@ -882,7 +882,7 @@ export default function ProfilCentrePage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">{form.nom}</h3>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-slate-300">
                       {form.adresse}, {form.codePostal} {form.ville}
                     </p>
                   </div>
@@ -907,7 +907,7 @@ export default function ProfilCentrePage() {
               {/* Mini cards preview */}
               <div className="p-4 grid grid-cols-2 gap-2 bg-gray-50">
                 <div className="bg-white rounded-lg p-3 border border-gray-100">
-                  <p className="text-[10px] text-gray-400 mb-0.5">Telephone</p>
+                  <p className="text-[10px] text-slate-300 mb-0.5">Telephone</p>
                   <p
                     className="text-xs font-semibold"
                     style={{ color: form.couleurPrimaire || "#3B82F6" }}
@@ -916,7 +916,7 @@ export default function ProfilCentrePage() {
                   </p>
                 </div>
                 <div className="bg-white rounded-lg p-3 border border-gray-100">
-                  <p className="text-[10px] text-gray-400 mb-0.5">Email</p>
+                  <p className="text-[10px] text-slate-300 mb-0.5">Email</p>
                   <p
                     className="text-xs font-semibold truncate"
                     style={{ color: form.couleurPrimaire || "#3B82F6" }}
@@ -969,7 +969,7 @@ export default function ProfilCentrePage() {
             },
           ].map((social) => (
             <div key={social.key}>
-              <label className="block text-xs font-medium text-gray-500 mb-2 flex items-center gap-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2 flex items-center gap-2">
                 <FontAwesomeIcon
                   icon={social.icon}
                   className="w-3.5 h-3.5"
@@ -992,7 +992,7 @@ export default function ProfilCentrePage() {
           {form.reseauxSociaux &&
             Object.values(form.reseauxSociaux).some((v) => v) && (
               <div className="pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5">
+                <p className="text-xs text-slate-400 mb-3 flex items-center gap-1.5">
                   <FontAwesomeIcon icon={faEye} className="w-3 h-3" />
                   Apercu des icones
                 </p>
@@ -1062,7 +1062,7 @@ export default function ProfilCentrePage() {
             href={`/centres/${form.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-1.5"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1.5"
           >
             <FontAwesomeIcon icon={faEye} className="w-3 h-3" />
             Voir la page publique

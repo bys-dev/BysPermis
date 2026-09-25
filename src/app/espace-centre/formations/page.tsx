@@ -211,7 +211,7 @@ export default function FormationsCentrePage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Mes formations</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-slate-400 text-sm">
             {loading ? "Chargement..." : `${actives} formation${actives > 1 ? "s" : ""} active${actives > 1 ? "s" : ""}`}
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function FormationsCentrePage() {
 
       {/* Error state */}
       {error && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
           <p className="text-sm text-red-400">{error}</p>
           <button onClick={loadFormations} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
@@ -236,7 +236,7 @@ export default function FormationsCentrePage() {
 
       {/* Empty state */}
       {!loading && !error && formations.length === 0 && (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-slate-400">
           <FontAwesomeIcon icon={faGraduationCap} className="text-3xl mb-3" />
           <p className="font-medium text-gray-300 mb-1">Aucune formation</p>
           <p className="text-sm">Créez votre première formation en cliquant sur &quot;Nouvelle formation&quot;.</p>
@@ -268,11 +268,11 @@ export default function FormationsCentrePage() {
                   {f.categorie && (
                     <span className="text-xs text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded-full">{f.categorie}</span>
                   )}
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${f.isActive ? "text-green-400 bg-green-400/10" : "text-gray-500 bg-gray-500/10"}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${f.isActive ? "text-green-400 bg-green-400/10" : "text-slate-400 bg-gray-500/10"}`}>
                     {f.isActive ? "Active" : "Inactive"}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
                   <span className="flex items-center gap-1">
                     <FontAwesomeIcon icon={faEuroSign} className="w-3 h-3" />
                     {f.prix} EUR
@@ -289,7 +289,7 @@ export default function FormationsCentrePage() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => openEditModal(f)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-gray-900 transition-colors"
                   style={{ background: "rgba(0,0,0,0.05)" }}
                 >
                   <FontAwesomeIcon icon={faPen} className="w-3 h-3" />
@@ -313,7 +313,7 @@ export default function FormationsCentrePage() {
                     </button>
                     <button
                       onClick={() => setDeletingId(null)}
-                      className="px-2 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                      className="px-2 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-gray-900 transition-colors"
                       style={{ background: "rgba(0,0,0,0.05)" }}
                     >
                       <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
@@ -337,12 +337,12 @@ export default function FormationsCentrePage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" style={{ background: "rgba(0,0,0,0.6)" }}>
-          <div className="w-full max-w-2xl rounded-2xl p-6 my-8" style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="w-full max-w-2xl rounded-2xl p-6 my-8" style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-display font-bold text-lg text-white">
                 {editingFormation ? "Modifier la formation" : "Nouvelle formation"}
               </h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white transition-colors">
+              <button onClick={() => setShowModal(false)} className="text-slate-300 hover:text-white transition-colors">
                 <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
               </button>
             </div>
@@ -359,7 +359,7 @@ export default function FormationsCentrePage() {
                   minLength={3}
                   maxLength={200}
                   placeholder="Stage de récupération de points"
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
@@ -374,7 +374,7 @@ export default function FormationsCentrePage() {
                   minLength={10}
                   rows={3}
                   placeholder="Description détaillée de la formation..."
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                   style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
@@ -402,7 +402,7 @@ export default function FormationsCentrePage() {
                     onChange={(e) => setFormData({ ...formData, duree: e.target.value })}
                     required
                     placeholder="2 jours"
-                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                   />
                 </div>
@@ -430,7 +430,7 @@ export default function FormationsCentrePage() {
                     value={formData.lieu}
                     onChange={(e) => setFormData({ ...formData, lieu: e.target.value })}
                     placeholder="Osny (95)"
-                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                   />
                 </div>
@@ -475,7 +475,7 @@ export default function FormationsCentrePage() {
                   onChange={(e) => setFormData({ ...formData, objectifs: e.target.value })}
                   rows={2}
                   placeholder="Objectifs de la formation..."
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                   style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
@@ -488,7 +488,7 @@ export default function FormationsCentrePage() {
                   onChange={(e) => setFormData({ ...formData, programme: e.target.value })}
                   rows={3}
                   placeholder="Programme détaillé..."
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                   style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
@@ -501,7 +501,7 @@ export default function FormationsCentrePage() {
                   onChange={(e) => setFormData({ ...formData, prerequis: e.target.value })}
                   rows={2}
                   placeholder="Prérequis nécessaires..."
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                   style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
@@ -514,7 +514,7 @@ export default function FormationsCentrePage() {
                   onChange={(e) => setFormData({ ...formData, publicCible: e.target.value })}
                   rows={2}
                   placeholder="À qui s'adresse cette formation..."
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                   style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
@@ -526,11 +526,11 @@ export default function FormationsCentrePage() {
                 </div>
               )}
 
-              <div className="flex justify-end gap-3 pt-2 sticky bottom-0 pb-1" style={{ background: "#0D1D3A" }}>
+              <div className="flex justify-end gap-3 pt-2 sticky bottom-0 pb-1" style={{ background: "#24385E" }}>
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors"
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 >
                   Annuler

@@ -111,7 +111,7 @@ export default function AdminModelesPage() {
         <div>
           <Link
             href="/admin/campagnes"
-            className="text-gray-400 text-xs hover:text-white transition-colors inline-flex items-center gap-1.5 mb-2"
+            className="text-slate-300 text-xs hover:text-white transition-colors inline-flex items-center gap-1.5 mb-2"
           >
             <FontAwesomeIcon icon={faArrowLeft} /> Retour aux campagnes
           </Link>
@@ -119,7 +119,7 @@ export default function AdminModelesPage() {
             <FontAwesomeIcon icon={faLayerGroup} className="text-blue-400" />
             Modèles d&apos;email
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-slate-300 text-sm mt-1">
             Messages types réutilisables. Charger un modèle remplit la campagne — le texte reste
             ensuite modifiable sans toucher au modèle.
           </p>
@@ -186,13 +186,13 @@ export default function AdminModelesPage() {
       </label>
 
       {loading ? (
-        <div className="p-12 text-center rounded-xl border border-white/10" style={{ background: "#0D1D3A" }}>
+        <div className="p-12 text-center rounded-xl border border-white/10" style={{ background: "#24385E" }}>
           <FontAwesomeIcon icon={faSpinner} spin className="text-blue-400 text-2xl" />
         </div>
       ) : modeles.length === 0 ? (
-        <div className="p-12 text-center rounded-xl border border-white/10" style={{ background: "#0D1D3A" }}>
-          <FontAwesomeIcon icon={faLayerGroup} className="text-gray-600 text-3xl mb-3" />
-          <p className="text-gray-400 text-sm">
+        <div className="p-12 text-center rounded-xl border border-white/10" style={{ background: "#24385E" }}>
+          <FontAwesomeIcon icon={faLayerGroup} className="text-slate-400 text-3xl mb-3" />
+          <p className="text-slate-300 text-sm">
             Aucun modèle. Créez-en un, ou restaurez le catalogue livré avec la plateforme.
           </p>
         </div>
@@ -206,7 +206,7 @@ export default function AdminModelesPage() {
                 className={`rounded-xl border p-4 flex flex-col gap-3 ${
                   m.isArchive ? "border-white/5 opacity-60" : "border-white/10"
                 }`}
-                style={{ background: "#0D1D3A" }}
+                style={{ background: "#24385E" }}
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
@@ -215,28 +215,28 @@ export default function AdminModelesPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                     {m.slug && (
-                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-gray-400 text-[10px]">
+                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300 text-[10px]">
                         livré
                       </span>
                     )}
                     {m.isArchive && (
-                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-gray-500 text-[10px]">
+                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400 text-[10px]">
                         archivé
                       </span>
                     )}
                     {m.delaiJours != null && (
-                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-gray-400 text-[10px] inline-flex items-center gap-1">
+                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300 text-[10px] inline-flex items-center gap-1">
                         <FontAwesomeIcon icon={faClock} /> J+{m.delaiJours}
                       </span>
                     )}
                   </div>
-                  {m.moment && <p className="text-gray-500 text-[11px] mt-1.5">{m.moment}</p>}
+                  {m.moment && <p className="text-slate-400 text-[11px] mt-1.5">{m.moment}</p>}
                 </div>
 
-                {m.objectif && <p className="text-gray-400 text-xs leading-relaxed">{m.objectif}</p>}
+                {m.objectif && <p className="text-slate-300 text-xs leading-relaxed">{m.objectif}</p>}
 
                 <div className="rounded-lg bg-white/[0.03] border border-white/5 p-2.5">
-                  <p className="text-gray-600 text-[10px] uppercase tracking-wide">Objet</p>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wide">Objet</p>
                   <p className="text-gray-300 text-[11px] mt-0.5 break-words">{m.sujet}</p>
                 </div>
 
@@ -269,7 +269,7 @@ export default function AdminModelesPage() {
                     onClick={() => supprimer(m)}
                     disabled={occupe}
                     title="Supprimer"
-                    className="ml-auto px-2.5 py-1.5 rounded-lg border border-white/15 text-gray-400 text-xs hover:border-red-500 hover:text-red-300 disabled:opacity-40 transition-colors"
+                    className="ml-auto px-2.5 py-1.5 rounded-lg border border-white/15 text-slate-300 text-xs hover:border-red-500 hover:text-red-300 disabled:opacity-40 transition-colors"
                   >
                     <FontAwesomeIcon icon={faTrash} />
                   </button>

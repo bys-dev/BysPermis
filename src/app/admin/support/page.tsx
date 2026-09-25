@@ -36,11 +36,11 @@ const statutMap: Record<TicketStatut, { label: string; cls: string }> = {
   OUVERT:   { label: "Ouvert",    cls: "bg-red-400/10 text-red-400 border-red-500/20"       },
   EN_COURS: { label: "En cours",  cls: "bg-yellow-400/10 text-yellow-400 border-yellow-500/20" },
   RESOLU:   { label: "Resolu",    cls: "bg-green-400/10 text-green-400 border-green-500/20"  },
-  FERME:    { label: "Ferme",     cls: "bg-gray-400/10 text-gray-400 border-gray-500/20"     },
+  FERME:    { label: "Ferme",     cls: "bg-gray-400/10 text-slate-300 border-gray-500/20"     },
 };
 
 const prioriteMap: Record<TicketPriorite, { label: string; cls: string }> = {
-  BASSE:    { label: "Basse",    cls: "text-gray-400" },
+  BASSE:    { label: "Basse",    cls: "text-slate-300" },
   NORMALE:  { label: "Normale",  cls: "text-blue-400" },
   HAUTE:    { label: "Haute",    cls: "text-orange-400" },
   URGENTE:  { label: "Urgente",  cls: "text-red-400" },
@@ -172,7 +172,7 @@ export default function AdminSupportPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Support</h1>
-        <p className="text-gray-400 text-sm mt-0.5">
+        <p className="text-slate-300 text-sm mt-0.5">
           {loading ? "Chargement..." : `${counts.OUVERT} ticket(s) ouvert(s) · ${counts.EN_COURS} en cours`}
         </p>
       </div>
@@ -187,24 +187,24 @@ export default function AdminSupportPage() {
 
       {selected ? (
         /* ── Vue detail ticket ── */
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 overflow-hidden">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 overflow-hidden">
           {/* Header */}
           <div className="flex items-start justify-between p-5 border-b border-white/8">
             <div className="flex items-start gap-4">
               <button
                 onClick={() => setSelected(null)}
-                className="p-2 rounded-lg bg-white/5 border border-white/8 text-gray-400 hover:text-white transition-colors mt-0.5"
+                className="p-2 rounded-lg bg-white/5 border border-white/8 text-slate-300 hover:text-white transition-colors mt-0.5"
               >
                 <FontAwesomeIcon icon={faArrowLeft} className="text-xs" />
               </button>
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-2">
-                  <span className="text-gray-500 text-xs font-mono">{selected.id.slice(0, 12)}</span>
+                  <span className="text-slate-400 text-xs font-mono">{selected.id.slice(0, 12)}</span>
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${statutMap[selected.status].cls}`}>
                     {statutMap[selected.status].label}
                   </span>
                   {selected.priorite && selected.priorite !== "NORMALE" && (
-                    <span className={`text-[11px] font-semibold ${prioriteMap[selected.priorite]?.cls ?? "text-gray-400"}`}>
+                    <span className={`text-[11px] font-semibold ${prioriteMap[selected.priorite]?.cls ?? "text-slate-300"}`}>
                       {prioriteMap[selected.priorite]?.label ?? selected.priorite}
                     </span>
                   )}
@@ -214,7 +214,7 @@ export default function AdminSupportPage() {
                   </span>
                 </div>
                 <h2 className="text-white font-semibold">{selected.sujet}</h2>
-                <p className="text-gray-500 text-xs mt-1 flex items-center gap-1">
+                <p className="text-slate-400 text-xs mt-1 flex items-center gap-1">
                   <FontAwesomeIcon icon={faEnvelope} className="text-[9px]" />
                   {selected.user.prenom} {selected.user.nom} · {selected.user.email} · {timeAgo(selected.createdAt)}
                 </p>
@@ -245,7 +245,7 @@ export default function AdminSupportPage() {
                   <button
                     onClick={() => changeStatus("FERME")}
                     disabled={changingStatus}
-                    className="px-3 py-1.5 rounded-lg bg-gray-400/10 border border-gray-500/20 text-gray-400 text-xs font-medium hover:bg-gray-400/20 transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-lg bg-gray-400/10 border border-gray-500/20 text-slate-300 text-xs font-medium hover:bg-gray-400/20 transition-colors disabled:opacity-50"
                   >
                     <FontAwesomeIcon icon={faLock} className="mr-1 text-[10px]" />
                     Fermer
@@ -271,7 +271,7 @@ export default function AdminSupportPage() {
                 </button>
               )}
               {changingStatus && (
-                <FontAwesomeIcon icon={faSpinner} className="text-gray-500 animate-spin text-xs mt-1.5" />
+                <FontAwesomeIcon icon={faSpinner} className="text-slate-400 animate-spin text-xs mt-1.5" />
               )}
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function AdminSupportPage() {
           {/* Messages */}
           <div className="p-5 space-y-4 max-h-96 overflow-y-auto">
             {selected.messages.length === 0 ? (
-              <p className="text-gray-600 text-sm text-center py-8">Aucun message</p>
+              <p className="text-slate-400 text-sm text-center py-8">Aucun message</p>
             ) : (
               selected.messages.map((m) => (
                 <div key={m.id} className={`flex gap-3 ${m.isAdmin ? "flex-row-reverse" : ""}`}>
@@ -290,7 +290,7 @@ export default function AdminSupportPage() {
                     <div className={`rounded-xl px-4 py-3 text-sm leading-relaxed ${m.isAdmin ? "bg-red-600/15 border border-red-500/20 text-white" : "bg-white/5 border border-white/8 text-gray-300"}`}>
                       {m.contenu}
                     </div>
-                    <p className="text-gray-600 text-[11px] mt-1">
+                    <p className="text-slate-400 text-[11px] mt-1">
                       {m.user.prenom} {m.user.nom} · {timeAgo(m.createdAt)}
                     </p>
                   </div>
@@ -310,7 +310,7 @@ export default function AdminSupportPage() {
                     onChange={(e) => setReply(e.target.value)}
                     placeholder="Repondre au ticket..."
                     rows={3}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 resize-none"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 resize-none"
                   />
                   <div className="flex justify-end mt-2">
                     <button
@@ -342,7 +342,7 @@ export default function AdminSupportPage() {
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border
                   ${filterStatut === s
                     ? "bg-white/10 text-white border-white/20"
-                    : "text-gray-400 border-white/8 hover:text-white hover:border-white/20"
+                    : "text-slate-300 border-white/8 hover:text-white hover:border-white/20"
                   }`}
               >
                 {s === "tous" ? "Tous" : statutMap[s].label}
@@ -354,13 +354,13 @@ export default function AdminSupportPage() {
           {/* Search + filters */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" />
+              <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
               <input
                 type="text"
                 placeholder="Rechercher un ticket, un nom..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
+                className="w-full pl-9 pr-4 py-2.5 bg-[#1C2D4F] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
               />
             </div>
             <div className="flex gap-2">
@@ -374,7 +374,7 @@ export default function AdminSupportPage() {
                   key={r.key}
                   onClick={() => setFilterRole(r.key)}
                   className={`px-3 py-2.5 rounded-lg text-xs font-medium border transition-colors
-                    ${filterRole === r.key ? "bg-white/10 text-white border-white/20" : "text-gray-400 border-white/8 hover:text-white"}`}
+                    ${filterRole === r.key ? "bg-white/10 text-white border-white/20" : "text-slate-300 border-white/8 hover:text-white"}`}
                 >
                   <FontAwesomeIcon icon={r.icon} className="mr-1" />{r.label}
                 </button>
@@ -385,7 +385,7 @@ export default function AdminSupportPage() {
               <select
                 value={filterPriorite}
                 onChange={(e) => setFilterPriorite(e.target.value as "tous" | TicketPriorite)}
-                className="px-3 py-2.5 rounded-lg text-xs font-medium border border-white/8 bg-[#0A1628] text-gray-400 focus:outline-none focus:border-blue-500/50"
+                className="px-3 py-2.5 rounded-lg text-xs font-medium border border-white/8 bg-[#1C2D4F] text-slate-300 focus:outline-none focus:border-blue-500/50"
               >
                 <option value="tous">Toutes priorites</option>
                 <option value="BASSE">Basse</option>
@@ -414,13 +414,13 @@ export default function AdminSupportPage() {
                   <button
                     key={t.id}
                     onClick={() => setSelected(t)}
-                    className="w-full bg-[#0A1628] rounded-xl border border-white/8 p-4 hover:border-white/15 transition-all text-left group"
+                    className="w-full bg-[#1C2D4F] rounded-xl border border-white/8 p-4 hover:border-white/15 transition-all text-left group"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 min-w-0">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="text-gray-500 text-xs font-mono">{t.id.slice(0, 12)}</span>
+                            <span className="text-slate-400 text-xs font-mono">{t.id.slice(0, 12)}</span>
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${st.cls}`}>
                               {st.label}
                             </span>
@@ -433,24 +433,24 @@ export default function AdminSupportPage() {
                             </span>
                           </div>
                           <p className="text-white font-medium truncate">{t.sujet}</p>
-                          <p className="text-gray-500 text-xs mt-0.5">
+                          <p className="text-slate-400 text-xs mt-0.5">
                             De {t.user.prenom} {t.user.nom} · {t.messages.length} message(s)
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
-                        <p className="text-gray-600 text-xs flex items-center gap-1">
+                        <p className="text-slate-400 text-xs flex items-center gap-1">
                           <FontAwesomeIcon icon={faClock} className="text-[9px]" />
                           {timeAgo(t.createdAt)}
                         </p>
-                        <FontAwesomeIcon icon={faChevronRight} className="text-gray-600 text-xs group-hover:text-gray-400 transition-colors" />
+                        <FontAwesomeIcon icon={faChevronRight} className="text-slate-400 text-xs group-hover:text-slate-300 transition-colors" />
                       </div>
                     </div>
                   </button>
                 );
               })}
               {filtered.length === 0 && !loading && (
-                <div className="text-center py-12 bg-[#0A1628] rounded-xl border border-white/8 text-gray-500">
+                <div className="text-center py-12 bg-[#1C2D4F] rounded-xl border border-white/8 text-slate-400">
                   <FontAwesomeIcon icon={faHeadset} className="text-2xl mb-2" />
                   <p className="text-sm">Aucun ticket trouve</p>
                 </div>

@@ -89,7 +89,7 @@ function Tooltip({ text }: { text: string }) {
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
         onClick={() => setShow(!show)}
-        className="text-gray-600 hover:text-blue-400 transition-colors"
+        className="text-slate-400 hover:text-blue-400 transition-colors"
         aria-label="Aide"
       >
         <FontAwesomeIcon icon={faCircleInfo} className="w-3 h-3" />
@@ -464,7 +464,7 @@ export default function OnboardingPage() {
 
   if (!loading && !centre) {
     return (
-      <div className="text-center py-24 text-gray-500">
+      <div className="text-center py-24 text-slate-400">
         <p>Impossible de charger les informations du centre.</p>
       </div>
     );
@@ -501,7 +501,7 @@ export default function OnboardingPage() {
         <h1 className="font-display font-bold text-3xl text-white mb-2">
           Completez votre profil
         </h1>
-        <p className="text-gray-400 text-sm max-w-lg mx-auto">
+        <p className="text-slate-300 text-sm max-w-lg mx-auto">
           Renseignez les informations de votre centre a votre rythme. Un profil
           complet ameliore votre visibilite sur la marketplace BYS Permis.
         </p>
@@ -510,7 +510,7 @@ export default function OnboardingPage() {
       {/* Progress bar */}
       <div className="rounded-xl p-6" style={cardStyle}>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-gray-400">
+          <span className="text-sm font-medium text-slate-300">
             Progression du profil
           </span>
           <span
@@ -545,7 +545,7 @@ export default function OnboardingPage() {
             Votre profil est complet !
           </p>
         ) : (
-          <p className="text-gray-500 text-xs mt-3">
+          <p className="text-slate-400 text-xs mt-3">
             Profil a {percentage}% — vous pouvez completer plus tard depuis votre
             espace centre.
           </p>
@@ -599,7 +599,7 @@ export default function OnboardingPage() {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-all ${
                     isActive
                       ? "bg-blue-600/15 text-white border border-blue-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
+                      : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
                   }`}
                 >
                   <div
@@ -608,7 +608,7 @@ export default function OnboardingPage() {
                         ? "bg-green-500 text-white"
                         : isActive
                         ? "bg-blue-600 text-white"
-                        : "bg-white/8 text-gray-500"
+                        : "bg-white/8 text-slate-400"
                     }`}
                   >
                     {isCompleted ? (
@@ -619,7 +619,7 @@ export default function OnboardingPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <span className="block truncate">{step.label}</span>
-                    <span className="text-[10px] text-gray-600 flex items-center gap-1 mt-0.5">
+                    <span className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
                       <FontAwesomeIcon icon={faClock} className="w-2.5 h-2.5" />
                       {step.estimatedTime}
                       {stepData && !isCompleted && (
@@ -649,14 +649,14 @@ export default function OnboardingPage() {
                   <h2 className="text-white font-semibold text-lg">
                     Informations de base
                   </h2>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-slate-400 text-xs">
                     Les informations essentielles de votre centre
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   Nom du centre *
                   <Tooltip text="Le nom officiel de votre centre tel qu'il apparaitra sur la marketplace." />
                 </label>
@@ -671,8 +671,8 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
-                  Description courte * <span className="text-gray-600">(min. 50 caracteres)</span>
+                <label className="block text-xs font-medium text-slate-400 mb-2">
+                  Description courte * <span className="text-slate-400">(min. 50 caracteres)</span>
                   <Tooltip text="Cette description courte sera affichee dans les resultats de recherche." />
                 </label>
                 <textarea
@@ -686,7 +686,7 @@ export default function OnboardingPage() {
                 <div className="flex items-center justify-between mt-1.5">
                   <span
                     className={`text-[11px] ${
-                      descriptionLength >= 50 ? "text-green-400" : "text-gray-600"
+                      descriptionLength >= 50 ? "text-green-400" : "text-slate-400"
                     }`}
                   >
                     {descriptionLength >= 50 ? (
@@ -696,20 +696,20 @@ export default function OnboardingPage() {
                       ? "Minimum atteint"
                       : `${50 - descriptionLength} caracteres restants`}
                   </span>
-                  <span className="text-[11px] text-gray-600">
+                  <span className="text-[11px] text-slate-400">
                     {descriptionLength} / 50 min.
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   Adresse *
                 </label>
                 <div className="relative">
                   <FontAwesomeIcon
                     icon={faLocationDot}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                   />
                   <input
                     type="text"
@@ -724,7 +724,7 @@ export default function OnboardingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-slate-400 mb-2">
                     Code postal *
                   </label>
                   <input
@@ -737,7 +737,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-slate-400 mb-2">
                     Ville *
                   </label>
                   <input
@@ -762,21 +762,21 @@ export default function OnboardingPage() {
                 </div>
                 <div>
                   <h2 className="text-white font-semibold text-lg">Contact</h2>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-slate-400 text-xs">
                     Comment vos clients peuvent vous joindre
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   Telephone *
                   <Tooltip text="Le numero de telephone principal pour les stagiaires." />
                 </label>
                 <div className="relative">
                   <FontAwesomeIcon
                     icon={faPhone}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                   />
                   <input
                     type="tel"
@@ -790,13 +790,13 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   Email *
                 </label>
                 <div className="relative">
                   <FontAwesomeIcon
                     icon={faEnvelope}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                   />
                   <input
                     type="email"
@@ -810,13 +810,13 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
-                  Site web <span className="text-gray-600">(optionnel)</span>
+                <label className="block text-xs font-medium text-slate-400 mb-2">
+                  Site web <span className="text-slate-400">(optionnel)</span>
                 </label>
                 <div className="relative">
                   <FontAwesomeIcon
                     icon={faGlobe}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                   />
                   <input
                     type="url"
@@ -844,16 +844,16 @@ export default function OnboardingPage() {
                     <h2 className="text-white font-semibold text-lg">
                       Presentation
                     </h2>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-slate-400 text-xs">
                       Decrivez votre centre en detail pour attirer les stagiaires
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-slate-400 mb-2">
                     Texte de presentation *{" "}
-                    <span className="text-gray-600">(min. 100 caracteres)</span>
+                    <span className="text-slate-400">(min. 100 caracteres)</span>
                     <Tooltip text="Redigez un texte complet qui decrit votre centre, vos atouts et votre pedagogie. Ce texte est affiche sur votre page centre." />
                   </label>
                   <textarea
@@ -871,7 +871,7 @@ export default function OnboardingPage() {
                       className={`text-[11px] ${
                         presentationLength >= 100
                           ? "text-green-400"
-                          : "text-gray-600"
+                          : "text-slate-400"
                       }`}
                     >
                       {presentationLength >= 100 ? (
@@ -884,7 +884,7 @@ export default function OnboardingPage() {
                         ? "Minimum atteint"
                         : `${100 - presentationLength} caracteres restants`}
                     </span>
-                    <span className="text-[11px] text-gray-600">
+                    <span className="text-[11px] text-slate-400">
                       {presentationLength} / 100 min.
                     </span>
                   </div>
@@ -895,7 +895,7 @@ export default function OnboardingPage() {
               <div className="rounded-xl p-6" style={cardStyle}>
                 <h3 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
                   <FontAwesomeIcon icon={faClock} className="text-blue-400 w-4 h-4" />
-                  Horaires d&apos;ouverture <span className="text-gray-600 font-normal">(optionnel)</span>
+                  Horaires d&apos;ouverture <span className="text-slate-400 font-normal">(optionnel)</span>
                 </h3>
                 <textarea
                   value={centre.horaires || ""}
@@ -911,7 +911,7 @@ export default function OnboardingPage() {
               <div className="rounded-xl p-6" style={cardStyle}>
                 <h3 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
                   <FontAwesomeIcon icon={faToolbox} className="text-blue-400 w-4 h-4" />
-                  Equipements <span className="text-gray-600 font-normal">(optionnel)</span>
+                  Equipements <span className="text-slate-400 font-normal">(optionnel)</span>
                 </h3>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {(centre.equipements || []).map((eq, i) => (
@@ -962,7 +962,7 @@ export default function OnboardingPage() {
                       onClick={() =>
                         addChip("equipements", s, setNewEquipement)
                       }
-                      className="px-2.5 py-1 rounded-full text-[11px] text-gray-500 border border-dashed border-gray-700 hover:border-blue-500 hover:text-blue-400 transition-all"
+                      className="px-2.5 py-1 rounded-full text-[11px] text-slate-400 border border-dashed border-gray-700 hover:border-blue-500 hover:text-blue-400 transition-all"
                     >
                       + {s}
                     </button>
@@ -974,7 +974,7 @@ export default function OnboardingPage() {
               <div className="rounded-xl p-6" style={cardStyle}>
                 <h3 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
                   <FontAwesomeIcon icon={faAward} className="text-blue-400 w-4 h-4" />
-                  Certifications <span className="text-gray-600 font-normal">(optionnel)</span>
+                  Certifications <span className="text-slate-400 font-normal">(optionnel)</span>
                 </h3>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {(centre.certifications || []).map((cert, i) => (
@@ -1034,7 +1034,7 @@ export default function OnboardingPage() {
                       onClick={() =>
                         addChip("certifications", s, setNewCertification)
                       }
-                      className="px-2.5 py-1 rounded-full text-[11px] text-gray-500 border border-dashed border-gray-700 hover:border-amber-500 hover:text-amber-400 transition-all"
+                      className="px-2.5 py-1 rounded-full text-[11px] text-slate-400 border border-dashed border-gray-700 hover:border-amber-500 hover:text-amber-400 transition-all"
                     >
                       + {s}
                     </button>
@@ -1058,7 +1058,7 @@ export default function OnboardingPage() {
                   <h2 className="text-white font-semibold text-lg">
                     Premiere formation
                   </h2>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-slate-400 text-xs">
                     Creez au moins une formation avec une session pour etre visible
                   </p>
                 </div>
@@ -1074,7 +1074,7 @@ export default function OnboardingPage() {
                     <p className="text-sm font-semibold text-green-400">
                       Vous avez au moins une formation active avec des sessions
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5">
                       Cette etape est completee.
                     </p>
                   </div>
@@ -1095,7 +1095,7 @@ export default function OnboardingPage() {
                     <p className="text-sm font-semibold text-orange-400">
                       Vous avez des formations, mais aucune session active
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-slate-300 mt-1">
                       Ajoutez au moins une session a une formation existante.
                     </p>
                   </div>
@@ -1110,13 +1110,13 @@ export default function OnboardingPage() {
                 >
                   <FontAwesomeIcon
                     icon={faCircleExclamation}
-                    className="text-gray-500 w-5 h-5 mt-0.5"
+                    className="text-slate-400 w-5 h-5 mt-0.5"
                   />
                   <div>
                     <p className="text-sm font-semibold text-gray-300">
                       Aucune formation creee
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Creez votre premiere formation pour commencer a recevoir des
                       inscriptions.
                     </p>
@@ -1149,7 +1149,7 @@ export default function OnboardingPage() {
                 </div>
                 <div>
                   <h2 className="text-white font-semibold text-lg">Paiement</h2>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-slate-400 text-xs">
                     Configurez votre mode de paiement pour recevoir les
                     versements
                   </p>
@@ -1171,7 +1171,7 @@ export default function OnboardingPage() {
                       <p className="text-sm font-semibold text-green-400">
                         Compte Stripe connecte
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-slate-300 mt-0.5">
                         Vous recevez automatiquement les paiements.
                       </p>
                     </div>
@@ -1193,7 +1193,7 @@ export default function OnboardingPage() {
                         <p className="text-sm font-semibold text-orange-400">
                           Compte Stripe non connecte
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           Connectez votre compte Stripe pour recevoir les
                           paiements de chaque reservation.
                         </p>
@@ -1236,7 +1236,7 @@ export default function OnboardingPage() {
                       <p className="text-sm font-semibold text-green-400">
                         Abonnement actif
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-slate-300 mt-0.5">
                         Votre abonnement est en cours. Vous pouvez le gerer dans
                         les parametres.
                       </p>
@@ -1244,7 +1244,7 @@ export default function OnboardingPage() {
                   </div>
                 ) : (
                   <div>
-                    <p className="text-xs text-gray-500 mb-3">
+                    <p className="text-xs text-slate-400 mb-3">
                       Souscrivez un abonnement pour beneficier de commissions
                       reduites.
                     </p>
@@ -1265,7 +1265,7 @@ export default function OnboardingPage() {
 
               {!centre.stripeOnboardingDone &&
                 centre.subscriptionStatus !== "ACTIVE" && (
-                  <p className="text-xs text-gray-600 italic">
+                  <p className="text-xs text-slate-400 italic">
                     Vous devez connecter Stripe Connect OU avoir un abonnement
                     actif pour completer cette etape.
                   </p>
@@ -1319,7 +1319,7 @@ export default function OnboardingPage() {
             <button
               onClick={goPrev}
               disabled={currentStepIndex === 0}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3" />
               Precedent
@@ -1389,13 +1389,13 @@ export default function OnboardingPage() {
 
       {/* Bottom message */}
       <div className="text-center pb-4">
-        <p className="text-gray-600 text-xs">
+        <p className="text-slate-400 text-xs">
           La completion du profil est recommandee mais non obligatoire. Votre
           centre sera visible apres validation par l&apos;equipe BYS.
         </p>
         <Link
           href="/espace-centre/dashboard"
-          className="text-xs text-gray-500 hover:text-blue-400 transition-colors mt-1 inline-block"
+          className="text-xs text-slate-400 hover:text-blue-400 transition-colors mt-1 inline-block"
         >
           Passer pour le moment et completer plus tard
         </Link>

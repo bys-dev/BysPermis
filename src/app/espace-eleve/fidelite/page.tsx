@@ -176,7 +176,7 @@ export default function FidelitePage() {
       <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
         <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
         <p className="text-white font-medium mb-1">Erreur de chargement</p>
-        <p className="text-gray-500 text-sm mb-6">{error}</p>
+        <p className="text-slate-400 text-sm mb-6">{error}</p>
         <button onClick={() => window.location.reload()} className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all">
           Reessayer
         </button>
@@ -193,7 +193,7 @@ export default function FidelitePage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Programme de fidelite</h1>
-        <p className="text-gray-500 text-sm">Gagnez des points a chaque reservation et echangez-les contre des reductions</p>
+        <p className="text-slate-400 text-sm">Gagnez des points a chaque reservation et echangez-les contre des reductions</p>
       </div>
 
       {/* Level Card */}
@@ -218,13 +218,13 @@ export default function FidelitePage() {
               <FontAwesomeIcon icon={faStar} className={`w-3 h-3 ${lvl.iconColor}`} />
             </div>
             <p className="text-3xl font-bold text-white mb-3">
-              {loyalty.totalPoints.toLocaleString("fr-FR")} <span className="text-base font-normal text-gray-400">points</span>
+              {loyalty.totalPoints.toLocaleString("fr-FR")} <span className="text-base font-normal text-slate-300">points</span>
             </p>
 
             {/* Progress bar */}
             {loyalty.nextLevel && (
               <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+                <div className="flex justify-between text-xs text-slate-400 mb-1.5">
                   <span>{lvl.label}</span>
                   <span>{levelConfig[loyalty.nextLevel]?.label ?? loyalty.nextLevel}</span>
                 </div>
@@ -234,13 +234,13 @@ export default function FidelitePage() {
                     style={{ width: `${loyalty.progressPercent}%`, background: lvl.color }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1.5">
+                <p className="text-xs text-slate-400 mt-1.5">
                   Encore <span className="text-white font-medium">{loyalty.pointsToNextLevel.toLocaleString("fr-FR")}</span> points pour atteindre le niveau {levelConfig[loyalty.nextLevel]?.label ?? loyalty.nextLevel}
                 </p>
               </div>
             )}
             {!loyalty.nextLevel && (
-              <p className="text-xs text-gray-400">Vous avez atteint le niveau maximum !</p>
+              <p className="text-xs text-slate-300">Vous avez atteint le niveau maximum !</p>
             )}
           </div>
         </div>
@@ -267,14 +267,14 @@ export default function FidelitePage() {
                   </div>
                   <span className="font-bold text-white text-lg">{r.value} EUR</span>
                 </div>
-                <p className="text-xs text-gray-500 mb-3">{r.points.toLocaleString("fr-FR")} points</p>
+                <p className="text-xs text-slate-400 mb-3">{r.points.toLocaleString("fr-FR")} points</p>
                 <button
                   onClick={() => handleRedeem(r.points)}
                   disabled={!canRedeem || redeemingPoints === r.points}
                   className={`w-full py-2 rounded-lg text-xs font-semibold transition-all ${
                     canRedeem
                       ? "bg-blue-600 text-white hover:bg-blue-700"
-                      : "bg-white/5 text-gray-600 cursor-not-allowed"
+                      : "bg-white/5 text-slate-400 cursor-not-allowed"
                   }`}
                 >
                   {redeemingPoints === r.points ? (
@@ -294,13 +294,13 @@ export default function FidelitePage() {
       {/* Redeem result modal */}
       {redeemResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
-          <div className="w-full max-w-md rounded-2xl border p-6" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.1)" }}>
+          <div className="w-full max-w-md rounded-2xl border p-6" style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.1)" }}>
             <div className="text-center mb-5">
               <div className="w-16 h-16 rounded-full bg-green-400/10 border-2 border-green-500/30 flex items-center justify-center mx-auto mb-4">
                 <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-3xl" />
               </div>
               <h2 className="font-display font-bold text-lg text-white mb-2">Code promo genere !</h2>
-              <p className="text-sm text-gray-400">Votre code promo de {redeemResult.reduction} EUR :</p>
+              <p className="text-sm text-slate-300">Votre code promo de {redeemResult.reduction} EUR :</p>
             </div>
 
             <div
@@ -316,7 +316,7 @@ export default function FidelitePage() {
               </button>
             </div>
 
-            <p className="text-xs text-gray-500 text-center mb-5">
+            <p className="text-xs text-slate-400 text-center mb-5">
               Valable 90 jours. Utilisez-le lors de votre prochaine reservation.
             </p>
 
@@ -343,7 +343,7 @@ export default function FidelitePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
           {/* Referral Code */}
           <div className="rounded-xl p-4 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
-            <p className="text-xs text-gray-500 mb-2">Votre code parrain</p>
+            <p className="text-xs text-slate-400 mb-2">Votre code parrain</p>
             <div className="flex items-center gap-2">
               <span className="font-mono font-bold text-lg text-white">{referral.referralCode ?? "---"}</span>
               {referral.referralCode && (
@@ -359,12 +359,12 @@ export default function FidelitePage() {
 
           {/* Stats */}
           <div className="rounded-xl p-4 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
-            <p className="text-xs text-gray-500 mb-2">Amis parraines</p>
+            <p className="text-xs text-slate-400 mb-2">Amis parraines</p>
             <span className="text-2xl font-bold text-white">{referral.referralCount}</span>
           </div>
 
           <div className="rounded-xl p-4 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
-            <p className="text-xs text-gray-500 mb-2">Points gagnes (parrainage)</p>
+            <p className="text-xs text-slate-400 mb-2">Points gagnes (parrainage)</p>
             <span className="text-2xl font-bold text-white">{referral.totalReferralPoints}</span>
           </div>
         </div>
@@ -401,18 +401,18 @@ export default function FidelitePage() {
             className="text-center py-12 rounded-xl border"
             style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}
           >
-            <FontAwesomeIcon icon={faCoins} className="text-3xl text-gray-600 mb-3" />
+            <FontAwesomeIcon icon={faCoins} className="text-3xl text-slate-400 mb-3" />
             <p className="text-white font-medium mb-1">Aucun mouvement</p>
-            <p className="text-gray-500 text-sm">Reservez un stage pour commencer a gagner des points.</p>
+            <p className="text-slate-400 text-sm">Reservez un stage pour commencer a gagner des points.</p>
           </div>
         ) : (
           <div className="rounded-xl border overflow-hidden" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
             <table className="w-full">
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                  <th className="text-left text-xs text-gray-500 font-medium uppercase tracking-wider px-4 py-3">Date</th>
-                  <th className="text-left text-xs text-gray-500 font-medium uppercase tracking-wider px-4 py-3">Description</th>
-                  <th className="text-right text-xs text-gray-500 font-medium uppercase tracking-wider px-4 py-3">Points</th>
+                  <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wider px-4 py-3">Date</th>
+                  <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wider px-4 py-3">Description</th>
+                  <th className="text-right text-xs text-slate-400 font-medium uppercase tracking-wider px-4 py-3">Points</th>
                 </tr>
               </thead>
               <tbody>
@@ -422,7 +422,7 @@ export default function FidelitePage() {
                     className="border-t"
                     style={{ borderColor: "rgba(255,255,255,0.05)" }}
                   >
-                    <td className="px-4 py-3 text-sm text-gray-400 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm text-slate-300 whitespace-nowrap">
                       {formatDate(item.createdAt)}
                     </td>
                     <td className="px-4 py-3 text-sm text-white">
@@ -493,7 +493,7 @@ export default function FidelitePage() {
                 <FontAwesomeIcon icon={item.icon} className={`${item.color} text-lg`} />
               </div>
               <h3 className="text-sm font-semibold text-white mb-1">{item.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+              <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>

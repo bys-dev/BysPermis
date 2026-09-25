@@ -54,7 +54,7 @@ function monthLabel(month: string): string {
 }
 
 function GrowthBadge({ value }: { value: number }) {
-  if (value === 0) return <span className="text-gray-500 text-xs">0%</span>;
+  if (value === 0) return <span className="text-slate-400 text-xs">0%</span>;
   const positive = value > 0;
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-semibold ${positive ? "text-green-400" : "text-red-400"}`}>
@@ -89,11 +89,11 @@ export default function AdminStatistiquesPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Statistiques</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Analyses et rapports de la plateforme</p>
+          <p className="text-slate-300 text-sm mt-0.5">Analyses et rapports de la plateforme</p>
         </div>
-        <div className="bg-[#0A1628] rounded-xl border border-red-500/20 p-12 text-center">
+        <div className="bg-[#1C2D4F] rounded-xl border border-red-500/20 p-12 text-center">
           <p className="text-red-400 font-medium">Impossible de charger les statistiques</p>
-          <p className="text-gray-600 text-sm mt-1">{error}</p>
+          <p className="text-slate-400 text-sm mt-1">{error}</p>
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export default function AdminStatistiquesPage() {
       ) : (
       <div>
         <h1 className="text-2xl font-bold text-white">Statistiques</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Analyses et rapports de la plateforme</p>
+        <p className="text-slate-300 text-sm mt-0.5">Analyses et rapports de la plateforme</p>
       </div>
       )}
 
@@ -121,7 +121,7 @@ export default function AdminStatistiquesPage() {
       <>
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="bg-[#0A1628] rounded-xl border border-green-500/20 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-green-500/20 p-5">
           <div className="flex items-start justify-between mb-3">
             <div className="w-10 h-10 rounded-lg bg-green-400/10 border border-green-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faEuro} className="text-green-400 text-sm" />
@@ -129,10 +129,10 @@ export default function AdminStatistiquesPage() {
             <GrowthBadge value={stats.growth.revenue} />
           </div>
           <p className="text-2xl font-bold text-white">{formatPrice(stats.revenusPlateforme)}</p>
-          <p className="text-xs text-gray-500 mt-1">Revenus ce mois</p>
+          <p className="text-xs text-slate-400 mt-1">Revenus ce mois</p>
         </div>
 
-        <div className="bg-[#0A1628] rounded-xl border border-purple-500/20 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-purple-500/20 p-5">
           <div className="flex items-start justify-between mb-3">
             <div className="w-10 h-10 rounded-lg bg-purple-400/10 border border-purple-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faClipboardList} className="text-purple-400 text-sm" />
@@ -140,50 +140,50 @@ export default function AdminStatistiquesPage() {
             <GrowthBadge value={stats.growth.reservations} />
           </div>
           <p className="text-2xl font-bold text-white">{stats.reservationsCeMois.toLocaleString("fr-FR")}</p>
-          <p className="text-xs text-gray-500 mt-1">Reservations ce mois</p>
+          <p className="text-xs text-slate-400 mt-1">Reservations ce mois</p>
         </div>
 
-        <div className="bg-[#0A1628] rounded-xl border border-blue-500/20 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-blue-500/20 p-5">
           <div className="flex items-start justify-between mb-3">
             <div className="w-10 h-10 rounded-lg bg-blue-400/10 border border-blue-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{stats.centresActifs}</p>
-          <p className="text-xs text-gray-500 mt-1">Centres actifs</p>
+          <p className="text-xs text-slate-400 mt-1">Centres actifs</p>
         </div>
 
-        <div className="bg-[#0A1628] rounded-xl border border-yellow-500/20 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-yellow-500/20 p-5">
           <div className="flex items-start justify-between mb-3">
             <div className="w-10 h-10 rounded-lg bg-yellow-400/10 border border-yellow-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faChartLine} className="text-yellow-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{stats.utilisateurs.toLocaleString("fr-FR")}</p>
-          <p className="text-xs text-gray-500 mt-1">Utilisateurs inscrits</p>
+          <p className="text-xs text-slate-400 mt-1">Utilisateurs inscrits</p>
         </div>
       </div>
 
       {/* Charts Row */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-white font-semibold text-sm">Revenus mensuels</h2>
-              <p className="text-gray-500 text-xs mt-0.5">Commission plateforme (derniers 6 mois)</p>
+              <p className="text-slate-400 text-xs mt-0.5">Commission plateforme (derniers 6 mois)</p>
             </div>
             <GrowthBadge value={stats.growth.revenue} />
           </div>
           {monthlyData.length === 0 ? (
-            <div className="text-center py-12 text-gray-600 text-sm">Aucune donnee</div>
+            <div className="text-center py-12 text-slate-400 text-sm">Aucune donnee</div>
           ) : (
             <div className="flex items-end gap-3 h-48">
               {monthlyData.map((d) => {
                 const height = maxRevenue > 0 ? (d.revenue / maxRevenue) * 100 : 0;
                 return (
                   <div key={d.month} className="flex-1 flex flex-col items-center gap-2">
-                    <span className="text-[10px] text-gray-400 font-medium">
+                    <span className="text-[10px] text-slate-300 font-medium">
                       {d.revenue > 0 ? formatPrice(d.revenue) : "0"}
                     </span>
                     <div className="w-full flex justify-center" style={{ height: "140px" }}>
@@ -192,7 +192,7 @@ export default function AdminStatistiquesPage() {
                         style={{ height: `${Math.max(height, 2)}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-gray-500">{monthLabel(d.month)}</span>
+                    <span className="text-[10px] text-slate-400">{monthLabel(d.month)}</span>
                   </div>
                 );
               })}
@@ -201,23 +201,23 @@ export default function AdminStatistiquesPage() {
         </div>
 
         {/* Reservations Chart */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-white font-semibold text-sm">Reservations mensuelles</h2>
-              <p className="text-gray-500 text-xs mt-0.5">Nombre de reservations (derniers 6 mois)</p>
+              <p className="text-slate-400 text-xs mt-0.5">Nombre de reservations (derniers 6 mois)</p>
             </div>
             <GrowthBadge value={stats.growth.reservations} />
           </div>
           {monthlyData.length === 0 ? (
-            <div className="text-center py-12 text-gray-600 text-sm">Aucune donnee</div>
+            <div className="text-center py-12 text-slate-400 text-sm">Aucune donnee</div>
           ) : (
             <div className="flex items-end gap-3 h-48">
               {monthlyData.map((d) => {
                 const height = maxReservations > 0 ? (d.reservations / maxReservations) * 100 : 0;
                 return (
                   <div key={d.month} className="flex-1 flex flex-col items-center gap-2">
-                    <span className="text-[10px] text-gray-400 font-medium">
+                    <span className="text-[10px] text-slate-300 font-medium">
                       {d.reservations}
                     </span>
                     <div className="w-full flex justify-center" style={{ height: "140px" }}>
@@ -226,7 +226,7 @@ export default function AdminStatistiquesPage() {
                         style={{ height: `${Math.max(height, 2)}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-gray-500">{monthLabel(d.month)}</span>
+                    <span className="text-[10px] text-slate-400">{monthLabel(d.month)}</span>
                   </div>
                 );
               })}
@@ -238,13 +238,13 @@ export default function AdminStatistiquesPage() {
       {/* Rankings Row */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Top Formations */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center gap-2 mb-5">
             <FontAwesomeIcon icon={faTrophy} className="text-yellow-400 text-sm" />
             <h2 className="text-white font-semibold text-sm">Top 5 formations</h2>
           </div>
           {stats.topFormations.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center py-8">Aucune donnee disponible</p>
+            <p className="text-slate-400 text-sm text-center py-8">Aucune donnee disponible</p>
           ) : (
             <div className="space-y-3">
               {stats.topFormations.map((f, i) => {
@@ -255,16 +255,16 @@ export default function AdminStatistiquesPage() {
                       {i < 3 ? (
                         <FontAwesomeIcon icon={faMedal} className={`text-sm ${medalColors[i]}`} />
                       ) : (
-                        <span className="text-gray-500 text-xs font-bold">{i + 1}</span>
+                        <span className="text-slate-400 text-xs font-bold">{i + 1}</span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{f.titre}</p>
-                      <p className="text-gray-500 text-xs">{f.reservationCount} reservation(s)</p>
+                      <p className="text-slate-400 text-xs">{f.reservationCount} reservation(s)</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-green-400 text-sm font-semibold">{formatPrice(f.revenue)}</p>
-                      <p className="text-gray-600 text-[10px]">CA total</p>
+                      <p className="text-slate-400 text-[10px]">CA total</p>
                     </div>
                   </div>
                 );
@@ -274,13 +274,13 @@ export default function AdminStatistiquesPage() {
         </div>
 
         {/* Top Centres */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center gap-2 mb-5">
             <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-sm" />
             <h2 className="text-white font-semibold text-sm">Top 5 centres par revenus</h2>
           </div>
           {stats.topCentres.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center py-8">Aucune donnee disponible</p>
+            <p className="text-slate-400 text-sm text-center py-8">Aucune donnee disponible</p>
           ) : (
             <div className="space-y-3">
               {stats.topCentres.map((c, i) => {
@@ -293,12 +293,12 @@ export default function AdminStatistiquesPage() {
                       {i < 3 ? (
                         <FontAwesomeIcon icon={faMedal} className={`text-sm ${medalColors[i]}`} />
                       ) : (
-                        <span className="text-gray-500 text-xs font-bold">{i + 1}</span>
+                        <span className="text-slate-400 text-xs font-bold">{i + 1}</span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{c.nom}</p>
-                      <p className="text-gray-500 text-xs">{c.ville} — {c.reservationCount} reservation(s)</p>
+                      <p className="text-slate-400 text-xs">{c.ville} — {c.reservationCount} reservation(s)</p>
                       <div className="mt-1.5 h-1 rounded-full bg-white/5 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-blue-500 transition-all duration-500"
@@ -308,7 +308,7 @@ export default function AdminStatistiquesPage() {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-blue-400 text-sm font-semibold">{formatPrice(c.revenue)}</p>
-                      <p className="text-gray-600 text-[10px]">CA total</p>
+                      <p className="text-slate-400 text-[10px]">CA total</p>
                     </div>
                   </div>
                 );

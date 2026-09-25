@@ -39,7 +39,7 @@ const statusConfig = {
   OUVERT:   { label: "Ouvert",   color: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-500/20" },
   EN_COURS: { label: "En cours", color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
   RESOLU:   { label: "Résolu",   color: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-500/20" },
-  FERME:    { label: "Fermé",    color: "text-gray-400",   bg: "bg-gray-400/10",   border: "border-gray-500/20" },
+  FERME:    { label: "Fermé",    color: "text-slate-300",   bg: "bg-gray-400/10",   border: "border-gray-500/20" },
 } as const;
 
 export default function SupportPage() {
@@ -161,7 +161,7 @@ export default function SupportPage() {
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Support</h1>
-          <p className="text-gray-500 text-sm">Besoin d&apos;aide ? Ouvrez un ticket et nous vous répondrons rapidement.</p>
+          <p className="text-slate-400 text-sm">Besoin d&apos;aide ? Ouvrez un ticket et nous vous répondrons rapidement.</p>
         </div>
         <button
           onClick={() => { setShowNewForm(true); setSelectedTicketId(null); }}
@@ -187,7 +187,7 @@ export default function SupportPage() {
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button onClick={fetchTickets} className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all">
             Réessayer
           </button>
@@ -201,13 +201,13 @@ export default function SupportPage() {
               <div className="rounded-xl p-5 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-white text-sm">Nouveau ticket</h2>
-                  <button onClick={() => setShowNewForm(false)} className="text-gray-500 hover:text-white text-xs">
+                  <button onClick={() => setShowNewForm(false)} className="text-slate-400 hover:text-white text-xs">
                     Annuler
                   </button>
                 </div>
                 <form onSubmit={handleCreateTicket} className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Sujet</label>
+                    <label className="block text-xs text-slate-300 mb-1">Sujet</label>
                     <input
                       type="text"
                       value={newSujet}
@@ -216,12 +216,12 @@ export default function SupportPage() {
                       required
                       minLength={5}
                       maxLength={200}
-                      className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-600 border focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-slate-400 border focus:outline-none focus:border-blue-500 transition-colors"
                       style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.1)" }}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Message</label>
+                    <label className="block text-xs text-slate-300 mb-1">Message</label>
                     <textarea
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
@@ -229,7 +229,7 @@ export default function SupportPage() {
                       required
                       minLength={10}
                       rows={4}
-                      className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-gray-600 border focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                      className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder-slate-400 border focus:outline-none focus:border-blue-500 transition-colors resize-none"
                       style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.1)" }}
                     />
                   </div>
@@ -251,9 +251,9 @@ export default function SupportPage() {
 
             {tickets.length === 0 && !showNewForm ? (
               <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-                <FontAwesomeIcon icon={faHeadset} className="text-3xl text-gray-600 mb-3" />
+                <FontAwesomeIcon icon={faHeadset} className="text-3xl text-slate-400 mb-3" />
                 <p className="text-white font-medium mb-1">Aucun ticket</p>
-                <p className="text-gray-500 text-sm">Vous n&apos;avez pas encore ouvert de ticket de support.</p>
+                <p className="text-slate-400 text-sm">Vous n&apos;avez pas encore ouvert de ticket de support.</p>
               </div>
             ) : (
               tickets.map((ticket) => {
@@ -282,12 +282,12 @@ export default function SupportPage() {
                       </span>
                     </div>
                     {lastMessage && (
-                      <p className="text-xs text-gray-500 truncate mb-2">
+                      <p className="text-xs text-slate-400 truncate mb-2">
                         {lastMessage.isAdmin ? "Support : " : "Vous : "}
                         {lastMessage.contenu}
                       </p>
                     )}
-                    <p className="text-[10px] text-gray-600">{fmtDate(ticket.updatedAt)}</p>
+                    <p className="text-[10px] text-slate-400">{fmtDate(ticket.updatedAt)}</p>
                   </button>
                 );
               })
@@ -299,8 +299,8 @@ export default function SupportPage() {
             {!selectedTicket ? (
               <div className="flex-1 flex items-center justify-center rounded-xl border" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}>
                 <div className="text-center">
-                  <FontAwesomeIcon icon={faInbox} className="text-3xl text-gray-600 mb-3" />
-                  <p className="text-gray-500 text-sm">Sélectionnez un ticket pour voir la conversation</p>
+                  <FontAwesomeIcon icon={faInbox} className="text-3xl text-slate-400 mb-3" />
+                  <p className="text-slate-400 text-sm">Sélectionnez un ticket pour voir la conversation</p>
                 </div>
               </div>
             ) : (
@@ -309,13 +309,13 @@ export default function SupportPage() {
                 <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                   <button
                     onClick={() => setSelectedTicketId(null)}
-                    className="lg:hidden text-gray-400 hover:text-white transition-colors"
+                    className="lg:hidden text-slate-300 hover:text-white transition-colors"
                   >
                     <FontAwesomeIcon icon={faChevronLeft} className="w-4 h-4" />
                   </button>
                   <div className="flex-1 min-w-0">
                     <h2 className="font-semibold text-white text-sm truncate">{selectedTicket.sujet}</h2>
-                    <p className="text-[10px] text-gray-500">Créé le {fmtDate(selectedTicket.createdAt)}</p>
+                    <p className="text-[10px] text-slate-400">Créé le {fmtDate(selectedTicket.createdAt)}</p>
                   </div>
                   <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border ${statusConfig[selectedTicket.status].color} ${statusConfig[selectedTicket.status].bg} ${statusConfig[selectedTicket.status].border}`}>
                     <FontAwesomeIcon icon={faCircle} className="w-1.5 h-1.5" />
@@ -343,10 +343,10 @@ export default function SupportPage() {
                         }}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-[10px] font-medium ${msg.isAdmin ? "text-blue-400" : "text-gray-400"}`}>
+                          <span className={`text-[10px] font-medium ${msg.isAdmin ? "text-blue-400" : "text-slate-300"}`}>
                             {msg.isAdmin ? `${msg.user.prenom} (Support)` : "Vous"}
                           </span>
-                          <span className="text-[10px] text-gray-600">
+                          <span className="text-[10px] text-slate-400">
                             {fmtDate(msg.createdAt)} {fmtTime(msg.createdAt)}
                           </span>
                         </div>
@@ -370,7 +370,7 @@ export default function SupportPage() {
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Écrire un message..."
                       required
-                      className="flex-1 px-3 py-2 rounded-lg text-sm text-white placeholder-gray-600 border focus:outline-none focus:border-blue-500 transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg text-sm text-white placeholder-slate-400 border focus:outline-none focus:border-blue-500 transition-colors"
                       style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.1)" }}
                     />
                     <button
@@ -389,7 +389,7 @@ export default function SupportPage() {
 
                 {selectedTicket.status === "FERME" && (
                   <div className="px-5 py-3 border-t text-center" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                    <p className="text-xs text-gray-500">Ce ticket est fermé. Vous ne pouvez plus y répondre.</p>
+                    <p className="text-xs text-slate-400">Ce ticket est fermé. Vous ne pouvez plus y répondre.</p>
                   </div>
                 )}
               </div>

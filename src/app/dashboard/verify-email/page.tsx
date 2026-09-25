@@ -59,7 +59,7 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#0A1628" }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#1C2D4F" }}>
       <div className="w-full max-w-md text-center">
         {/* Envelope icon */}
         <div className="w-20 h-20 rounded-full bg-blue-600/15 border border-blue-500/20 flex items-center justify-center mx-auto mb-6">
@@ -68,7 +68,7 @@ export default function VerifyEmailPage() {
 
         {/* Title */}
         <h1 className="text-2xl font-bold text-white mb-2">Verifiez votre email</h1>
-        <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+        <p className="text-slate-300 text-sm mb-8 leading-relaxed">
           Un email de verification a ete envoye a{" "}
           <span className="text-blue-400 font-medium">{email ?? "votre adresse"}</span>.
           <br />
@@ -125,7 +125,7 @@ export default function VerifyEmailPage() {
         <div className="mt-8 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <a
             href="/auth/logout"
-            className="inline-flex items-center gap-2 text-gray-500 hover:text-red-400 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-red-400 text-sm transition-colors"
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="text-xs" />
             Se deconnecter

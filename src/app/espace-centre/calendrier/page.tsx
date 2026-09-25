@@ -132,7 +132,7 @@ export default function CalendrierPage() {
             <FontAwesomeIcon icon={faCalendarDays} className="text-blue-400 mr-3" />
             Calendrier des sessions
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-slate-400 text-sm">
             Visualisez et gérez toutes vos sessions de formation
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function CalendrierPage() {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: statusColors[key] }}
             />
-            <span className="text-xs text-gray-400">{label}</span>
+            <span className="text-xs text-slate-300">{label}</span>
           </div>
         ))}
       </div>
@@ -168,7 +168,7 @@ export default function CalendrierPage() {
         >
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -195,7 +195,7 @@ export default function CalendrierPage() {
             {[
               { label: "Sessions actives", value: sessions.filter((s) => s.status === "ACTIVE").length, color: "text-blue-600" },
               { label: "Complètes", value: sessions.filter((s) => s.status === "COMPLETE").length, color: "text-green-600" },
-              { label: "Passées", value: sessions.filter((s) => s.status === "PASSEE").length, color: "text-gray-600" },
+              { label: "Passées", value: sessions.filter((s) => s.status === "PASSEE").length, color: "text-slate-400" },
               { label: "Annulées", value: sessions.filter((s) => s.status === "ANNULEE").length, color: "text-red-600" },
             ].map((stat) => (
               <div
@@ -204,7 +204,7 @@ export default function CalendrierPage() {
                 style={{ borderColor: "#E5E7EB" }}
               >
                 <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-gray-500">{stat.label}</p>
+                <p className="text-xs text-slate-400">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -223,7 +223,7 @@ export default function CalendrierPage() {
           {/* Modal */}
           <div
             className="relative w-full max-w-lg rounded-xl border overflow-hidden"
-            style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.1)" }}
+            style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.1)" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Color bar */}
@@ -253,7 +253,7 @@ export default function CalendrierPage() {
               </div>
               <button
                 onClick={() => setSelectedSession(null)}
-                className="text-gray-500 hover:text-white transition-colors p-1"
+                className="text-slate-400 hover:text-white transition-colors p-1"
               >
                 <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
               </button>
@@ -267,11 +267,11 @@ export default function CalendrierPage() {
                     <FontAwesomeIcon icon={faClock} className="text-blue-400 text-sm" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Dates</p>
+                    <p className="text-xs text-slate-400">Dates</p>
                     <p className="text-sm text-white font-medium">
                       {formatDate(selectedSession.dateDebut, "short")}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-300">
                       au {formatDate(selectedSession.dateFin, "short")}
                     </p>
                   </div>
@@ -282,7 +282,7 @@ export default function CalendrierPage() {
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-purple-400 text-sm" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Lieu</p>
+                    <p className="text-xs text-slate-400">Lieu</p>
                     <p className="text-sm text-white font-medium">{selectedSession.ville}</p>
                   </div>
                 </div>
@@ -292,11 +292,11 @@ export default function CalendrierPage() {
                     <FontAwesomeIcon icon={faUsers} className="text-green-400 text-sm" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Places</p>
+                    <p className="text-xs text-slate-400">Places</p>
                     <p className="text-sm text-white font-medium">
                       {selectedSession.reservationsCount} / {selectedSession.placesTotal}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-300">
                       {selectedSession.placesRestantes} restante{selectedSession.placesRestantes !== 1 ? "s" : ""}
                     </p>
                   </div>
@@ -307,7 +307,7 @@ export default function CalendrierPage() {
                     <FontAwesomeIcon icon={faEuroSign} className="text-yellow-400 text-sm" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Prix</p>
+                    <p className="text-xs text-slate-400">Prix</p>
                     <p className="text-sm text-white font-medium">{formatPrice(selectedSession.prix)}</p>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default function CalendrierPage() {
               {/* Progress bar places */}
               <div>
                 <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-gray-500">Taux de remplissage</span>
+                  <span className="text-slate-400">Taux de remplissage</span>
                   <span className="text-white font-medium">
                     {Math.round(((selectedSession.placesTotal - selectedSession.placesRestantes) / selectedSession.placesTotal) * 100)}%
                   </span>
@@ -343,7 +343,7 @@ export default function CalendrierPage() {
               </a>
               <button
                 onClick={() => setSelectedSession(null)}
-                className="px-4 py-2.5 text-sm font-medium text-gray-400 hover:text-white rounded-lg border transition-colors"
+                className="px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-lg border transition-colors"
                 style={{ borderColor: "rgba(255,255,255,0.1)" }}
               >
                 Fermer

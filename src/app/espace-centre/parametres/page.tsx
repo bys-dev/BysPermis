@@ -262,7 +262,7 @@ export default function ParametresCentrePage() {
 
   if (!loading && !form) {
     return (
-      <div className="text-center py-24 text-gray-500">
+      <div className="text-center py-24 text-slate-400">
         <p>Impossible de charger les paramètres du centre.</p>
       </div>
     );
@@ -291,7 +291,7 @@ export default function ParametresCentrePage() {
         <h1 className="font-display font-bold text-2xl text-white mb-1">
           Parametres
         </h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-slate-400 text-sm">
           Gerez les informations de votre centre, votre abonnement et votre
           compte Stripe
         </p>
@@ -321,7 +321,7 @@ export default function ParametresCentrePage() {
               className={`px-4 py-3 text-sm font-medium transition-all flex items-center gap-2 border-b-2 -mb-px ${
                 activeTab === tab.id
                   ? "text-blue-400 border-blue-500"
-                  : "text-gray-400 hover:text-white border-transparent"
+                  : "text-slate-300 hover:text-white border-transparent"
               }`}
             >
               <FontAwesomeIcon icon={tab.icon} className="w-3.5 h-3.5" />
@@ -340,7 +340,7 @@ export default function ParametresCentrePage() {
           </h2>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Nom du centre
             </label>
             <input
@@ -353,13 +353,13 @@ export default function ParametresCentrePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Adresse
             </label>
             <div className="relative">
               <FontAwesomeIcon
                 icon={faLocationDot}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
               />
               <input
                 type="text"
@@ -373,7 +373,7 @@ export default function ParametresCentrePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Code postal
               </label>
               <input
@@ -385,7 +385,7 @@ export default function ParametresCentrePage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Ville
               </label>
               <input
@@ -400,13 +400,13 @@ export default function ParametresCentrePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Telephone
               </label>
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPhone}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                 />
                 <input
                   type="tel"
@@ -418,13 +418,13 @@ export default function ParametresCentrePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Email
               </label>
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faEnvelope}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
                 />
                 <input
                   type="email"
@@ -446,12 +446,12 @@ export default function ParametresCentrePage() {
             <FontAwesomeIcon icon={faFileInvoice} className="text-blue-400 w-4 h-4" />
             Identite juridique & facturation
           </h2>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate-400">
             Ces informations apparaitront sur vos contrats et factures.
           </p>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Raison sociale
             </label>
             <input
@@ -466,7 +466,7 @@ export default function ParametresCentrePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 SIRET
               </label>
               <input
@@ -482,7 +482,7 @@ export default function ParametresCentrePage() {
               )}
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-slate-400 mb-2">
                 Code APE / NAF
               </label>
               <input
@@ -500,7 +500,7 @@ export default function ParametresCentrePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Numero de TVA intracommunautaire
             </label>
             <input
@@ -517,12 +517,12 @@ export default function ParametresCentrePage() {
           </div>
 
           <div className="pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 mt-3">
+            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3 mt-3">
               Coordonnees bancaires
             </h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   IBAN
                 </label>
                 <input
@@ -538,7 +538,7 @@ export default function ParametresCentrePage() {
                 )}
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-slate-400 mb-2">
                   BIC / SWIFT
                 </label>
                 <input
@@ -566,7 +566,7 @@ export default function ParametresCentrePage() {
               <FontAwesomeIcon icon={faGavel} className="text-blue-400 w-4 h-4" />
               Mentions legales
             </h2>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-slate-400 mb-4">
               Apparaitront en pied de contrat. Renseignez votre forme juridique,
               capital, RCS, etc.
             </p>
@@ -585,7 +585,7 @@ export default function ParametresCentrePage() {
               <FontAwesomeIcon icon={faGavel} className="text-blue-400 w-4 h-4" />
               Conditions generales de vente
             </h2>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-slate-400 mb-4">
               Les CGV seront annexees au contrat et a la facture envoyes au
               stagiaire.
             </p>
@@ -608,13 +608,13 @@ export default function ParametresCentrePage() {
             <FontAwesomeIcon icon={faUserTie} className="text-blue-400 w-4 h-4" />
             Responsable & cachet numérique
           </h2>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate-400">
             Le nom et le cachet qui apparaitront en bas des contrats et documents
             emis par votre centre.
           </p>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               Nom du responsable
             </label>
             <input
@@ -650,7 +650,7 @@ export default function ParametresCentrePage() {
             </h2>
 
             {loadingSub ? (
-              <div className="flex items-center gap-3 py-4 text-gray-500">
+              <div className="flex items-center gap-3 py-4 text-slate-400">
                 <FontAwesomeIcon icon={faSpinner} className="animate-spin text-sm" />
                 <span className="text-sm">Chargement...</span>
               </div>
@@ -667,7 +667,7 @@ export default function ParametresCentrePage() {
                     <p className="text-sm font-semibold text-white">
                       Plan {subscription.plan.nom}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5">
                       {subscription.plan.prix}&euro;/mois &middot; Commission{" "}
                       {subscription.plan.commissionRate}%
                     </p>
@@ -676,7 +676,7 @@ export default function ParametresCentrePage() {
                     <span
                       className={`text-xs font-semibold ${
                         STATUS_LABELS[subscription.status || ""]?.color ||
-                        "text-gray-400"
+                        "text-slate-300"
                       }`}
                     >
                       {STATUS_LABELS[subscription.status || ""]?.label ||
@@ -687,7 +687,7 @@ export default function ParametresCentrePage() {
                 </div>
 
                 {subscription.currentPeriodEnd && (
-                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
                     <FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5" />
                     <span>
                       {subscription.cancelAtPeriodEnd
@@ -778,13 +778,13 @@ export default function ParametresCentrePage() {
                 >
                   <FontAwesomeIcon
                     icon={faCircleExclamation}
-                    className="text-gray-500 w-5 h-5 mt-0.5"
+                    className="text-slate-400 w-5 h-5 mt-0.5"
                   />
                   <div>
                     <p className="text-sm font-semibold text-gray-300">
                       Aucun abonnement actif
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Souscrivez un abonnement pour referencer votre centre sur
                       la marketplace et beneficier de commissions reduites.
                     </p>
@@ -824,7 +824,7 @@ export default function ParametresCentrePage() {
                   <p className="text-sm font-semibold text-blue-400">
                     Compte Stripe connecte
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-slate-300">
                     Vous recevez automatiquement les paiements de chaque
                     reservation (hors commission).
                   </p>
@@ -847,7 +847,7 @@ export default function ParametresCentrePage() {
                     <p className="text-sm font-semibold text-red-400">
                       Compte Stripe non connecte
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Sans compte Stripe Connect, vous ne pouvez pas recevoir
                       les paiements. Connectez votre compte pour recevoir les
                       paiements de chaque reservation.
@@ -871,7 +871,7 @@ export default function ParametresCentrePage() {
             )}
 
             <div
-              className="mt-4 pt-4 border-t text-xs text-gray-600"
+              className="mt-4 pt-4 border-t text-xs text-slate-400"
               style={{ borderColor: "rgba(255,255,255,0.07)" }}
             >
               Commission appliquee :{" "}

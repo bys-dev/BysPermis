@@ -37,6 +37,8 @@ export interface AudienceFilter {
   exclureDejaContactes?: boolean;
   exclureCampagneIds?: string[];
   recherche?: string;
+  /** Cf. `ajoutsManuels` côté serveur : fiches issues d'adresses saisies à la main. */
+  ajoutsManuels?: string[];
 }
 
 export interface CampagneForm {
@@ -106,4 +108,4 @@ export const STATUTS_CIBLABLES: { value: Statut; label: string }[] = [
 ];
 
 export const inputClass =
-  "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500";
+  "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500";

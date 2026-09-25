@@ -104,7 +104,7 @@ export default function PaiementsPage() {
     <div>
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Historique des paiements</h1>
-        <p className="text-gray-500 text-sm">Retrouvez tous vos paiements et factures</p>
+        <p className="text-slate-400 text-sm">Retrouvez tous vos paiements et factures</p>
       </div>
 
       <div className="relative min-h-[50vh]">
@@ -118,7 +118,7 @@ export default function PaiementsPage() {
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -138,7 +138,7 @@ export default function PaiementsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{formatPrice(totalPaye)}</p>
-                    <p className="text-xs text-gray-500">Total dépensé</p>
+                    <p className="text-xs text-slate-400">Total dépensé</p>
                   </div>
                 </div>
               </div>
@@ -149,7 +149,7 @@ export default function PaiementsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{formatPrice(totalRembourse)}</p>
-                    <p className="text-xs text-gray-500">Total remboursé</p>
+                    <p className="text-xs text-slate-400">Total remboursé</p>
                   </div>
                 </div>
               </div>
@@ -160,7 +160,7 @@ export default function PaiementsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{nbPaiements}</p>
-                    <p className="text-xs text-gray-500">Paiement{nbPaiements > 1 ? "s" : ""}</p>
+                    <p className="text-xs text-slate-400">Paiement{nbPaiements > 1 ? "s" : ""}</p>
                   </div>
                 </div>
               </div>
@@ -170,9 +170,9 @@ export default function PaiementsPage() {
           {/* Empty state */}
           {reservations.length === 0 ? (
             <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-              <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
+              <FontAwesomeIcon icon={faSearch} className="text-3xl text-slate-400 mb-3" />
               <p className="text-white font-medium mb-1">Aucun paiement</p>
-              <p className="text-gray-500 text-sm">Vous n&apos;avez pas encore effectué de paiement.</p>
+              <p className="text-slate-400 text-sm">Vous n&apos;avez pas encore effectué de paiement.</p>
             </div>
           ) : (
             /* Payments table */
@@ -182,12 +182,12 @@ export default function PaiementsPage() {
                 <table className="w-full">
                   <thead>
                     <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Date</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Formation</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Référence</th>
-                      <th className="text-right text-xs font-medium text-gray-500 px-5 py-3">Montant</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Statut</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Documents</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Date</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Formation</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Référence</th>
+                      <th className="text-right text-xs font-medium text-slate-400 px-5 py-3">Montant</th>
+                      <th className="text-center text-xs font-medium text-slate-400 px-5 py-3">Statut</th>
+                      <th className="text-center text-xs font-medium text-slate-400 px-5 py-3">Documents</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -199,19 +199,19 @@ export default function PaiementsPage() {
                           className="border-t"
                           style={{ borderColor: "rgba(255,255,255,0.05)" }}
                         >
-                          <td className="px-5 py-4 text-sm text-gray-400">
+                          <td className="px-5 py-4 text-sm text-slate-300">
                             {formatDate(r.createdAt, "short")}
                           </td>
                           <td className="px-5 py-4">
                             <p className="text-sm text-white font-medium truncate max-w-[250px]">
                               {r.session.formation.titre}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-slate-400">
                               {r.session.formation.centre.nom}
                             </p>
                           </td>
                           <td className="px-5 py-4">
-                            <span className="text-xs text-gray-500 font-mono">{r.numero}</span>
+                            <span className="text-xs text-slate-400 font-mono">{r.numero}</span>
                           </td>
                           <td className="px-5 py-4 text-right">
                             <span className="text-sm font-semibold text-white">
@@ -275,7 +275,7 @@ export default function PaiementsPage() {
                           <p className="text-sm text-white font-medium truncate">
                             {r.session.formation.titre}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-slate-400">
                             {r.session.formation.centre.nom} - {formatDate(r.createdAt, "short")}
                           </p>
                         </div>
@@ -285,7 +285,7 @@ export default function PaiementsPage() {
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-600 font-mono">{r.numero}</span>
+                        <span className="text-xs text-slate-400 font-mono">{r.numero}</span>
                         <span className="text-sm font-semibold text-white">{formatPrice(r.montant)}</span>
                       </div>
                       {(r.status === "CONFIRMEE" || r.status === "TERMINEE") && (

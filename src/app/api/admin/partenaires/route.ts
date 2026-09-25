@@ -9,6 +9,13 @@ const STATUTS: PartnerLeadStatus[] = ["NOUVEAU", "EN_COURS", "COMPTE_CREE", "REF
 export async function GET(req: NextRequest) {
   try {
     await requireAdmin();
+
+    // Compteur léger pour le badge du menu et le dashboard.
+    if (req.nextUrl.searchParams.get("only") === "pending") {
+      const pending = await prisma.partnerLead.count({ where: { statut: { in: ["NOUVEAU", "EN_COURS"] } } });
+      return NextResponse.json({ pending });
+    }
+
     const statut = req.nextUrl.searchParams.get("statut");
     const search = req.nextUrl.searchParams.get("search")?.trim();
 

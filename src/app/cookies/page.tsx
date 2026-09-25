@@ -201,16 +201,44 @@ export default function CookiesPage() {
                     <tbody>
                       <tr>
                         <td className="p-3 border-b border-brand-border">
-                          _vercel_insights
+                          _ga
                         </td>
                         <td className="p-3 border-b border-brand-border">
-                          Vercel Analytics
+                          Google Analytics 4
                         </td>
                         <td className="p-3 border-b border-brand-border">
-                          Mesure d&apos;audience et analyse du trafic
+                          Distingue les visiteurs pour la mesure d&apos;audience
                         </td>
                         <td className="p-3 border-b border-brand-border">
-                          12 mois
+                          13 mois
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border-b border-brand-border">
+                          _ga_*
+                        </td>
+                        <td className="p-3 border-b border-brand-border">
+                          Google Analytics 4
+                        </td>
+                        <td className="p-3 border-b border-brand-border">
+                          Conserve l&apos;état de la session de mesure
+                        </td>
+                        <td className="p-3 border-b border-brand-border">
+                          13 mois
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border-b border-brand-border">
+                          _gcl_au
+                        </td>
+                        <td className="p-3 border-b border-brand-border">
+                          Google Ads
+                        </td>
+                        <td className="p-3 border-b border-brand-border">
+                          Attribution des conversions publicitaires
+                        </td>
+                        <td className="p-3 border-b border-brand-border">
+                          90 jours
                         </td>
                       </tr>
                     </tbody>

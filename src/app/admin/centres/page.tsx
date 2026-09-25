@@ -151,7 +151,7 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-lg mx-4 rounded-xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
-        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+        style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
@@ -161,12 +161,12 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">Inviter un centre</h2>
-              <p className="text-gray-500 text-xs">
+              <p className="text-slate-400 text-xs">
                 Saisissez le SIRET pour pré-remplir automatiquement les informations
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
           </button>
         </div>
@@ -177,7 +177,7 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
               <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
             </div>
             <p className="text-green-400 font-semibold text-lg">Invitation envoyée !</p>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-slate-400 text-sm mt-1">
               Le centre a été créé et l&apos;email d&apos;invitation envoyé.
             </p>
           </div>
@@ -193,13 +193,13 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                   Remplissage rapide par SIRET
                 </span>
               </div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                SIRET <span className="text-gray-600">(optionnel, 14 chiffres)</span>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                SIRET <span className="text-slate-400">(optionnel, 14 chiffres)</span>
               </label>
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faHashtag}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                 />
                 <input
                   type="text"
@@ -250,17 +250,17 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/10 text-white text-[10px] font-bold">
                   2
                 </span>
-                <span className="text-xs font-medium text-gray-400">Identité du centre</span>
+                <span className="text-xs font-medium text-slate-300">Identité du centre</span>
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
                     Nom du centre *
                   </label>
                   <div className="relative">
                     <FontAwesomeIcon
                       icon={faSignature}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                     />
                     <input
                       type="text"
@@ -275,13 +275,13 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
                     Email du propriétaire *
                   </label>
                   <div className="relative">
                     <FontAwesomeIcon
                       icon={faEnvelope}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                     />
                     <input
                       type="email"
@@ -296,13 +296,13 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                    Téléphone <span className="text-gray-600">(optionnel)</span>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Téléphone <span className="text-slate-400">(optionnel)</span>
                   </label>
                   <div className="relative">
                     <FontAwesomeIcon
                       icon={faPhone}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                     />
                     <input
                       type="tel"
@@ -323,17 +323,17 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/10 text-white text-[10px] font-bold">
                   3
                 </span>
-                <span className="text-xs font-medium text-gray-400">Adresse</span>
+                <span className="text-xs font-medium text-slate-300">Adresse</span>
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                    Adresse <span className="text-gray-600">(optionnel)</span>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Adresse <span className="text-slate-400">(optionnel)</span>
                   </label>
                   <div className="relative">
                     <FontAwesomeIcon
                       icon={faRoad}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                     />
                     <input
                       type="text"
@@ -348,13 +348,13 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
 
                 <div className="grid grid-cols-5 gap-3">
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
                       Code postal
                     </label>
                     <div className="relative">
                       <FontAwesomeIcon
                         icon={faMapPin}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                       />
                       <input
                         type="text"
@@ -369,13 +369,13 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                     </div>
                   </div>
                   <div className="col-span-3">
-                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
                       Ville
                     </label>
                     <div className="relative">
                       <FontAwesomeIcon
                         icon={faLocationDot}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                       />
                       <input
                         type="text"
@@ -402,7 +402,7 @@ function InviteModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+                className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors border border-white/10 hover:border-white/20"
               >
                 Annuler
               </button>
@@ -473,7 +473,7 @@ function RejectModal({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-md mx-4 rounded-xl p-6 shadow-2xl"
-        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+        style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -482,17 +482,17 @@ function RejectModal({
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">Rejeter le centre</h2>
-              <p className="text-gray-500 text-xs">{centre.nom}</p>
+              <p className="text-slate-400 text-xs">{centre.nom}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleReject} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">
               Raison du refus *
             </label>
             <textarea
@@ -517,7 +517,7 @@ function RejectModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+              className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors border border-white/10 hover:border-white/20"
             >
               Annuler
             </button>
@@ -598,7 +598,7 @@ function AddLieuModal({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-lg mx-4 rounded-xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
-        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+        style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}
       >
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
@@ -607,10 +607,10 @@ function AddLieuModal({
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">Ajouter un lieu</h2>
-              <p className="text-gray-500 text-xs">Chef de centre : {centre.ownerNom}</p>
+              <p className="text-slate-400 text-xs">Chef de centre : {centre.ownerNom}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
           </button>
         </div>
@@ -621,44 +621,44 @@ function AddLieuModal({
               <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
             </div>
             <p className="text-green-400 font-semibold text-lg">Lieu créé !</p>
-            <p className="text-gray-500 text-sm mt-1">Le nouveau lieu a été ajouté au chef de centre.</p>
+            <p className="text-slate-400 text-sm mt-1">Le nouveau lieu a été ajouté au chef de centre.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Nom du lieu *</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Nom du lieu *</label>
               <div className="relative">
-                <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                 <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} required className={inputClass} style={inputStyle} placeholder="Ex: Centre ABC — Sarcelles" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Adresse</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Adresse</label>
               <div className="relative">
-                <FontAwesomeIcon icon={faRoad} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faRoad} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                 <input type="text" value={adresse} onChange={(e) => setAdresse(e.target.value)} className={inputClass} style={inputStyle} placeholder="12 rue de la Paix" />
               </div>
             </div>
             <div className="grid grid-cols-5 gap-3">
               <div className="col-span-2">
-                <label className="block text-xs font-medium text-gray-400 mb-1.5">Code postal</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">Code postal</label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faMapPin} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <FontAwesomeIcon icon={faMapPin} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                   <input type="text" value={codePostal} onChange={(e) => setCodePostal(e.target.value)} className={inputClass} style={inputStyle} placeholder="95200" inputMode="numeric" maxLength={5} />
                 </div>
               </div>
               <div className="col-span-3">
-                <label className="block text-xs font-medium text-gray-400 mb-1.5">Ville</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">Ville</label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faLocationDot} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <FontAwesomeIcon icon={faLocationDot} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                   <input type="text" value={ville} onChange={(e) => setVille(e.target.value)} className={inputClass} style={inputStyle} placeholder="Sarcelles" />
                 </div>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Téléphone <span className="text-gray-600">(optionnel)</span></label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Téléphone <span className="text-slate-400">(optionnel)</span></label>
               <div className="relative">
-                <FontAwesomeIcon icon={faPhone} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faPhone} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                 <input type="tel" value={telephone} onChange={(e) => setTelephone(e.target.value)} className={inputClass} style={inputStyle} placeholder="01 23 45 67 89" />
               </div>
             </div>
@@ -669,7 +669,7 @@ function AddLieuModal({
               </div>
             )}
             <div className="flex gap-3 pt-2">
-              <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20">
+              <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors border border-white/10 hover:border-white/20">
                 Annuler
               </button>
               <button type="submit" disabled={loading || !nom.trim()} className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all">
@@ -735,7 +735,7 @@ function InviteDirecteurModal({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-lg mx-4 rounded-xl p-6 shadow-2xl"
-        style={{ background: "#0D1D3A", border: "1px solid rgba(255,255,255,0.1)" }}
+        style={{ background: "#24385E", border: "1px solid rgba(255,255,255,0.1)" }}
       >
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
@@ -744,10 +744,10 @@ function InviteDirecteurModal({
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">Inviter un directeur de lieu</h2>
-              <p className="text-gray-500 text-xs">Lieu : {centre.nom}</p>
+              <p className="text-slate-400 text-xs">Lieu : {centre.nom}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
           </button>
         </div>
@@ -758,7 +758,7 @@ function InviteDirecteurModal({
               <FontAwesomeIcon icon={faCircleCheck} className="text-green-400 text-2xl" />
             </div>
             <p className="text-green-400 font-semibold text-lg">Invitation envoyée !</p>
-            <p className="text-gray-500 text-sm mt-1">Le directeur de lieu a reçu ses identifiants par email.</p>
+            <p className="text-slate-400 text-sm mt-1">Le directeur de lieu a reçu ses identifiants par email.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -767,24 +767,24 @@ function InviteDirecteurModal({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1.5">Prénom *</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">Prénom *</label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                   <input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} required className={inputClass} style={inputStyle} placeholder="Jean" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1.5">Nom *</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">Nom *</label>
                 <div className="relative">
-                  <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                  <FontAwesomeIcon icon={faSignature} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                   <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} required className={inputClass} style={inputStyle} placeholder="Dupont" />
                 </div>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Email *</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Email *</label>
               <div className="relative">
-                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} style={inputStyle} placeholder="directeur@centre.fr" />
               </div>
             </div>
@@ -795,7 +795,7 @@ function InviteDirecteurModal({
               </div>
             )}
             <div className="flex gap-3 pt-2">
-              <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20">
+              <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors border border-white/10 hover:border-white/20">
                 Annuler
               </button>
               <button type="submit" disabled={loading || !email.trim() || !prenom.trim() || !nom.trim()} className="flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all">
@@ -932,7 +932,7 @@ export default function AdminCentresPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Centres partenaires</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             {loading
               ? "Chargement..."
               : `${counts.tous} centres · ${counts.EN_ATTENTE} en attente de validation`}
@@ -961,7 +961,7 @@ export default function AdminCentresPage() {
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border
               ${filterStatut === s
                 ? "bg-white/10 text-white border-white/20"
-                : "text-gray-400 border-white/8 hover:text-white hover:border-white/20"
+                : "text-slate-300 border-white/8 hover:text-white hover:border-white/20"
               }`}
           >
             {s === "tous" ? "Tous" : statusMap[s].label}
@@ -973,13 +973,13 @@ export default function AdminCentresPage() {
       {/* Search */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" />
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
           <input
             type="text"
             placeholder="Rechercher un centre, une ville, un email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-[#0A1628] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
+            className="w-full pl-9 pr-4 py-2.5 bg-[#1C2D4F] border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50"
           />
         </div>
       </div>
@@ -995,7 +995,7 @@ export default function AdminCentresPage() {
       )}
 
       {/* Table */}
-      <div className="relative min-h-[280px] bg-[#0A1628] rounded-xl border border-white/8 overflow-hidden">
+      <div className="relative min-h-[280px] bg-[#1C2D4F] rounded-xl border border-white/8 overflow-hidden">
         <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
         {loading ? (
           <div className="animate-pulse divide-y divide-white/5 p-4">
@@ -1004,7 +1004,7 @@ export default function AdminCentresPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-slate-400">
             <FontAwesomeIcon icon={faBuilding} className="text-2xl mb-2" />
             <p className="text-sm">Aucun centre trouve</p>
           </div>
@@ -1013,13 +1013,13 @@ export default function AdminCentresPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/8">
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-5">Centre</th>
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Statut</th>
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Profil</th>
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Abonnement</th>
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Formations</th>
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">CA total</th>
-                  <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Inscrit</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-5">Centre</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Statut</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Profil</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Abonnement</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Formations</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">CA total</th>
+                  <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Inscrit</th>
                   <th className="py-3 px-4"><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
@@ -1037,7 +1037,7 @@ export default function AdminCentresPage() {
                             <div className="py-3.5 px-5 flex-1 min-w-[200px]">
                               <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/8 flex items-center justify-center shrink-0">
-                                  <FontAwesomeIcon icon={faBuilding} className="text-xs text-gray-500" />
+                                  <FontAwesomeIcon icon={faBuilding} className="text-xs text-slate-400" />
                                 </div>
                                 <div>
                                   <div className="flex items-center gap-2">
@@ -1049,7 +1049,7 @@ export default function AdminCentresPage() {
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-gray-500 text-xs flex items-center gap-1 mt-0.5">
+                                  <p className="text-slate-400 text-xs flex items-center gap-1 mt-0.5">
                                     <FontAwesomeIcon icon={faLocationDot} className="text-[9px]" />
                                     {c.ville || "Ville non renseignee"}
                                   </p>
@@ -1092,19 +1092,19 @@ export default function AdminCentresPage() {
                               {c.subscriptionPlan ? (
                                 <span className="text-gray-300 text-xs">{c.subscriptionPlan.nom}</span>
                               ) : (
-                                <span className="text-gray-600 text-xs">Aucun</span>
+                                <span className="text-slate-400 text-xs">Aucun</span>
                               )}
                             </div>
                             <div className="py-3.5 px-4">
                               <span className="text-gray-300 text-xs">{c.formationCount} formation(s)</span>
-                              <p className="text-gray-600 text-[10px]">{c.sessionCount} session(s)</p>
+                              <p className="text-slate-400 text-[10px]">{c.sessionCount} session(s)</p>
                             </div>
                             <div className="py-3.5 px-4">
                               <span className="text-green-400 text-xs font-semibold">
                                 {c.revenue > 0 ? formatPrice(c.revenue) : "\u2014"}
                               </span>
                             </div>
-                            <div className="py-3.5 px-4 text-gray-500 text-xs">
+                            <div className="py-3.5 px-4 text-slate-400 text-xs">
                               <div className="flex items-center gap-1">
                                 <FontAwesomeIcon icon={faClock} className="text-[9px]" />
                                 {formatDate(new Date(c.createdAt))}
@@ -1193,7 +1193,7 @@ export default function AdminCentresPage() {
                                 )}
                                 <button
                                   onClick={() => setExpandedId(isExpanded ? null : c.id)}
-                                  className="p-1.5 rounded-lg bg-white/5 border border-white/8 text-gray-400 hover:text-white transition-colors"
+                                  className="p-1.5 rounded-lg bg-white/5 border border-white/8 text-slate-300 hover:text-white transition-colors"
                                   title={isExpanded ? "Masquer les details" : "Voir les details"}
                                 >
                                   <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="text-xs" />
@@ -1210,28 +1210,28 @@ export default function AdminCentresPage() {
                                 <div className="space-y-3">
                                   <h3 className="text-white text-xs font-semibold uppercase tracking-wider">Contact</h3>
                                   <div className="space-y-2">
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faUsers} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faUsers} className="text-slate-400 text-[10px] w-3" />
                                       Proprietaire : <span className="text-white">{c.ownerNom}</span>
                                     </p>
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faEnvelope} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faEnvelope} className="text-slate-400 text-[10px] w-3" />
                                       {c.email ?? c.ownerEmail}
                                     </p>
                                     {c.telephone && (
-                                      <p className="text-gray-400 text-xs flex items-center gap-2">
-                                        <FontAwesomeIcon icon={faPhone} className="text-gray-600 text-[10px] w-3" />
+                                      <p className="text-slate-300 text-xs flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faPhone} className="text-slate-400 text-[10px] w-3" />
                                         {c.telephone}
                                       </p>
                                     )}
                                     {c.siteWeb && (
-                                      <p className="text-gray-400 text-xs flex items-center gap-2">
-                                        <FontAwesomeIcon icon={faGlobe} className="text-gray-600 text-[10px] w-3" />
+                                      <p className="text-slate-300 text-xs flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faGlobe} className="text-slate-400 text-[10px] w-3" />
                                         {c.siteWeb}
                                       </p>
                                     )}
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faLocationDot} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faLocationDot} className="text-slate-400 text-[10px] w-3" />
                                       {c.adresse}, {c.codePostal} {c.ville}
                                     </p>
                                   </div>
@@ -1258,23 +1258,23 @@ export default function AdminCentresPage() {
                                 <div className="space-y-3">
                                   <h3 className="text-white text-xs font-semibold uppercase tracking-wider">Abonnement & chiffres</h3>
                                   <div className="space-y-2">
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faEuro} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faEuro} className="text-slate-400 text-[10px] w-3" />
                                       Plan : <span className="text-white">{c.subscriptionPlan?.nom ?? "Aucun"}</span>
                                       {c.subscriptionPlan && (
-                                        <span className="text-gray-500">({formatPrice(c.subscriptionPlan.prix)}/mois)</span>
+                                        <span className="text-slate-400">({formatPrice(c.subscriptionPlan.prix)}/mois)</span>
                                       )}
                                     </p>
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faCalendarDay} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faCalendarDay} className="text-slate-400 text-[10px] w-3" />
                                       {c.formationCount} formation(s) · {c.sessionCount} session(s)
                                     </p>
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faUsers} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faUsers} className="text-slate-400 text-[10px] w-3" />
                                       {c.membreCount} membre(s) dans l'equipe
                                     </p>
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faEuro} className="text-gray-600 text-[10px] w-3" />
+                                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faEuro} className="text-slate-400 text-[10px] w-3" />
                                       CA total : <span className="text-green-400 font-semibold">{formatPrice(c.revenue)}</span>
                                     </p>
                                     {c.certifications.length > 0 && (
@@ -1294,14 +1294,14 @@ export default function AdminCentresPage() {
                                 <div className="space-y-3">
                                   <h3 className="text-white text-xs font-semibold uppercase tracking-wider">Formations actives</h3>
                                   {c.formations.length === 0 ? (
-                                    <p className="text-gray-600 text-xs">Aucune formation active</p>
+                                    <p className="text-slate-400 text-xs">Aucune formation active</p>
                                   ) : (
                                     <div className="space-y-2 max-h-40 overflow-y-auto">
                                       {c.formations.map((f) => (
                                         <div key={f.id} className="flex items-center justify-between p-2 rounded-lg bg-white/3 border border-white/5">
                                           <div className="min-w-0 flex-1">
                                             <p className="text-white text-xs truncate">{f.titre}</p>
-                                            <p className="text-gray-600 text-[10px]">
+                                            <p className="text-slate-400 text-[10px]">
                                               {f.sessionCount} session(s) · {f.modalite}
                                             </p>
                                           </div>

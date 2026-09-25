@@ -9,7 +9,7 @@ jest.mock("@/lib/prisma", () => ({ prisma: {} }));
 jest.mock("@/lib/email", () => ({ resend: { batch: { send: jest.fn() } } }));
 jest.mock("@/lib/email-log", () => ({ logEmail: jest.fn() }));
 
-import { buildAudienceWhere, buildCampaignMessage } from "@/lib/prospects/campaign";
+import { buildAudienceWhere, buildCampaignMessage, estAdresseUnique } from "@/lib/prospects/campaign";
 import type { TemplateProspect } from "@/lib/prospects/template";
 
 const prospect = (over: Partial<TemplateProspect> = {}): TemplateProspect => ({
@@ -116,6 +116,26 @@ describe("buildCampaignMessage", () => {
     expect(Array.isArray(message.to)).toBe(false);
     expect(message).not.toHaveProperty("cc");
     expect(message).not.toHaveProperty("bcc");
+  });
+
+  it("refuse une adresse qui en contient plusieurs", () => {
+    for (const multiple of [
+      "a@exemple.fr, b@exemple.fr",
+      "a@exemple.fr;b@exemple.fr",
+      "a@exemple.fr b@exemple.fr",
+      "Centre <a@exemple.fr>",
+    ]) {
+      expect(estAdresseUnique(multiple)).toBe(false);
+      expect(() =>
+        buildCampaignMessage({ campaign, email: multiple, prospect: prospect() }),
+      ).toThrow(/plusieurs destinataires/);
+    }
+  });
+
+  it("accepte une adresse simple, espaces de bordure compris", () => {
+    expect(estAdresseUnique("contact@exemple.fr")).toBe(true);
+    expect(estAdresseUnique("  contact@exemple.fr  ")).toBe(true);
+    expect(estAdresseUnique("contact")).toBe(false);
   });
 
   it("utilise l'adresse figée au ciblage plutôt que celle de la fiche", () => {

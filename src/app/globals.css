@@ -10,10 +10,10 @@
   --color-brand-red: #EF4444;
 
   /* ─── Thème SOMBRE (espaces connectés) ─── */
-  --color-navy-900: #0A1628;
-  --color-navy-800: #0D1D3A;
-  --color-navy-700: #0F2044;
-  --color-navy-600: #132B5C;
+  --color-navy-900: #1C2D4F;
+  --color-navy-800: #24385E;
+  --color-navy-700: #2B416A;
+  --color-navy-600: #36528A;
 
   --color-gold-500: #E8A020;
   --color-gold-400: #F5B84C;
@@ -21,8 +21,8 @@
   --color-gold-200: #FEE4B0;
 
   --color-dark-text: #F0F4FF;
-  --color-dark-text-2: #8BA3CC;
-  --color-dark-text-3: #4A6491;
+  --color-dark-text-2: #B4C6E4;
+  --color-dark-text-3: #8FA6CF;
   --color-dark-border: rgba(255, 255, 255, 0.07);
 
   /* ─── Sémantique ─── */

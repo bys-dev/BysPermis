@@ -51,7 +51,7 @@ export default function QuestionnaireReservationPage() {
   if (!loading && !data) {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
-        <p className="text-gray-400 mb-4">Questionnaire indisponible.</p>
+        <p className="text-slate-300 mb-4">Questionnaire indisponible.</p>
         <Link href="/espace-eleve/avis" className="text-blue-400 hover:underline">
           Retour aux questionnaires
         </Link>
@@ -64,7 +64,7 @@ export default function QuestionnaireReservationPage() {
       <div className="max-w-lg mx-auto text-center py-16">
         <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-green-400 mb-4" />
         <h1 className="font-display font-bold text-xl text-white mb-2">Merci pour vos retours !</h1>
-        <p className="text-gray-400 text-sm mb-6">
+        <p className="text-slate-300 text-sm mb-6">
           Vos avis sur {data.centre.nom} et sur BYS Permis ont bien été enregistrés.
         </p>
         <Link
@@ -110,7 +110,7 @@ export default function QuestionnaireReservationPage() {
         />
       </div>
 
-      <p className="text-xs text-gray-500 mb-4">
+      <p className="text-xs text-slate-400 mb-4">
         {data.formationTitre} — {data.centre.nom}
       </p>
 
@@ -161,7 +161,7 @@ function StepBadge({
           ? "border-green-500/40 text-green-400 bg-green-500/10"
           : active
             ? "border-blue-500/50 text-blue-300 bg-blue-500/10"
-            : "border-white/10 text-gray-500"
+            : "border-white/10 text-slate-400"
       }`}
     >
       <FontAwesomeIcon icon={done ? faCheckCircle : icon} />

@@ -108,7 +108,7 @@ export default function AdminParametresPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Parametres</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Configuration globale de la plateforme</p>
+          <p className="text-slate-300 text-sm mt-0.5">Configuration globale de la plateforme</p>
         </div>
         {isOwner && (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-400/10 text-yellow-400 border border-yellow-500/20">
@@ -132,41 +132,41 @@ export default function AdminParametresPage() {
 
       {/* Platform info */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="w-10 h-10 rounded-lg bg-blue-400/10 border border-blue-500/20 flex items-center justify-center mb-4">
             <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-sm" />
           </div>
-          <label className="text-gray-400 text-xs font-medium mb-1.5 block">Nom de la plateforme</label>
+          <label className="text-slate-300 text-xs font-medium mb-1.5 block">Nom de la plateforme</label>
           <input
             type="text"
             value={platformName}
             readOnly
             className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none opacity-60 cursor-not-allowed"
           />
-          <p className="text-gray-600 text-[11px] mt-2">Nom affiche sur la plateforme</p>
+          <p className="text-slate-400 text-[11px] mt-2">Nom affiche sur la plateforme</p>
         </div>
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="w-10 h-10 rounded-lg bg-blue-400/10 border border-blue-500/20 flex items-center justify-center mb-4">
             <FontAwesomeIcon icon={faEnvelope} className="text-blue-400 text-sm" />
           </div>
-          <label className="text-gray-400 text-xs font-medium mb-1.5 block">Email de contact</label>
+          <label className="text-slate-300 text-xs font-medium mb-1.5 block">Email de contact</label>
           <input
             type="email"
             value={contactEmail}
             readOnly
             className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none opacity-60 cursor-not-allowed"
           />
-          <p className="text-gray-600 text-[11px] mt-2">Email utilise pour les notifications plateforme</p>
+          <p className="text-slate-400 text-[11px] mt-2">Email utilise pour les notifications plateforme</p>
         </div>
       </div>
 
       {/* Commission & monetisation */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className={`bg-[#0A1628] rounded-xl border p-5 ${isOwner ? "border-green-500/20" : "border-white/8"}`}>
+        <div className={`bg-[#1C2D4F] rounded-xl border p-5 ${isOwner ? "border-green-500/20" : "border-white/8"}`}>
           <div className="w-10 h-10 rounded-lg bg-green-400/10 border border-green-500/20 flex items-center justify-center mb-4">
             <FontAwesomeIcon icon={faPercent} className="text-green-400 text-sm" />
           </div>
-          <label className="text-gray-400 text-xs font-medium mb-1.5 block">Taux de commission (%)</label>
+          <label className="text-slate-300 text-xs font-medium mb-1.5 block">Taux de commission (%)</label>
           <div className="relative">
             <input
               type="number"
@@ -178,9 +178,9 @@ export default function AdminParametresPage() {
               disabled={!isOwner}
               className={`w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-green-500/50 ${!isOwner ? "opacity-60 cursor-not-allowed" : ""}`}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">%</span>
           </div>
-          <p className="text-gray-600 text-[11px] mt-2">Commission percue sur chaque reservation</p>
+          <p className="text-slate-400 text-[11px] mt-2">Commission percue sur chaque reservation</p>
           {!isOwner && (
             <p className="text-yellow-400/60 text-[10px] mt-1 flex items-center gap-1">
               <FontAwesomeIcon icon={faCrown} className="text-[8px]" />
@@ -189,11 +189,11 @@ export default function AdminParametresPage() {
           )}
         </div>
 
-        <div className={`bg-[#0A1628] rounded-xl border p-5 ${isOwner ? "border-green-500/20" : "border-white/8"}`}>
+        <div className={`bg-[#1C2D4F] rounded-xl border p-5 ${isOwner ? "border-green-500/20" : "border-white/8"}`}>
           <div className="w-10 h-10 rounded-lg bg-green-400/10 border border-green-500/20 flex items-center justify-center mb-4">
             <FontAwesomeIcon icon={faCoins} className="text-green-400 text-sm" />
           </div>
-          <label className="text-gray-400 text-xs font-medium mb-1.5 block">Modele de monetisation</label>
+          <label className="text-slate-300 text-xs font-medium mb-1.5 block">Modele de monetisation</label>
           <select
             value={monetisationModel}
             onChange={(e) => setMonetisationModel(e.target.value as MonetisationModel)}
@@ -201,12 +201,12 @@ export default function AdminParametresPage() {
             className={`w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-green-500/50 appearance-none ${!isOwner ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             {(Object.entries(monetisationLabels) as [MonetisationModel, string][]).map(([key, label]) => (
-              <option key={key} value={key} className="bg-[#0A1628]">
+              <option key={key} value={key} className="bg-[#1C2D4F]">
                 {label}
               </option>
             ))}
           </select>
-          <p className="text-gray-600 text-[11px] mt-2">Comment la plateforme genere ses revenus</p>
+          <p className="text-slate-400 text-[11px] mt-2">Comment la plateforme genere ses revenus</p>
           {!isOwner && (
             <p className="text-yellow-400/60 text-[10px] mt-1 flex items-center gap-1">
               <FontAwesomeIcon icon={faCrown} className="text-[8px]" />
@@ -236,7 +236,7 @@ export default function AdminParametresPage() {
 
       {/* Danger zone - OWNER only */}
       {isOwner && (
-        <div className="bg-[#0A1628] rounded-xl border border-red-500/30 p-6">
+        <div className="bg-[#1C2D4F] rounded-xl border border-red-500/30 p-6">
           <div className="flex items-center gap-2 mb-4">
             <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400" />
             <h2 className="text-red-400 font-semibold text-sm">Zone dangereuse</h2>
@@ -248,7 +248,7 @@ export default function AdminParametresPage() {
                   <FontAwesomeIcon icon={faShieldHalved} className="text-red-400 text-xs" />
                   Mode maintenance
                 </p>
-                <p className="text-gray-500 text-xs mt-0.5">
+                <p className="text-slate-400 text-xs mt-0.5">
                   Desactiver temporairement l&apos;acces public a la plateforme
                 </p>
               </div>
@@ -279,7 +279,7 @@ export default function AdminParametresPage() {
             </div>
             {maintenanceMode && (
               <div className="p-4 rounded-lg bg-red-400/5 border border-red-500/10">
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Message de maintenance (optionnel)</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Message de maintenance (optionnel)</label>
                 <textarea
                   value={maintenanceMessage}
                   onChange={(e) => setMaintenanceMessage(e.target.value)}

@@ -105,7 +105,7 @@ export default function PlateformeModerationPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Moderation</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Revue des centres et formations en attente d&apos;action
           </p>
         </div>
@@ -130,28 +130,28 @@ export default function PlateformeModerationPage() {
 
       {/* KPIs rapides */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-yellow-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-yellow-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-yellow-400/10 border border-yellow-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faBuilding} className="text-yellow-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : centresEnAttente.length}</p>
-          <p className="text-xs text-gray-500 mt-1">Centres en attente d&apos;activation</p>
+          <p className="text-xs text-slate-400 mt-1">Centres en attente d&apos;activation</p>
         </div>
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-orange-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-orange-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-orange-400/10 border border-orange-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faCalendarXmark} className="text-orange-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : formationsSansSession.length}</p>
-          <p className="text-xs text-gray-500 mt-1">Formations sans sessions planifiees</p>
+          <p className="text-xs text-slate-400 mt-1">Formations sans sessions planifiees</p>
         </div>
       </div>
 
       {/* Centres en attente */}
-      <div className="bg-[#0A1628] rounded-xl border border-yellow-500/20 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-yellow-500/20 p-5">
         <div className="flex items-center gap-2 mb-5">
           <FontAwesomeIcon icon={faClock} className="text-yellow-400 text-sm" />
           <h2 className="text-white font-semibold text-sm">Centres en attente d&apos;activation</h2>
@@ -164,7 +164,7 @@ export default function PlateformeModerationPage() {
         ) : centresEnAttente.length === 0 ? (
           <div className="text-center py-6">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-400 text-2xl mb-2" />
-            <p className="text-gray-500 text-sm">Aucun centre en attente</p>
+            <p className="text-slate-400 text-sm">Aucun centre en attente</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -178,13 +178,13 @@ export default function PlateformeModerationPage() {
                     <FontAwesomeIcon icon={faCircle} className="text-yellow-400 text-[6px]" />
                     <p className="text-white font-medium text-sm">{c.nom}</p>
                   </div>
-                  <p className="text-gray-500 text-xs mt-0.5">
+                  <p className="text-slate-400 text-xs mt-0.5">
                     {c.ville} &mdash; {c.email}
                   </p>
                   {c.telephone && (
-                    <p className="text-gray-600 text-[11px] mt-0.5">Tel : {c.telephone}</p>
+                    <p className="text-slate-400 text-[11px] mt-0.5">Tel : {c.telephone}</p>
                   )}
-                  <p className="text-gray-600 text-[11px] mt-0.5">
+                  <p className="text-slate-400 text-[11px] mt-0.5">
                     Inscrit le {new Date(c.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
                 </div>
@@ -221,7 +221,7 @@ export default function PlateformeModerationPage() {
       </div>
 
       {/* Formations sans sessions */}
-      <div className="bg-[#0A1628] rounded-xl border border-orange-500/20 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-orange-500/20 p-5">
         <div className="flex items-center gap-2 mb-5">
           <FontAwesomeIcon icon={faCalendarXmark} className="text-orange-400 text-sm" />
           <h2 className="text-white font-semibold text-sm">Formations sans sessions planifiees</h2>
@@ -234,7 +234,7 @@ export default function PlateformeModerationPage() {
         ) : formationsSansSession.length === 0 ? (
           <div className="text-center py-6">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-400 text-2xl mb-2" />
-            <p className="text-gray-500 text-sm">Toutes les formations ont des sessions</p>
+            <p className="text-slate-400 text-sm">Toutes les formations ont des sessions</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -248,10 +248,10 @@ export default function PlateformeModerationPage() {
                     <FontAwesomeIcon icon={faCircle} className="text-orange-400 text-[6px]" />
                     <p className="text-white font-medium text-sm">{f.titre}</p>
                   </div>
-                  <p className="text-gray-500 text-xs mt-0.5">
+                  <p className="text-slate-400 text-xs mt-0.5">
                     Centre : {f.centreNom}
                   </p>
-                  <p className="text-gray-600 text-[11px] mt-0.5">
+                  <p className="text-slate-400 text-[11px] mt-0.5">
                     Creee le {new Date(f.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
                 </div>

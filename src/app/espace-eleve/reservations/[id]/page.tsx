@@ -92,7 +92,7 @@ const statusConfig = {
   TERMINEE: {
     label: "Terminée",
     icon: faCheckCircle,
-    color: "text-gray-400",
+    color: "text-slate-300",
     bg: "bg-gray-400/10",
     border: "border-gray-500/20",
   },
@@ -228,7 +228,7 @@ export default function ReservationDetailPage() {
           className="text-3xl text-yellow-400 mb-3"
         />
         <p className="text-white font-medium mb-1">Réservation introuvable</p>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-slate-400 text-sm mb-6">
           Cette réservation n&apos;existe pas ou ne vous appartient pas.
         </p>
         <Link
@@ -256,7 +256,7 @@ export default function ReservationDetailPage() {
           className="text-3xl text-red-400 mb-3"
         />
         <p className="text-white font-medium mb-1">Erreur de chargement</p>
-        <p className="text-gray-500 text-sm mb-6">{error}</p>
+        <p className="text-slate-400 text-sm mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()}
           className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -280,7 +280,7 @@ export default function ReservationDetailPage() {
   return (
     <div className="max-w-3xl">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6">
+      <nav className="flex items-center gap-2 text-xs text-slate-400 mb-6">
         <Link
           href="/espace-eleve"
           className="hover:text-white transition-colors"
@@ -295,7 +295,7 @@ export default function ReservationDetailPage() {
           Mes réservations
         </Link>
         <FontAwesomeIcon icon={faChevronRight} className="w-2.5 h-2.5" />
-        <span className="text-gray-400 font-mono">{reservation.numero}</span>
+        <span className="text-slate-300 font-mono">{reservation.numero}</span>
       </nav>
 
       {/* Header */}
@@ -310,7 +310,7 @@ export default function ReservationDetailPage() {
         >
           <FontAwesomeIcon
             icon={faArrowLeft}
-            className="w-4 h-4 text-gray-400"
+            className="w-4 h-4 text-slate-300"
           />
         </button>
         <div className="flex-1">
@@ -325,7 +325,7 @@ export default function ReservationDetailPage() {
               {s.label}
             </span>
           </div>
-          <p className="text-gray-500 text-sm font-mono">
+          <p className="text-slate-400 text-sm font-mono">
             {reservation.numero}
           </p>
         </div>
@@ -340,7 +340,7 @@ export default function ReservationDetailPage() {
             borderColor: "rgba(255,255,255,0.07)",
           }}
         >
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
             Progression
           </h3>
           <div className="flex items-center gap-0">
@@ -356,7 +356,7 @@ export default function ReservationDetailPage() {
                           ? isCurrent
                             ? "bg-blue-600 text-white ring-4 ring-blue-600/20"
                             : "bg-green-500/20 text-green-400"
-                          : "bg-gray-800 text-gray-600"
+                          : "bg-gray-800 text-slate-400"
                       }`}
                     >
                       {isActive && !isCurrent ? (
@@ -370,7 +370,7 @@ export default function ReservationDetailPage() {
                     </div>
                     <span
                       className={`text-xs mt-2 font-medium ${
-                        isActive ? "text-white" : "text-gray-600"
+                        isActive ? "text-white" : "text-slate-400"
                       }`}
                     >
                       {step.label}
@@ -444,22 +444,22 @@ export default function ReservationDetailPage() {
           </div>
           <div className="space-y-2.5 text-sm">
             <div>
-              <p className="text-gray-500 text-xs">Titre</p>
+              <p className="text-slate-400 text-xs">Titre</p>
               <p className="text-white">{formation.titre}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-xs">Description</p>
+              <p className="text-slate-400 text-xs">Description</p>
               <p className="text-gray-300 text-xs leading-relaxed line-clamp-3">
                 {formation.description}
               </p>
             </div>
             <div className="flex gap-4">
               <div>
-                <p className="text-gray-500 text-xs">Durée</p>
+                <p className="text-slate-400 text-xs">Durée</p>
                 <p className="text-white">{formation.duree}</p>
               </div>
               <div>
-                <p className="text-gray-500 text-xs">Modalité</p>
+                <p className="text-slate-400 text-xs">Modalité</p>
                 <p className="text-white">
                   {modaliteLabels[formation.modalite] || formation.modalite}
                 </p>
@@ -496,11 +496,11 @@ export default function ReservationDetailPage() {
           </div>
           <div className="space-y-2.5 text-sm">
             <div>
-              <p className="text-gray-500 text-xs">Dates</p>
+              <p className="text-slate-400 text-xs">Dates</p>
               <p className="text-white flex items-center gap-1.5">
                 <FontAwesomeIcon
                   icon={faClock}
-                  className="w-3 h-3 text-gray-500"
+                  className="w-3 h-3 text-slate-400"
                 />
                 {formatDate(reservation.session.dateDebut)} —{" "}
                 {formatDate(reservation.session.dateFin)}
@@ -508,22 +508,22 @@ export default function ReservationDetailPage() {
             </div>
             {formation.lieu && (
               <div>
-                <p className="text-gray-500 text-xs">Lieu</p>
+                <p className="text-slate-400 text-xs">Lieu</p>
                 <p className="text-white flex items-center gap-1.5">
                   <FontAwesomeIcon
                     icon={faMapMarkerAlt}
-                    className="w-3 h-3 text-gray-500"
+                    className="w-3 h-3 text-slate-400"
                   />
                   {formation.lieu}
                 </p>
               </div>
             )}
             <div>
-              <p className="text-gray-500 text-xs">Places</p>
+              <p className="text-slate-400 text-xs">Places</p>
               <p className="text-white flex items-center gap-1.5">
                 <FontAwesomeIcon
                   icon={faUsers}
-                  className="w-3 h-3 text-gray-500"
+                  className="w-3 h-3 text-slate-400"
                 />
                 {reservation.session.placesRestantes} /{" "}
                 {reservation.session.placesTotal} places restantes
@@ -551,15 +551,15 @@ export default function ReservationDetailPage() {
           </div>
           <div className="space-y-2.5 text-sm">
             <div>
-              <p className="text-gray-500 text-xs">Nom</p>
+              <p className="text-slate-400 text-xs">Nom</p>
               <p className="text-white">{centre.nom}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-xs">Adresse</p>
+              <p className="text-slate-400 text-xs">Adresse</p>
               <p className="text-white flex items-center gap-1.5">
                 <FontAwesomeIcon
                   icon={faLocationDot}
-                  className="w-3 h-3 text-gray-500"
+                  className="w-3 h-3 text-slate-400"
                 />
                 {centre.adresse}, {centre.codePostal} {centre.ville}
               </p>
@@ -568,14 +568,14 @@ export default function ReservationDetailPage() {
                 réservation CONFIRMEE/TERMINEE de l'élève connecté. */}
             {centre.telephone && (
               <div>
-                <p className="text-gray-500 text-xs">Téléphone</p>
+                <p className="text-slate-400 text-xs">Téléphone</p>
                 <a
                   href={`tel:${centre.telephone.replace(/\s+/g, "")}`}
                   className="text-white flex items-center gap-1.5 hover:underline"
                 >
                   <FontAwesomeIcon
                     icon={faPhone}
-                    className="w-3 h-3 text-gray-500"
+                    className="w-3 h-3 text-slate-400"
                   />
                   {centre.telephone}
                 </a>
@@ -583,14 +583,14 @@ export default function ReservationDetailPage() {
             )}
             {centre.email && (
               <div>
-                <p className="text-gray-500 text-xs">Email</p>
+                <p className="text-slate-400 text-xs">Email</p>
                 <a
                   href={`mailto:${centre.email}`}
                   className="text-white flex items-center gap-1.5 hover:underline break-all"
                 >
                   <FontAwesomeIcon
                     icon={faEnvelope}
-                    className="w-3 h-3 text-gray-500"
+                    className="w-3 h-3 text-slate-400"
                   />
                   {centre.email}
                 </a>
@@ -598,7 +598,7 @@ export default function ReservationDetailPage() {
             )}
             {!centre.telephone && !centre.email && !isCancelled &&
               reservation.status !== "CONFIRMEE" && reservation.status !== "TERMINEE" && (
-              <p className="text-gray-500 text-xs">
+              <p className="text-slate-400 text-xs">
                 Les coordonnées du centre seront visibles ici dès la confirmation de votre réservation.
               </p>
             )}
@@ -624,21 +624,21 @@ export default function ReservationDetailPage() {
           </div>
           <div className="space-y-2.5 text-sm">
             <div>
-              <p className="text-gray-500 text-xs">Montant</p>
+              <p className="text-slate-400 text-xs">Montant</p>
               <p className="text-white text-lg font-bold">
                 {formatPrice(reservation.montant)}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 text-xs">Date</p>
+              <p className="text-slate-400 text-xs">Date</p>
               <p className="text-white">
                 {formatDate(reservation.createdAt)}
               </p>
             </div>
             {reservation.stripePaymentId && (
               <div>
-                <p className="text-gray-500 text-xs">Référence Stripe</p>
-                <p className="text-gray-400 font-mono text-xs truncate">
+                <p className="text-slate-400 text-xs">Référence Stripe</p>
+                <p className="text-slate-300 font-mono text-xs truncate">
                   {reservation.stripePaymentId}
                 </p>
               </div>
@@ -655,7 +655,7 @@ export default function ReservationDetailPage() {
           borderColor: "rgba(255,255,255,0.07)",
         }}
       >
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
           Actions
         </h3>
         <div className="flex flex-wrap gap-3">
@@ -695,7 +695,7 @@ export default function ReservationDetailPage() {
 
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-gray-400 border transition-all hover:text-white hover:border-gray-500/30"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-slate-300 border transition-all hover:text-white hover:border-gray-500/30"
             style={{ borderColor: "rgba(255,255,255,0.1)" }}
           >
             <FontAwesomeIcon icon={faHeadset} className="w-4 h-4" />
@@ -716,7 +716,7 @@ export default function ReservationDetailPage() {
           <div
             className="relative w-full max-w-md rounded-2xl p-6 border shadow-2xl"
             style={{
-              background: "#0D1D3A",
+              background: "#24385E",
               borderColor: "rgba(255,255,255,0.1)",
             }}
           >
@@ -730,7 +730,7 @@ export default function ReservationDetailPage() {
               <h3 className="text-white font-bold text-lg mb-2">
                 Annuler cette réservation ?
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-slate-300 text-sm">
                 {reservation.stripePaymentId &&
                 reservation.status === "CONFIRMEE"
                   ? "Votre paiement sera remboursé automatiquement. Cette action est irréversible."
@@ -741,7 +741,7 @@ export default function ReservationDetailPage() {
               <button
                 onClick={() => setShowCancelModal(false)}
                 disabled={cancelling}
-                className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-400 border transition-all hover:text-white disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 border transition-all hover:text-white disabled:opacity-50"
                 style={{ borderColor: "rgba(255,255,255,0.1)" }}
               >
                 Non, garder

@@ -87,7 +87,7 @@ const DOC_CONFIG: Record<DocType, { icon: typeof faFileLines; color: string; bgC
 const STATUS_CONFIG = {
   disponible:     { label: "Disponible",     icon: faCircleCheck,  color: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-500/20" },
   en_attente:     { label: "En attente",     icon: faClock,        color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
-  non_applicable: { label: "Non applicable", icon: faCircleMinus,  color: "text-gray-500",   bg: "bg-gray-500/10",   border: "border-gray-500/20" },
+  non_applicable: { label: "Non applicable", icon: faCircleMinus,  color: "text-slate-400",   bg: "bg-gray-500/10",   border: "border-gray-500/20" },
 };
 
 export default function DocumentsPage() {
@@ -218,7 +218,7 @@ export default function DocumentsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes Documents</h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-slate-400 text-sm">
           Retrouvez tous vos documents : convocations, contrats, factures et attestations
         </p>
       </div>
@@ -241,7 +241,7 @@ export default function DocumentsPage() {
         >
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -267,7 +267,7 @@ export default function DocumentsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{allDocuments.length}</p>
-                    <p className="text-xs text-gray-500">Documents au total</p>
+                    <p className="text-xs text-slate-400">Documents au total</p>
                   </div>
                 </div>
               </div>
@@ -281,7 +281,7 @@ export default function DocumentsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{availableCount}</p>
-                    <p className="text-xs text-gray-500">Disponibles</p>
+                    <p className="text-xs text-slate-400">Disponibles</p>
                   </div>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function DocumentsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{pendingCount}</p>
-                    <p className="text-xs text-gray-500">En attente</p>
+                    <p className="text-xs text-slate-400">En attente</p>
                   </div>
                 </div>
               </div>
@@ -316,7 +316,7 @@ export default function DocumentsPage() {
                   className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
                     activeTab === tab.key
                       ? "bg-blue-600 text-white"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-slate-300 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   {tab.label}
@@ -329,7 +329,7 @@ export default function DocumentsPage() {
               <div className="relative flex-1">
                 <FontAwesomeIcon
                   icon={faSearch}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                 />
                 <input
                   type="text"
@@ -345,7 +345,7 @@ export default function DocumentsPage() {
               </div>
               <button
                 onClick={() => setSortAsc(!sortAsc)}
-                className="px-3 py-2 rounded-lg text-gray-400 hover:text-white border transition-colors shrink-0"
+                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white border transition-colors shrink-0"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   borderColor: "rgba(255,255,255,0.07)",
@@ -366,9 +366,9 @@ export default function DocumentsPage() {
               className="text-center py-16 rounded-xl border"
               style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}
             >
-              <FontAwesomeIcon icon={faFolderOpen} className="text-3xl text-gray-600 mb-3" />
+              <FontAwesomeIcon icon={faFolderOpen} className="text-3xl text-slate-400 mb-3" />
               <p className="text-white font-medium mb-1">Aucun document</p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Vos documents apparaitront ici apres votre premiere reservation.
               </p>
             </div>
@@ -377,9 +377,9 @@ export default function DocumentsPage() {
               className="text-center py-16 rounded-xl border"
               style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}
             >
-              <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
+              <FontAwesomeIcon icon={faSearch} className="text-3xl text-slate-400 mb-3" />
               <p className="text-white font-medium mb-1">Aucun resultat</p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Essayez de modifier votre recherche ou vos filtres.
               </p>
             </div>
@@ -393,12 +393,12 @@ export default function DocumentsPage() {
                 <table className="w-full">
                   <thead>
                     <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Document</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Formation</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Reference</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Date</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Statut</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Action</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Document</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Formation</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Reference</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Date</th>
+                      <th className="text-center text-xs font-medium text-slate-400 px-5 py-3">Statut</th>
+                      <th className="text-center text-xs font-medium text-slate-400 px-5 py-3">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -421,12 +421,12 @@ export default function DocumentsPage() {
                           </td>
                           <td className="px-5 py-4">
                             <p className="text-sm text-white truncate max-w-[220px]">{doc.formationTitre}</p>
-                            <p className="text-xs text-gray-500">{doc.centreName}</p>
+                            <p className="text-xs text-slate-400">{doc.centreName}</p>
                           </td>
                           <td className="px-5 py-4">
-                            <span className="text-xs text-gray-500 font-mono">{doc.reservationNumero}</span>
+                            <span className="text-xs text-slate-400 font-mono">{doc.reservationNumero}</span>
                           </td>
-                          <td className="px-5 py-4 text-sm text-gray-400">{doc.date}</td>
+                          <td className="px-5 py-4 text-sm text-slate-300">{doc.date}</td>
                           <td className="px-5 py-4 text-center">
                             <span
                               className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full border ${st.color} ${st.bg} ${st.border}`}
@@ -447,7 +447,7 @@ export default function DocumentsPage() {
                                 Telecharger
                               </a>
                             ) : (
-                              <span className="text-xs text-gray-600">—</span>
+                              <span className="text-xs text-slate-400">—</span>
                             )}
                           </td>
                         </tr>
@@ -478,7 +478,7 @@ export default function DocumentsPage() {
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm text-white font-medium">{doc.label}</p>
-                            <p className="text-xs text-gray-500 truncate">{doc.formationTitre}</p>
+                            <p className="text-xs text-slate-400 truncate">{doc.formationTitre}</p>
                           </div>
                         </div>
                         <span
@@ -490,10 +490,10 @@ export default function DocumentsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-gray-500">{doc.centreName}</p>
-                          <p className="text-xs text-gray-600 font-mono">{doc.reservationNumero}</p>
+                          <p className="text-xs text-slate-400">{doc.centreName}</p>
+                          <p className="text-xs text-slate-400 font-mono">{doc.reservationNumero}</p>
                         </div>
-                        <span className="text-xs text-gray-400">{doc.date}</span>
+                        <span className="text-xs text-slate-300">{doc.date}</span>
                       </div>
                       {doc.href && (
                         <a

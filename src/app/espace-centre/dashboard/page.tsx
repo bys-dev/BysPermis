@@ -171,7 +171,7 @@ export default function DashboardCentrePage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Tableau de bord
             </h1>
-            <p className="text-gray-400 text-base mt-1">
+            <p className="text-slate-300 text-base mt-1">
               Vue d&apos;ensemble de votre activité
             </p>
           </div>

@@ -157,7 +157,7 @@ export default function DisponibilitesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Disponibilites</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Gerez vos creneaux de disponibilite pour les formations
           </p>
         </div>
@@ -193,7 +193,7 @@ export default function DisponibilitesPage() {
 
       {/* Add form modal */}
       {showForm && selectedDate && (
-        <div className="rounded-xl border p-5" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
+        <div className="rounded-xl border p-5" style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.07)" }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-semibold text-sm flex items-center gap-2">
               <FontAwesomeIcon icon={faCalendarCheck} className="text-blue-400 text-xs" />
@@ -201,7 +201,7 @@ export default function DisponibilitesPage() {
             </h2>
             <button
               onClick={() => setShowForm(false)}
-              className="text-gray-500 hover:text-white text-sm"
+              className="text-slate-400 hover:text-white text-sm"
             >
               Fermer
             </button>
@@ -209,7 +209,7 @@ export default function DisponibilitesPage() {
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
-              <label className="text-gray-400 text-xs font-medium mb-1.5 block">Date</label>
+              <label className="text-slate-300 text-xs font-medium mb-1.5 block">Date</label>
               <input
                 type="date"
                 value={toDateKey(selectedDate)}
@@ -218,7 +218,7 @@ export default function DisponibilitesPage() {
               />
             </div>
             <div>
-              <label className="text-gray-400 text-xs font-medium mb-1.5 block">Heure de debut</label>
+              <label className="text-slate-300 text-xs font-medium mb-1.5 block">Heure de debut</label>
               <input
                 type="time"
                 value={startTime}
@@ -227,7 +227,7 @@ export default function DisponibilitesPage() {
               />
             </div>
             <div>
-              <label className="text-gray-400 text-xs font-medium mb-1.5 block">Heure de fin</label>
+              <label className="text-slate-300 text-xs font-medium mb-1.5 block">Heure de fin</label>
               <input
                 type="time"
                 value={endTime}
@@ -238,7 +238,7 @@ export default function DisponibilitesPage() {
           </div>
 
           <div className="mt-4">
-            <label className="text-gray-400 text-xs font-medium mb-1.5 block">Note (optionnel)</label>
+            <label className="text-slate-300 text-xs font-medium mb-1.5 block">Note (optionnel)</label>
             <input
               type="text"
               value={note}
@@ -266,7 +266,7 @@ export default function DisponibilitesPage() {
       )}
 
       {/* Calendar */}
-      <div className="rounded-xl border p-5" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
+      <div className="rounded-xl border p-5" style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.07)" }}>
         <Calendar
           events={calendarEvents}
           onDayClick={handleDayClick}
@@ -274,24 +274,24 @@ export default function DisponibilitesPage() {
         <div className="flex items-center gap-4 mt-4 pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-green-600" />
-            <span className="text-xs text-gray-500">Disponible</span>
+            <span className="text-xs text-slate-400">Disponible</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
-            <span className="text-xs text-gray-500">Reserve</span>
+            <span className="text-xs text-slate-400">Reserve</span>
           </div>
         </div>
       </div>
 
       {/* Upcoming slots list */}
-      <div className="rounded-xl border p-5" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
+      <div className="rounded-xl border p-5" style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.07)" }}>
         <h2 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
           <FontAwesomeIcon icon={faClock} className="text-blue-400 text-xs" />
           Prochaines disponibilites
         </h2>
 
         {upcomingSlots.length === 0 ? (
-          <p className="text-gray-500 text-sm py-4 text-center">
+          <p className="text-slate-400 text-sm py-4 text-center">
             Aucune disponibilite a venir. Cliquez sur un jour du calendrier pour en ajouter.
           </p>
         ) : (
@@ -305,11 +305,11 @@ export default function DisponibilitesPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-center min-w-[48px]">
-                      <div className="text-xs text-gray-500 uppercase">
+                      <div className="text-xs text-slate-400 uppercase">
                         {date.toLocaleDateString("fr-FR", { weekday: "short" })}
                       </div>
                       <div className="text-lg font-bold text-white">{date.getDate()}</div>
-                      <div className="text-[10px] text-gray-600">
+                      <div className="text-[10px] text-slate-400">
                         {date.toLocaleDateString("fr-FR", { month: "short" })}
                       </div>
                     </div>
@@ -329,8 +329,8 @@ export default function DisponibilitesPage() {
                       </div>
                       {slot.note && (
                         <div className="flex items-center gap-1 mt-0.5">
-                          <FontAwesomeIcon icon={faStickyNote} className="text-[9px] text-gray-600" />
-                          <span className="text-xs text-gray-500">{slot.note}</span>
+                          <FontAwesomeIcon icon={faStickyNote} className="text-[9px] text-slate-400" />
+                          <span className="text-xs text-slate-400">{slot.note}</span>
                         </div>
                       )}
                     </div>
@@ -338,7 +338,7 @@ export default function DisponibilitesPage() {
                   {!slot.isBooked && (
                     <button
                       onClick={() => deleteSlot(slot.id)}
-                      className="text-gray-600 hover:text-red-400 transition-colors p-2"
+                      className="text-slate-400 hover:text-red-400 transition-colors p-2"
                       title="Supprimer"
                     >
                       <FontAwesomeIcon icon={faTrash} className="text-xs" />
