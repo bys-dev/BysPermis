@@ -41,7 +41,7 @@ const statusConfig = {
   TERMINEE:   { label: "Terminee",  color: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-500/20",  icon: faCircleCheck },
   EN_ATTENTE: { label: "En attente",color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20", icon: faClock },
   ANNULEE:    { label: "Annulee",   color: "text-red-400",    bg: "bg-red-400/10",    border: "border-red-500/20",   icon: faClock },
-  REMBOURSEE: { label: "Remboursee",color: "text-gray-400",   bg: "bg-gray-400/10",   border: "border-gray-500/20",  icon: faClock },
+  REMBOURSEE: { label: "Remboursee",color: "text-slate-300",   bg: "bg-gray-400/10",   border: "border-gray-500/20",  icon: faClock },
 } as const;
 
 export default function CentreContratsPage() {
@@ -135,7 +135,7 @@ export default function CentreContratsPage() {
       ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Contrats de formation</h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-slate-400 text-sm">
           Gerez et telechargez les contrats de formation de vos stagiaires
         </p>
       </div>
@@ -148,7 +148,7 @@ export default function CentreContratsPage() {
         >
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -171,7 +171,7 @@ export default function CentreContratsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{totalContrats}</p>
-                    <p className="text-xs text-gray-500">Contrats generes</p>
+                    <p className="text-xs text-slate-400">Contrats generes</p>
                   </div>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export default function CentreContratsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{totalConfirmees}</p>
-                    <p className="text-xs text-gray-500">En cours</p>
+                    <p className="text-xs text-slate-400">En cours</p>
                   </div>
                 </div>
               </div>
@@ -199,7 +199,7 @@ export default function CentreContratsPage() {
                   </div>
                   <div>
                     <p className="text-xl font-bold text-white">{totalTerminees}</p>
-                    <p className="text-xs text-gray-500">Terminees</p>
+                    <p className="text-xs text-slate-400">Terminees</p>
                   </div>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default function CentreContratsPage() {
             <div className="relative flex-1">
               <FontAwesomeIcon
                 icon={faSearch}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
               />
               <input
                 type="text"
@@ -232,7 +232,7 @@ export default function CentreContratsPage() {
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faFilter}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"
                 />
                 <select
                   value={filterFormation}
@@ -277,9 +277,9 @@ export default function CentreContratsPage() {
               className="text-center py-16 rounded-xl border"
               style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}
             >
-              <FontAwesomeIcon icon={faFileContract} className="text-3xl text-gray-600 mb-3" />
+              <FontAwesomeIcon icon={faFileContract} className="text-3xl text-slate-400 mb-3" />
               <p className="text-white font-medium mb-1">Aucun contrat</p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Les contrats apparaitront ici lorsque des stagiaires reserveront vos formations.
               </p>
             </div>
@@ -288,9 +288,9 @@ export default function CentreContratsPage() {
               className="text-center py-16 rounded-xl border"
               style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}
             >
-              <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
+              <FontAwesomeIcon icon={faSearch} className="text-3xl text-slate-400 mb-3" />
               <p className="text-white font-medium mb-1">Aucun resultat</p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Essayez de modifier votre recherche ou vos filtres.
               </p>
             </div>
@@ -304,12 +304,12 @@ export default function CentreContratsPage() {
                 <table className="w-full">
                   <thead>
                     <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Stagiaire</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Formation</th>
-                      <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Dates</th>
-                      <th className="text-right text-xs font-medium text-gray-500 px-5 py-3">Montant</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Statut</th>
-                      <th className="text-center text-xs font-medium text-gray-500 px-5 py-3">Actions</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Stagiaire</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Formation</th>
+                      <th className="text-left text-xs font-medium text-slate-400 px-5 py-3">Dates</th>
+                      <th className="text-right text-xs font-medium text-slate-400 px-5 py-3">Montant</th>
+                      <th className="text-center text-xs font-medium text-slate-400 px-5 py-3">Statut</th>
+                      <th className="text-center text-xs font-medium text-slate-400 px-5 py-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -326,19 +326,19 @@ export default function CentreContratsPage() {
                             <p className="text-sm text-white font-medium">
                               {r.prenom} {r.nom}
                             </p>
-                            <p className="text-xs text-gray-500">{r.email}</p>
+                            <p className="text-xs text-slate-400">{r.email}</p>
                           </td>
                           <td className="px-5 py-4">
                             <p className="text-sm text-white truncate max-w-[200px]">
                               {r.session.formation.titre}
                             </p>
-                            <p className="text-xs text-gray-500 font-mono">{r.numero}</p>
+                            <p className="text-xs text-slate-400 font-mono">{r.numero}</p>
                           </td>
                           <td className="px-5 py-4">
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm text-slate-300">
                               {formatDate(r.session.dateDebut, "short")}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-slate-400">
                               au {formatDate(r.session.dateFin, "short")}
                             </p>
                           </td>
@@ -384,7 +384,7 @@ export default function CentreContratsPage() {
                                   </button>
                                 </>
                               ) : (
-                                <span className="text-xs text-gray-600">—</span>
+                                <span className="text-xs text-slate-400">—</span>
                               )}
                             </div>
                           </td>
@@ -414,7 +414,7 @@ export default function CentreContratsPage() {
                           <p className="text-sm text-white font-medium">
                             {r.prenom} {r.nom}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">{r.session.formation.titre}</p>
+                          <p className="text-xs text-slate-400 truncate">{r.session.formation.titre}</p>
                         </div>
                         <span
                           className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${st.color} ${st.bg} ${st.border}`}
@@ -424,10 +424,10 @@ export default function CentreContratsPage() {
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500 font-mono">{r.numero}</span>
+                        <span className="text-slate-400 font-mono">{r.numero}</span>
                         <span className="text-white font-semibold">{formatPrice(r.montant)}</span>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-gray-400">
+                      <div className="flex items-center justify-between text-xs text-slate-300">
                         <span>
                           {formatDate(r.session.dateDebut, "short")} — {formatDate(r.session.dateFin, "short")}
                         </span>

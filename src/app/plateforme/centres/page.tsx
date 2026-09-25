@@ -32,7 +32,7 @@ const statusConfig: Record<string, { cls: string; label: string; dot: string }> 
 };
 
 const planConfig: Record<string, { cls: string }> = {
-  GRATUIT: { cls: "text-gray-400" },
+  GRATUIT: { cls: "text-slate-300" },
   STARTER: { cls: "text-blue-400" },
   PRO: { cls: "text-purple-400" },
   ENTREPRISE: { cls: "text-yellow-400" },
@@ -87,7 +87,7 @@ export default function PlateformeCentresPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Centres partenaires</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Gerer et suivre les centres de formation partenaires
           </p>
         </div>
@@ -95,31 +95,31 @@ export default function PlateformeCentresPage() {
 
       {/* Mini KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#0A1628] rounded-xl border border-blue-500/20 p-4 flex items-center gap-4">
+        <div className="bg-[#1C2D4F] rounded-xl border border-blue-500/20 p-4 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-400/10 border border-blue-500/20 flex items-center justify-center">
             <FontAwesomeIcon icon={faBuilding} className="text-blue-400 text-sm" />
           </div>
           <div>
             <p className="text-white font-bold text-lg">{loading ? "..." : actifs}</p>
-            <p className="text-gray-500 text-xs">Centres actifs</p>
+            <p className="text-slate-400 text-xs">Centres actifs</p>
           </div>
         </div>
-        <div className="bg-[#0A1628] rounded-xl border border-green-500/20 p-4 flex items-center gap-4">
+        <div className="bg-[#1C2D4F] rounded-xl border border-green-500/20 p-4 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-green-400/10 border border-green-500/20 flex items-center justify-center">
             <FontAwesomeIcon icon={faEuro} className="text-green-400 text-sm" />
           </div>
           <div>
             <p className="text-white font-bold text-lg">{loading ? "..." : formatPrice(totalRevenu)}</p>
-            <p className="text-gray-500 text-xs">Revenu total</p>
+            <p className="text-slate-400 text-xs">Revenu total</p>
           </div>
         </div>
-        <div className="bg-[#0A1628] rounded-xl border border-purple-500/20 p-4 flex items-center gap-4">
+        <div className="bg-[#1C2D4F] rounded-xl border border-purple-500/20 p-4 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-purple-400/10 border border-purple-500/20 flex items-center justify-center">
             <FontAwesomeIcon icon={faUsers} className="text-purple-400 text-sm" />
           </div>
           <div>
             <p className="text-white font-bold text-lg">{loading ? "..." : totalReservations.toLocaleString("fr-FR")}</p>
-            <p className="text-gray-500 text-xs">Reservations totales</p>
+            <p className="text-slate-400 text-xs">Reservations totales</p>
           </div>
         </div>
       </div>
@@ -127,19 +127,19 @@ export default function PlateformeCentresPage() {
       {/* Recherche et filtres */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs" />
+          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher un centre..."
-            className="w-full bg-[#0A1628] border border-white/10 text-gray-300 text-sm rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-blue-500/50 placeholder:text-gray-600"
+            className="w-full bg-[#1C2D4F] border border-white/10 text-gray-300 text-sm rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-blue-500/50 placeholder:text-slate-400"
           />
         </div>
         <select
           value={filterStatut}
           onChange={(e) => setFilterStatut(e.target.value)}
-          className="bg-[#0A1628] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50"
+          className="bg-[#1C2D4F] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50"
         >
           <option value="TOUS">Tous les statuts</option>
           <option value="ACTIF">Actif</option>
@@ -149,25 +149,25 @@ export default function PlateformeCentresPage() {
       </div>
 
       {/* Tableau */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         {loading ? (
           <div className="h-64 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : filtered.length === 0 ? (
           <div className="text-center py-8">
-            <FontAwesomeIcon icon={faBuilding} className="text-gray-600 text-3xl mb-3" />
-            <p className="text-gray-500 text-sm">Aucun centre trouve</p>
+            <FontAwesomeIcon icon={faBuilding} className="text-slate-400 text-3xl mb-3" />
+            <p className="text-slate-400 text-sm">Aucun centre trouve</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Ville</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Statut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Plan</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reservations</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Revenu</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Centre</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Ville</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Statut</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Plan</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Reservations</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3">Revenu</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -178,9 +178,9 @@ export default function PlateformeCentresPage() {
                     <tr key={c.id} className="hover:bg-white/3 transition-colors">
                       <td className="py-3 pr-4">
                         <p className="text-white font-medium">{c.nom}</p>
-                        <p className="text-gray-600 text-xs">{c.email}</p>
+                        <p className="text-slate-400 text-xs">{c.email}</p>
                       </td>
-                      <td className="py-3 pr-4 text-gray-400">{c.ville}</td>
+                      <td className="py-3 pr-4 text-slate-300">{c.ville}</td>
                       <td className="py-3 pr-4">
                         <span className="flex items-center gap-1.5">
                           <FontAwesomeIcon icon={faCircle} className={`text-[6px] ${sc.dot}`} />

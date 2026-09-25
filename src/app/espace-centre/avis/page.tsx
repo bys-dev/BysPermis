@@ -84,7 +84,7 @@ export default function CentreAvisPage() {
       ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white">Avis & questionnaires</h1>
-        <p className="text-sm text-gray-400 mt-1">
+        <p className="text-sm text-slate-300 mt-1">
           Personnalisez les questions envoyées à vos stagiaires après chaque formation (1 à 10).
         </p>
       </div>
@@ -104,11 +104,11 @@ export default function CentreAvisPage() {
       >
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-gray-900">Vos questions (centre)</h2>
-          <span className="text-xs text-gray-500">{draft.length}/10</span>
+          <span className="text-xs text-slate-400">{draft.length}/10</span>
         </div>
         {draft.map((libelle, i) => (
           <div key={i} className="flex items-start gap-2">
-            <span className="text-xs text-gray-500 mt-2.5 w-5 shrink-0">{i + 1}.</span>
+            <span className="text-xs text-slate-400 mt-2.5 w-5 shrink-0">{i + 1}.</span>
             <input
               value={libelle}
               onChange={(e) => {
@@ -124,7 +124,7 @@ export default function CentreAvisPage() {
               onClick={() => setDraft(draft.filter((_, idx) => idx !== i))}
               disabled={draft.length <= 1}
               title="Supprimer"
-              className="mt-1 p-2 text-gray-400 hover:text-red-500 disabled:opacity-30 disabled:hover:text-gray-400"
+              className="mt-1 p-2 text-slate-300 hover:text-red-500 disabled:opacity-30 disabled:hover:text-slate-300"
             >
               <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" />
             </button>
@@ -159,7 +159,7 @@ export default function CentreAvisPage() {
           Derniers avis reçus
         </h2>
         {responses.length === 0 ? (
-          <p className="text-sm text-gray-500">Aucun avis pour le moment.</p>
+          <p className="text-sm text-slate-400">Aucun avis pour le moment.</p>
         ) : (
           <div className="space-y-4">
             {responses.map((r) => (
@@ -171,20 +171,20 @@ export default function CentreAvisPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
                     <p className="text-sm font-medium text-gray-900">{r.auteur}</p>
-                    <p className="text-xs text-gray-500">{r.formation} — {formatDate(r.createdAt)}</p>
+                    <p className="text-xs text-slate-400">{r.formation} — {formatDate(r.createdAt)}</p>
                   </div>
                   <HalfStarRating value={r.noteGlobale} readonly size="sm" />
                 </div>
                 <div className="space-y-1 mb-2">
                   {(r.reponses as Array<{ libelle: string; note: number }>).map((item, idx) => (
-                    <p key={idx} className="text-xs text-gray-600 flex justify-between gap-4">
+                    <p key={idx} className="text-xs text-slate-400 flex justify-between gap-4">
                       <span>{item.libelle}</span>
                       <span className="text-yellow-600 shrink-0">{item.note.toFixed(1)}/5</span>
                     </p>
                   ))}
                 </div>
                 {r.commentaire && (
-                  <p className="text-sm text-gray-600 italic border-t border-gray-100 pt-2 mt-2">
+                  <p className="text-sm text-slate-400 italic border-t border-gray-100 pt-2 mt-2">
                     « {r.commentaire} »
                   </p>
                 )}
@@ -207,7 +207,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
       className="rounded-xl border p-4 bg-white"
       style={{ borderColor: "#E5E7EB" }}
     >
-      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-xs text-slate-400">{label}</p>
       <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
     </div>
   )

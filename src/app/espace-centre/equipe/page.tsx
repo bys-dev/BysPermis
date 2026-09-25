@@ -191,7 +191,7 @@ export default function EquipePage() {
       ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Équipe</h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-slate-400 text-sm">
           Gérez les membres de votre centre de formation
         </p>
       </div>
@@ -215,7 +215,7 @@ export default function EquipePage() {
                 placeholder="Adresse e-mail du membre"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
               />
             </div>
             <select
@@ -224,7 +224,7 @@ export default function EquipePage() {
               className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50"
             >
               {inviteRoles.map((r) => (
-                <option key={r.value} value={r.value} className="bg-[#0A1628]">
+                <option key={r.value} value={r.value} className="bg-[#1C2D4F]">
                   {r.label}
                 </option>
               ))}
@@ -251,7 +251,7 @@ export default function EquipePage() {
               className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50"
             >
               {fonctionOptions.map((f) => (
-                <option key={f.value} value={f.value} className="bg-[#0A1628]">
+                <option key={f.value} value={f.value} className="bg-[#1C2D4F]">
                   {f.label}
                 </option>
               ))}
@@ -262,11 +262,11 @@ export default function EquipePage() {
                 placeholder="N° d'autorisation d'animer (préfecture)"
                 value={numero}
                 onChange={(e) => setNumero(e.target.value)}
-                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
               />
             )}
           </div>
-          <p className="text-gray-500 text-xs mt-2">
+          <p className="text-slate-400 text-xs mt-2">
             La fonction animateur (expert sécurité routière / psychologue) et son n° d&apos;autorisation
             apparaissent sur l&apos;attestation de suivi de stage.
           </p>
@@ -293,13 +293,13 @@ export default function EquipePage() {
             <FontAwesomeIcon icon={faUsers} className="text-blue-400 text-xs" />
             Membres du centre
           </h2>
-          <span className="text-gray-500 text-xs">
+          <span className="text-slate-400 text-xs">
             {loading ? "…" : `${membres.length} membre(s)`}
           </span>
         </div>
 
         {!loading && membres.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-slate-400">
             <FontAwesomeIcon icon={faUsers} className="text-2xl mb-3" />
             <p className="font-medium text-white mb-1">Aucun membre</p>
             <p className="text-sm">Ajoutez des collaborateurs à votre centre.</p>
@@ -308,7 +308,7 @@ export default function EquipePage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-xs text-gray-500 uppercase tracking-wider">
+                <tr className="text-left text-xs text-slate-400 uppercase tracking-wider">
                   <th className="px-6 py-3 font-medium">Membre</th>
                   <th className="px-6 py-3 font-medium">E-mail</th>
                   <th className="px-6 py-3 font-medium">Rôle</th>
@@ -319,13 +319,13 @@ export default function EquipePage() {
               </thead>
               <tbody className="divide-y" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 {membres.map((m) => {
-                  const rl = roleLabels[m.role] ?? { label: m.role, color: "text-gray-400", bg: "bg-gray-400/10" };
+                  const rl = roleLabels[m.role] ?? { label: m.role, color: "text-slate-300", bg: "bg-gray-400/10" };
                   return (
                     <tr key={m.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
-                            <span className="text-xs font-bold text-gray-400">
+                            <span className="text-xs font-bold text-slate-300">
                               {m.user.prenom?.[0] ?? ""}{m.user.nom?.[0] ?? ""}
                             </span>
                           </div>
@@ -335,8 +335,8 @@ export default function EquipePage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm text-gray-400 flex items-center gap-1.5">
-                          <FontAwesomeIcon icon={faEnvelope} className="w-3 h-3 text-gray-600" />
+                        <span className="text-sm text-slate-300 flex items-center gap-1.5">
+                          <FontAwesomeIcon icon={faEnvelope} className="w-3 h-3 text-slate-400" />
                           {m.user.email}
                         </span>
                       </td>
@@ -355,7 +355,7 @@ export default function EquipePage() {
                               className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500/50"
                             >
                               {fonctionOptions.map((f) => (
-                                <option key={f.value} value={f.value} className="bg-[#0A1628]">
+                                <option key={f.value} value={f.value} className="bg-[#1C2D4F]">
                                   {f.label}
                                 </option>
                               ))}
@@ -366,7 +366,7 @@ export default function EquipePage() {
                                 placeholder="N° d'autorisation"
                                 value={editNumero}
                                 onChange={(e) => setEditNumero(e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+                                className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
                               />
                             )}
                             <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ export default function EquipePage() {
                               </button>
                               <button
                                 onClick={cancelEdit}
-                                className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300"
+                                className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-gray-300"
                               >
                                 <FontAwesomeIcon icon={faXmark} />
                                 Annuler
@@ -396,18 +396,18 @@ export default function EquipePage() {
                                   {fonctionLabels[m.fonctionAnimateur]}
                                 </span>
                                 {m.numeroAutorisation && (
-                                  <span className="text-[11px] text-gray-500 mt-0.5 ml-4">
+                                  <span className="text-[11px] text-slate-400 mt-0.5 ml-4">
                                     N° {m.numeroAutorisation}
                                   </span>
                                 )}
                               </span>
                             ) : (
-                              <span className="text-xs text-gray-600">—</span>
+                              <span className="text-xs text-slate-400">—</span>
                             )}
                             {isOwner && (
                               <button
                                 onClick={() => startEdit(m)}
-                                className="text-gray-600 hover:text-blue-400 transition-colors"
+                                className="text-slate-400 hover:text-blue-400 transition-colors"
                                 title="Modifier la fonction animateur"
                               >
                                 <FontAwesomeIcon icon={faPen} className="w-3 h-3" />
@@ -417,7 +417,7 @@ export default function EquipePage() {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-slate-400">
                           {new Date(m.createdAt).toLocaleDateString("fr-FR")}
                         </span>
                       </td>
@@ -426,7 +426,7 @@ export default function EquipePage() {
                           <button
                             onClick={() => removeMember(m.userId)}
                             disabled={deletingId === m.userId}
-                            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-400 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-red-400 transition-colors disabled:opacity-50"
                             title="Retirer du centre"
                           >
                             {deletingId === m.userId ? (

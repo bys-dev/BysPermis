@@ -188,7 +188,7 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative" style={{ background: "#0A1628" }}>
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative" style={{ background: "#1C2D4F" }}>
         <div className="w-full max-w-lg opacity-40 pointer-events-none select-none">
           <div className="text-center mb-8 animate-pulse">
             <div className="w-12 h-12 bg-white/10 rounded-xl mx-auto mb-4" />
@@ -208,7 +208,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: "#0A1628" }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: "#1C2D4F" }}>
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
@@ -216,7 +216,7 @@ export default function OnboardingPage() {
             <span className="font-bold text-lg text-white">BYS</span>
           </div>
           <h1 className="text-2xl font-bold text-white">Completez votre profil</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-slate-300 text-sm mt-1">
             Etape {step + 1} sur {STEPS.length} — {STEPS[step].label}
           </p>
         </div>
@@ -234,12 +234,12 @@ export default function OnboardingPage() {
                 <FontAwesomeIcon
                   icon={i < step ? faCheck : s.icon}
                   className={`text-[10px] ${
-                    i <= step ? "text-blue-400" : "text-gray-600"
+                    i <= step ? "text-blue-400" : "text-slate-400"
                   }`}
                 />
                 <span
                   className={`text-[10px] font-medium ${
-                    i <= step ? "text-blue-400" : "text-gray-600"
+                    i <= step ? "text-blue-400" : "text-slate-400"
                   }`}
                 >
                   {s.label}
@@ -258,13 +258,13 @@ export default function OnboardingPage() {
         )}
 
         {/* Form card */}
-        <div className="rounded-xl border p-6" style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}>
+        <div className="rounded-xl border p-6" style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.07)" }}>
           {/* Step 1 — Informations personnelles */}
           {step === 0 && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-gray-400 text-xs font-medium mb-1.5 block">Prenom *</label>
+                  <label className="text-slate-300 text-xs font-medium mb-1.5 block">Prenom *</label>
                   <input
                     type="text"
                     value={form.prenom}
@@ -274,7 +274,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-gray-400 text-xs font-medium mb-1.5 block">Nom *</label>
+                  <label className="text-slate-300 text-xs font-medium mb-1.5 block">Nom *</label>
                   <input
                     type="text"
                     value={form.nom}
@@ -285,7 +285,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Telephone *</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Telephone *</label>
                 <input
                   type="tel"
                   value={form.telephone}
@@ -295,7 +295,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Date de naissance</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Date de naissance</label>
                 <input
                   type="text"
                   value={form.dateNaissance}
@@ -318,7 +318,7 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Adresse</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Adresse</label>
                 <input
                   type="text"
                   value={form.adresse}
@@ -329,7 +329,7 @@ export default function OnboardingPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-gray-400 text-xs font-medium mb-1.5 block">Code postal</label>
+                  <label className="text-slate-300 text-xs font-medium mb-1.5 block">Code postal</label>
                   <input
                     type="text"
                     value={form.codePostal}
@@ -339,7 +339,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-gray-400 text-xs font-medium mb-1.5 block">Ville *</label>
+                  <label className="text-slate-300 text-xs font-medium mb-1.5 block">Ville *</label>
                   <input
                     type="text"
                     value={form.ville}
@@ -355,11 +355,11 @@ export default function OnboardingPage() {
           {/* Step 3 — Permis de conduire (optionnel) */}
           {step === 2 && (
             <div className="space-y-4">
-              <p className="text-gray-500 text-xs mb-2">
+              <p className="text-slate-400 text-xs mb-2">
                 Ces informations sont optionnelles et peuvent etre ajoutees plus tard.
               </p>
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Numero de permis</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Numero de permis</label>
                 <input
                   type="text"
                   value={form.numeroPermis}
@@ -369,7 +369,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Date d&apos;obtention</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Date d&apos;obtention</label>
                 <input
                   type="text"
                   value={form.dateObtentionPermis}
@@ -386,7 +386,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Categories</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Categories</label>
                 <div className="flex flex-wrap gap-2">
                   {["A", "A1", "A2", "B", "B1", "C", "C1", "D", "D1", "BE", "CE"].map((cat) => (
                     <button
@@ -396,7 +396,7 @@ export default function OnboardingPage() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                         form.categoriesPermis.includes(cat)
                           ? "bg-blue-600/20 border-blue-500/30 text-blue-400"
-                          : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20"
+                          : "bg-white/5 border-white/10 text-slate-300 hover:text-white hover:border-white/20"
                       }`}
                     >
                       {cat}
@@ -413,7 +413,7 @@ export default function OnboardingPage() {
               <div className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
                 <div>
                   <p className="text-white text-sm font-medium">Notifications email</p>
-                  <p className="text-gray-500 text-xs mt-0.5">
+                  <p className="text-slate-400 text-xs mt-0.5">
                     Recevoir des emails pour vos reservations et rappels
                   </p>
                 </div>
@@ -435,7 +435,7 @@ export default function OnboardingPage() {
               <div className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
                 <div>
                   <p className="text-white text-sm font-medium">Newsletter</p>
-                  <p className="text-gray-500 text-xs mt-0.5">
+                  <p className="text-slate-400 text-xs mt-0.5">
                     Recevoir nos offres et actualites par email
                   </p>
                 </div>
@@ -463,7 +463,7 @@ export default function OnboardingPage() {
             {step > 0 && (
               <button
                 onClick={handlePrev}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors"
               >
                 <FontAwesomeIcon icon={faChevronLeft} className="text-xs" />
                 Precedent
@@ -495,7 +495,7 @@ export default function OnboardingPage() {
         <div className="text-center mt-8 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <a
             href="/auth/logout"
-            className="inline-flex items-center gap-2 text-gray-500 hover:text-red-400 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-red-400 text-sm transition-colors"
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="text-xs" />
             Se deconnecter

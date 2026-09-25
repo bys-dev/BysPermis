@@ -165,7 +165,7 @@ export default function PlateformeDashboardPage() {
           <h1 className="text-2xl font-bold text-white">
             Bonjour{welcomeName ? `, ${welcomeName}` : ""} !
           </h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Espace {welcomeRole} &mdash; Vue d&apos;ensemble de la plateforme
           </p>
         </div>
@@ -186,7 +186,7 @@ export default function PlateformeDashboardPage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {kpis.map((k) => (
-          <div key={k.label} className={`rounded-xl p-5 border bg-[#0A1628] ${k.border}`}>
+          <div key={k.label} className={`rounded-xl p-5 border bg-[#1C2D4F] ${k.border}`}>
             <div className="flex items-start justify-between mb-4">
               <div className={`w-10 h-10 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
@@ -199,14 +199,14 @@ export default function PlateformeDashboardPage() {
               )}
             </div>
             <p className="text-2xl font-bold text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
+            <p className="text-xs text-slate-400 mt-1">{k.label}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{k.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Activite recente */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-4">Activite recente</h2>
         {loading ? (
           <div className="space-y-3 animate-pulse">
@@ -216,8 +216,8 @@ export default function PlateformeDashboardPage() {
           </div>
         ) : recentActivity.length === 0 ? (
           <div className="text-center py-6">
-            <FontAwesomeIcon icon={faClock} className="text-gray-600 text-2xl mb-2" />
-            <p className="text-gray-500 text-sm">Aucune activite recente</p>
+            <FontAwesomeIcon icon={faClock} className="text-slate-400 text-2xl mb-2" />
+            <p className="text-slate-400 text-sm">Aucune activite recente</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -244,14 +244,14 @@ export default function PlateformeDashboardPage() {
                     <p className="text-gray-300 text-sm">
                       <span className="text-white font-medium">{a.eleve}</span>
                       {" "}&mdash;{" "}
-                      <span className="text-gray-400">{a.stage}</span>
+                      <span className="text-slate-300">{a.stage}</span>
                     </p>
                     <div className="flex items-center gap-3 mt-0.5">
-                      <span className="flex items-center gap-1 text-gray-500 text-xs">
+                      <span className="flex items-center gap-1 text-slate-400 text-xs">
                         <FontAwesomeIcon icon={faBuilding} className="text-[10px]" />
                         {a.centre}
                       </span>
-                      <span className="flex items-center gap-1 text-gray-500 text-xs">
+                      <span className="flex items-center gap-1 text-slate-400 text-xs">
                         <FontAwesomeIcon icon={faEuro} className="text-[10px]" />
                         {formatPrice(a.montant)}
                       </span>
@@ -259,7 +259,7 @@ export default function PlateformeDashboardPage() {
                         {statusLabel}
                       </span>
                     </div>
-                    <p className="text-gray-600 text-xs mt-0.5">{timeAgo(a.createdAt)}</p>
+                    <p className="text-slate-400 text-xs mt-0.5">{timeAgo(a.createdAt)}</p>
                   </div>
                 </div>
               );

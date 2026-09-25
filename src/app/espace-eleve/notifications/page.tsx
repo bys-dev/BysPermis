@@ -24,7 +24,7 @@ function iconForType(titre: string) {
   if (t.includes("convocation") || t.includes("document")) {
     return { icon: faFileLines, color: "text-blue-400", bg: "bg-blue-400/10" };
   }
-  return { icon: faCircleInfo, color: "text-gray-400", bg: "bg-gray-400/10" };
+  return { icon: faCircleInfo, color: "text-slate-300", bg: "bg-gray-400/10" };
 }
 
 function timeAgo(dateStr: string): string {
@@ -127,7 +127,7 @@ export default function NotificationsPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Notifications</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-slate-400 text-sm">
             {loading
               ? "Chargement..."
               : error
@@ -141,7 +141,7 @@ export default function NotificationsPage() {
           <button
             onClick={markAllRead}
             disabled={marking}
-            className="text-xs text-gray-500 hover:text-blue-400 transition-colors disabled:opacity-50"
+            className="text-xs text-slate-400 hover:text-blue-400 transition-colors disabled:opacity-50"
           >
             {marking ? "..." : "Tout marquer comme lu"}
           </button>
@@ -161,7 +161,7 @@ export default function NotificationsPage() {
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => { setError(null); setLoading(true); window.location.reload(); }}
             className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -174,14 +174,14 @@ export default function NotificationsPage() {
         <div className="text-center py-16">
           <FontAwesomeIcon icon={faBell} className="text-gray-700 text-4xl mb-4" />
           <p className="text-white font-medium mb-1">Aucune notification</p>
-          <p className="text-gray-500 text-sm">Vos notifications apparaitront ici.</p>
+          <p className="text-slate-400 text-sm">Vos notifications apparaitront ici.</p>
         </div>
       ) : (
         /* Grouped list */
         <div className="space-y-6">
           {orderedGroups.map((groupName) => (
             <div key={groupName}>
-              <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">{groupName}</h2>
+              <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{groupName}</h2>
               <div className="space-y-3">
                 {grouped[groupName].map((n) => {
                   const { icon, color, bg } = iconForType(n.titre);
@@ -203,7 +203,7 @@ export default function NotificationsPage() {
                           <p className="text-sm font-semibold text-white">{n.titre}</p>
                           {!n.isRead && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />}
                         </div>
-                        <p className="text-xs text-gray-500 leading-relaxed">{n.contenu}</p>
+                        <p className="text-xs text-slate-400 leading-relaxed">{n.contenu}</p>
                         <p className="text-xs text-gray-700 mt-2">{timeAgo(n.createdAt)}</p>
                       </div>
                     </button>

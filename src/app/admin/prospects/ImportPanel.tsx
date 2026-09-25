@@ -40,7 +40,7 @@ interface AnalyseResponse {
 }
 
 const inputClass =
-  "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500";
+  "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500";
 
 /**
  * Import d'un fichier de prospects, en deux temps.
@@ -119,14 +119,14 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
   const colonnesMappees = Object.values(mapping).filter(Boolean).length;
 
   return (
-    <div className="rounded-xl border border-white/10 p-6" style={{ background: "#0D1D3A" }}>
+    <div className="rounded-xl border border-white/10 p-6" style={{ background: "#24385E" }}>
       <div className="flex items-start gap-3 mb-5">
         <div className="w-10 h-10 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0">
           <FontAwesomeIcon icon={faFileArrowUp} className="text-blue-400" />
         </div>
         <div>
           <h2 className="text-white font-semibold">Importer un fichier de prospects</h2>
-          <p className="text-gray-400 text-xs mt-0.5">
+          <p className="text-slate-300 text-xs mt-0.5">
             Excel (.xlsx), CSV ou JSON — 10 Mo et 50 000 lignes maximum. Les colonnes sont
             reconnues automatiquement, vous pouvez les corriger avant de valider.
           </p>
@@ -145,7 +145,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
                 {succes.nbIgnores} ignoré(s), {succes.nbErreurs} ligne(s) rejetée(s).
               </p>
             </div>
-            <button onClick={() => setSucces(null)} className="text-gray-500 hover:text-white">
+            <button onClick={() => setSucces(null)} className="text-slate-400 hover:text-white">
               <FontAwesomeIcon icon={faXmark} />
             </button>
           </div>
@@ -155,7 +155,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
       {/* ── Choix du fichier ── */}
       <div className="grid sm:grid-cols-3 gap-4 mb-4">
         <div className="sm:col-span-2">
-          <label className="block text-gray-400 text-xs mb-1.5">Fichier</label>
+          <label className="block text-slate-300 text-xs mb-1.5">Fichier</label>
           <input
             ref={fileRef}
             type="file"
@@ -169,8 +169,8 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
           />
         </div>
         <div>
-          <label className="block text-gray-400 text-xs mb-1.5">
-            Source <span className="text-gray-600">(étiquette)</span>
+          <label className="block text-slate-300 text-xs mb-1.5">
+            Source <span className="text-slate-400">(étiquette)</span>
           </label>
           <input
             type="text"
@@ -191,7 +191,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
         />
         <span className="text-gray-300 text-xs">
           Écraser les données existantes
-          <span className="text-gray-500">
+          <span className="text-slate-400">
             {" "}
             — par défaut, seuls les champs vides sont complétés
           </span>
@@ -228,27 +228,27 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
         <div className="space-y-5">
           <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs">
-              <span className="text-gray-400">
+              <span className="text-slate-300">
                 Format <span className="text-white font-semibold">{analyse.format}</span>
               </span>
-              <span className="text-gray-400">
+              <span className="text-slate-300">
                 Lignes lues <span className="text-white font-semibold">{analyse.rapport.totalRows}</span>
               </span>
-              <span className="text-gray-400">
+              <span className="text-slate-300">
                 À créer <span className="text-green-400 font-semibold">{analyse.rapport.nbCrees}</span>
               </span>
-              <span className="text-gray-400">
+              <span className="text-slate-300">
                 À enrichir <span className="text-blue-400 font-semibold">{analyse.rapport.nbMisAJour}</span>
               </span>
-              <span className="text-gray-400">
+              <span className="text-slate-300">
                 Ignorées <span className="text-gray-300 font-semibold">{analyse.rapport.nbIgnores}</span>
               </span>
-              <span className="text-gray-400">
+              <span className="text-slate-300">
                 Rejetées <span className="text-orange-400 font-semibold">{analyse.rapport.nbErreurs}</span>
               </span>
             </div>
             {analyse.rapport.nbDoublonsFichier > 0 && (
-              <p className="text-gray-500 text-[11px] mt-2">
+              <p className="text-slate-400 text-[11px] mt-2">
                 {analyse.rapport.nbDoublonsFichier} doublon(s) interne(s) au fichier — seule la
                 première occurrence est retenue.
               </p>
@@ -259,11 +259,11 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
           <div>
             <p className="text-white text-sm font-semibold mb-1">
               Correspondance des colonnes{" "}
-              <span className="text-gray-500 font-normal text-xs">
+              <span className="text-slate-400 font-normal text-xs">
                 ({colonnesMappees}/{analyse.headers.length} associée(s))
               </span>
             </p>
-            <p className="text-gray-500 text-[11px] mb-3">
+            <p className="text-slate-400 text-[11px] mb-3">
               Les colonnes laissées sur « Ignorer » ne sont pas importées.
             </p>
             <div className="grid sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
@@ -301,7 +301,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
               <div className="overflow-x-auto rounded-lg border border-white/10">
                 <table className="w-full text-xs">
                   <thead className="bg-white/5">
-                    <tr className="text-gray-400 text-left">
+                    <tr className="text-slate-300 text-left">
                       <th className="px-3 py-2 font-medium">Nom</th>
                       <th className="px-3 py-2 font-medium">Email</th>
                       <th className="px-3 py-2 font-medium">Téléphone</th>
@@ -333,7 +333,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
               </summary>
               <ul className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                 {analyse.rapport.erreurs.map((e, i) => (
-                  <li key={i} className="text-gray-400 text-[11px]">
+                  <li key={i} className="text-slate-300 text-[11px]">
                     Ligne {e.ligne} — {e.motif}
                   </li>
                 ))}
@@ -348,7 +348,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
               </summary>
               <ul className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                 {analyse.rapport.warnings.map((w, i) => (
-                  <li key={i} className="text-gray-400 text-[11px]">
+                  <li key={i} className="text-slate-300 text-[11px]">
                     Ligne {w.ligne} — {w.motif}
                   </li>
                 ))}
@@ -382,7 +382,7 @@ export default function ImportPanel({ onImported }: { onImported: () => void }) 
             <button
               onClick={reset}
               disabled={busy !== null}
-              className="px-5 py-2.5 rounded-lg text-gray-400 text-sm hover:text-white transition-colors"
+              className="px-5 py-2.5 rounded-lg text-slate-300 text-sm hover:text-white transition-colors"
             >
               Annuler
             </button>

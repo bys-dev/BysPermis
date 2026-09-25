@@ -50,14 +50,14 @@ export default function BibliothequeModeles({
         >
           <FontAwesomeIcon icon={faLayerGroup} className="text-blue-400" />
           Partir d&apos;un modèle
-          <span className="text-gray-500 font-normal text-xs">
+          <span className="text-slate-400 font-normal text-xs">
             ({chargement ? "…" : modeles.length})
           </span>
-          <FontAwesomeIcon icon={ouvert ? faChevronUp : faChevronDown} className="text-gray-500 text-xs" />
+          <FontAwesomeIcon icon={ouvert ? faChevronUp : faChevronDown} className="text-slate-400 text-xs" />
         </button>
         <Link
           href="/admin/campagnes/modeles"
-          className="ml-auto text-gray-400 text-xs hover:text-white transition-colors inline-flex items-center gap-1.5"
+          className="ml-auto text-slate-300 text-xs hover:text-white transition-colors inline-flex items-center gap-1.5"
         >
           <FontAwesomeIcon icon={faSliders} /> Gérer les modèles
         </Link>
@@ -72,7 +72,7 @@ export default function BibliothequeModeles({
           ) : erreur ? (
             <p className="text-orange-300 text-xs py-3">{erreur}</p>
           ) : modeles.length === 0 ? (
-            <p className="text-gray-500 text-xs py-3">
+            <p className="text-slate-400 text-xs py-3">
               Aucun modèle enregistré.{" "}
               <Link href="/admin/campagnes/modeles" className="text-blue-400 hover:underline">
                 Créer le premier
@@ -89,11 +89,11 @@ export default function BibliothequeModeles({
                   className="text-left rounded-lg border border-white/10 bg-white/[0.03] p-3 hover:border-blue-500 hover:bg-blue-500/5 transition-colors group"
                 >
                   <p className="text-white text-xs font-semibold group-hover:text-blue-200">{m.nom}</p>
-                  {m.moment && <p className="text-gray-500 text-[11px] mt-0.5">{m.moment}</p>}
+                  {m.moment && <p className="text-slate-400 text-[11px] mt-0.5">{m.moment}</p>}
                   {m.objectif && (
-                    <p className="text-gray-400 text-[11px] mt-1.5 line-clamp-2">{m.objectif}</p>
+                    <p className="text-slate-300 text-[11px] mt-1.5 line-clamp-2">{m.objectif}</p>
                   )}
-                  <p className="text-gray-600 text-[11px] mt-2 truncate" title={m.sujet}>
+                  <p className="text-slate-400 text-[11px] mt-2 truncate" title={m.sujet}>
                     Objet : {m.sujet}
                   </p>
                 </button>

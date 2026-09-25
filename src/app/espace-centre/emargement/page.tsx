@@ -11,7 +11,7 @@ export default function EmargementRedirect() {
   }, [router]);
 
   return (
-    <div className="flex items-center justify-center py-16 text-gray-500 text-sm">
+    <div className="flex items-center justify-center py-16 text-slate-400 text-sm">
       Redirection vers Mes sessions…
     </div>
   );

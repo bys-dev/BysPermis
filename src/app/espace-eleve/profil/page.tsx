@@ -144,7 +144,7 @@ export default function ProfilPage() {
       <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
         <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
         <p className="text-white font-medium mb-1">Erreur de chargement</p>
-        <p className="text-gray-500 text-sm mb-6">{error || "Profil introuvable."}</p>
+        <p className="text-slate-400 text-sm mb-6">{error || "Profil introuvable."}</p>
         <button
           onClick={() => window.location.reload()}
           className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -177,13 +177,13 @@ export default function ProfilPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-white mb-1">Mon profil</h1>
-          <p className="text-gray-500 text-sm">Gérez vos informations personnelles</p>
+          <p className="text-slate-400 text-sm">Gérez vos informations personnelles</p>
         </div>
         <div className="flex items-center gap-2">
           {editing && (
             <button
               onClick={handleCancel}
-              className="px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-400 hover:text-white"
+              className="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               Annuler
@@ -226,7 +226,7 @@ export default function ProfilPage() {
         </div>
         <div>
           <p className="font-semibold text-white">{profile.prenom} {profile.nom}</p>
-          <p className="text-sm text-gray-500">{profile.email}</p>
+          <p className="text-sm text-slate-400">{profile.email}</p>
           <span className="text-xs text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-full mt-1 inline-block">
             {profile.role === "ELEVE" ? "Élève" : profile.role}
           </span>
@@ -239,14 +239,14 @@ export default function ProfilPage() {
 
         {/* Email (always readonly) */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-2">Email</label>
+          <label className="block text-xs font-medium text-slate-400 mb-2">Email</label>
           <div className="relative">
-            <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
+            <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input
               type="email"
               value={profile.email}
               disabled
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-gray-400 transition-all focus:outline-none"
+              className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-slate-300 transition-all focus:outline-none"
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
             />
           </div>
@@ -266,16 +266,16 @@ export default function ProfilPage() {
                 <div key={`row-${field.key}-${field2.key}`} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[field, field2].map((f) => (
                     <div key={f.key}>
-                      <label className="block text-xs font-medium text-gray-500 mb-2">{f.label}</label>
+                      <label className="block text-xs font-medium text-slate-400 mb-2">{f.label}</label>
                       <div className="relative">
-                        <FontAwesomeIcon icon={f.icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
+                        <FontAwesomeIcon icon={f.icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                         <input
                           type={f.type}
                           value={form[f.key]}
                           disabled={!editing}
                           placeholder={f.placeholder}
                           onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-                          className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white disabled:text-gray-400 transition-all focus:outline-none focus:ring-1 focus:ring-blue-600"
+                          className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white disabled:text-slate-300 transition-all focus:outline-none focus:ring-1 focus:ring-blue-600"
                           style={{ background: editing ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
                         />
                       </div>
@@ -288,16 +288,16 @@ export default function ProfilPage() {
               // Render full-width field
               elements.push(
                 <div key={field.key}>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">{field.label}</label>
+                  <label className="block text-xs font-medium text-slate-400 mb-2">{field.label}</label>
                   <div className="relative">
-                    <FontAwesomeIcon icon={field.icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
+                    <FontAwesomeIcon icon={field.icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                     <input
                       type={field.type}
                       value={form[field.key]}
                       disabled={!editing}
                       placeholder={field.placeholder}
                       onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-                      className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white disabled:text-gray-400 transition-all focus:outline-none focus:ring-1 focus:ring-blue-600"
+                      className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm text-white disabled:text-slate-300 transition-all focus:outline-none focus:ring-1 focus:ring-blue-600"
                       style={{ background: editing ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
                     />
                   </div>
@@ -313,7 +313,7 @@ export default function ProfilPage() {
       {/* Danger zone */}
       <div className="mt-6 rounded-xl p-5" style={{ background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.15)" }}>
         <h3 className="text-sm font-semibold text-red-400 mb-1">Zone danger</h3>
-        <p className="text-xs text-gray-500 mb-3">La suppression de votre compte est irréversible.</p>
+        <p className="text-xs text-slate-400 mb-3">La suppression de votre compte est irréversible.</p>
         <button className="text-xs text-red-500 hover:text-red-400 transition-colors font-medium">
           Supprimer mon compte
         </button>

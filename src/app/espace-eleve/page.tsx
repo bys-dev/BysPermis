@@ -79,7 +79,7 @@ function iconForNotif(titre: string) {
   if (t.includes("annul")) {
     return { icon: faCircleInfo, color: "text-red-400", bg: "bg-red-400/10" };
   }
-  return { icon: faBell, color: "text-gray-400", bg: "bg-gray-400/10" };
+  return { icon: faBell, color: "text-slate-300", bg: "bg-gray-400/10" };
 }
 
 function timeAgo(dateStr: string): string {
@@ -186,7 +186,7 @@ export default function DashboardPage() {
           className="text-3xl text-red-400 mb-3"
         />
         <p className="text-white font-medium mb-1">Erreur de chargement</p>
-        <p className="text-gray-400 text-sm mb-6">
+        <p className="text-slate-300 text-sm mb-6">
           {error || "Impossible de charger votre profil."}
         </p>
         <button
@@ -223,7 +223,7 @@ export default function DashboardPage() {
         <h1 className="font-display font-bold text-2xl text-white mb-1">
           Bonjour, {user.prenom || user.nom} !
         </h1>
-        <p className="text-gray-400 text-sm">
+        <p className="text-slate-300 text-sm">
           Bienvenue dans votre espace personnel
         </p>
       </div>
@@ -252,7 +252,7 @@ export default function DashboardPage() {
             </div>
             <Link
               href={`/espace-eleve/avis/${pendingQuestionnaires[0].reservationId}`}
-              className="inline-flex items-center justify-center gap-2 bg-yellow-500 text-[#0A1628] px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-yellow-400 shrink-0"
+              className="inline-flex items-center justify-center gap-2 bg-yellow-500 text-[#1C2D4F] px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-yellow-400 shrink-0"
             >
               Donner mon avis
               <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
@@ -295,7 +295,7 @@ export default function DashboardPage() {
           <h3 className="text-white font-semibold text-lg mb-2">
             {nextReservation.session.formation.titre}
           </h3>
-          <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-400">
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-300">
             <span className="flex items-center gap-1.5">
               <FontAwesomeIcon icon={faClock} className="w-3.5 h-3.5" />
               {formatDate(nextReservation.session.dateDebut)} —{" "}
@@ -333,8 +333,8 @@ export default function DashboardPage() {
             label: "Terminées",
             value: stats.terminees,
             icon: faFlagCheckered,
-            color: "text-gray-400",
-            iconColor: "text-gray-400",
+            color: "text-slate-300",
+            iconColor: "text-slate-300",
             iconBg: "bg-gray-400/10",
           },
           {
@@ -365,14 +365,14 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+            <p className="text-xs text-slate-300 mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Actions rapides */}
       <div className="mb-8">
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+        <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">
           Actions rapides
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -421,7 +421,7 @@ export default function DashboardPage() {
               </span>
               <FontAwesomeIcon
                 icon={faArrowRight}
-                className="w-3 h-3 ml-auto text-gray-400 group-hover:text-blue-400 transition-colors"
+                className="w-3 h-3 ml-auto text-slate-300 group-hover:text-blue-400 transition-colors"
               />
             </Link>
           ))}
@@ -431,7 +431,7 @@ export default function DashboardPage() {
       {/* Dernières notifications */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
             Dernières notifications
           </h2>
           <Link
@@ -452,9 +452,9 @@ export default function DashboardPage() {
           >
             <FontAwesomeIcon
               icon={faBell}
-              className="text-gray-400 text-2xl mb-2"
+              className="text-slate-300 text-2xl mb-2"
             />
-            <p className="text-gray-400 text-sm">Aucune notification</p>
+            <p className="text-slate-300 text-sm">Aucune notification</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -488,10 +488,10 @@ export default function DashboardPage() {
                         <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-slate-300 truncate">
                       {n.contenu}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-slate-300 mt-1">
                       {timeAgo(n.createdAt)}
                     </p>
                   </div>

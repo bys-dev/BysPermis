@@ -279,7 +279,7 @@ export default function AdminCampagnesPage() {
             <FontAwesomeIcon icon={faEnvelopeOpenText} className="text-blue-400" />
             Campagnes de prospection
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-slate-300 text-sm mt-1">
             Emails personnalisés envoyés aux centres du fichier de prospects.
           </p>
         </div>
@@ -324,15 +324,15 @@ export default function AdminCampagnesPage() {
       )}
 
       {/* ── Liste ── */}
-      <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: "#0D1D3A" }}>
+      <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: "#24385E" }}>
         {loading ? (
           <div className="p-12 text-center">
             <FontAwesomeIcon icon={faSpinner} spin className="text-blue-400 text-2xl" />
           </div>
         ) : campagnes.length === 0 ? (
           <div className="p-12 text-center">
-            <FontAwesomeIcon icon={faEnvelopeOpenText} className="text-gray-600 text-3xl mb-3" />
-            <p className="text-gray-400 text-sm">
+            <FontAwesomeIcon icon={faEnvelopeOpenText} className="text-slate-400 text-3xl mb-3" />
+            <p className="text-slate-300 text-sm">
               Aucune campagne. Créez-en une pour démarcher les centres importés.
             </p>
           </div>
@@ -340,7 +340,7 @@ export default function AdminCampagnesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-white/5">
-                <tr className="text-gray-400 text-left text-xs">
+                <tr className="text-slate-300 text-left text-xs">
                   <th className="px-4 py-3 font-medium">Campagne</th>
                   <th className="px-4 py-3 font-medium">Statut</th>
                   <th className="px-4 py-3 font-medium">Progression</th>
@@ -356,11 +356,11 @@ export default function AdminCampagnesPage() {
                     <tr key={c.id} className="border-t border-white/5 hover:bg-white/[0.02]">
                       <td className="px-4 py-3">
                         <p className="text-white font-medium">{c.nom}</p>
-                        <p className="text-gray-500 text-xs truncate max-w-xs" title={c.sujet}>
+                        <p className="text-slate-400 text-xs truncate max-w-xs" title={c.sujet}>
                           {c.sujet}
                         </p>
                         {c.createdBy && (
-                          <p className="text-gray-600 text-[11px] mt-0.5">
+                          <p className="text-slate-400 text-[11px] mt-0.5">
                             {c.createdBy.prenom} {c.createdBy.nom} ·{" "}
                             {new Date(c.createdAt).toLocaleDateString("fr-FR")}
                           </p>
@@ -395,10 +395,10 @@ export default function AdminCampagnesPage() {
                         <p className="text-gray-300">
                           {c.nbOuvertures} ouverture(s)
                           {c.nbEnvoyes > 0 && (
-                            <span className="text-gray-500"> · {tauxOuverture(c)} %</span>
+                            <span className="text-slate-400"> · {tauxOuverture(c)} %</span>
                           )}
                         </p>
-                        <p className="text-gray-500 text-[11px]">{c.nbClics} clic(s)</p>
+                        <p className="text-slate-400 text-[11px]">{c.nbClics} clic(s)</p>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1.5">
@@ -406,10 +406,10 @@ export default function AdminCampagnesPage() {
 
                           {attente > 0 && (
                             <span
-                              className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-400 text-[11px] tabular-nums"
+                              className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[11px] tabular-nums"
                               title={`Le lot suivant part automatiquement dans ${formatAttente(attente)}`}
                             >
-                              <FontAwesomeIcon icon={faClock} className="text-gray-500 mr-1" />
+                              <FontAwesomeIcon icon={faClock} className="text-slate-400 mr-1" />
                               {formatAttente(attente)}
                             </span>
                           )}
@@ -469,7 +469,7 @@ export default function AdminCampagnesPage() {
                               onClick={() => supprimer(c.id)}
                               disabled={occupe}
                               title="Supprimer"
-                              className="px-2.5 py-1.5 rounded-lg border border-white/15 text-gray-400 text-xs hover:border-red-500 hover:text-red-300 disabled:opacity-40 transition-colors"
+                              className="px-2.5 py-1.5 rounded-lg border border-white/15 text-slate-300 text-xs hover:border-red-500 hover:text-red-300 disabled:opacity-40 transition-colors"
                             >
                               <FontAwesomeIcon icon={faTrash} />
                             </button>
@@ -485,7 +485,7 @@ export default function AdminCampagnesPage() {
         )}
       </div>
 
-      <p className="text-gray-600 text-[11px]">
+      <p className="text-slate-400 text-[11px]">
         Chaque centre reçoit un message qui lui est propre — aucune adresse n&apos;est en copie.
         Les envois sont étalés par lots de 100 : une campagne volumineuse se poursuit
         automatiquement en tâche de fond (cron toutes les 5 minutes) pour préserver la

@@ -9,7 +9,7 @@ const RichTextEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="border border-gray-200 rounded-lg p-4 text-sm text-gray-400">
+      <div className="border border-gray-200 rounded-lg p-4 text-sm text-slate-300">
         Chargement de l&apos;éditeur…
       </div>
     ),
@@ -188,7 +188,7 @@ export default function EmailTemplatesPage() {
       ) : (
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Templates d&apos;emails</h1>
-        <p className="text-gray-400 mt-1">
+        <p className="text-slate-300 mt-1">
           Personnalisez les emails envoyés automatiquement par la plateforme
         </p>
       </div>
@@ -221,7 +221,7 @@ export default function EmailTemplatesPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{meta.description}</p>
+                <p className="text-xs text-slate-400 mt-1">{meta.description}</p>
               </button>
             );
           })}
@@ -234,7 +234,7 @@ export default function EmailTemplatesPage() {
               className="flex items-center justify-center rounded-lg border border-white/10 min-h-[400px]"
               style={{ background: "rgba(255,255,255,0.02)" }}
             >
-              <p className="text-gray-500">Sélectionnez un template pour le modifier</p>
+              <p className="text-slate-400">Sélectionnez un template pour le modifier</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -324,7 +324,7 @@ export default function EmailTemplatesPage() {
                 </label>
                 <div className="rounded-lg border border-white/10 overflow-hidden">
                   <div className="px-4 py-2 border-b border-white/10 bg-white/5">
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-300">
                       <span className="font-medium">Sujet :</span>{" "}
                       <span className="text-white">{renderPreview(editSubject)}</span>
                     </p>

@@ -141,7 +141,7 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
             style={cardStyle}
           >
             {reservations.map((r) => (
-              <option key={r.id} value={r.id} className="bg-[#0D1D3A]">
+              <option key={r.id} value={r.id} className="bg-[#24385E]">
                 {r.session.formation.titre} — {r.numero}
               </option>
             ))}
@@ -159,23 +159,23 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Mes envois */}
         <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
             <FontAwesomeIcon icon={faFileArrowUp} className="text-blue-400" /> Documents à transmettre
           </p>
           <form onSubmit={handleUpload} className="flex flex-col gap-2 mb-4 p-3 rounded-lg" style={{ background: "rgba(255,255,255,0.03)" }}>
             <select value={kind} onChange={(e) => setKind(e.target.value)} className="px-3 py-2 rounded-lg text-sm text-white focus:outline-none" style={cardStyle}>
-              {ELEVE_KINDS.map((k) => <option key={k.value} value={k.value} className="bg-[#0D1D3A]">{k.label}</option>)}
+              {ELEVE_KINDS.map((k) => <option key={k.value} value={k.value} className="bg-[#24385E]">{k.label}</option>)}
             </select>
-            <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
+            <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
             <button type="submit" disabled={uploading} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold py-2 rounded-lg transition-colors">
               <FontAwesomeIcon icon={uploading ? faSpinner : faUpload} className={uploading ? "animate-spin" : ""} />
               {uploading ? "Envoi…" : "Envoyer au centre"}
             </button>
-            <p className="text-[11px] text-gray-500">JPEG, PNG, WEBP ou PDF — max 8 MB. Ex : photo recto/verso de votre permis.</p>
+            <p className="text-[11px] text-slate-400">JPEG, PNG, WEBP ou PDF — max 8 MB. Ex : photo recto/verso de votre permis.</p>
           </form>
 
           <div className="space-y-2">
-            {envois.length === 0 && <p className="text-xs text-gray-500">Aucun document transmis.</p>}
+            {envois.length === 0 && <p className="text-xs text-slate-400">Aucun document transmis.</p>}
             {envois.map((d) => {
               const valide = d.verifiedAt && d.status === "ACCEPTE";
               const refuse = d.verifiedAt && d.status === "REFUSE";
@@ -183,12 +183,12 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
                 <div key={d.id} className="p-2.5 rounded-lg" style={cardStyle}>
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faFileArrowUp} className="text-gray-400 text-xs shrink-0" />
+                      <FontAwesomeIcon icon={faFileArrowUp} className="text-slate-300 text-xs shrink-0" />
                       <div className="min-w-0">
                         <span className="text-sm text-white truncate block">{d.nom}</span>
                         <span
                           className={`text-[10px] ${
-                            d.purgedAt ? "text-gray-500"
+                            d.purgedAt ? "text-slate-400"
                               : valide ? "text-green-400"
                               : refuse ? "text-red-400"
                               : "text-amber-400"
@@ -205,7 +205,7 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
                       {d.blobUrl && <a href={d.blobUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs"><FontAwesomeIcon icon={faDownload} /></a>}
                       {/* Un justificatif déjà validé ou purgé ne doit plus être supprimé par l'élève. */}
                       {!valide && !d.purgedAt && (
-                        <button onClick={() => handleDelete(d.id)} disabled={busyId === d.id} className="text-gray-400 hover:text-red-400 text-xs">
+                        <button onClick={() => handleDelete(d.id)} disabled={busyId === d.id} className="text-slate-300 hover:text-red-400 text-xs">
                           <FontAwesomeIcon icon={busyId === d.id ? faSpinner : faTrash} className={busyId === d.id ? "animate-spin" : ""} />
                         </button>
                       )}
@@ -222,12 +222,12 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
 
         {/* Documents reçus */}
         <div className="relative min-h-[80px]">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
             <FontAwesomeIcon icon={faFileArrowDown} className="text-green-400" /> Documents reçus du centre
           </p>
           <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
           {!loading && recus.length === 0 ? (
-            <p className="text-xs text-gray-500">Aucun document reçu pour le moment.</p>
+            <p className="text-xs text-slate-400">Aucun document reçu pour le moment.</p>
           ) : (
             <div className="space-y-2">
               {recus.map((d) => {
@@ -247,7 +247,7 @@ export default function EleveDocumentExchange({ reservations }: { reservations: 
                         </a>
                       )}
                     </div>
-                    {d.contenu && <p className="text-xs text-gray-400 mt-2 whitespace-pre-line line-clamp-4">{d.contenu}</p>}
+                    {d.contenu && <p className="text-xs text-slate-300 mt-2 whitespace-pre-line line-clamp-4">{d.contenu}</p>}
                     {d.status === "ACCEPTE" && (
                       <p className="text-[11px] text-green-400 mt-2 flex items-center gap-1.5">
                         <FontAwesomeIcon icon={faCircleCheck} /> Accepté{d.acceptedAt ? ` le ${new Date(d.acceptedAt).toLocaleDateString("fr-FR")}` : ""}

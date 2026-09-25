@@ -154,7 +154,7 @@ export default function AdminPromoPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Codes promo</h1>
-          <p className="text-gray-500 text-sm mt-1">Gérez les codes promotionnels de la plateforme</p>
+          <p className="text-slate-400 text-sm mt-1">Gérez les codes promotionnels de la plateforme</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -173,30 +173,30 @@ export default function AdminPromoPage() {
 
       {/* Create form */}
       {showForm && (
-        <form onSubmit={handleCreate} className="rounded-xl border border-white/10 p-6 space-y-4" style={{ background: "#0D1D3A" }}>
+        <form onSubmit={handleCreate} className="rounded-xl border border-white/10 p-6 space-y-4" style={{ background: "#24385E" }}>
           <h2 className="text-white font-semibold text-lg mb-2">Nouveau code promo</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Code *</label>
+              <label className="block text-xs text-slate-300 mb-1">Code *</label>
               <input
                 value={formCode}
                 onChange={(e) => setFormCode(e.target.value.toUpperCase())}
                 required
                 placeholder="BIENVENUE10"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500 uppercase"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 uppercase"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Description</label>
+              <label className="block text-xs text-slate-300 mb-1">Description</label>
               <input
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder="10% de réduction bienvenue"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Type *</label>
+              <label className="block text-xs text-slate-300 mb-1">Type *</label>
               <select
                 value={formType}
                 onChange={(e) => setFormType(e.target.value as "POURCENTAGE" | "MONTANT_FIXE")}
@@ -207,7 +207,7 @@ export default function AdminPromoPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">
+              <label className="block text-xs text-slate-300 mb-1">
                 Valeur * ({formType === "POURCENTAGE" ? "%" : "€"})
               </label>
               <input
@@ -218,11 +218,11 @@ export default function AdminPromoPage() {
                 onChange={(e) => setFormValeur(e.target.value)}
                 required
                 placeholder="10"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Montant minimum d'achat (€)</label>
+              <label className="block text-xs text-slate-300 mb-1">Montant minimum d'achat (€)</label>
               <input
                 type="number"
                 step="0.01"
@@ -230,22 +230,22 @@ export default function AdminPromoPage() {
                 value={formMinAchat}
                 onChange={(e) => setFormMinAchat(e.target.value)}
                 placeholder="Aucun"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Max utilisations</label>
+              <label className="block text-xs text-slate-300 mb-1">Max utilisations</label>
               <input
                 type="number"
                 min="1"
                 value={formMaxUtilisations}
                 onChange={(e) => setFormMaxUtilisations(e.target.value)}
                 placeholder="Illimité"
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Date de début *</label>
+              <label className="block text-xs text-slate-300 mb-1">Date de début *</label>
               <input
                 type="date"
                 value={formDateDebut}
@@ -255,7 +255,7 @@ export default function AdminPromoPage() {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Date de fin *</label>
+              <label className="block text-xs text-slate-300 mb-1">Date de fin *</label>
               <input
                 type="date"
                 value={formDateFin}
@@ -269,7 +269,7 @@ export default function AdminPromoPage() {
             <button
               type="button"
               onClick={() => { setShowForm(false); resetForm(); }}
-              className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-lg text-sm text-slate-300 hover:text-white transition-colors"
             >
               Annuler
             </button>
@@ -289,7 +289,7 @@ export default function AdminPromoPage() {
       <div className="relative min-h-[280px]">
       <div className={loading ? "opacity-40 pointer-events-none select-none" : ""}>
       {loading ? (
-        <div className="rounded-xl border border-white/10 overflow-hidden animate-pulse" style={{ background: "#0D1D3A" }}>
+        <div className="rounded-xl border border-white/10 overflow-hidden animate-pulse" style={{ background: "#24385E" }}>
           <div className="h-10 bg-white/5 border-b border-white/10" />
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-14 border-b border-white/5" />
@@ -298,14 +298,14 @@ export default function AdminPromoPage() {
       ) : promos.length === 0 ? (
         <div className="text-center py-20">
           <FontAwesomeIcon icon={faTag} className="text-4xl text-gray-700 mb-4" />
-          <p className="text-gray-500">Aucun code promo pour le moment</p>
+          <p className="text-slate-400">Aucun code promo pour le moment</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: "#0D1D3A" }}>
+        <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: "#24385E" }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-gray-500 text-xs uppercase tracking-wider">
+                <tr className="border-b border-white/10 text-slate-400 text-xs uppercase tracking-wider">
                   <th className="text-left px-5 py-3 font-medium">Code</th>
                   <th className="text-left px-5 py-3 font-medium">Type</th>
                   <th className="text-left px-5 py-3 font-medium">Valeur</th>
@@ -324,11 +324,11 @@ export default function AdminPromoPage() {
                         {promo.code}
                       </span>
                       {promo.description && (
-                        <p className="text-gray-500 text-xs mt-1">{promo.description}</p>
+                        <p className="text-slate-400 text-xs mt-1">{promo.description}</p>
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+                      <span className="inline-flex items-center gap-1 text-xs text-slate-300">
                         <FontAwesomeIcon
                           icon={promo.type === "POURCENTAGE" ? faPercent : faEuroSign}
                           className="text-[10px]"
@@ -339,13 +339,13 @@ export default function AdminPromoPage() {
                     <td className="px-5 py-4 text-white font-medium">
                       {promo.valeur}{promo.type === "POURCENTAGE" ? "%" : " €"}
                       {promo.minAchat && (
-                        <p className="text-gray-600 text-xs">min. {promo.minAchat} €</p>
+                        <p className="text-slate-400 text-xs">min. {promo.minAchat} €</p>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-gray-400">
+                    <td className="px-5 py-4 text-slate-300">
                       {promo.utilisations}{promo.maxUtilisations ? ` / ${promo.maxUtilisations}` : " / ∞"}
                     </td>
-                    <td className="px-5 py-4 text-gray-400 text-xs">
+                    <td className="px-5 py-4 text-slate-300 text-xs">
                       {new Date(promo.dateDebut).toLocaleDateString("fr-FR")}
                       <br />
                       → {new Date(promo.dateFin).toLocaleDateString("fr-FR")}
@@ -354,12 +354,12 @@ export default function AdminPromoPage() {
                       {promo.centre ? (
                         <span className="text-xs text-blue-400">{promo.centre.nom}</span>
                       ) : (
-                        <span className="text-xs text-gray-500">Plateforme</span>
+                        <span className="text-xs text-slate-400">Plateforme</span>
                       )}
                     </td>
                     <td className="px-5 py-4">
                       {isExpired(promo.dateFin) ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-500/10 text-gray-500 border border-gray-500/20">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-500/10 text-slate-400 border border-gray-500/20">
                           Expiré
                         </span>
                       ) : promo.isActive ? (
@@ -376,17 +376,17 @@ export default function AdminPromoPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleToggle(promo)}
-                          className="text-gray-500 hover:text-white transition-colors"
+                          className="text-slate-400 hover:text-white transition-colors"
                           title={promo.isActive ? "Désactiver" : "Activer"}
                         >
                           <FontAwesomeIcon
                             icon={promo.isActive ? faToggleOn : faToggleOff}
-                            className={`text-lg ${promo.isActive ? "text-green-400" : "text-gray-600"}`}
+                            className={`text-lg ${promo.isActive ? "text-green-400" : "text-slate-400"}`}
                           />
                         </button>
                         <button
                           onClick={() => handleDelete(promo.id)}
-                          className="text-gray-600 hover:text-red-400 transition-colors"
+                          className="text-slate-400 hover:text-red-400 transition-colors"
                           title="Supprimer"
                         >
                           <FontAwesomeIcon icon={faTrash} className="text-xs" />

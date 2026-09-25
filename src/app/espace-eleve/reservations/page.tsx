@@ -35,7 +35,7 @@ interface Reservation {
 
 const statusConfig = {
   CONFIRMEE:  { label: "Confirmée",  icon: faCircleCheck,      color: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-500/20" },
-  TERMINEE:   { label: "Terminée",   icon: faCircleCheck,      color: "text-gray-400",   bg: "bg-gray-400/10",   border: "border-gray-500/20"  },
+  TERMINEE:   { label: "Terminée",   icon: faCircleCheck,      color: "text-slate-300",   bg: "bg-gray-400/10",   border: "border-gray-500/20"  },
   ANNULEE:    { label: "Annulée",    icon: faCircleXmark,      color: "text-red-400",    bg: "bg-red-400/10",    border: "border-red-500/20"   },
   EN_ATTENTE: { label: "En attente", icon: faHourglassHalf,    color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/20" },
   REMBOURSEE: { label: "Remboursée", icon: faCircleExclamation,color: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-500/20"  },
@@ -47,7 +47,7 @@ const filterPills: { key: StatusFilter; label: string; color: string }[] = [
   { key: "TOUTES",     label: "Toutes",      color: "text-white"       },
   { key: "CONFIRMEE",  label: "Confirmées",  color: "text-green-400"   },
   { key: "EN_ATTENTE", label: "En attente",  color: "text-yellow-400"  },
-  { key: "TERMINEE",   label: "Terminées",   color: "text-gray-400"    },
+  { key: "TERMINEE",   label: "Terminées",   color: "text-slate-300"    },
   { key: "ANNULEE",    label: "Annulées",    color: "text-red-400"     },
 ];
 
@@ -120,7 +120,7 @@ export default function ReservationsPage() {
     <div>
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes réservations</h1>
-        <p className="text-gray-500 text-sm">Retrouvez l&apos;historique de tous vos stages</p>
+        <p className="text-slate-400 text-sm">Retrouvez l&apos;historique de tous vos stages</p>
       </div>
 
       <div className="relative min-h-[50vh]">
@@ -131,12 +131,12 @@ export default function ReservationsPage() {
           {[
             { label: "Total",       value: counts.total,      color: "text-white"      },
             { label: "Confirmées",  value: counts.confirmees, color: "text-green-400"  },
-            { label: "Terminées",   value: counts.terminees,  color: "text-gray-400"   },
+            { label: "Terminées",   value: counts.terminees,  color: "text-slate-300"   },
             { label: "Annulées",    value: counts.annulees,   color: "text-red-400"    },
           ].map((s) => (
             <div key={s.label} className="rounded-xl p-4 border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.07)" }}>
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+              <p className="text-xs text-slate-400 mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -154,7 +154,7 @@ export default function ReservationsPage() {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all border ${
                   statusFilter === pill.key
                     ? `${pill.color} border-current bg-white/5`
-                    : "text-gray-500 border-transparent hover:text-gray-300"
+                    : "text-slate-400 border-transparent hover:text-gray-300"
                 }`}
               >
                 {pill.label}
@@ -166,14 +166,14 @@ export default function ReservationsPage() {
           <div className="relative">
             <FontAwesomeIcon
               icon={faSearch}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
             />
             <input
               type="text"
               placeholder="Rechercher par formation, centre, ville ou numéro..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 rounded-lg text-sm text-white placeholder-gray-600 border outline-none focus:border-blue-500/40 transition-colors"
+              className="w-full pl-10 pr-10 py-2.5 rounded-lg text-sm text-white placeholder-slate-400 border outline-none focus:border-blue-500/40 transition-colors"
               style={{
                 background: "rgba(255,255,255,0.04)",
                 borderColor: "rgba(255,255,255,0.07)",
@@ -182,7 +182,7 @@ export default function ReservationsPage() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors"
               >
                 <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
               </button>
@@ -197,7 +197,7 @@ export default function ReservationsPage() {
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(220,38,38,0.05)", borderColor: "rgba(220,38,38,0.15)" }}>
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-3xl text-red-400 mb-3" />
           <p className="text-white font-medium mb-1">Erreur de chargement</p>
-          <p className="text-gray-500 text-sm mb-6">{error}</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
           <button
             onClick={() => { setError(null); setLoading(true); window.location.reload(); }}
             className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all"
@@ -208,9 +208,9 @@ export default function ReservationsPage() {
       ) : reservations.length === 0 ? (
         /* Empty */
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-          <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
+          <FontAwesomeIcon icon={faSearch} className="text-3xl text-slate-400 mb-3" />
           <p className="text-white font-medium mb-1">Aucune réservation</p>
-          <p className="text-gray-500 text-sm mb-6">Vous n&apos;avez pas encore réservé de stage.</p>
+          <p className="text-slate-400 text-sm mb-6">Vous n&apos;avez pas encore réservé de stage.</p>
           <Link href="/recherche" className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all">
             Réserver un stage
           </Link>
@@ -218,9 +218,9 @@ export default function ReservationsPage() {
       ) : filtered.length === 0 ? (
         /* No results for filter */
         <div className="text-center py-16 rounded-xl border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-          <FontAwesomeIcon icon={faSearch} className="text-3xl text-gray-600 mb-3" />
+          <FontAwesomeIcon icon={faSearch} className="text-3xl text-slate-400 mb-3" />
           <p className="text-white font-medium mb-1">Aucun résultat</p>
-          <p className="text-gray-500 text-sm mb-4">Aucune réservation ne correspond à vos filtres.</p>
+          <p className="text-slate-400 text-sm mb-4">Aucune réservation ne correspond à vos filtres.</p>
           <button
             onClick={() => { setStatusFilter("TOUTES"); setSearchQuery(""); }}
             className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
@@ -255,7 +255,7 @@ export default function ReservationsPage() {
                         {s.label}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
                       <span className="flex items-center gap-1">
                         <FontAwesomeIcon icon={faLocationDot} className="w-3 h-3" />
                         {r.session.formation.centre.nom} — {r.session.formation.centre.ville}
@@ -269,7 +269,7 @@ export default function ReservationsPage() {
 
                   <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-1 shrink-0">
                     <span className="font-bold text-white text-sm">{formatPrice(r.montant)}</span>
-                    <span className="text-xs text-gray-600 font-mono">{r.numero}</span>
+                    <span className="text-xs text-slate-400 font-mono">{r.numero}</span>
                     {r.status === "CONFIRMEE" && (
                       <span
                         className="flex items-center gap-1.5 text-xs text-blue-400 mt-1"
@@ -292,7 +292,7 @@ export default function ReservationsPage() {
 
       {!loading && !error && (
         <div className="mt-10 text-center rounded-xl p-8 border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }}>
-          <p className="text-gray-400 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
+          <p className="text-slate-300 mb-4 text-sm">Vous souhaitez réserver un nouveau stage ?</p>
           <Link href="/recherche" className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">
             Rechercher un stage
           </Link>

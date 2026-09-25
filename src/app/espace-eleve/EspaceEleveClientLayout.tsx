@@ -46,11 +46,11 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#0A1628" }}>
+    <div className="min-h-screen flex" style={{ background: "#1C2D4F" }}>
       {/* Sidebar */}
       <aside
-        className="hidden lg:flex flex-col w-64 shrink-0 border-r"
-        style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}
+        className="hidden lg:flex flex-col w-64 shrink-0 border-r sticky top-0 h-screen self-start overflow-y-auto"
+        style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.07)" }}
       >
         {/* Logo */}
         <div
@@ -83,7 +83,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Espace Élève</p>
-              <p className="text-xs text-gray-500">Mon compte</p>
+              <p className="text-xs text-slate-400">Mon compte</p>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
                 key={link.href}
                 href={link.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
-                  active ? "text-white bg-white/5" : "text-gray-400 hover:text-white"
+                  active ? "text-white bg-white/5" : "text-slate-300 hover:text-white"
                 }`}
               >
                 <div className="relative">
@@ -132,7 +132,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
         >
           <Link
             href="/auth/logout"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-400 transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-red-400 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-4 h-4" />
             Se déconnecter
@@ -145,7 +145,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
         {/* Top bar mobile */}
         <div
           className="lg:hidden flex items-center justify-between px-4 py-4 border-b"
-          style={{ background: "#0D1D3A", borderColor: "rgba(255,255,255,0.07)" }}
+          style={{ background: "#24385E", borderColor: "rgba(255,255,255,0.07)" }}
         >
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -157,7 +157,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
             {unreadCount > 0 && (
               <Link
                 href="/espace-eleve/notifications"
-                className="relative text-gray-400 hover:text-white text-sm"
+                className="relative text-slate-300 hover:text-white text-sm"
               >
                 <FontAwesomeIcon icon={faBell} />
                 <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 flex items-center justify-center px-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
@@ -165,7 +165,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
                 </span>
               </Link>
             )}
-            <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
+            <Link href="/auth/logout" className="text-slate-400 hover:text-red-400 text-sm">
               <FontAwesomeIcon icon={faArrowRightFromBracket} />
             </Link>
           </div>
@@ -176,7 +176,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
           className="lg:hidden flex gap-1 px-2 py-2 border-b overflow-x-auto scrollbar-hide"
           style={{
             borderColor: "rgba(255,255,255,0.07)",
-            background: "#0D1D3A",
+            background: "#24385E",
             WebkitOverflowScrolling: "touch",
           }}
         >
@@ -188,7 +188,7 @@ export default function EspaceEleveClientLayout({ children }: { children: React.
                 href={link.href}
                 title={link.label}
                 className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors shrink-0 min-w-[52px] ${
-                  active ? "text-blue-400 bg-blue-500/10" : "text-gray-500 hover:text-white"
+                  active ? "text-blue-400 bg-blue-500/10" : "text-slate-400 hover:text-white"
                 }`}
               >
                 <div className="relative">

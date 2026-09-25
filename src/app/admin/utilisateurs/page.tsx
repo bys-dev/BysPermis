@@ -202,7 +202,7 @@ export default function AdminUtilisateursPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Utilisateurs</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             {counts.tous} comptes · {counts.eleves} élèves · {counts.centres} centres · {counts.plateforme} plateforme
           </p>
         </div>
@@ -229,7 +229,7 @@ export default function AdminUtilisateursPage() {
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border
               ${filterRole === r.key
                 ? "bg-white/10 text-white border-white/20"
-                : "text-gray-400 border-white/8 hover:text-white hover:border-white/20"
+                : "text-slate-300 border-white/8 hover:text-white hover:border-white/20"
               }`}
           >
             {r.label}
@@ -240,7 +240,7 @@ export default function AdminUtilisateursPage() {
 
       {/* Search */}
       <div className="relative">
-        <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" />
+        <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
         <input
           type="text"
           placeholder="Rechercher par nom, prénom ou email..."
@@ -254,7 +254,7 @@ export default function AdminUtilisateursPage() {
       {error && !loading && (
         <div className="text-center py-12">
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400 text-2xl mb-3" />
-          <p className="text-gray-400 text-sm mb-4">Erreur lors du chargement</p>
+          <p className="text-slate-300 text-sm mb-4">Erreur lors du chargement</p>
           <button onClick={() => fetchUsers()} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Réessayer</button>
         </div>
       )}
@@ -274,11 +274,11 @@ export default function AdminUtilisateursPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/8">
-                    <th className="text-left text-gray-500 font-medium text-xs py-3 px-5">Utilisateur</th>
-                    <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Rôle</th>
-                    <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Statut</th>
-                    <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Réservations</th>
-                    <th className="text-left text-gray-500 font-medium text-xs py-3 px-4">Inscrit</th>
+                    <th className="text-left text-slate-400 font-medium text-xs py-3 px-5">Utilisateur</th>
+                    <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Rôle</th>
+                    <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Statut</th>
+                    <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Réservations</th>
+                    <th className="text-left text-slate-400 font-medium text-xs py-3 px-4">Inscrit</th>
                     <th className="py-3 px-4"><span className="sr-only">Actions</span></th>
                   </tr>
                 </thead>
@@ -296,7 +296,7 @@ export default function AdminUtilisateursPage() {
                             </div>
                             <div>
                               <p className="text-white font-medium">{fullName}</p>
-                              <p className="text-gray-500 text-xs flex items-center gap-1">
+                              <p className="text-slate-400 text-xs flex items-center gap-1">
                                 <FontAwesomeIcon icon={faEnvelope} className="text-[9px]" />
                                 {u.email}
                               </p>
@@ -323,9 +323,9 @@ export default function AdminUtilisateursPage() {
                           )}
                         </td>
                         <td className="py-3.5 px-4 text-white">
-                          {u._count.reservations > 0 ? u._count.reservations : <span className="text-gray-600">—</span>}
+                          {u._count.reservations > 0 ? u._count.reservations : <span className="text-slate-400">—</span>}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-500 text-xs">
+                        <td className="py-3.5 px-4 text-slate-400 text-xs">
                           <span className="flex items-center gap-1">
                             <FontAwesomeIcon icon={faClock} className="text-[9px]" />
                             {formatDate(new Date(u.createdAt))}
@@ -336,7 +336,7 @@ export default function AdminUtilisateursPage() {
                             <div className="relative">
                               <button
                                 onClick={() => setOpenMenu(openMenu === u.id ? null : u.id)}
-                                className="p-1.5 rounded-lg bg-white/5 border border-white/8 text-gray-400 hover:text-white transition-colors"
+                                className="p-1.5 rounded-lg bg-white/5 border border-white/8 text-slate-300 hover:text-white transition-colors"
                               >
                                 <FontAwesomeIcon icon={faEllipsisVertical} className="text-xs" />
                               </button>
@@ -380,12 +380,12 @@ export default function AdminUtilisateursPage() {
           {/* Pagination */}
           {!loading && totalPages > 1 && (
             <div className="flex items-center justify-between px-5 py-4 border-t border-white/8">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-400">
                 Page {page} / {totalPages} — {total} résultat{total > 1 ? "s" : ""}
               </p>
               <div className="flex items-center gap-1">
                 <button
-                  className="px-2.5 py-1.5 rounded-lg text-xs border border-white/10 text-gray-400 hover:text-white disabled:opacity-40"
+                  className="px-2.5 py-1.5 rounded-lg text-xs border border-white/10 text-slate-300 hover:text-white disabled:opacity-40"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
                 >
@@ -395,20 +395,20 @@ export default function AdminUtilisateursPage() {
                   <>
                     <button
                       className={`px-2.5 py-1.5 rounded-lg text-xs border ${
-                        page === 1 ? "border-white/20 text-white bg-white/10" : "border-white/10 text-gray-400 hover:text-white"
+                        page === 1 ? "border-white/20 text-white bg-white/10" : "border-white/10 text-slate-300 hover:text-white"
                       }`}
                       onClick={() => setPage(1)}
                     >
                       1
                     </button>
-                    {startPage > 2 && <span className="px-1 text-gray-600 text-xs">…</span>}
+                    {startPage > 2 && <span className="px-1 text-slate-400 text-xs">…</span>}
                   </>
                 )}
                 {pageWindow.map((p) => (
                   <button
                     key={p}
                     className={`px-2.5 py-1.5 rounded-lg text-xs border ${
-                      page === p ? "border-white/20 text-white bg-white/10" : "border-white/10 text-gray-400 hover:text-white"
+                      page === p ? "border-white/20 text-white bg-white/10" : "border-white/10 text-slate-300 hover:text-white"
                     }`}
                     onClick={() => setPage(p)}
                   >
@@ -417,10 +417,10 @@ export default function AdminUtilisateursPage() {
                 ))}
                 {endPage < totalPages && (
                   <>
-                    {endPage < totalPages - 1 && <span className="px-1 text-gray-600 text-xs">…</span>}
+                    {endPage < totalPages - 1 && <span className="px-1 text-slate-400 text-xs">…</span>}
                     <button
                       className={`px-2.5 py-1.5 rounded-lg text-xs border ${
-                        page === totalPages ? "border-white/20 text-white bg-white/10" : "border-white/10 text-gray-400 hover:text-white"
+                        page === totalPages ? "border-white/20 text-white bg-white/10" : "border-white/10 text-slate-300 hover:text-white"
                       }`}
                       onClick={() => setPage(totalPages)}
                     >
@@ -429,7 +429,7 @@ export default function AdminUtilisateursPage() {
                   </>
                 )}
                 <button
-                  className="px-2.5 py-1.5 rounded-lg text-xs border border-white/10 text-gray-400 hover:text-white disabled:opacity-40"
+                  className="px-2.5 py-1.5 rounded-lg text-xs border border-white/10 text-slate-300 hover:text-white disabled:opacity-40"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
                 >
@@ -440,7 +440,7 @@ export default function AdminUtilisateursPage() {
           )}
 
           {!loading && filteredUsers.length === 0 && !error && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-slate-400">
               <FontAwesomeIcon icon={faUsers} className="text-2xl mb-2" />
               <p className="text-sm">Aucun utilisateur trouvé</p>
             </div>
@@ -457,7 +457,7 @@ export default function AdminUtilisateursPage() {
                 <FontAwesomeIcon icon={faUserPlus} className="text-blue-400" />
                 Créer un utilisateur
               </h2>
-              <button onClick={() => setShowCreate(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => setShowCreate(false)} className="text-slate-300 hover:text-white">
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
@@ -471,7 +471,7 @@ export default function AdminUtilisateursPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 mb-1.5">Prénom</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Prénom</label>
                   <input
                     type="text" required value={createForm.prenom}
                     onChange={(e) => setCreateForm({ ...createForm, prenom: e.target.value })}
@@ -480,7 +480,7 @@ export default function AdminUtilisateursPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 mb-1.5">Nom</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Nom</label>
                   <input
                     type="text" required value={createForm.nom}
                     onChange={(e) => setCreateForm({ ...createForm, nom: e.target.value })}
@@ -491,7 +491,7 @@ export default function AdminUtilisateursPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1.5">Email</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email</label>
                 <input
                   type="email" required value={createForm.email}
                   onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
@@ -501,7 +501,7 @@ export default function AdminUtilisateursPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1.5">Rôle</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Rôle</label>
                 <select
                   value={createForm.role}
                   onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as Role })}
@@ -514,8 +514,8 @@ export default function AdminUtilisateursPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1.5">
-                  Mot de passe <span className="text-gray-600">(optionnel — auto-généré si vide)</span>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Mot de passe <span className="text-slate-400">(optionnel — auto-généré si vide)</span>
                 </label>
                 <input
                   type="text" value={createForm.password}
@@ -529,7 +529,7 @@ export default function AdminUtilisateursPage() {
               <div className="flex gap-3 pt-2">
                 <button
                   type="button" onClick={() => setShowCreate(false)}
-                  className="flex-1 py-2.5 rounded-lg border border-white/10 text-gray-400 hover:text-white text-sm font-medium transition-colors"
+                  className="flex-1 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:text-white text-sm font-medium transition-colors"
                 >
                   Annuler
                 </button>
@@ -554,17 +554,17 @@ export default function AdminUtilisateursPage() {
                 <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400 text-xl" />
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Supprimer cet utilisateur ?</h3>
-              <p className="text-gray-400 text-sm mb-1">
+              <p className="text-slate-300 text-sm mb-1">
                 <strong className="text-white">{deleteTarget.prenom} {deleteTarget.nom}</strong>
               </p>
-              <p className="text-gray-500 text-xs mb-6">{deleteTarget.email} · {roleMap[deleteTarget.role].label}</p>
+              <p className="text-slate-400 text-xs mb-6">{deleteTarget.email} · {roleMap[deleteTarget.role].label}</p>
               <p className="text-red-400/80 text-xs mb-6">
                 Cette action est irréversible. Toutes les données associées (réservations, tickets, notifications) seront supprimées.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteTarget(null)}
-                  className="flex-1 py-2.5 rounded-lg border border-white/10 text-gray-400 hover:text-white text-sm font-medium transition-colors"
+                  className="flex-1 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:text-white text-sm font-medium transition-colors"
                 >
                   Annuler
                 </button>

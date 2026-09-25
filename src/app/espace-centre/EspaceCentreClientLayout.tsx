@@ -185,8 +185,8 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
     nom: theme.nom,
   });
 
-  const sidebarBg = `linear-gradient(180deg, rgba(${theme.secondaryRgb}, 0.28) 0%, #0A1628 55%)`;
-  const panelBg = `linear-gradient(135deg, rgba(${theme.secondaryRgb}, 0.22) 0%, #0D1D3A 100%)`;
+  const sidebarBg = `linear-gradient(180deg, rgba(${theme.secondaryRgb}, 0.28) 0%, #1C2D4F 55%)`;
+  const panelBg = `linear-gradient(135deg, rgba(${theme.secondaryRgb}, 0.22) 0%, #24385E 100%)`;
   const borderColor = `rgba(${theme.primaryRgb}, 0.18)`;
 
   useEffect(() => {
@@ -246,11 +246,11 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
       className="centre-themed min-h-screen flex"
       style={{
         ...cssVars,
-        background: "#0A1628",
+        background: "#1C2D4F",
       }}
     >
       <aside
-        className="hidden lg:flex flex-col w-64 shrink-0 border-r bg-[#0A1628]"
+        className="hidden lg:flex flex-col w-64 shrink-0 border-r bg-[#1C2D4F] sticky top-0 h-screen self-start overflow-y-auto"
         style={{ background: sidebarBg, borderColor: "rgba(255,255,255,0.07)" }}
       >
         <div
@@ -325,7 +325,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="px-4 pb-6 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <Link
             href="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 transition-colors mb-2 hover:text-white"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-colors mb-2 hover:text-white"
             style={{ color: undefined }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = theme.primary;
@@ -338,7 +338,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
           </Link>
           <Link
             href="/auth/logout"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-400 transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-red-400 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-4 h-4" />
             Se déconnecter
@@ -368,7 +368,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
               {theme.nom || "Espace centre"}
             </span>
           </Link>
-          <Link href="/auth/logout" className="text-gray-500 hover:text-red-400 text-sm">
+          <Link href="/auth/logout" className="text-slate-400 hover:text-red-400 text-sm">
             <FontAwesomeIcon icon={faArrowRightFromBracket} />
           </Link>
         </div>
@@ -437,7 +437,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
             </Link>
             <button
               onClick={() => setBannerDismissed(true)}
-              className="shrink-0 text-gray-600 hover:text-gray-400 transition-colors"
+              className="shrink-0 text-slate-400 hover:text-slate-300 transition-colors"
               title="Masquer"
             >
               <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
@@ -445,7 +445,7 @@ function EspaceCentreLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-[#0A1628]">
+        <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-[#1C2D4F]">
           {children}
         </main>
       </div>

@@ -126,7 +126,7 @@ function fmtPct(n: number): string {
 function TrendBadge({ value }: { value: number }) {
   if (value === 0) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500">
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
         <FontAwesomeIcon icon={faMinus} className="text-[10px]" />
         0%
       </span>
@@ -179,7 +179,7 @@ function BarChart({
                 title={`${d.label}: ${fmtNum(d.value)}`}
               />
             </div>
-            <span className="text-[9px] text-gray-600 truncate w-full text-center">{d.label}</span>
+            <span className="text-[9px] text-slate-400 truncate w-full text-center">{d.label}</span>
           </div>
         );
       })}
@@ -198,7 +198,7 @@ function HorizontalBar({ label, value, max, color = "bg-blue-500", suffix = "" }
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-400 truncate max-w-[60%]">{label}</span>
+        <span className="text-xs text-slate-300 truncate max-w-[60%]">{label}</span>
         <span className="text-xs text-white font-semibold">{suffix === "EUR" ? formatPrice(value) : fmtNum(value)}{suffix && suffix !== "EUR" ? suffix : ""}</span>
       </div>
       <div className="w-full h-2 rounded-full bg-white/5">
@@ -219,7 +219,7 @@ function StatCard({ label, value, sub, icon, color, border, bg, trend }: {
   trend?: number;
 }) {
   return (
-    <div className={`rounded-xl p-4 border bg-[#0A1628] ${border}`}>
+    <div className={`rounded-xl p-4 border bg-[#1C2D4F] ${border}`}>
       <div className="flex items-start justify-between mb-3">
         <div className={`w-10 h-10 rounded-lg ${bg} border ${border} flex items-center justify-center`}>
           <FontAwesomeIcon icon={icon} className={`${color} text-sm`} />
@@ -227,8 +227,8 @@ function StatCard({ label, value, sub, icon, color, border, bg, trend }: {
         {trend !== undefined && <TrendBadge value={trend} />}
       </div>
       <p className="text-xl font-bold text-white">{value}</p>
-      <p className="text-[11px] text-gray-500 mt-1">{label}</p>
-      {sub && <p className="text-[10px] text-gray-600 mt-0.5">{sub}</p>}
+      <p className="text-[11px] text-slate-400 mt-1">{label}</p>
+      {sub && <p className="text-[10px] text-slate-400 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -286,20 +286,20 @@ function TabRevenus({ data }: { data: AnalyticsData }) {
       {/* Revenue chart + split */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Monthly revenue chart */}
-        <div className="lg:col-span-2 bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="lg:col-span-2 bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-white font-semibold text-sm">Revenus mensuels</h3>
-              <p className="text-gray-600 text-[11px] mt-0.5">Commissions + Abonnements (12 derniers mois)</p>
+              <p className="text-slate-400 text-[11px] mt-0.5">Commissions + Abonnements (12 derniers mois)</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />
-                <span className="text-[10px] text-gray-500">Commissions</span>
+                <span className="text-[10px] text-slate-400">Commissions</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-sm bg-yellow-500 opacity-70" />
-                <span className="text-[10px] text-gray-500">Abonnements</span>
+                <span className="text-[10px] text-slate-400">Abonnements</span>
               </div>
             </div>
           </div>
@@ -314,32 +314,32 @@ function TabRevenus({ data }: { data: AnalyticsData }) {
         </div>
 
         {/* Revenue split */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <h3 className="text-white font-semibold text-sm mb-4">Repartition revenus (12 mois)</h3>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-400">Commissions</span>
+                <span className="text-xs text-slate-300">Commissions</span>
                 <span className="text-xs text-blue-400 font-semibold">{formatPrice(revenue.totalCommission12m)}</span>
               </div>
               <div className="w-full h-3 rounded-full bg-white/5">
                 <div className="h-full rounded-full bg-blue-500 transition-all duration-700" style={{ width: `${commissionPct}%` }} />
               </div>
-              <p className="text-[10px] text-gray-600 mt-1">{commissionPct}% du total</p>
+              <p className="text-[10px] text-slate-400 mt-1">{commissionPct}% du total</p>
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-400">Abonnements</span>
+                <span className="text-xs text-slate-300">Abonnements</span>
                 <span className="text-xs text-yellow-400 font-semibold">{formatPrice(revenue.totalAbonnement12m)}</span>
               </div>
               <div className="w-full h-3 rounded-full bg-white/5">
                 <div className="h-full rounded-full bg-yellow-500 transition-all duration-700" style={{ width: `${abonnementPct}%` }} />
               </div>
-              <p className="text-[10px] text-gray-600 mt-1">{abonnementPct}% du total</p>
+              <p className="text-[10px] text-slate-400 mt-1">{abonnementPct}% du total</p>
             </div>
             <div className="pt-3 border-t border-white/5">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400 font-medium">Total 12 mois</span>
+                <span className="text-xs text-slate-300 font-medium">Total 12 mois</span>
                 <span className="text-sm text-white font-bold">{formatPrice(totalRevenue12m)}</span>
               </div>
             </div>
@@ -350,9 +350,9 @@ function TabRevenus({ data }: { data: AnalyticsData }) {
       {/* Average ticket trend + Revenue by category */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Ticket moyen trend */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <h3 className="text-white font-semibold text-sm mb-1">Evolution du ticket moyen</h3>
-          <p className="text-gray-600 text-[11px] mb-4">Montant moyen par reservation par mois</p>
+          <p className="text-slate-400 text-[11px] mb-4">Montant moyen par reservation par mois</p>
           <BarChart
             data={revenue.monthly.map((m) => ({
               label: m.label,
@@ -364,7 +364,7 @@ function TabRevenus({ data }: { data: AnalyticsData }) {
         </div>
 
         {/* Revenue by category */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <h3 className="text-white font-semibold text-sm mb-4">Revenus par categorie</h3>
           <div className="space-y-3">
             {revenue.byCategory.slice(0, 8).map((c, i) => (
@@ -378,7 +378,7 @@ function TabRevenus({ data }: { data: AnalyticsData }) {
               />
             ))}
             {revenue.byCategory.length === 0 && (
-              <p className="text-gray-600 text-sm text-center py-6">Aucune donnee disponible</p>
+              <p className="text-slate-400 text-sm text-center py-6">Aucune donnee disponible</p>
             )}
           </div>
         </div>
@@ -438,13 +438,13 @@ function TabUtilisateurs({ data }: { data: AnalyticsData }) {
       {/* New users chart + funnel */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Monthly new users */}
-        <div className="lg:col-span-2 bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="lg:col-span-2 bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-white font-semibold text-sm">Nouvelles inscriptions</h3>
-              <p className="text-gray-600 text-[11px] mt-0.5">12 derniers mois</p>
+              <p className="text-slate-400 text-[11px] mt-0.5">12 derniers mois</p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-slate-400">
               <FontAwesomeIcon icon={faUsers} className="text-blue-400" />
               {fmtNum(users.total)} total
             </div>
@@ -458,7 +458,7 @@ function TabUtilisateurs({ data }: { data: AnalyticsData }) {
         </div>
 
         {/* Funnel */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <h3 className="text-white font-semibold text-sm mb-4">Entonnoir de conversion</h3>
           <div className="space-y-3">
             {funnelSteps.map((step, i) => {
@@ -470,8 +470,8 @@ function TabUtilisateurs({ data }: { data: AnalyticsData }) {
                 <div key={i}>
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
-                      <FontAwesomeIcon icon={step.icon} className="text-gray-500 text-xs w-3.5" />
-                      <span className="text-xs text-gray-400">{step.label}</span>
+                      <FontAwesomeIcon icon={step.icon} className="text-slate-400 text-xs w-3.5" />
+                      <span className="text-xs text-slate-300">{step.label}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-white font-semibold">{fmtNum(step.value)}</span>
@@ -492,7 +492,7 @@ function TabUtilisateurs({ data }: { data: AnalyticsData }) {
           </div>
           <div className="mt-4 pt-3 border-t border-white/5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-gray-500">Actifs ce mois</span>
+              <span className="text-[11px] text-slate-400">Actifs ce mois</span>
               <span className="text-sm text-white font-bold">{fmtNum(users.activeThisMonth)}</span>
             </div>
           </div>
@@ -544,12 +544,12 @@ function TabCentres({ data }: { data: AnalyticsData }) {
       {/* Status distribution + Growth */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Status bars */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <h3 className="text-white font-semibold text-sm mb-4">Repartition par statut</h3>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-gray-400">Actifs</span>
+                <span className="text-xs text-slate-300">Actifs</span>
                 <span className="text-xs text-green-400 font-semibold">{fmtNum(centres.byStatus.actif)}</span>
               </div>
               <div className="w-full h-3 rounded-full bg-white/5">
@@ -558,7 +558,7 @@ function TabCentres({ data }: { data: AnalyticsData }) {
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-gray-400">En attente</span>
+                <span className="text-xs text-slate-300">En attente</span>
                 <span className="text-xs text-yellow-400 font-semibold">{fmtNum(centres.byStatus.enAttente)}</span>
               </div>
               <div className="w-full h-3 rounded-full bg-white/5">
@@ -567,7 +567,7 @@ function TabCentres({ data }: { data: AnalyticsData }) {
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-gray-400">Suspendus</span>
+                <span className="text-xs text-slate-300">Suspendus</span>
                 <span className="text-xs text-red-400 font-semibold">{fmtNum(centres.byStatus.suspendu)}</span>
               </div>
               <div className="w-full h-3 rounded-full bg-white/5">
@@ -577,18 +577,18 @@ function TabCentres({ data }: { data: AnalyticsData }) {
           </div>
           <div className="mt-4 pt-3 border-t border-white/5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-gray-500">Total centres</span>
+              <span className="text-[11px] text-slate-400">Total centres</span>
               <span className="text-sm text-white font-bold">{fmtNum(totalCentres)}</span>
             </div>
           </div>
         </div>
 
         {/* Growth chart */}
-        <div className="lg:col-span-2 bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="lg:col-span-2 bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-white font-semibold text-sm">Croissance des centres</h3>
-              <p className="text-gray-600 text-[11px] mt-0.5">Nouveaux centres par mois (12 mois)</p>
+              <p className="text-slate-400 text-[11px] mt-0.5">Nouveaux centres par mois (12 mois)</p>
             </div>
           </div>
           <BarChart
@@ -601,28 +601,28 @@ function TabCentres({ data }: { data: AnalyticsData }) {
       </div>
 
       {/* Top 10 centres table */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-white font-semibold text-sm">Top 10 centres par chiffre d&apos;affaires</h3>
-            <p className="text-gray-600 text-[11px] mt-0.5">12 derniers mois</p>
+            <p className="text-slate-400 text-[11px] mt-0.5">12 derniers mois</p>
           </div>
           <FontAwesomeIcon icon={faRankingStar} className="text-yellow-400/50" />
         </div>
         {centres.topByRevenue.length === 0 ? (
-          <p className="text-gray-600 text-sm text-center py-8">Aucune donnee disponible</p>
+          <p className="text-slate-400 text-sm text-center py-8">Aucune donnee disponible</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">#</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Ville</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4 text-right">CA</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4 text-right">Commission</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4 text-right">Reservations</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 text-right">Note</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">#</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Centre</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Ville</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4 text-right">CA</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4 text-right">Commission</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4 text-right">Reservations</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 text-right">Note</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -633,25 +633,25 @@ function TabCentres({ data }: { data: AnalyticsData }) {
                         ${i === 0 ? "bg-yellow-400/15 text-yellow-400 border border-yellow-500/20" :
                           i === 1 ? "bg-gray-400/10 text-gray-300 border border-gray-500/20" :
                           i === 2 ? "bg-orange-400/10 text-orange-400 border border-orange-500/20" :
-                          "bg-white/5 text-gray-500 border border-white/10"}`}
+                          "bg-white/5 text-slate-400 border border-white/10"}`}
                       >
                         {i + 1}
                       </span>
                     </td>
                     <td className="py-2.5 pr-4 text-white font-medium">{c.nom}</td>
-                    <td className="py-2.5 pr-4 text-gray-400">{c.ville}</td>
+                    <td className="py-2.5 pr-4 text-slate-300">{c.ville}</td>
                     <td className="py-2.5 pr-4 text-white font-semibold text-right">{formatPrice(c.revenue)}</td>
                     <td className="py-2.5 pr-4 text-green-400 font-semibold text-right">{formatPrice(c.commission)}</td>
-                    <td className="py-2.5 pr-4 text-gray-400 text-right">{fmtNum(c.reservations)}</td>
+                    <td className="py-2.5 pr-4 text-slate-300 text-right">{fmtNum(c.reservations)}</td>
                     <td className="py-2.5 text-right">
                       {c.rating ? (
                         <span className="inline-flex items-center gap-1 text-yellow-400">
                           <FontAwesomeIcon icon={faStar} className="text-[10px]" />
                           <span className="text-xs font-semibold">{c.rating}</span>
-                          <span className="text-[10px] text-gray-600">({c.reviewCount})</span>
+                          <span className="text-[10px] text-slate-400">({c.reviewCount})</span>
                         </span>
                       ) : (
-                        <span className="text-gray-600 text-xs">--</span>
+                        <span className="text-slate-400 text-xs">--</span>
                       )}
                     </td>
                   </tr>
@@ -726,7 +726,7 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
         <h3 className="text-white font-semibold text-sm mb-3">Ce mois vs mois dernier</h3>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {kpiCards.map((k, i) => (
-            <div key={i} className={`rounded-xl p-4 border bg-[#0A1628] ${k.border}`}>
+            <div key={i} className={`rounded-xl p-4 border bg-[#1C2D4F] ${k.border}`}>
               <div className="flex items-start justify-between mb-3">
                 <div className={`w-9 h-9 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                   <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
@@ -734,8 +734,8 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
                 <TrendBadge value={k.change} />
               </div>
               <p className="text-lg font-bold text-white">{k.current}</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">{k.label}</p>
-              <p className="text-[10px] text-gray-600 mt-1">Mois precedent : {k.previous}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">{k.label}</p>
+              <p className="text-[10px] text-slate-400 mt-1">Mois precedent : {k.previous}</p>
             </div>
           ))}
         </div>
@@ -744,13 +744,13 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
       {/* Top / Bottom formations + Promos */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Top formations */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center gap-2 mb-4">
             <FontAwesomeIcon icon={faArrowTrendUp} className="text-green-400 text-xs" />
             <h3 className="text-white font-semibold text-sm">Top formations</h3>
           </div>
           {formations.topPopular.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center py-6">Aucune donnee</p>
+            <p className="text-slate-400 text-sm text-center py-6">Aucune donnee</p>
           ) : (
             <div className="space-y-2.5">
               {formations.topPopular.slice(0, 5).map((f, i) => (
@@ -759,13 +759,13 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
                     ${i === 0 ? "bg-yellow-400/15 text-yellow-400" :
                       i === 1 ? "bg-gray-400/10 text-gray-300" :
                       i === 2 ? "bg-orange-400/10 text-orange-400" :
-                      "bg-white/5 text-gray-500"}`}
+                      "bg-white/5 text-slate-400"}`}
                   >
                     {i + 1}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-white text-xs font-medium truncate">{f.titre}</p>
-                    <p className="text-gray-600 text-[10px]">{f.categorie}</p>
+                    <p className="text-slate-400 text-[10px]">{f.categorie}</p>
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-white text-xs font-semibold">{fmtNum(f.count)} res.</p>
@@ -778,25 +778,25 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
         </div>
 
         {/* Bottom formations */}
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <div className="flex items-center gap-2 mb-4">
             <FontAwesomeIcon icon={faArrowTrendDown} className="text-red-400 text-xs" />
             <h3 className="text-white font-semibold text-sm">Formations a surveiller</h3>
           </div>
           {formations.worstRated.length === 0 && formations.bottomPopular.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center py-6">Aucune donnee</p>
+            <p className="text-slate-400 text-sm text-center py-6">Aucune donnee</p>
           ) : (
             <div className="space-y-3">
               {formations.worstRated.length > 0 && (
                 <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider font-medium mb-2">Moins bien notees</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium mb-2">Moins bien notees</p>
                   {formations.worstRated.slice(0, 3).map((f, i) => (
                     <div key={`wr-${i}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/3 transition-colors">
-                      <span className="text-xs text-gray-400 truncate max-w-[65%]">{f.titre}</span>
+                      <span className="text-xs text-slate-300 truncate max-w-[65%]">{f.titre}</span>
                       <span className="inline-flex items-center gap-1 text-yellow-400">
                         <FontAwesomeIcon icon={faStar} className="text-[10px]" />
                         <span className="text-xs font-semibold">{f.rating}</span>
-                        <span className="text-[10px] text-gray-600">({f.reviewCount})</span>
+                        <span className="text-[10px] text-slate-400">({f.reviewCount})</span>
                       </span>
                     </div>
                   ))}
@@ -804,10 +804,10 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
               )}
               {formations.bottomPopular.length > 0 && (
                 <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider font-medium mb-2 mt-3">Moins reservees</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium mb-2 mt-3">Moins reservees</p>
                   {formations.bottomPopular.slice(0, 3).map((f, i) => (
                     <div key={`bp-${i}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/3 transition-colors">
-                      <span className="text-xs text-gray-400 truncate max-w-[65%]">{f.titre}</span>
+                      <span className="text-xs text-slate-300 truncate max-w-[65%]">{f.titre}</span>
                       <span className="text-xs text-white font-semibold">{fmtNum(f.count)} res.</span>
                     </div>
                   ))}
@@ -820,7 +820,7 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
         {/* Promos + Category distribution */}
         <div className="space-y-6">
           {/* Promo effectiveness */}
-          <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+          <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
             <div className="flex items-center gap-2 mb-4">
               <FontAwesomeIcon icon={faTag} className="text-pink-400 text-xs" />
               <h3 className="text-white font-semibold text-sm">Codes promo</h3>
@@ -829,21 +829,21 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
               <div className="flex items-center justify-between p-3 rounded-lg bg-white/3 border border-white/5">
                 <div>
                   <p className="text-white text-sm font-semibold">{fmtNum(promos.totalUsedThisMonth)}</p>
-                  <p className="text-gray-500 text-[10px]">Utilisations ce mois</p>
+                  <p className="text-slate-400 text-[10px]">Utilisations ce mois</p>
                 </div>
                 <FontAwesomeIcon icon={faPercent} className="text-pink-400/30 text-xl" />
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-white/3 border border-white/5">
                 <div>
                   <p className="text-white text-sm font-semibold">{formatPrice(promos.revenueImpact)}</p>
-                  <p className="text-gray-500 text-[10px]">Remises accordees</p>
+                  <p className="text-slate-400 text-[10px]">Remises accordees</p>
                 </div>
                 <FontAwesomeIcon icon={faEuro} className="text-red-400/30 text-xl" />
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-white/3 border border-white/5">
                 <div>
                   <p className="text-white text-sm font-semibold">{fmtNum(promos.activeCount)}</p>
-                  <p className="text-gray-500 text-[10px]">Codes actifs</p>
+                  <p className="text-slate-400 text-[10px]">Codes actifs</p>
                 </div>
                 <FontAwesomeIcon icon={faTag} className="text-green-400/30 text-xl" />
               </div>
@@ -851,7 +851,7 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
           </div>
 
           {/* Category distribution */}
-          <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+          <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
             <h3 className="text-white font-semibold text-sm mb-3">Formations par categorie</h3>
             <div className="space-y-2">
               {formations.categoryDistribution.slice(0, 6).map((c, i) => {
@@ -867,7 +867,7 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
                 );
               })}
               {formations.categoryDistribution.length === 0 && (
-                <p className="text-gray-600 text-xs text-center py-4">Aucune donnee</p>
+                <p className="text-slate-400 text-xs text-center py-4">Aucune donnee</p>
               )}
             </div>
           </div>
@@ -875,13 +875,13 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
       </div>
 
       {/* Best rated formations */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <div className="flex items-center gap-2 mb-4">
           <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-xs" />
           <h3 className="text-white font-semibold text-sm">Meilleures formations par note</h3>
         </div>
         {formations.bestRated.length === 0 ? (
-          <p className="text-gray-600 text-sm text-center py-6">Aucun avis disponible</p>
+          <p className="text-slate-400 text-sm text-center py-6">Aucun avis disponible</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {formations.bestRated.slice(0, 10).map((f, i) => (
@@ -897,7 +897,7 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
                   <span className="text-xs text-white font-semibold ml-1">{f.rating}</span>
                 </div>
                 <p className="text-white text-xs font-medium truncate">{f.titre}</p>
-                <p className="text-gray-600 text-[10px] mt-0.5">{fmtNum(f.reviewCount)} avis</p>
+                <p className="text-slate-400 text-[10px] mt-0.5">{fmtNum(f.reviewCount)} avis</p>
               </div>
             ))}
           </div>
@@ -905,17 +905,17 @@ function TabPerformances({ data }: { data: AnalyticsData }) {
       </div>
 
       {/* Average price by category */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h3 className="text-white font-semibold text-sm mb-4">Prix moyen par categorie</h3>
         {formations.avgPriceByCategory.length === 0 ? (
-          <p className="text-gray-600 text-sm text-center py-6">Aucune donnee</p>
+          <p className="text-slate-400 text-sm text-center py-6">Aucune donnee</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {formations.avgPriceByCategory.map((c, i) => (
               <div key={i} className="p-3 rounded-lg bg-white/3 border border-white/5">
-                <p className="text-gray-400 text-xs truncate">{c.nom}</p>
+                <p className="text-slate-300 text-xs truncate">{c.nom}</p>
                 <p className="text-white text-lg font-bold mt-1">{formatPrice(c.avgPrice)}</p>
-                <p className="text-gray-600 text-[10px] mt-0.5">{fmtNum(c.count)} formation{c.count > 1 ? "s" : ""}</p>
+                <p className="text-slate-400 text-[10px] mt-0.5">{fmtNum(c.count)} formation{c.count > 1 ? "s" : ""}</p>
               </div>
             ))}
           </div>
@@ -959,12 +959,12 @@ export default function AdminAnalyticsPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <div className="bg-[#0A1628] rounded-xl border border-red-500/20 p-12 text-center">
+        <div className="bg-[#1C2D4F] rounded-xl border border-red-500/20 p-12 text-center">
           <p className="text-red-400 font-medium">Impossible de charger les analytics</p>
-          <p className="text-gray-600 text-sm mt-1">{error}</p>
+          <p className="text-slate-400 text-sm mt-1">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white text-sm transition-colors"
+            className="mt-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white text-sm transition-colors"
           >
             Recharger
           </button>
@@ -988,7 +988,7 @@ export default function AdminAnalyticsPage() {
               Owner
             </span>
           </div>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Business Intelligence — Vue strategique de la plateforme
           </p>
         </div>
@@ -1008,7 +1008,7 @@ export default function AdminAnalyticsPage() {
       ) : data ? (
       <>
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl bg-[#0A1628] border border-white/8 overflow-x-auto">
+      <div className="flex gap-1 p-1 rounded-xl bg-[#1C2D4F] border border-white/8 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -1016,7 +1016,7 @@ export default function AdminAnalyticsPage() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap
               ${activeTab === tab.id
                 ? "bg-yellow-500/15 text-yellow-400 border border-yellow-500/20"
-                : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
+                : "text-slate-400 hover:text-gray-300 hover:bg-white/5 border border-transparent"
               }`}
           >
             <FontAwesomeIcon icon={tab.icon} className="text-xs" />

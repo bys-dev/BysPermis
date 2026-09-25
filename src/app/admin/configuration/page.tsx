@@ -95,12 +95,12 @@ export default function AdminConfigurationPage() {
             <FontAwesomeIcon icon={faScrewdriverWrench} className="text-yellow-400 text-xl" />
             <h1 className="text-2xl font-bold text-white">Configuration avancee</h1>
           </div>
-          <p className="text-gray-400 text-sm">Parametres avances reserves au Owner de la plateforme.</p>
+          <p className="text-slate-300 text-sm">Parametres avances reserves au Owner de la plateforme.</p>
         </div>
-        <div className="bg-[#0A1628] rounded-xl border border-red-500/20 p-12 text-center">
+        <div className="bg-[#1C2D4F] rounded-xl border border-red-500/20 p-12 text-center">
           <FontAwesomeIcon icon={faShieldHalved} className="text-4xl text-red-500/40 mb-4" />
           <p className="text-red-400 font-medium">Acces restreint</p>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-slate-400 text-sm mt-1">
             Cette page est reservee au Owner de la plateforme. Contactez l'administrateur principal.
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function AdminConfigurationPage() {
             OWNER
           </span>
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className="text-slate-300 text-sm">
           Parametres avances, integrations et outils systeme.
         </p>
       </div>
@@ -143,7 +143,7 @@ export default function AdminConfigurationPage() {
       )}
 
       {/* Integrations */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
           <FontAwesomeIcon icon={faGlobe} className="text-blue-400 text-xs" />
           Integrations & API
@@ -157,7 +157,7 @@ export default function AdminConfigurationPage() {
               </div>
               <div>
                 <p className="text-white text-sm font-medium">Stripe</p>
-                <p className="text-gray-500 text-xs">Paiements et abonnements</p>
+                <p className="text-slate-400 text-xs">Paiements et abonnements</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -181,11 +181,11 @@ export default function AdminConfigurationPage() {
               </div>
               <div>
                 <p className="text-white text-sm font-medium">Resend</p>
-                <p className="text-gray-500 text-xs">Service d'envoi d'emails transactionnels</p>
+                <p className="text-slate-400 text-xs">Service d'envoi d'emails transactionnels</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 text-xs font-mono">re_****...****</span>
+              <span className="text-slate-400 text-xs font-mono">re_****...****</span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-green-400/10 text-green-400 border-green-500/20">
                 <FontAwesomeIcon icon={faCheckCircle} className="text-[9px]" />
                 Active
@@ -201,7 +201,7 @@ export default function AdminConfigurationPage() {
               </div>
               <div>
                 <p className="text-white text-sm font-medium">Auth0</p>
-                <p className="text-gray-500 text-xs">Authentification et gestion des sessions</p>
+                <p className="text-slate-400 text-xs">Authentification et gestion des sessions</p>
               </div>
             </div>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-green-400/10 text-green-400 border-green-500/20">
@@ -214,23 +214,23 @@ export default function AdminConfigurationPage() {
 
       {/* Platform Settings */}
       {settings && (
-        <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
           <h2 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
             <FontAwesomeIcon icon={faDatabase} className="text-green-400 text-xs" />
             Parametres plateforme
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-              <p className="text-gray-500 text-xs mb-1">Taux de commission</p>
+              <p className="text-slate-400 text-xs mb-1">Taux de commission</p>
               <p className="text-white text-lg font-bold">{settings.commissionRate}%</p>
-              <p className="text-gray-600 text-[10px] mt-0.5">Configurable dans Parametres</p>
+              <p className="text-slate-400 text-[10px] mt-0.5">Configurable dans Parametres</p>
             </div>
             <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-              <p className="text-gray-500 text-xs mb-1">Modele de monetisation</p>
+              <p className="text-slate-400 text-xs mb-1">Modele de monetisation</p>
               <p className="text-white text-lg font-bold">{settings.monetisationModel}</p>
             </div>
             <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-              <p className="text-gray-500 text-xs mb-1">Derniere mise a jour</p>
+              <p className="text-slate-400 text-xs mb-1">Derniere mise a jour</p>
               <p className="text-white text-sm font-medium">
                 {new Date(settings.updatedAt).toLocaleString("fr-FR")}
               </p>
@@ -240,12 +240,12 @@ export default function AdminConfigurationPage() {
       )}
 
       {/* Export */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
           <FontAwesomeIcon icon={faDownload} className="text-yellow-400 text-xs" />
           Export de donnees
         </h2>
-        <p className="text-gray-400 text-sm mb-4">
+        <p className="text-slate-300 text-sm mb-4">
           Exporter toutes les donnees de la plateforme au format JSON (statistiques, centres, utilisateurs, tickets, parametres).
         </p>
         <div className="flex items-center gap-3">
@@ -271,26 +271,26 @@ export default function AdminConfigurationPage() {
       </div>
 
       {/* System Info */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
-          <FontAwesomeIcon icon={faServer} className="text-gray-400 text-xs" />
+          <FontAwesomeIcon icon={faServer} className="text-slate-300 text-xs" />
           Informations systeme
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-            <p className="text-gray-500 text-xs mb-1">Framework</p>
+            <p className="text-slate-400 text-xs mb-1">Framework</p>
             <p className="text-white text-sm font-medium">Next.js 16</p>
           </div>
           <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-            <p className="text-gray-500 text-xs mb-1">Runtime</p>
+            <p className="text-slate-400 text-xs mb-1">Runtime</p>
             <p className="text-white text-sm font-medium">Node.js</p>
           </div>
           <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-            <p className="text-gray-500 text-xs mb-1">Base de donnees</p>
+            <p className="text-slate-400 text-xs mb-1">Base de donnees</p>
             <p className="text-white text-sm font-medium">PostgreSQL + Prisma 7</p>
           </div>
           <div className="p-4 rounded-lg bg-white/3 border border-white/5">
-            <p className="text-gray-500 text-xs mb-1">Plateforme</p>
+            <p className="text-slate-400 text-xs mb-1">Plateforme</p>
             <p className="text-white text-sm font-medium">BYS Permis v1.0</p>
           </div>
         </div>

@@ -36,7 +36,7 @@ interface SessionFormateur {
 
 const statusMap: Record<string, { label: string; color: string; bg: string }> = {
   ACTIVE:   { label: "À venir",   color: "text-green-400",  bg: "bg-green-400/10" },
-  PASSEE:   { label: "Terminée",  color: "text-gray-400",   bg: "bg-gray-400/10"  },
+  PASSEE:   { label: "Terminée",  color: "text-slate-300",   bg: "bg-gray-400/10"  },
   ANNULEE:  { label: "Annulée",   color: "text-red-400",    bg: "bg-red-400/10"   },
   COMPLETE: { label: "Complète",  color: "text-blue-400",   bg: "bg-blue-400/10"  },
 };
@@ -114,13 +114,13 @@ export default function MesSessionsPage() {
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={() => setSelectedSession(null)}
-            className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white transition-colors"
           >
             <FontAwesomeIcon icon={faArrowLeft} className="text-xs" />
           </button>
           <div>
             <h1 className="font-display font-bold text-xl text-white">Émargement</h1>
-            <p className="text-gray-500 text-sm">
+            <p className="text-slate-400 text-sm">
               {selectedSession.formation} — {formatDate(new Date(selectedSession.dateDebut))}
             </p>
           </div>
@@ -132,13 +132,13 @@ export default function MesSessionsPage() {
               <FontAwesomeIcon icon={faClipboardCheck} className="text-blue-400" />
               <span className="text-white text-sm font-semibold">Liste des stagiaires</span>
             </div>
-            <span className="text-gray-500 text-xs">
+            <span className="text-slate-400 text-xs">
               {Object.values(attendance).filter(Boolean).length}/{selectedSession.stagiaires.length} présents
             </span>
           </div>
 
           {selectedSession.stagiaires.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">
+            <div className="text-center py-10 text-slate-400">
               <FontAwesomeIcon icon={faUsers} className="text-2xl mb-3" />
               <p className="text-sm">Aucun stagiaire inscrit pour cette session.</p>
             </div>
@@ -156,14 +156,14 @@ export default function MesSessionsPage() {
                     className="w-5 h-5 rounded border-gray-600 bg-white/5 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0 cursor-pointer"
                   />
                   <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-gray-400">
+                    <span className="text-xs font-bold text-slate-300">
                       {s.prenom[0]}{s.nom[0]}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white">{s.prenom} {s.nom}</p>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${attendance[s.id] ? "text-green-400 bg-green-400/10" : "text-gray-500 bg-white/5"}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${attendance[s.id] ? "text-green-400 bg-green-400/10" : "text-slate-400 bg-white/5"}`}>
                     {attendance[s.id] ? "Présent" : "Absent"}
                   </span>
                 </label>
@@ -208,7 +208,7 @@ export default function MesSessionsPage() {
       ) : (
       <div className="mb-8">
         <h1 className="font-display font-bold text-2xl text-white mb-1">Mes sessions</h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-slate-400 text-sm">
           {loading ? "Chargement..." : `${sessions.filter((s) => s.status === "ACTIVE").length} session(s) à venir`}
         </p>
       </div>
@@ -216,7 +216,7 @@ export default function MesSessionsPage() {
 
       {/* Error state */}
       {error && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
           <FontAwesomeIcon icon={faTriangleExclamation} className="text-2xl text-red-400" />
           <p className="text-sm text-red-400">{error}</p>
           <button onClick={loadSessions} className="text-xs text-blue-400 hover:text-blue-300 underline">Réessayer</button>
@@ -225,7 +225,7 @@ export default function MesSessionsPage() {
 
       {/* Empty state */}
       {!loading && !error && sessions.length === 0 && (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-slate-400">
           <FontAwesomeIcon icon={faBookOpen} className="text-3xl mb-3" />
           <p className="font-medium text-white mb-1">Aucune session</p>
           <p className="text-sm">Aucune session ne vous est attribuée pour le moment.</p>
@@ -258,7 +258,7 @@ export default function MesSessionsPage() {
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400 mb-3">
                       <span className="flex items-center gap-1">
                         <FontAwesomeIcon icon={faClock} className="w-3 h-3" />
                         {formatDate(new Date(s.dateDebut))} &rarr; {formatDate(new Date(s.dateFin))}

@@ -118,7 +118,7 @@ export default function PlateformeExportsPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Exports</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-slate-300 text-sm mt-0.5">
             Exporter les donnees financieres de la plateforme
           </p>
         </div>
@@ -134,18 +134,18 @@ export default function PlateformeExportsPage() {
 
       {/* Selecteur de periode */}
       <div className="flex items-center gap-3 flex-wrap">
-        <FontAwesomeIcon icon={faCalendar} className="text-gray-500 text-sm" />
+        <FontAwesomeIcon icon={faCalendar} className="text-slate-400 text-sm" />
         <select
           value={months}
           onChange={(e) => setMonths(Number(e.target.value))}
-          className="bg-[#0A1628] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50"
+          className="bg-[#1C2D4F] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50"
         >
           <option value={3}>3 derniers mois</option>
           <option value={6}>6 derniers mois</option>
           <option value={12}>12 derniers mois</option>
           <option value={24}>24 derniers mois</option>
         </select>
-        <span className="text-gray-500 text-xs ml-2">
+        <span className="text-slate-400 text-xs ml-2">
           Periode : {months} derniers mois
         </span>
       </div>
@@ -160,54 +160,54 @@ export default function PlateformeExportsPage() {
 
       {/* KPIs resume */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-green-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-green-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-green-400/10 border border-green-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faEuro} className="text-green-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(totaux.commission)}</p>
-          <p className="text-xs text-gray-500 mt-1">Total commissions</p>
+          <p className="text-xs text-slate-400 mt-1">Total commissions</p>
         </div>
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-blue-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-blue-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-blue-400/10 border border-blue-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faFileExport} className="text-blue-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(totaux.revenuBrut)}</p>
-          <p className="text-xs text-gray-500 mt-1">Revenu brut total</p>
+          <p className="text-xs text-slate-400 mt-1">Revenu brut total</p>
         </div>
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-purple-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-purple-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-purple-400/10 border border-purple-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faBuilding} className="text-purple-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : totaux.reservations.toLocaleString("fr-FR")}</p>
-          <p className="text-xs text-gray-500 mt-1">Total reservations</p>
+          <p className="text-xs text-slate-400 mt-1">Total reservations</p>
         </div>
       </div>
 
       {/* Tableau revenus mensuels */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-5">Resume mensuel des revenus</h2>
         {loading ? (
           <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : monthly.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 text-sm">Aucune donnee pour cette periode</p>
+            <p className="text-slate-400 text-sm">Aucune donnee pour cette periode</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Mois</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reservations</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Revenu brut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Commission</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Revenu centres</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Mois</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Reservations</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Revenu brut</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Commission</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3">Revenu centres</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -236,7 +236,7 @@ export default function PlateformeExportsPage() {
       </div>
 
       {/* Tableau commissions par centre */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-white font-semibold text-sm">Commissions par centre</h2>
           <button
@@ -252,25 +252,25 @@ export default function PlateformeExportsPage() {
           <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : centres.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 text-sm">Aucune commission enregistree</p>
+            <p className="text-slate-400 text-sm">Aucune commission enregistree</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Ville</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reservations</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Revenu brut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Commission</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Centre</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Ville</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Reservations</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Revenu brut</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3">Commission</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {centres.map((c) => (
                   <tr key={c.centreId} className="hover:bg-white/3 transition-colors">
                     <td className="py-3 pr-4 text-white font-medium">{c.nom}</td>
-                    <td className="py-3 pr-4 text-gray-400">{c.ville}</td>
+                    <td className="py-3 pr-4 text-slate-300">{c.ville}</td>
                     <td className="py-3 pr-4 text-gray-300">{c.reservations}</td>
                     <td className="py-3 pr-4 text-white font-semibold">{formatPrice(c.revenuBrut)}</td>
                     <td className="py-3 text-green-400 font-semibold">{formatPrice(c.commission)}</td>

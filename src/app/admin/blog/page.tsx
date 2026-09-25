@@ -9,7 +9,7 @@ const RichTextEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="border border-gray-200 rounded-lg p-4 text-sm text-gray-400">
+      <div className="border border-gray-200 rounded-lg p-4 text-sm text-slate-300">
         Chargement de l&apos;éditeur…
       </div>
     ),
@@ -185,7 +185,7 @@ export default function AdminBlogPage() {
             <FontAwesomeIcon icon={faNewspaper} className="text-red-400" />
             Blog
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-slate-400 text-sm mt-1">
             Gerez les articles du blog
           </p>
         </div>
@@ -201,14 +201,14 @@ export default function AdminBlogPage() {
       {/* Form modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-10 overflow-y-auto">
-          <div className="bg-[#0D1D3A] rounded-xl border border-white/10 w-full max-w-3xl mx-4 mb-10">
+          <div className="bg-[#24385E] rounded-xl border border-white/10 w-full max-w-3xl mx-4 mb-10">
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
               <h2 className="text-lg font-semibold text-white">
                 {editingSlug ? "Modifier l'article" : "Nouvel article"}
               </h2>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-slate-300 hover:text-white"
               >
                 <FontAwesomeIcon icon={faXmark} />
               </button>
@@ -223,7 +223,7 @@ export default function AdminBlogPage() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
                     Titre
                   </label>
                   <input
@@ -241,7 +241,7 @@ export default function AdminBlogPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
                     Slug
                   </label>
                   <input
@@ -255,7 +255,7 @@ export default function AdminBlogPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">
                   Extrait
                 </label>
                 <textarea
@@ -268,7 +268,7 @@ export default function AdminBlogPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">
                   Contenu de l&apos;article
                 </label>
                 <RichTextEditor
@@ -281,7 +281,7 @@ export default function AdminBlogPage() {
 
               <div className="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
                     Image URL
                   </label>
                   <input
@@ -295,7 +295,7 @@ export default function AdminBlogPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
                     Categorie
                   </label>
                   <select
@@ -313,7 +313,7 @@ export default function AdminBlogPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
                     Tags (virgules)
                   </label>
                   <input
@@ -346,7 +346,7 @@ export default function AdminBlogPage() {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors"
                 >
                   Annuler
                 </button>
@@ -385,9 +385,9 @@ export default function AdminBlogPage() {
         <div className="text-center py-20 bg-white/3 rounded-xl border border-white/8">
           <FontAwesomeIcon
             icon={faNewspaper}
-            className="text-gray-600 text-3xl mb-4"
+            className="text-slate-400 text-3xl mb-4"
           />
-          <p className="text-gray-500">Aucun article</p>
+          <p className="text-slate-400">Aucun article</p>
           <button
             onClick={openCreate}
             className="mt-4 text-red-400 hover:text-red-300 text-sm font-medium"
@@ -399,7 +399,7 @@ export default function AdminBlogPage() {
         <div className="bg-white/3 rounded-xl border border-white/8 overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/8 text-left text-xs text-gray-500 uppercase tracking-wider">
+              <tr className="border-b border-white/8 text-left text-xs text-slate-400 uppercase tracking-wider">
                 <th className="px-5 py-3 font-medium">Article</th>
                 <th className="px-5 py-3 font-medium hidden sm:table-cell">
                   Categorie
@@ -421,7 +421,7 @@ export default function AdminBlogPage() {
                     <p className="text-white text-sm font-medium truncate max-w-xs">
                       {article.titre}
                     </p>
-                    <p className="text-gray-600 text-xs mt-0.5">
+                    <p className="text-slate-400 text-xs mt-0.5">
                       /{article.slug}
                     </p>
                   </td>
@@ -431,11 +431,11 @@ export default function AdminBlogPage() {
                         {article.categorie}
                       </span>
                     ) : (
-                      <span className="text-gray-600 text-xs">--</span>
+                      <span className="text-slate-400 text-xs">--</span>
                     )}
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
-                    <span className="text-gray-400 text-sm">
+                    <span className="text-slate-300 text-sm">
                       {article.author.prenom} {article.author.nom}
                     </span>
                   </td>
@@ -459,14 +459,14 @@ export default function AdminBlogPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => openEdit(article)}
-                        className="p-2 text-gray-500 hover:text-blue-400 transition-colors"
+                        className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
                         title="Modifier"
                       >
                         <FontAwesomeIcon icon={faEdit} className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => deleteArticle(article.slug)}
-                        className="p-2 text-gray-500 hover:text-red-400 transition-colors"
+                        className="p-2 text-slate-400 hover:text-red-400 transition-colors"
                         title="Supprimer"
                       >
                         <FontAwesomeIcon

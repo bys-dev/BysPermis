@@ -86,7 +86,7 @@ export default function AdminAvisPlateformePage() {
               <FontAwesomeIcon icon={faLaptop} className="text-blue-400" />
               Avis plateforme BYS Permis
             </h1>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-slate-300 mt-1">
               Retours utilisateurs sur le site et le parcours de réservation (5 questions, notes 1 à 5).
             </p>
           </div>
@@ -101,11 +101,11 @@ export default function AdminAvisPlateformePage() {
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="rounded-xl border p-4" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}>
-                <p className="text-xs text-gray-500">Note moyenne plateforme</p>
+                <p className="text-xs text-slate-400">Note moyenne plateforme</p>
                 <p className="text-2xl font-bold text-white mt-1">{averageRating != null ? `${averageRating}/5` : "—"}</p>
               </div>
               <div className="rounded-xl border p-4" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}>
-                <p className="text-xs text-gray-500">Réponses totales</p>
+                <p className="text-xs text-slate-400">Réponses totales</p>
                 <p className="text-2xl font-bold text-white mt-1">{totalCount}</p>
               </div>
             </div>
@@ -120,14 +120,14 @@ export default function AdminAvisPlateformePage() {
             >
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-white">Questions plateforme</h2>
-                <span className="text-xs text-gray-500">{draft.length}/10</span>
+                <span className="text-xs text-slate-400">{draft.length}/10</span>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-400">
                 Ces questions sont envoyées aux stagiaires après leur formation. Notes de 1 à 5.
               </p>
               {draft.map((libelle, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <span className="text-xs text-gray-500 mt-2.5 w-5 shrink-0">{i + 1}.</span>
+                  <span className="text-xs text-slate-400 mt-2.5 w-5 shrink-0">{i + 1}.</span>
                   <input
                     value={libelle}
                     onChange={(e) => {
@@ -144,7 +144,7 @@ export default function AdminAvisPlateformePage() {
                     onClick={() => setDraft(draft.filter((_, idx) => idx !== i))}
                     disabled={draft.length <= 1}
                     title="Supprimer"
-                    className="mt-1 p-2 text-gray-500 hover:text-red-400 disabled:opacity-30 disabled:hover:text-gray-500"
+                    className="mt-1 p-2 text-slate-400 hover:text-red-400 disabled:opacity-30 disabled:hover:text-slate-400"
                   >
                     <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" />
                   </button>
@@ -183,7 +183,7 @@ export default function AdminAvisPlateformePage() {
                 ))}
               </div>
             ) : responses.length === 0 ? (
-              <p className="text-sm text-gray-500">Aucun retour plateforme pour le moment.</p>
+              <p className="text-sm text-slate-400">Aucun retour plateforme pour le moment.</p>
             ) : (
               responses.map((r) => (
                 <div
@@ -194,14 +194,14 @@ export default function AdminAvisPlateformePage() {
                   <div className="flex flex-wrap justify-between gap-2 mb-3">
                     <div>
                       <p className="text-sm font-medium text-white">{r.auteur}</p>
-                      <p className="text-xs text-gray-500">{r.email}</p>
-                      <p className="text-xs text-gray-500">{r.formation} — {r.centre}</p>
+                      <p className="text-xs text-slate-400">{r.email}</p>
+                      <p className="text-xs text-slate-400">{r.formation} — {r.centre}</p>
                     </div>
                     <HalfStarRating value={r.noteGlobale} readonly size="sm" />
                   </div>
                   <div className="space-y-1">
                     {r.reponses.map((item, idx) => (
-                      <p key={idx} className="text-xs text-gray-400 flex justify-between gap-4">
+                      <p key={idx} className="text-xs text-slate-300 flex justify-between gap-4">
                         <span>{item.libelle}</span>
                         <span className="text-yellow-400/90">{item.note.toFixed(1)}/5</span>
                       </p>
@@ -212,7 +212,7 @@ export default function AdminAvisPlateformePage() {
                       « {r.commentaire} »
                     </p>
                   )}
-                  <p className="text-xs text-gray-600 mt-2">{formatDate(r.createdAt)}</p>
+                  <p className="text-xs text-slate-400 mt-2">{formatDate(r.createdAt)}</p>
                 </div>
               ))
             )}

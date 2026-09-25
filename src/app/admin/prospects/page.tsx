@@ -90,13 +90,13 @@ const STATUTS: { value: Statut; label: string; classe: string }[] = [
   { value: "INSCRIT", label: "Inscrit", classe: "bg-green-500/15 text-green-300 border-green-500/30" },
   { value: "REFUSE", label: "Refusé", classe: "bg-red-500/15 text-red-300 border-red-500/30" },
   { value: "INJOIGNABLE", label: "Injoignable", classe: "bg-orange-500/15 text-orange-300 border-orange-500/30" },
-  { value: "DESABONNE", label: "Désabonné", classe: "bg-white/5 text-gray-400 border-white/10" },
+  { value: "DESABONNE", label: "Désabonné", classe: "bg-white/5 text-slate-300 border-white/10" },
 ];
 
 const statutMeta = (s: Statut) => STATUTS.find((x) => x.value === s) ?? STATUTS[0];
 
 const inputClass =
-  "px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500";
+  "px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500";
 
 export default function AdminProspectsPage() {
   const router = useRouter();
@@ -258,7 +258,7 @@ export default function AdminProspectsPage() {
             <FontAwesomeIcon icon={faBullseye} className="text-blue-400" />
             Prospects
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-slate-300 text-sm mt-1">
             Fichier de centres agréés à démarcher — {total} fiche(s) au total.
           </p>
         </div>
@@ -289,16 +289,16 @@ export default function AdminProspectsPage() {
             className={`rounded-xl border p-4 text-left transition-all ${
               filtreStatut === s.value ? "border-blue-500 bg-blue-500/10" : "border-white/10 hover:border-white/25"
             }`}
-            style={filtreStatut === s.value ? undefined : { background: "#0D1D3A" }}
+            style={filtreStatut === s.value ? undefined : { background: "#24385E" }}
           >
-            <p className="text-gray-400 text-xs">{s.label}</p>
+            <p className="text-slate-300 text-xs">{s.label}</p>
             <p className="text-white font-bold text-xl mt-1">{stats[s.value] ?? 0}</p>
           </button>
         ))}
       </div>
 
       {/* ── Filtres ── */}
-      <div className="rounded-xl border border-white/10 p-4" style={{ background: "#0D1D3A" }}>
+      <div className="rounded-xl border border-white/10 p-4" style={{ background: "#24385E" }}>
         <div className="flex flex-wrap gap-3">
           <form
             onSubmit={(e) => {
@@ -367,13 +367,13 @@ export default function AdminProspectsPage() {
                 setFiltreDepartement("");
                 setFiltreSource("");
               }}
-              className="px-3 py-2 rounded-lg text-gray-400 text-sm hover:text-white transition-colors"
+              className="px-3 py-2 rounded-lg text-slate-300 text-sm hover:text-white transition-colors"
             >
               Réinitialiser
             </button>
           )}
         </div>
-        <p className="text-gray-500 text-[11px] mt-3">
+        <p className="text-slate-400 text-[11px] mt-3">
           {contactables} des {prospects.length} fiches affichées sont contactables par email
           (adresse valide et sans opposition).
         </p>
@@ -446,15 +446,15 @@ export default function AdminProspectsPage() {
       )}
 
       {/* ── Table ── */}
-      <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: "#0D1D3A" }}>
+      <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: "#24385E" }}>
         {loading ? (
           <div className="p-12 text-center">
             <FontAwesomeIcon icon={faSpinner} spin className="text-blue-400 text-2xl" />
           </div>
         ) : prospects.length === 0 ? (
           <div className="p-12 text-center">
-            <FontAwesomeIcon icon={faBullseye} className="text-gray-600 text-3xl mb-3" />
-            <p className="text-gray-400 text-sm">
+            <FontAwesomeIcon icon={faBullseye} className="text-slate-400 text-3xl mb-3" />
+            <p className="text-slate-300 text-sm">
               Aucun prospect ne correspond. Importez un fichier pour démarrer.
             </p>
           </div>
@@ -462,7 +462,7 @@ export default function AdminProspectsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-white/5">
-                <tr className="text-gray-400 text-left text-xs">
+                <tr className="text-slate-300 text-left text-xs">
                   <th className="px-3 py-3 w-10">
                     <input
                       type="checkbox"
@@ -498,10 +498,10 @@ export default function AdminProspectsPage() {
                       <td className="px-3 py-3">
                         <p className="text-white font-medium">{p.nom}</p>
                         {p.raisonSociale && p.raisonSociale !== p.nom && (
-                          <p className="text-gray-500 text-xs">{p.raisonSociale}</p>
+                          <p className="text-slate-400 text-xs">{p.raisonSociale}</p>
                         )}
                         {p.source && (
-                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/5 text-gray-400 text-[10px]">
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/5 text-slate-300 text-[10px]">
                             {p.source}
                           </span>
                         )}
@@ -511,30 +511,30 @@ export default function AdminProspectsPage() {
                           <p className="text-gray-300 text-xs flex items-center gap-1.5">
                             <FontAwesomeIcon
                               icon={faEnvelope}
-                              className={p.emailValide ? "text-gray-500" : "text-orange-400"}
+                              className={p.emailValide ? "text-slate-400" : "text-orange-400"}
                             />
-                            <span className={p.emailValide ? "" : "line-through text-gray-500"}>
+                            <span className={p.emailValide ? "" : "line-through text-slate-400"}>
                               {p.email}
                             </span>
                           </p>
                         ) : (
-                          <p className="text-gray-600 text-xs italic">pas d&apos;email</p>
+                          <p className="text-slate-400 text-xs italic">pas d&apos;email</p>
                         )}
                         {p.telephone && (
-                          <p className="text-gray-400 text-xs flex items-center gap-1.5 mt-0.5">
-                            <FontAwesomeIcon icon={faPhone} className="text-gray-600" />
+                          <p className="text-slate-300 text-xs flex items-center gap-1.5 mt-0.5">
+                            <FontAwesomeIcon icon={faPhone} className="text-slate-400" />
                             {p.telephone}
                           </p>
                         )}
                         {(p.contactPrenom || p.contactNom) && (
-                          <p className="text-gray-500 text-[11px] mt-0.5">
+                          <p className="text-slate-400 text-[11px] mt-0.5">
                             {[p.contactPrenom, p.contactNom].filter(Boolean).join(" ")}
                           </p>
                         )}
                       </td>
                       <td className="px-3 py-3 text-gray-300 text-xs">
                         {p.ville ?? "—"}
-                        {p.departement && <span className="text-gray-500"> ({p.departement})</span>}
+                        {p.departement && <span className="text-slate-400"> ({p.departement})</span>}
                       </td>
                       <td className="px-3 py-3">
                         <select
@@ -549,7 +549,7 @@ export default function AdminProspectsPage() {
                           ))}
                         </select>
                         {p.unsubscribedAt && (
-                          <p className="text-gray-500 text-[10px] mt-1 flex items-center gap-1">
+                          <p className="text-slate-400 text-[10px] mt-1 flex items-center gap-1">
                             <FontAwesomeIcon icon={faUserSlash} /> opposition enregistrée
                           </p>
                         )}
@@ -579,7 +579,7 @@ export default function AdminProspectsPage() {
                       <td className="px-3 py-3 text-xs">
                         <p className="text-gray-300">{p.nbEmailsEnvoyes} envoi(s)</p>
                         {p.nbEmailsEnvoyes > 0 && (
-                          <p className="text-gray-500 text-[11px]">
+                          <p className="text-slate-400 text-[11px]">
                             {p.nbOuvertures} ouv. · {p.nbClics} clic(s)
                           </p>
                         )}
@@ -589,10 +589,10 @@ export default function AdminProspectsPage() {
                           </p>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-xs text-gray-400">
-                        {p.owner ? `${p.owner.prenom} ${p.owner.nom}` : <span className="text-gray-600">—</span>}
+                      <td className="px-3 py-3 text-xs text-slate-300">
+                        {p.owner ? `${p.owner.prenom} ${p.owner.nom}` : <span className="text-slate-400">—</span>}
                         {p.lastContactedAt && (
-                          <p className="text-gray-600 text-[11px]">
+                          <p className="text-slate-400 text-[11px]">
                             {new Date(p.lastContactedAt).toLocaleDateString("fr-FR")}
                           </p>
                         )}
@@ -608,7 +608,7 @@ export default function AdminProspectsPage() {
         {/* ── Pagination ── */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
-            <p className="text-gray-500 text-xs">
+            <p className="text-slate-400 text-xs">
               Page {page} sur {totalPages}
             </p>
             <div className="flex gap-2">

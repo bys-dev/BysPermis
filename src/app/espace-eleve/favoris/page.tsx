@@ -85,7 +85,7 @@ export default function FavorisPage() {
         <FontAwesomeIcon icon={faHeart} className="text-red-400" />
         Mes favoris
       </h1>
-      <p className="text-gray-500 text-sm mb-8">
+      <p className="text-slate-400 text-sm mb-8">
         Retrouvez les formations que vous avez mises en favori.
       </p>
 
@@ -101,12 +101,12 @@ export default function FavorisPage() {
         <div className="text-center py-20 rounded-xl border" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.07)" }}>
           <FontAwesomeIcon
             icon={faHeartCrack}
-            className="text-gray-600 text-3xl mb-4"
+            className="text-slate-400 text-3xl mb-4"
           />
-          <p className="text-gray-400 text-lg font-medium mb-2">
+          <p className="text-slate-300 text-lg font-medium mb-2">
             Aucun favori
           </p>
-          <p className="text-gray-600 text-sm mb-6">
+          <p className="text-slate-400 text-sm mb-6">
             Explorez les formations et ajoutez-les a vos favoris !
           </p>
           <Link
@@ -187,7 +187,7 @@ export default function FavorisPage() {
                     </h3>
                   </Link>
 
-                  <div className="flex items-center gap-1.5 text-gray-500 text-xs mb-3">
+                  <div className="flex items-center gap-1.5 text-slate-400 text-xs mb-3">
                     <FontAwesomeIcon
                       icon={faMapMarkerAlt}
                       className="w-3 h-3"
@@ -203,7 +203,7 @@ export default function FavorisPage() {
                   {/* Next session */}
                   {nextSession ? (
                     <div className="flex items-center justify-between text-xs mb-4">
-                      <span className="text-gray-400 flex items-center gap-1.5">
+                      <span className="text-slate-300 flex items-center gap-1.5">
                         <FontAwesomeIcon
                           icon={faCalendar}
                           className="w-3 h-3"
@@ -213,7 +213,7 @@ export default function FavorisPage() {
                           { day: "numeric", month: "short" }
                         )}
                       </span>
-                      <span className="text-gray-400 flex items-center gap-1.5">
+                      <span className="text-slate-300 flex items-center gap-1.5">
                         <FontAwesomeIcon
                           icon={faUsers}
                           className="w-3 h-3"
@@ -223,7 +223,7 @@ export default function FavorisPage() {
                       </span>
                     </div>
                   ) : (
-                    <p className="text-gray-600 text-xs mb-4">
+                    <p className="text-slate-400 text-xs mb-4">
                       Aucune session disponible
                     </p>
                   )}
@@ -232,7 +232,7 @@ export default function FavorisPage() {
                   <div className="flex items-center justify-between">
                     <p className="text-blue-400 font-bold text-lg">
                       {fav.formation.prix.toFixed(0)}
-                      <span className="text-xs font-normal text-gray-500 ml-0.5">
+                      <span className="text-xs font-normal text-slate-400 ml-0.5">
                         EUR
                       </span>
                     </p>

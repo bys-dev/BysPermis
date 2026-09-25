@@ -87,7 +87,7 @@ export default function PlateformeRevenusPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Revenus</h1>
-        <p className="text-gray-400 text-sm mt-0.5">
+        <p className="text-slate-300 text-sm mt-0.5">
           Suivi des commissions, revenus et paiements centres
         </p>
       </div>
@@ -99,7 +99,7 @@ export default function PlateformeRevenusPage() {
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
             activeTab === "revenus"
               ? "bg-blue-600/20 text-blue-400 border border-blue-500/20"
-              : "text-gray-400 hover:text-white hover:bg-white/5"
+              : "text-slate-300 hover:text-white hover:bg-white/5"
           }`}
         >
           Revenus
@@ -109,7 +109,7 @@ export default function PlateformeRevenusPage() {
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
             activeTab === "paiements"
               ? "bg-blue-600/20 text-blue-400 border border-blue-500/20"
-              : "text-gray-400 hover:text-white hover:bg-white/5"
+              : "text-slate-300 hover:text-white hover:bg-white/5"
           }`}
         >
           Paiements centres
@@ -247,7 +247,7 @@ function RevenusTab() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {kpis.map((k) => (
-          <div key={k.label} className={`rounded-xl p-5 border bg-[#0A1628] ${k.border}`}>
+          <div key={k.label} className={`rounded-xl p-5 border bg-[#1C2D4F] ${k.border}`}>
             <div className="flex items-start justify-between mb-4">
               <div className={`w-10 h-10 rounded-lg ${k.bg} border ${k.border} flex items-center justify-center`}>
                 <FontAwesomeIcon icon={k.icon} className={`${k.color} text-sm`} />
@@ -260,20 +260,20 @@ function RevenusTab() {
               )}
             </div>
             <p className="text-2xl font-bold text-white">{k.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{k.label}</p>
-            <p className="text-[11px] text-gray-600 mt-0.5">{k.sub}</p>
+            <p className="text-xs text-slate-400 mt-1">{k.label}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{k.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Graphique mensuel */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-6">Commissions mensuelles</h2>
         {loading ? (
           <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : monthly.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 text-sm">Aucune donnee pour cette periode</p>
+            <p className="text-slate-400 text-sm">Aucune donnee pour cette periode</p>
           </div>
         ) : (
           <div className="flex items-end gap-3 h-48">
@@ -281,7 +281,7 @@ function RevenusTab() {
               const height = maxMontant > 0 ? (m.commission / maxMontant) * 100 : 0;
               return (
                 <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
-                  <span className="text-gray-400 text-[10px] font-medium">
+                  <span className="text-slate-300 text-[10px] font-medium">
                     {formatPrice(m.commission)}
                   </span>
                   <div className="w-full relative" style={{ height: "100%" }}>
@@ -290,7 +290,7 @@ function RevenusTab() {
                       style={{ height: `${height}%` }}
                     />
                   </div>
-                  <span className="text-gray-500 text-xs">{m.label.split(" ")[0]?.slice(0, 3)}</span>
+                  <span className="text-slate-400 text-xs">{m.label.split(" ")[0]?.slice(0, 3)}</span>
                 </div>
               );
             })}
@@ -299,31 +299,31 @@ function RevenusTab() {
       </div>
 
       {/* Tableau par centre */}
-      <div className="bg-[#0A1628] rounded-xl border border-white/8 p-5">
+      <div className="bg-[#1C2D4F] rounded-xl border border-white/8 p-5">
         <h2 className="text-white font-semibold text-sm mb-5">Revenus par centre</h2>
         {loading ? (
           <div className="h-48 rounded-lg bg-white/5 border border-white/5 animate-pulse" />
         ) : centres.length === 0 ? (
           <div className="text-center py-6">
-            <p className="text-gray-500 text-sm">Aucun revenu enregistre</p>
+            <p className="text-slate-400 text-sm">Aucun revenu enregistre</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Ville</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Reservations</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3 pr-4">Revenu brut</th>
-                  <th className="text-gray-500 font-medium text-xs pb-3">Commission</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Centre</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Ville</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Reservations</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3 pr-4">Revenu brut</th>
+                  <th className="text-slate-400 font-medium text-xs pb-3">Commission</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {centres.map((c) => (
                   <tr key={c.centreId} className="hover:bg-white/3 transition-colors">
                     <td className="py-3 pr-4 text-white font-medium">{c.nom}</td>
-                    <td className="py-3 pr-4 text-gray-400">{c.ville}</td>
+                    <td className="py-3 pr-4 text-slate-300">{c.ville}</td>
                     <td className="py-3 pr-4 text-gray-300">{c.reservations}</td>
                     <td className="py-3 pr-4 text-white font-semibold">{formatPrice(c.revenuBrut)}</td>
                     <td className="py-3 text-green-400 font-semibold">{formatPrice(c.commission)}</td>
@@ -442,38 +442,38 @@ function PaiementsCentresTab() {
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-green-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-green-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-green-400/10 border border-green-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faCheck} className="text-green-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(data?.totaux.paye ?? 0)}</p>
-          <p className="text-xs text-gray-500 mt-1">Total paye</p>
+          <p className="text-xs text-slate-400 mt-1">Total paye</p>
         </div>
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-orange-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-orange-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-orange-400/10 border border-orange-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faClock} className="text-orange-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(data?.totaux.enAttente ?? 0)}</p>
-          <p className="text-xs text-gray-500 mt-1">En attente de paiement</p>
+          <p className="text-xs text-slate-400 mt-1">En attente de paiement</p>
         </div>
-        <div className="rounded-xl p-5 border bg-[#0A1628] border-red-500/20">
+        <div className="rounded-xl p-5 border bg-[#1C2D4F] border-red-500/20">
           <div className="flex items-start justify-between mb-4">
             <div className="w-10 h-10 rounded-lg bg-red-400/10 border border-red-500/20 flex items-center justify-center">
               <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-400 text-sm" />
             </div>
           </div>
           <p className="text-2xl font-bold text-white">{loading ? "..." : formatPrice(data?.totaux.echoue ?? 0)}</p>
-          <p className="text-xs text-gray-500 mt-1">Echoues</p>
+          <p className="text-xs text-slate-400 mt-1">Echoues</p>
         </div>
       </div>
 
       {/* Centres en attente */}
       {data?.enAttenteparCentre && data.enAttenteparCentre.length > 0 && (
-        <div className="bg-[#0A1628] rounded-xl border border-orange-500/20 p-5">
+        <div className="bg-[#1C2D4F] rounded-xl border border-orange-500/20 p-5">
           <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
             <FontAwesomeIcon icon={faClock} className="text-orange-400 w-4 h-4" />
             Centres avec paiements en attente
@@ -488,7 +488,7 @@ function PaiementsCentresTab() {
               >
                 <div>
                   <p className="text-sm text-white font-medium">{c.nom}</p>
-                  <p className="text-xs text-gray-500">{c.ville} &middot; {c.count} paiement{c.count > 1 ? "s" : ""}</p>
+                  <p className="text-xs text-slate-400">{c.ville} &middot; {c.count} paiement{c.count > 1 ? "s" : ""}</p>
                 </div>
                 <p className="text-sm font-semibold text-orange-400">{formatPrice(c.montantEnAttente)}</p>
               </div>
@@ -500,7 +500,7 @@ function PaiementsCentresTab() {
       {/* Filters */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <FontAwesomeIcon icon={faFilter} className="text-gray-500 w-3 h-3" />
+          <FontAwesomeIcon icon={faFilter} className="text-slate-400 w-3 h-3" />
           <select
             value={typeFilter}
             onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
@@ -551,7 +551,7 @@ function PaiementsCentresTab() {
       )}
 
       {/* Table */}
-      <div className="rounded-xl border border-white/8 bg-[#0A1628] overflow-hidden">
+      <div className="rounded-xl border border-white/8 bg-[#1C2D4F] overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-3 animate-pulse">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -561,7 +561,7 @@ function PaiementsCentresTab() {
         ) : !data?.payments.length ? (
           <div className="text-center py-12">
             <FontAwesomeIcon icon={faReceipt} className="text-gray-700 text-2xl mb-3" />
-            <p className="text-gray-500 text-sm">Aucun paiement trouve</p>
+            <p className="text-slate-400 text-sm">Aucun paiement trouve</p>
           </div>
         ) : (
           <>
@@ -569,32 +569,32 @@ function PaiementsCentresTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left border-b border-white/8">
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Date</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Centre</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Type</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3">Description</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3 text-right">Montant</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3 text-right">Statut</th>
-                  <th className="text-gray-500 font-medium text-xs px-4 py-3 text-right">Actions</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Date</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Centre</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Type</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3">Description</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3 text-right">Montant</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3 text-right">Statut</th>
+                  <th className="text-slate-400 font-medium text-xs px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {data.payments.map((p) => (
                   <tr key={p.id} className="hover:bg-white/3 transition-colors">
-                    <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{formatDateShort(p.createdAt)}</td>
+                    <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{formatDateShort(p.createdAt)}</td>
                     <td className="px-4 py-3">
                       <p className="text-white font-medium text-sm">{p.centre.nom}</p>
-                      <p className="text-gray-500 text-xs">{p.centre.ville}</p>
+                      <p className="text-slate-400 text-xs">{p.centre.ville}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_LABELS[p.type]?.bg ?? "bg-gray-400/10"} ${TYPE_LABELS[p.type]?.color ?? "text-gray-400"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_LABELS[p.type]?.bg ?? "bg-gray-400/10"} ${TYPE_LABELS[p.type]?.color ?? "text-slate-300"}`}>
                         {TYPE_LABELS[p.type]?.label ?? p.type}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-300 max-w-[200px] truncate">{p.description}</td>
                     <td className="px-4 py-3 text-white font-semibold text-right">{formatPrice(p.montant)}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABELS[p.status]?.bg ?? "bg-gray-400/10"} ${STATUS_LABELS[p.status]?.color ?? "text-gray-400"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABELS[p.status]?.bg ?? "bg-gray-400/10"} ${STATUS_LABELS[p.status]?.color ?? "text-slate-300"}`}>
                         {STATUS_LABELS[p.status]?.label ?? p.status}
                       </span>
                     </td>
@@ -622,21 +622,21 @@ function PaiementsCentresTab() {
         {/* Pagination */}
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-white/8">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-400">
               Page {data.page} sur {data.totalPages} ({data.total} resultats)
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1 rounded-lg text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
+                className="px-3 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
               >
                 Precedent
               </button>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page >= (data?.totalPages ?? 1)}
-                className="px-3 py-1 rounded-lg text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
+                className="px-3 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 disabled:opacity-30 transition-colors"
               >
                 Suivant
               </button>

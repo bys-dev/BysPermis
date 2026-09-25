@@ -253,13 +253,13 @@ export default function AdminRolesPage() {
           <FontAwesomeIcon icon={faUserShield} className="text-yellow-400 text-xl" />
           <h1 className="text-2xl font-bold text-white">Roles & Permissions</h1>
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className="text-slate-300 text-sm">
           Gerez les 10 roles de la plateforme et modifiez les roles des utilisateurs. Acces reserve au Owner.
         </p>
       </div>
 
       {/* Role change form */}
-      <div className="bg-[#0A1628] rounded-xl border border-yellow-500/20 p-6">
+      <div className="bg-[#1C2D4F] rounded-xl border border-yellow-500/20 p-6">
         <h2 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
           <FontAwesomeIcon icon={faCrown} className="text-yellow-400 text-xs" />
           Changer le role d&apos;un utilisateur
@@ -267,7 +267,7 @@ export default function AdminRolesPage() {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1">
-            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" />
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
             <input
               type="email"
               placeholder="Rechercher par email..."
@@ -301,7 +301,7 @@ export default function AdminRolesPage() {
               </div>
               <div>
                 <p className="text-white font-medium">{foundUser.prenom} {foundUser.nom}</p>
-                <p className="text-gray-500 text-xs">{foundUser.email}</p>
+                <p className="text-slate-400 text-xs">{foundUser.email}</p>
               </div>
               <span className={`ml-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${ROLES.find((r) => r.role === foundUser.role)?.bg} ${ROLES.find((r) => r.role === foundUser.role)?.color} ${ROLES.find((r) => r.role === foundUser.role)?.border}`}>
                 Role actuel : {ROLES.find((r) => r.role === foundUser.role)?.label}
@@ -310,14 +310,14 @@ export default function AdminRolesPage() {
 
             <div className="flex flex-col sm:flex-row gap-3 items-end">
               <div className="flex-1">
-                <label className="text-gray-400 text-xs font-medium mb-1.5 block">Nouveau role</label>
+                <label className="text-slate-300 text-xs font-medium mb-1.5 block">Nouveau role</label>
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as Role)}
                   className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-yellow-500/50 appearance-none"
                 >
                   {ROLES.map((r) => (
-                    <option key={r.role} value={r.role} className="bg-[#0A1628]">
+                    <option key={r.role} value={r.role} className="bg-[#1C2D4F]">
                       {r.label} — {r.description}
                     </option>
                   ))}
@@ -339,7 +339,7 @@ export default function AdminRolesPage() {
                   <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-400 mt-0.5" />
                   <div className="flex-1">
                     <p className="text-white text-sm font-medium">Confirmer le changement de role</p>
-                    <p className="text-gray-400 text-xs mt-1">
+                    <p className="text-slate-300 text-xs mt-1">
                       Vous allez changer le role de <span className="text-white">{foundUser.prenom} {foundUser.nom}</span> de{" "}
                       <span className="text-red-400">{ROLES.find((r) => r.role === foundUser.role)?.label}</span> vers{" "}
                       <span className="text-green-400">{ROLES.find((r) => r.role === selectedRole)?.label}</span>.
@@ -355,7 +355,7 @@ export default function AdminRolesPage() {
                       </button>
                       <button
                         onClick={() => setShowConfirm(false)}
-                        className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white text-xs font-medium transition-colors"
+                        className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white text-xs font-medium transition-colors"
                       >
                         Annuler
                       </button>
@@ -390,7 +390,7 @@ export default function AdminRolesPage() {
         ) : (
           <div className="space-y-3">
             {ROLES.map((r) => (
-              <div key={r.role} className={`bg-[#0A1628] rounded-xl border ${r.border} overflow-hidden`}>
+              <div key={r.role} className={`bg-[#1C2D4F] rounded-xl border ${r.border} overflow-hidden`}>
                 <button
                   onClick={() => setExpandedRole(expandedRole === r.role ? null : r.role)}
                   className="w-full flex items-center gap-4 p-4 text-left hover:bg-white/3 transition-colors"
@@ -405,23 +405,23 @@ export default function AdminRolesPage() {
                         {r.role}
                       </span>
                     </div>
-                    <p className="text-gray-500 text-xs mt-0.5">{r.description}</p>
+                    <p className="text-slate-400 text-xs mt-0.5">{r.description}</p>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
                     <div className="text-right">
                       <p className="text-white font-semibold text-sm">{roleCounts[r.role] ?? 0}</p>
-                      <p className="text-gray-600 text-[10px]">utilisateur(s)</p>
+                      <p className="text-slate-400 text-[10px]">utilisateur(s)</p>
                     </div>
                     <FontAwesomeIcon
                       icon={expandedRole === r.role ? faChevronUp : faChevronDown}
-                      className="text-gray-500 text-xs"
+                      className="text-slate-400 text-xs"
                     />
                   </div>
                 </button>
 
                 {expandedRole === r.role && (
                   <div className="px-4 pb-4 border-t border-white/5">
-                    <p className="text-gray-400 text-xs font-medium mt-3 mb-2">Permissions :</p>
+                    <p className="text-slate-300 text-xs font-medium mt-3 mb-2">Permissions :</p>
                     <div className="grid sm:grid-cols-2 gap-1.5">
                       {r.permissions.map((perm) => (
                         <div key={perm} className="flex items-center gap-2 text-xs text-gray-300">

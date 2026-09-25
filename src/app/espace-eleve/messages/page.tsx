@@ -139,7 +139,7 @@ export default function EleveMessagesPage() {
       <div
         className="flex rounded-xl border overflow-hidden"
         style={{
-          background: "#0D1D3A",
+          background: "#24385E",
           borderColor: "rgba(255,255,255,0.07)",
           height: "calc(100vh - 220px)",
           minHeight: "500px",
@@ -153,7 +153,7 @@ export default function EleveMessagesPage() {
           style={{ borderColor: "rgba(255,255,255,0.07)" }}
         >
           <div
-            className="px-4 py-3 border-b text-sm font-medium text-gray-400"
+            className="px-4 py-3 border-b text-sm font-medium text-slate-300"
             style={{ borderColor: "rgba(255,255,255,0.07)" }}
           >
             Conversations
@@ -176,9 +176,9 @@ export default function EleveMessagesPage() {
               <div className="text-center py-10 px-4">
                 <FontAwesomeIcon
                   icon={faInbox}
-                  className="text-gray-600 text-2xl mb-3"
+                  className="text-slate-400 text-2xl mb-3"
                 />
-                <p className="text-gray-500 text-sm">Aucune conversation</p>
+                <p className="text-slate-400 text-sm">Aucune conversation</p>
               </div>
             ) : (
               conversations.map((conv) => (
@@ -210,7 +210,7 @@ export default function EleveMessagesPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-500 text-xs truncate mt-0.5">
+                      <p className="text-slate-400 text-xs truncate mt-0.5">
                         {conv.lastMessage}
                       </p>
                     </div>
@@ -237,7 +237,7 @@ export default function EleveMessagesPage() {
                 style={{ borderColor: "rgba(255,255,255,0.07)" }}
               >
                 <button
-                  className="sm:hidden text-gray-400 hover:text-white mr-1"
+                  className="sm:hidden text-slate-300 hover:text-white mr-1"
                   onClick={() => setSelectedPartner(null)}
                 >
                   &larr;
@@ -253,7 +253,7 @@ export default function EleveMessagesPage() {
                     {selectedConversation.partnerPrenom}{" "}
                     {selectedConversation.partnerNom}
                   </p>
-                  <p className="text-gray-500 text-xs capitalize">
+                  <p className="text-slate-400 text-xs capitalize">
                     {selectedConversation.partnerRole
                       .replace("CENTRE_", "")
                       .replace("_", " ")
@@ -302,7 +302,7 @@ export default function EleveMessagesPage() {
                           </p>
                           <p
                             className={`text-[10px] mt-1 ${
-                              isMine ? "text-blue-200" : "text-gray-500"
+                              isMine ? "text-blue-200" : "text-slate-400"
                             }`}
                           >
                             {new Date(msg.createdAt).toLocaleTimeString(
@@ -339,7 +339,7 @@ export default function EleveMessagesPage() {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Votre message..."
-                  className="flex-1 bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500/50 placeholder:text-gray-600"
+                  className="flex-1 bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500/50 placeholder:text-slate-400"
                 />
                 <button
                   type="submit"
@@ -367,7 +367,7 @@ export default function EleveMessagesPage() {
                   icon={faComments}
                   className="text-gray-700 text-3xl mb-3"
                 />
-                <p className="text-gray-500 text-sm">
+                <p className="text-slate-400 text-sm">
                   Selectionnez une conversation
                 </p>
               </div>
