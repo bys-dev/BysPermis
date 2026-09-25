@@ -10,6 +10,8 @@ const ApercuSchema = z.object({
   fromName: z.string().max(100).nullable().optional(),
   /** Prospect à utiliser pour la personnalisation ; sinon un prospect réel au hasard. */
   prospectId: z.string().nullable().optional(),
+  /** Force le centre fictif, même quand le fichier de prospects est rempli. */
+  exemple: z.boolean().optional(),
 });
 
 /**
@@ -28,9 +30,11 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Données invalides", details: parsed.error.flatten() }, { status: 400 });
     }
-    const { sujet, contenu, fromName, prospectId } = parsed.data;
+    const { sujet, contenu, fromName, prospectId, exemple } = parsed.data;
 
-    const prospect = prospectId
+    const prospect = exemple
+      ? null
+      : prospectId
       ? await prisma.prospect.findUnique({ where: { id: prospectId } })
       : await prisma.prospect.findFirst({
           where: { email: { not: null }, unsubscribedAt: null },
@@ -38,7 +42,9 @@ export async function POST(req: NextRequest) {
         });
 
     // Jeu d'exemple quand le fichier de prospects est encore vide.
-    const sample = prospect ?? {
+    // Le jeton de désinscription réel n'est jamais exposé dans l'aperçu : un
+    // clic sur le lien de pied de page désinscrirait le centre pour de bon.
+    const sample = prospect ? { ...prospect, unsubscribeToken: "apercu" } : {
       nom: "Centre de démonstration",
       raisonSociale: "CENTRE DEMO SARL",
       ville: "Cergy",
@@ -60,6 +66,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       sujet: rendu.subject,
       html: rendu.html,
+      text: rendu.text,
       variablesInconnues: rendu.unknown,
       variablesVides: rendu.empty,
       validation,

@@ -12,6 +12,9 @@ import { z } from "zod";
 /** Plafond de la sélection nominative. */
 export const MAX_SELECTION = 2000;
 
+/** Plafond des adresses saisies à la main dans une campagne. */
+export const MAX_AJOUTS_MANUELS = 500;
+
 export const AudienceFilterSchema = z.object({
   mode: z.enum(["FILTRE", "SELECTION"]).optional(),
   prospectIds: z.array(z.string().max(40)).max(MAX_SELECTION).optional(),
@@ -38,6 +41,8 @@ export const AudienceFilterSchema = z.object({
   exclureDejaContactes: z.boolean().optional(),
   exclureCampagneIds: z.array(z.string()).optional(),
   recherche: z.string().max(200).optional(),
+  /** Fiches créées ou retrouvées à partir d'adresses saisies à la main. */
+  ajoutsManuels: z.array(z.string().max(40)).max(MAX_AJOUTS_MANUELS).optional(),
 });
 
 export type AudienceFilterInput = z.infer<typeof AudienceFilterSchema>;

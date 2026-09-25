@@ -13,10 +13,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
   faFloppyDisk,
-  faEye,
   faCode,
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
+import ApercuEmail from "../ApercuEmail";
 import { STATUTS_CIBLABLES, inputClass, type Modele, type Statut, type Variable } from "../types";
 
 export interface ModeleForm {
@@ -75,8 +75,6 @@ export default function ModeleEditor({
 }) {
   const [form, setForm] = useState<ModeleForm>(initial);
   const [enregistrement, setEnregistrement] = useState(false);
-  const [apercu, setApercu] = useState<{ sujet: string; html: string; vides: string[] } | null>(null);
-  const [chargementApercu, setChargementApercu] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
   const contenuRef = useRef<HTMLTextAreaElement>(null);
@@ -95,29 +93,6 @@ export default function ModeleEditor({
       textarea.focus();
       textarea.setSelectionRange(debut + jeton.length, debut + jeton.length);
     });
-  };
-
-  const voirApercu = async () => {
-    setChargementApercu(true);
-    setErreur(null);
-    try {
-      const res = await fetch("/api/admin/campagnes/apercu", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sujet: form.sujet, contenu: form.contenu, fromName: form.fromName || null }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setErreur(data?.error ?? "Aperçu impossible.");
-        return;
-      }
-      if (data.validation?.errors?.length) setErreur(data.validation.errors.join(" "));
-      setApercu({ sujet: data.sujet, html: data.html, vides: data.variablesVides ?? [] });
-    } catch {
-      setErreur("Impossible de générer l'aperçu.");
-    } finally {
-      setChargementApercu(false);
-    }
   };
 
   const enregistrer = async () => {
@@ -172,12 +147,12 @@ export default function ModeleEditor({
     }));
 
   return (
-    <div className="rounded-xl border border-white/10 p-6 space-y-5" style={{ background: "#0D1D3A" }}>
+    <div className="rounded-xl border border-white/10 p-6 space-y-5" style={{ background: "#24385E" }}>
       <div className="flex items-start justify-between gap-4">
         <h2 className="text-white font-semibold text-lg">
           {form.id ? "Modifier le modèle" : "Nouveau modèle"}
         </h2>
-        <button onClick={onCancel} className="text-gray-400 text-sm hover:text-white transition-colors">
+        <button onClick={onCancel} className="text-slate-300 text-sm hover:text-white transition-colors">
           Fermer
         </button>
       </div>
@@ -191,7 +166,7 @@ export default function ModeleEditor({
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-gray-400 text-xs mb-1.5">Nom du modèle *</label>
+          <label className="block text-slate-300 text-xs mb-1.5">Nom du modèle *</label>
           <input
             type="text"
             value={form.nom}
@@ -201,8 +176,8 @@ export default function ModeleEditor({
           />
         </div>
         <div>
-          <label className="block text-gray-400 text-xs mb-1.5">
-            Moment de la séquence <span className="text-gray-600">(indicatif)</span>
+          <label className="block text-slate-300 text-xs mb-1.5">
+            Moment de la séquence <span className="text-slate-400">(indicatif)</span>
           </label>
           <input
             type="text"
@@ -215,7 +190,7 @@ export default function ModeleEditor({
       </div>
 
       <div>
-        <label className="block text-gray-400 text-xs mb-1.5">Objectif du message</label>
+        <label className="block text-slate-300 text-xs mb-1.5">Objectif du message</label>
         <input
           type="text"
           value={form.objectif}
@@ -227,7 +202,7 @@ export default function ModeleEditor({
 
       <div className="grid sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-gray-400 text-xs mb-1.5">Expéditeur par défaut</label>
+          <label className="block text-slate-300 text-xs mb-1.5">Expéditeur par défaut</label>
           <input
             type="text"
             value={form.fromName}
@@ -237,7 +212,7 @@ export default function ModeleEditor({
           />
         </div>
         <div>
-          <label className="block text-gray-400 text-xs mb-1.5">Adresse de réponse</label>
+          <label className="block text-slate-300 text-xs mb-1.5">Adresse de réponse</label>
           <input
             type="email"
             value={form.replyTo}
@@ -247,8 +222,8 @@ export default function ModeleEditor({
           />
         </div>
         <div>
-          <label className="block text-gray-400 text-xs mb-1.5">
-            Délai conseillé <span className="text-gray-600">(jours)</span>
+          <label className="block text-slate-300 text-xs mb-1.5">
+            Délai conseillé <span className="text-slate-400">(jours)</span>
           </label>
           <input
             type="number"
@@ -263,7 +238,7 @@ export default function ModeleEditor({
       </div>
 
       <div>
-        <label className="block text-gray-400 text-xs mb-1.5">Objet de l&apos;email *</label>
+        <label className="block text-slate-300 text-xs mb-1.5">Objet de l&apos;email *</label>
         <input
           type="text"
           value={form.sujet}
@@ -273,40 +248,46 @@ export default function ModeleEditor({
         />
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <label className="text-gray-400 text-xs">Contenu (HTML) *</label>
-          <span className="text-gray-600 text-[11px]">
-            <FontAwesomeIcon icon={faCode} className="mr-1" />
-            Repli : <code className="text-gray-400">{"{{ville|votre secteur}}"}</code>
-          </span>
+      {/* ── Rédaction + aperçu en direct (même rendu que l'envoi réel) ── */}
+      <div className="grid lg:grid-cols-2 gap-5 items-start">
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-slate-300 text-xs">Contenu (HTML) *</label>
+            <span className="text-slate-400 text-[11px]">
+              <FontAwesomeIcon icon={faCode} className="mr-1" />
+              Repli : <code className="text-slate-300">{"{{ville|votre secteur}}"}</code>
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {variables.map((v) => (
+              <button
+                key={v.key}
+                type="button"
+                onClick={() => insererVariable(v.key)}
+                title={`${v.label} — ex. ${v.example}`}
+                className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-[11px] hover:border-blue-500 hover:text-white transition-colors"
+              >
+                {`{{${v.key}}}`}
+              </button>
+            ))}
+          </div>
+          <textarea
+            ref={contenuRef}
+            value={form.contenu}
+            onChange={(e) => setForm((f) => ({ ...f, contenu: e.target.value }))}
+            rows={22}
+            className={`${inputClass} font-mono text-xs leading-relaxed`}
+          />
         </div>
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {variables.map((v) => (
-            <button
-              key={v.key}
-              type="button"
-              onClick={() => insererVariable(v.key)}
-              title={`${v.label} — ex. ${v.example}`}
-              className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-[11px] hover:border-blue-500 hover:text-white transition-colors"
-            >
-              {`{{${v.key}}}`}
-            </button>
-          ))}
+        <div className="min-w-0 lg:sticky lg:top-4">
+          <ApercuEmail sujet={form.sujet} contenu={form.contenu} fromName={form.fromName} />
         </div>
-        <textarea
-          ref={contenuRef}
-          value={form.contenu}
-          onChange={(e) => setForm((f) => ({ ...f, contenu: e.target.value }))}
-          rows={16}
-          className={`${inputClass} font-mono text-xs leading-relaxed`}
-        />
       </div>
 
       {/* ── Ciblage conseillé ── */}
       <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4 space-y-3">
         <p className="text-white text-sm font-semibold">Ciblage conseillé</p>
-        <p className="text-gray-500 text-[11px]">
+        <p className="text-slate-400 text-[11px]">
           Pré-rempli quand on charge le modèle dans une campagne — jamais imposé.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -320,7 +301,7 @@ export default function ModeleEditor({
                 className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                   actif
                     ? "bg-blue-500/20 border-blue-500/50 text-blue-200"
-                    : "bg-white/5 border-white/10 text-gray-400 hover:border-white/25"
+                    : "bg-white/5 border-white/10 text-slate-300 hover:border-white/25"
                 }`}
               >
                 {s.label}
@@ -339,24 +320,6 @@ export default function ModeleEditor({
         </label>
       </div>
 
-      {apercu && (
-        <div className="rounded-lg border border-white/10 overflow-hidden">
-          <div className="px-4 py-2.5 bg-white/5 border-b border-white/10">
-            <p className="text-gray-400 text-[11px]">Objet</p>
-            <p className="text-white text-sm font-medium">{apercu.sujet || "(vide)"}</p>
-            {apercu.vides.length > 0 && (
-              <p className="text-orange-300 text-[11px] mt-1">
-                Variables vides pour ce prospect : {apercu.vides.map((v) => `{{${v}}}`).join(", ")}.
-              </p>
-            )}
-          </div>
-          <div className="bg-white p-4 max-h-96 overflow-y-auto">
-            {/* Habillage produit par notre gabarit, valeurs échappées côté serveur. */}
-            <div dangerouslySetInnerHTML={{ __html: apercu.html }} />
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={enregistrer}
@@ -365,14 +328,6 @@ export default function ModeleEditor({
         >
           {enregistrement ? <FontAwesomeIcon icon={faSpinner} spin /> : <FontAwesomeIcon icon={faFloppyDisk} />}
           {form.id ? "Enregistrer" : "Créer le modèle"}
-        </button>
-        <button
-          onClick={voirApercu}
-          disabled={chargementApercu}
-          className="px-5 py-2.5 rounded-lg border border-white/15 text-gray-300 text-sm font-semibold hover:border-blue-500 hover:text-white disabled:opacity-40 transition-colors inline-flex items-center gap-2"
-        >
-          {chargementApercu ? <FontAwesomeIcon icon={faSpinner} spin /> : <FontAwesomeIcon icon={faEye} />}
-          Aperçu
         </button>
       </div>
     </div>

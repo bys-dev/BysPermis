@@ -17,6 +17,7 @@
  */
 
 import { escapeHtml } from "@/lib/utils";
+import { habillerEmail } from "./email-layout";
 
 const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
@@ -75,9 +76,14 @@ export function buildProspectVariables(prospect: TemplateProspect): Record<strin
   const prenom = (prospect.contactPrenom ?? "").trim();
   const nomContact = (prospect.contactNom ?? "").trim();
   const identite = [prenom, nomContact].filter(Boolean).join(" ");
+  // Une adresse ajoutée à la main n'a pas de nom de centre : sa fiche porte
+  // l'adresse en guise de nom. Ce n'est pas un nom, on le traite comme vide
+  // (« Je vous écris au sujet de contact@… » serait du plus mauvais effet).
+  const nom = (prospect.nom ?? "").trim();
+  const nomReel = nom && nom.toLowerCase() !== (prospect.email ?? "").trim().toLowerCase() ? nom : "";
 
   return {
-    nom: prospect.nom ?? "",
+    nom: nomReel,
     raisonSociale: prospect.raisonSociale ?? "",
     ville: prospect.ville ?? "",
     codePostal: prospect.codePostal ?? "",
@@ -97,6 +103,17 @@ export function buildProspectVariables(prospect: TemplateProspect): Record<strin
     lienDesinscription: unsubscribeUrl(prospect.unsubscribeToken),
   };
 }
+
+/**
+ * Repli implicite quand une variable est vide et que le texte n'en précise
+ * aucun. Limité aux variables qui s'insèrent partout sans casser la phrase :
+ * pour la ville ou le département, la tournure dépend du contexte et reste à
+ * la main du rédacteur (`{{ville|près de chez vous}}`).
+ */
+export const REPLIS_PAR_DEFAUT: Record<string, string> = {
+  nom: "votre centre",
+  raisonSociale: "votre centre",
+};
 
 /** Placeholder : `{{cle}}` ou `{{cle|valeur de repli}}`. */
 const PLACEHOLDER_RE = /\{\{\s*([a-zA-Z0-9_]+)\s*(?:\|([^}]*))?\}\}/g;
@@ -131,6 +148,8 @@ export function renderTemplate(
     if (!value) {
       if (fallback !== undefined) {
         value = fallback.trim();
+      } else if (known && REPLIS_PAR_DEFAUT[key]) {
+        value = REPLIS_PAR_DEFAUT[key];
       } else if (known) {
         empty.add(key);
       }
@@ -144,44 +163,43 @@ export function renderTemplate(
 }
 
 /**
- * Habillage du corps rédigé par le staff : en-tête léger, corps, puis mentions
- * légales et lien de désinscription.
+ * Habillage complet du corps rédigé par le staff : logo, carte blanche, corps
+ * mis en forme, puis mentions légales et lien de désinscription.
  *
  * Volontairement sobre — un email de démarchage trop « marketing » (grosses
- * images, boutons multiples) dégrade la délivrabilité.
+ * images, boutons multiples) dégrade la délivrabilité. Le détail du gabarit
+ * est dans `email-layout.ts`.
  */
 export function wrapCampaignHtml(params: {
   bodyHtml: string;
   desinscriptionUrl: string;
   fromName?: string | null;
+  sujet?: string;
 }): string {
-  const expediteur = params.fromName?.trim() || "BYS Permis";
-  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#1f2937;font-size:15px;line-height:1.6">
-  <div style="padding:8px 0 20px">
-    ${params.bodyHtml}
-  </div>
-  <hr style="border:none;border-top:1px solid #e5e7eb;margin:28px 0 14px"/>
-  <div style="color:#9ca3af;font-size:11px;line-height:1.6">
-    <p style="margin:0 0 6px">
-      ${escapeHtml(expediteur)} — plateforme de réservation de stages de récupération de points.
-      Ce message vous est adressé dans un cadre professionnel, à l'adresse de votre centre agréé.
-    </p>
-    <p style="margin:0">
-      Vous ne souhaitez plus recevoir nos messages ?
-      <a href="${params.desinscriptionUrl}" style="color:#6b7280;text-decoration:underline">Se désinscrire en un clic</a>.
-    </p>
-  </div>
-</div>`;
+  return habillerEmail({
+    sujet: params.sujet ?? "",
+    corpsHtml: params.bodyHtml,
+    lienInscription: `${APP_URL}/devenir-partenaire`,
+    desinscriptionUrl: params.desinscriptionUrl,
+    fromName: params.fromName,
+  }).html;
 }
 
 export interface RenderedCampaignEmail {
   subject: string;
+  /** Document HTML complet, prêt à l'envoi (et affiché tel quel par l'aperçu). */
   html: string;
+  /** Version texte brut, envoyée en parallèle du HTML. */
+  text: string;
   unknown: string[];
   empty: string[];
 }
 
-/** Rend l'objet + le corps complet (habillage inclus) pour un prospect donné. */
+/**
+ * Rend l'objet + le corps complet (habillage inclus) pour un prospect donné.
+ * C'est l'unique moteur de rendu : l'envoi, l'email de test et l'aperçu de
+ * l'admin passent tous par ici.
+ */
 export function renderCampaignEmail(params: {
   sujet: string;
   contenu: string;
@@ -192,14 +210,22 @@ export function renderCampaignEmail(params: {
 
   const subject = renderTemplate(params.sujet, variables, { escape: false });
   const body = renderTemplate(params.contenu, variables, { escape: true });
+  // Un repli placé en tête d'objet (« votre centre — … ») prend la majuscule.
+  const brut = subject.output.trim();
+  const sujet = brut.charAt(0).toUpperCase() + brut.slice(1);
+
+  const { html, text } = habillerEmail({
+    sujet,
+    corpsHtml: body.output,
+    lienInscription: variables.lienInscription,
+    desinscriptionUrl: variables.lienDesinscription,
+    fromName: params.fromName,
+  });
 
   return {
-    subject: subject.output.trim(),
-    html: wrapCampaignHtml({
-      bodyHtml: body.output,
-      desinscriptionUrl: variables.lienDesinscription,
-      fromName: params.fromName,
-    }),
+    subject: sujet,
+    html,
+    text,
     unknown: [...new Set([...subject.unknown, ...body.unknown])],
     empty: [...new Set([...subject.empty, ...body.empty])],
   };
