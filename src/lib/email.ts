@@ -1,6 +1,12 @@
 import { Resend } from "resend";
 import { logEmail, EMAIL_KIND, type EmailLogContext } from "@/lib/email-log";
-import { BRAND_NAVY } from "@/lib/brand-colors";
+import {
+  renderEmail,
+  emailDetails,
+  emailEncadre,
+  emailEtapes,
+  type GabaritEmail,
+} from "@/lib/email-layout";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -59,8 +65,26 @@ export async function sendMail(
 
 const FROM = process.env.EMAIL_FROM ?? "BYS Permis <noreply@byspermis.fr>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
-// Logo embed pour emails — PNG fiable sur tous les clients (Outlook compris).
-const LOGO_IMG = `<img src="${APP_URL}/colored-logo.png" alt="BYS Permis" height="48" style="display:block;height:48px;width:auto;margin:0 auto 12px"/>`;
+
+/** Construit le payload Resend (HTML + version texte) à partir du gabarit commun. */
+function payloadGabarit(to: string, gabarit: Omit<GabaritEmail, "sujet"> & { sujet: string }) {
+  const { html, text } = renderEmail(gabarit);
+  return { from: FROM, to, subject: gabarit.sujet, html, text };
+}
+
+/** Bloc « identifiants de connexion » des emails d'invitation. */
+function blocIdentifiants(email: string, tempPassword?: string): string {
+  if (!tempPassword) return "";
+  return emailEncadre(
+    "info",
+    "Vos identifiants de connexion",
+    `${emailDetails([
+      ["Email", email],
+      ["Mot de passe temporaire", `<span style="font-family:'Courier New',monospace;letter-spacing:0.5px">${tempPassword}</span>`],
+    ])}
+    <p style="margin:0;font-size:12px">Pensez à changer ce mot de passe lors de votre première connexion.</p>`,
+  );
+}
 
 /**
  * Send confirmation email after reservation.
@@ -76,32 +100,28 @@ export async function sendConfirmationEmail(params: {
   context?: EmailLogContext;
 }): Promise<void> {
   await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Confirmation de réservation ${params.reservationNumber}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Réservation confirmée</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Numéro : ${params.reservationNumber}</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour,</p>
-    <p>Votre réservation <strong>${params.reservationNumber}</strong> a bien été enregistrée.</p>
-    <table style="border-collapse:collapse;margin:16px 0;width:100%">
-      <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold;width:120px">Formation</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.formationTitle}</td></tr>
-      <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold">Date</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.sessionDate}</td></tr>
-      <tr><td style="padding:8px 12px;background:#F9FAFB;font-weight:bold">Centre</td><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB">${params.centreName}</td></tr>
-    </table>
-    <p>Votre <strong>facture</strong> est jointe à ce mail au format PDF. Votre <strong>convocation</strong> vous sera envoyée 48h avant la session.</p>
-    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:16px 20px;margin:20px 0">
-      <p style="margin:0 0 6px;font-weight:bold;color:#92400E">Dernière étape : transmettez vos justificatifs</p>
-      <p style="margin:0 0 12px;font-size:14px;color:#78350F">Pour valider définitivement votre inscription, envoyez votre <strong>pièce d'identité</strong> et votre <strong>permis de conduire</strong> à votre centre depuis votre espace élève.</p>
-      <a href="${APP_URL}/espace-eleve/documents" style="display:inline-block;background:#F59E0B;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;padding:10px 18px;border-radius:8px">Envoyer mes documents</a>
-    </div>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
-  </div>
-</div>`,
+    ...payloadGabarit(params.to, {
+      sujet: `Confirmation de réservation ${params.reservationNumber}`,
+      badge: { ton: "succes", libelle: "✓ Réservation confirmée" },
+      titre: "Votre place est réservée",
+      sousTitre: `Réservation n° ${params.reservationNumber}`,
+      apercu: `Votre stage du ${params.sessionDate} chez ${params.centreName} est confirmé. Dernière étape : vos justificatifs.`,
+      corpsHtml: `<p>Bonjour,</p>
+<p>Votre réservation a bien été enregistrée. Voici le récapitulatif de votre stage :</p>
+${emailDetails([
+  ["Stage", params.formationTitle],
+  ["Date", params.sessionDate],
+  ["Centre", params.centreName],
+  ["Référence", params.reservationNumber],
+])}
+<p>Votre <strong>facture</strong> est jointe à cet email au format PDF. Votre <strong>convocation</strong> vous sera envoyée 48 h avant le stage.</p>
+${emailEncadre(
+  "alerte",
+  "Dernière étape : transmettez vos justificatifs",
+  `<p style="margin:0">Pour valider définitivement votre inscription, envoyez votre <strong>pièce d'identité</strong> et votre <strong>permis de conduire</strong> à votre centre depuis votre espace élève.</p>`,
+)}`,
+      cta: { url: `${APP_URL}/espace-eleve/documents`, libelle: "Envoyer mes documents" },
+    }),
     ...(params.attachments && params.attachments.length > 0
       ? { attachments: params.attachments }
       : {}),
@@ -127,29 +147,16 @@ export async function sendJustificatifRecuEmail(params: {
     return;
   }
 
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Justificatif bien reçu — ${params.documentLabel}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Justificatif bien reçu</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Réservation ${params.reservationNumber}</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
-    <p>Nous avons bien reçu votre <strong>${params.documentLabel}</strong> pour le stage
-      « ${params.formationTitle} » auprès de <strong>${params.centreName}</strong>.</p>
-    <p>Votre centre va le vérifier. Vous n'avez rien d'autre à faire pour ce document — vous serez
-      prévenu si une pièce complémentaire est nécessaire.</p>
-    <p style="text-align:center;margin:24px 0">
-      <a href="${APP_URL}/espace-eleve/documents" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Voir mes documents</a>
-    </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px">Cordialement,<br/>L'équipe BYS Permis</p>
-  </div>
-</div>`,
-  }, params.context ?? { kind: EMAIL_KIND.JUSTIFICATIF_RECU });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `Justificatif bien reçu — ${params.documentLabel}`,
+    badge: { ton: "succes", libelle: "✓ Document reçu" },
+    titre: "Justificatif bien reçu",
+    sousTitre: `Réservation n° ${params.reservationNumber}`,
+    corpsHtml: `<p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
+<p>Nous avons bien reçu votre <strong>${params.documentLabel}</strong> pour le stage « ${params.formationTitle} » auprès de <strong>${params.centreName}</strong>.</p>
+<p>Votre centre va le vérifier. Vous n'avez rien d'autre à faire pour ce document — vous serez prévenu si une pièce complémentaire est nécessaire.</p>`,
+    cta: { url: `${APP_URL}/espace-eleve/documents`, libelle: "Voir mes documents" },
+  }), params.context ?? { kind: EMAIL_KIND.JUSTIFICATIF_RECU });
 }
 
 /**
@@ -168,30 +175,12 @@ export async function sendEleveEventEmail(params: {
     return;
   }
 
-  const cta = params.ctaUrl
-    ? `<p style="text-align:center;margin:24px 0">
-         <a href="${params.ctaUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">${params.ctaLabel ?? "Accéder à mon espace"}</a>
-       </p>`
-    : "";
-
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: params.subject,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">${params.title}</h1>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    ${params.bodyHtml}
-    ${cta}
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'équipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: params.subject,
+    titre: params.title,
+    corpsHtml: params.bodyHtml,
+    cta: params.ctaUrl ? { url: params.ctaUrl, libelle: params.ctaLabel ?? "Accéder à mon espace" } : undefined,
+  }));
 }
 
 /**
@@ -210,30 +199,12 @@ export async function sendCentreEventEmail(params: {
     return;
   }
 
-  const cta = params.ctaUrl
-    ? `<p style="text-align:center;margin:24px 0">
-         <a href="${params.ctaUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">${params.ctaLabel ?? "Accéder à mon espace"}</a>
-       </p>`
-    : "";
-
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: params.subject,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">${params.title}</h1>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    ${params.bodyHtml}
-    ${cta}
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'équipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: params.subject,
+    titre: params.title,
+    corpsHtml: params.bodyHtml,
+    cta: params.ctaUrl ? { url: params.ctaUrl, libelle: params.ctaLabel ?? "Accéder à mon espace" } : undefined,
+  }));
 }
 
 /**
@@ -253,33 +224,25 @@ export async function sendEleveCancellationEmail(params: {
     return;
   }
 
-  const refundLine = params.refunded
-    ? "<p>Votre remboursement a été initié et apparaîtra sur votre compte sous 5 à 10 jours ouvrés.</p>"
-    : "<p>Aucun remboursement n'est prévu pour cette annulation selon les conditions applicables.</p>";
+  const remboursement = params.refunded
+    ? emailEncadre("info", "Remboursement en cours", `<p style="margin:0">Votre remboursement a été initié et apparaîtra sur votre compte sous 5 à 10 jours ouvrés.</p>`)
+    : emailEncadre("alerte", null, `<p style="margin:0">Aucun remboursement n'est prévu pour cette annulation selon les conditions applicables.</p>`);
 
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Annulation de votre réservation ${params.reservationNumber}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Réservation annulée</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Réf. ${params.reservationNumber}</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
-    <p>Votre réservation <strong>${params.reservationNumber}</strong> pour le stage <strong>${params.formationTitle}</strong> chez <strong>${params.centreName}</strong> (${params.sessionDate}) a bien été annulée.</p>
-    ${refundLine}
-    <p style="text-align:center;margin:24px 0">
-      <a href="${APP_URL}/espace-eleve/reservations" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Voir mes réservations</a>
-    </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'équipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `Annulation de votre réservation ${params.reservationNumber}`,
+    badge: { ton: "danger", libelle: "Réservation annulée" },
+    titre: "Votre réservation est annulée",
+    sousTitre: `Réservation n° ${params.reservationNumber}`,
+    corpsHtml: `<p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
+<p>L'annulation de votre réservation a bien été prise en compte :</p>
+${emailDetails([
+  ["Stage", params.formationTitle],
+  ["Date", params.sessionDate],
+  ["Centre", params.centreName],
+])}
+${remboursement}`,
+    cta: { url: `${APP_URL}/espace-eleve/reservations`, libelle: "Voir mes réservations" },
+  }));
 }
 
 /**
@@ -297,23 +260,20 @@ export async function sendCentreNotificationEmail(params: {
     currency: "EUR",
   }).format(params.amount);
 
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Nouvelle réservation - ${params.formationTitle}`,
-    html: `
-      <h1>Nouvelle réservation</h1>
-      <p>Un nouvel élève a réservé une place dans votre formation.</p>
-      <table style="border-collapse:collapse;margin:16px 0">
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Élève</td><td>${params.eleveName}</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Formation</td><td>${params.formationTitle}</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Date</td><td>${params.sessionDate}</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:bold">Montant</td><td>${formattedAmount}</td></tr>
-      </table>
-      <p>Connectez-vous à votre espace pour gérer cette réservation.</p>
-      <p>Cordialement,<br/>L'équipe BYS Permis</p>
-    `,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `Nouvelle réservation - ${params.formationTitle}`,
+    badge: { ton: "succes", libelle: "Nouvelle réservation" },
+    titre: "Un stagiaire vient de réserver",
+    corpsHtml: `<p>Un nouvel élève a réservé une place dans l'un de vos stages.</p>
+${emailDetails([
+  ["Élève", params.eleveName],
+  ["Stage", params.formationTitle],
+  ["Date", params.sessionDate],
+  ["Montant", formattedAmount],
+])}
+<p>Connectez-vous à votre espace pour gérer cette réservation.</p>`,
+    cta: { url: `${APP_URL}/espace-centre`, libelle: "Voir la réservation" },
+  }));
 }
 
 /**
@@ -325,54 +285,26 @@ export async function sendCentreInvitationEmail(params: {
   loginUrl: string;
   tempPassword?: string;
 }): Promise<void> {
-  const credentialsBlock = params.tempPassword
-    ? `<div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
-        <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">Vos identifiants de connexion :</p>
-        <table style="border-collapse:collapse">
-          <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Email</td><td style="font-size:13px;color:#1E3A5F">${params.to}</td></tr>
-          <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Mot de passe temporaire</td><td style="font-size:13px;color:#1E3A5F;font-family:monospace;background:#E0F2FE;padding:2px 8px;border-radius:4px">${params.tempPassword}</td></tr>
-        </table>
-        <p style="margin:8px 0 0;color:#64748B;font-size:11px">Nous vous recommandons de changer votre mot de passe lors de votre premiere connexion.</p>
-      </div>`
-    : "";
-
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Bienvenue sur BYS Permis — Votre espace centre est pret`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Votre espace centre est pret !</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour,</p>
-    <p>Nous avons le plaisir de vous informer que votre centre <strong>${params.centreName}</strong> a ete cree sur la plateforme <strong>BYS Permis</strong>.</p>
-    <p>Votre espace est pret — il ne reste plus qu'a completer votre profil pour etre visible sur notre marketplace et commencer a recevoir des reservations.</p>
-
-    ${credentialsBlock}
-
-    <h3 style="color:#1E293B;font-size:15px;margin:24px 0 12px">Les etapes pour demarrer :</h3>
-    <table style="width:100%;border-collapse:collapse;margin:0 0 20px">
-      <tr><td style="padding:10px 12px;vertical-align:top;width:36px"><span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#2563EB;color:#fff;border-radius:50%;font-weight:bold;font-size:13px">1</span></td><td style="padding:10px 12px"><strong>Informations de base</strong><br/><span style="color:#6B7280;font-size:13px">Nom, adresse et description de votre centre (~2 min)</span></td></tr>
-      <tr style="background:#f9fafb"><td style="padding:10px 12px;vertical-align:top"><span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#2563EB;color:#fff;border-radius:50%;font-weight:bold;font-size:13px">2</span></td><td style="padding:10px 12px"><strong>Contact</strong><br/><span style="color:#6B7280;font-size:13px">Telephone, email et site web (~1 min)</span></td></tr>
-      <tr><td style="padding:10px 12px;vertical-align:top"><span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#2563EB;color:#fff;border-radius:50%;font-weight:bold;font-size:13px">3</span></td><td style="padding:10px 12px"><strong>Presentation</strong><br/><span style="color:#6B7280;font-size:13px">Texte de presentation, equipements, certifications (~5 min)</span></td></tr>
-      <tr style="background:#f9fafb"><td style="padding:10px 12px;vertical-align:top"><span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#2563EB;color:#fff;border-radius:50%;font-weight:bold;font-size:13px">4</span></td><td style="padding:10px 12px"><strong>Premiere formation</strong><br/><span style="color:#6B7280;font-size:13px">Creez au moins une formation avec une session (~5 min)</span></td></tr>
-      <tr><td style="padding:10px 12px;vertical-align:top"><span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#2563EB;color:#fff;border-radius:50%;font-weight:bold;font-size:13px">5</span></td><td style="padding:10px 12px"><strong>Paiement</strong><br/><span style="color:#6B7280;font-size:13px">Connectez Stripe pour recevoir vos paiements (~3 min)</span></td></tr>
-    </table>
-
-    <p style="text-align:center;margin:24px 0">
-      <a href="${params.loginUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Acceder a mon espace centre</a>
-    </p>
-
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Si vous avez des questions, n'hesitez pas a contacter notre equipe support.<br/>
-      Cordialement,<br/>L'equipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `Bienvenue sur BYS Permis — Votre espace centre est prêt`,
+    badge: { ton: "info", libelle: "Espace centre" },
+    titre: "Bienvenue sur BYS Permis",
+    sousTitre: "Votre espace centre est prêt !",
+    corpsHtml: `<p>Bonjour,</p>
+<p>Nous avons le plaisir de vous informer que votre centre <strong>${params.centreName}</strong> a été créé sur la plateforme <strong>BYS Permis</strong>.</p>
+<p>Il ne reste plus qu'à compléter votre profil pour être visible sur la marketplace et commencer à recevoir des réservations.</p>
+${blocIdentifiants(params.to, params.tempPassword)}
+<h3>Les étapes pour démarrer</h3>
+${emailEtapes([
+  { titre: "Informations de base", detail: "Nom, adresse et description de votre centre (~2 min)" },
+  { titre: "Contact", detail: "Téléphone, email et site web (~1 min)" },
+  { titre: "Présentation", detail: "Texte de présentation, équipements, photos (~5 min)" },
+  { titre: "Premier stage", detail: "Créez au moins un stage avec une session (~5 min)" },
+  { titre: "Paiement", detail: "Connectez Stripe pour recevoir vos paiements (~3 min)" },
+])}`,
+    cta: { url: params.loginUrl, libelle: "Accéder à mon espace centre" },
+    note: "Une question ? Notre équipe support est là pour vous aider.",
+  }));
 }
 
 /**
@@ -385,45 +317,18 @@ export async function sendDirecteurLieuInvitationEmail(params: {
   loginUrl: string;
   tempPassword?: string;
 }): Promise<void> {
-  const credentialsBlock = params.tempPassword
-    ? `<div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
-        <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">Vos identifiants de connexion :</p>
-        <table style="border-collapse:collapse">
-          <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Email</td><td style="font-size:13px;color:#1E3A5F">${params.to}</td></tr>
-          <tr><td style="padding:4px 16px 4px 0;font-weight:bold;color:#0C4A6E;font-size:13px">Mot de passe temporaire</td><td style="font-size:13px;color:#1E3A5F;font-family:monospace;background:#E0F2FE;padding:2px 8px;border-radius:4px">${params.tempPassword}</td></tr>
-        </table>
-        <p style="margin:8px 0 0;color:#64748B;font-size:11px">Nous vous recommandons de changer votre mot de passe lors de votre premiere connexion.</p>
-      </div>`
-    : "";
-
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `BYS Permis — Votre acces directeur de lieu est pret`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Bienvenue sur BYS Permis</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">Acces directeur de lieu</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour ${params.prenom},</p>
-    <p>Un acces directeur de lieu a ete cree pour vous sur la plateforme <strong>BYS Permis</strong> pour le centre <strong>${params.centreName}</strong>.</p>
-    <p>En tant que directeur de lieu, vous pouvez gerer les formations, sessions, inscrits et l'emargement de votre lieu.</p>
-
-    ${credentialsBlock}
-
-    <p style="text-align:center;margin:24px 0">
-      <a href="${params.loginUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Acceder a mon espace</a>
-    </p>
-
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Si vous avez des questions, contactez votre chef de centre ou notre equipe support.<br/>
-      Cordialement,<br/>L'equipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `BYS Permis — Votre accès directeur de lieu est prêt`,
+    badge: { ton: "info", libelle: "Accès directeur de lieu" },
+    titre: "Bienvenue sur BYS Permis",
+    sousTitre: params.centreName,
+    corpsHtml: `<p>Bonjour ${params.prenom},</p>
+<p>Un accès directeur de lieu a été créé pour vous sur la plateforme <strong>BYS Permis</strong> pour le centre <strong>${params.centreName}</strong>.</p>
+<p>En tant que directeur de lieu, vous pouvez gérer les stages, sessions, inscrits et l'émargement de votre lieu.</p>
+${blocIdentifiants(params.to, params.tempPassword)}`,
+    cta: { url: params.loginUrl, libelle: "Accéder à mon espace" },
+    note: "Une question ? Contactez votre chef de centre ou notre équipe support.",
+  }));
 }
 
 /**
@@ -434,43 +339,23 @@ export async function sendCentreActivationEmail(params: {
   centreName: string;
   dashboardUrl: string;
 }): Promise<void> {
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Votre centre est maintenant visible sur BYS Permis !`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Felicitations !</h1>
-    <p style="color:#4ADE80;margin:8px 0 0;font-size:14px;font-weight:bold">Votre centre est maintenant actif</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour,</p>
-    <p>Excellente nouvelle ! Votre centre <strong>${params.centreName}</strong> a ete valide par notre equipe et est desormais <strong>visible sur la marketplace BYS Permis</strong>.</p>
-
-    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:16px 20px;margin:20px 0;text-align:center">
-      <p style="margin:0;color:#166534;font-size:15px;font-weight:bold">Votre centre est en ligne !</p>
-      <p style="margin:8px 0 0;color:#15803D;font-size:13px">Les stagiaires peuvent desormais decouvrir et reserver vos formations.</p>
-    </div>
-
-    <h3 style="color:#1E293B;font-size:15px;margin:24px 0 12px">Prochaines etapes recommandees :</h3>
-    <ul style="color:#4B5563;line-height:2;font-size:14px;padding-left:20px">
-      <li>Ajoutez d'autres formations pour attirer plus de stagiaires</li>
-      <li>Planifiez vos prochaines sessions</li>
-      <li>Partagez votre profil sur vos reseaux sociaux</li>
-      <li>Consultez votre dashboard pour suivre vos statistiques</li>
-    </ul>
-
-    <p style="text-align:center;margin:24px 0">
-      <a href="${params.dashboardUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Acceder a mon dashboard</a>
-    </p>
-
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Cordialement,<br/>L'equipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `Votre centre est maintenant visible sur BYS Permis !`,
+    badge: { ton: "succes", libelle: "✓ Centre activé" },
+    titre: "Félicitations, vous êtes en ligne !",
+    sousTitre: params.centreName,
+    corpsHtml: `<p>Bonjour,</p>
+<p>Excellente nouvelle : votre centre <strong>${params.centreName}</strong> a été validé par notre équipe et est désormais <strong>visible sur la marketplace BYS Permis</strong>.</p>
+${emailEncadre("succes", "Votre centre est en ligne", `<p style="margin:0">Les stagiaires peuvent dès maintenant découvrir et réserver vos stages.</p>`)}
+<h3>Prochaines étapes recommandées</h3>
+<ul>
+  <li>Planifiez vos prochaines sessions</li>
+  <li>Ajoutez des photos de vos salles</li>
+  <li>Partagez votre page centre sur vos réseaux sociaux</li>
+  <li>Suivez vos statistiques depuis votre tableau de bord</li>
+</ul>`,
+    cta: { url: params.dashboardUrl, libelle: "Accéder à mon tableau de bord" },
+  }));
 }
 
 /**
@@ -488,38 +373,25 @@ export async function sendQuestionnaireEmail(params: {
     return;
   }
 
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `Votre avis compte — ${params.formationTitle}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Questionnaire satisfaction</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">${params.formationTitle}</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour ${params.prenom},</p>
-    <p>Merci d'avoir suivi votre formation <strong>${params.formationTitle}</strong> chez <strong>${params.centreName}</strong>.</p>
-    <p>Votre retour nous aide à améliorer la qualité des centres partenaires et de la plateforme BYS Permis.</p>
-    <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:16px 20px;margin:20px 0">
-      <p style="margin:0 0 8px;font-weight:bold;color:#0369A1;font-size:14px">2 questionnaires rapides :</p>
-      <ul style="margin:0;padding-left:20px;color:#0C4A6E;font-size:13px;line-height:1.8">
-        <li><strong>5 questions</strong> sur votre centre de formation</li>
-        <li><strong>5 questions</strong> sur BYS Permis (réservation, site, suivi)</li>
-      </ul>
-      <p style="margin:8px 0 0;color:#64748B;font-size:12px">Notes de 1 à 5 — demi-étoiles possibles.</p>
-    </div>
-    <p style="text-align:center;margin:24px 0">
-      <a href="${params.questionnaireUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Donner mon avis</a>
-    </p>
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Vous pouvez aussi répondre depuis votre espace élève → <strong>Mes avis</strong>.<br/>
-      Cordialement,<br/>L'équipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `Votre avis compte — ${params.formationTitle}`,
+    badge: { ton: "info", libelle: "2 minutes" },
+    titre: "Comment s'est passé votre stage ?",
+    sousTitre: `${params.formationTitle} — ${params.centreName}`,
+    corpsHtml: `<p>Bonjour ${params.prenom},</p>
+<p>Merci d'avoir suivi votre stage chez <strong>${params.centreName}</strong>. Votre retour nous aide à améliorer la qualité des centres partenaires et de la plateforme.</p>
+${emailEncadre(
+  "info",
+  "2 questionnaires rapides",
+  `<ul style="margin:0;padding-left:20px">
+    <li><strong>5 questions</strong> sur votre centre</li>
+    <li><strong>5 questions</strong> sur BYS Permis (réservation, site, suivi)</li>
+  </ul>
+  <p style="margin:8px 0 0;font-size:12px">Notes de 1 à 5 — demi-étoiles possibles.</p>`,
+)}`,
+    cta: { url: params.questionnaireUrl, libelle: "Donner mon avis" },
+    note: "Vous pouvez aussi répondre depuis votre espace élève → <strong>Mes avis</strong>.",
+  }));
 }
 
 /**
@@ -541,31 +413,17 @@ export async function sendDocumentEmail(params: {
     console.warn("[email] RESEND_API_KEY absent — document non envoyé à", params.to);
     return;
   }
-  const cta = params.ctaUrl
-    ? `<p style="text-align:center;margin:24px 0">
-         <a href="${params.ctaUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">${params.ctaLabel ?? "Voir le document"}</a>
-       </p>`
-    : "";
 
   await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: params.sujet,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">${params.sujet}</h1>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
-    <p>${params.intro}</p>
-    ${cta}
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Vous pouvez aussi retrouver vos documents depuis votre espace élève → <strong>Mes documents</strong>.<br/>
-      Cordialement,<br/>L'équipe BYS Permis
-    </p>
-  </div>
-</div>`,
+    ...payloadGabarit(params.to, {
+      sujet: params.sujet,
+      badge: params.attachments && params.attachments.length > 0 ? { ton: "info", libelle: "📎 Document joint" } : undefined,
+      titre: params.sujet,
+      corpsHtml: `<p>Bonjour${params.prenom ? ` ${params.prenom}` : ""},</p>
+<p>${params.intro}</p>`,
+      cta: params.ctaUrl ? { url: params.ctaUrl, libelle: params.ctaLabel ?? "Voir le document" } : undefined,
+      note: "Retrouvez tous vos documents dans votre espace élève → <strong>Mes documents</strong>.",
+    }),
     ...(params.attachments && params.attachments.length > 0
       ? { attachments: params.attachments }
       : {}),
@@ -581,36 +439,16 @@ export async function sendCentreRejectionEmail(params: {
   reason: string;
   onboardingUrl: string;
 }): Promise<void> {
-  await sendMail({
-    from: FROM,
-    to: params.to,
-    subject: `BYS Permis — Votre demande d'activation necessite des modifications`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
-  <div style="background:${BRAND_NAVY};padding:24px 32px;border-radius:8px 8px 0 0;text-align:center">
-    ${LOGO_IMG}
-    <h1 style="color:#fff;margin:0;font-size:22px">Modifications requises</h1>
-    <p style="color:#9CA3AF;margin:8px 0 0;font-size:13px">${params.centreName}</p>
-  </div>
-  <div style="padding:24px 32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-    <p>Bonjour,</p>
-    <p>Apres examen de votre profil centre <strong>${params.centreName}</strong>, notre equipe a identifie des elements a corriger avant de pouvoir activer votre centre sur la marketplace.</p>
-
-    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:16px 20px;margin:20px 0">
-      <p style="margin:0 0 8px;font-weight:bold;color:#991B1B;font-size:14px">Raison du refus :</p>
-      <p style="margin:0;color:#7F1D1D;font-size:13px">${params.reason}</p>
-    </div>
-
-    <p>Veuillez corriger les elements mentionnes et soumettre a nouveau votre centre pour validation.</p>
-
-    <p style="text-align:center;margin:24px 0">
-      <a href="${params.onboardingUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px">Modifier mon profil centre</a>
-    </p>
-
-    <p style="color:#6B7280;font-size:12px;margin-top:24px;text-align:center">
-      Si vous avez des questions, n'hesitez pas a contacter notre equipe support.<br/>
-      Cordialement,<br/>L'equipe BYS Permis
-    </p>
-  </div>
-</div>`,
-  });
+  await sendMail(payloadGabarit(params.to, {
+    sujet: `BYS Permis — Votre demande d'activation nécessite des modifications`,
+    badge: { ton: "alerte", libelle: "Action requise" },
+    titre: "Quelques modifications sont nécessaires",
+    sousTitre: params.centreName,
+    corpsHtml: `<p>Bonjour,</p>
+<p>Après examen de votre profil centre <strong>${params.centreName}</strong>, notre équipe a identifié des éléments à corriger avant de pouvoir l'activer sur la marketplace.</p>
+${emailEncadre("danger", "Éléments à corriger", `<p style="margin:0">${params.reason}</p>`)}
+<p>Corrigez les éléments mentionnés puis soumettez à nouveau votre centre pour validation.</p>`,
+    cta: { url: params.onboardingUrl, libelle: "Modifier mon profil centre" },
+    note: "Une question ? Notre équipe support est là pour vous aider.",
+  }));
 }

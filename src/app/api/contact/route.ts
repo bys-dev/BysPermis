@@ -3,6 +3,7 @@ import { z } from "zod";
 import { sendMail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
+import { renderEmail, emailDetails, emailEncadre } from "@/lib/email-layout";
 
 const ContactSchema = z.object({
   nom: z.string().min(1, "Nom requis"),
@@ -38,38 +39,22 @@ export async function POST(req: NextRequest) {
     const safeSujet = escapeHtml(sujet);
     const safeMessage = escapeHtml(message).replace(/\n/g, "<br/>");
 
-    await sendMail({
-      from: FROM,
-      to: TO,
-      replyTo: email,
-      subject: `[Contact BYS] ${sujet} — ${nom}`,
-      html: `
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-          <h2 style="color:#1e3a5f">Nouveau message de contact</h2>
-          <table style="border-collapse:collapse;width:100%;margin:16px 0">
-            <tr>
-              <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151;width:100px">Nom</td>
-              <td style="padding:8px 0;color:#111827">${safeNom}</td>
-            </tr>
-            <tr>
-              <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151">Email</td>
-              <td style="padding:8px 0;color:#111827"><a href="mailto:${safeEmail}">${safeEmail}</a></td>
-            </tr>
-            <tr>
-              <td style="padding:8px 16px 8px 0;font-weight:bold;color:#374151">Sujet</td>
-              <td style="padding:8px 0;color:#111827">${safeSujet}</td>
-            </tr>
-          </table>
-          <h3 style="color:#374151">Message</h3>
-          <div style="background:#f9fafb;border-left:4px solid #3b82f6;padding:16px;border-radius:4px;color:#111827;line-height:1.6">
-            ${safeMessage}
-          </div>
-          <p style="color:#9ca3af;font-size:12px;margin-top:24px">
-            Envoyé depuis le formulaire de contact BYS Permis
-          </p>
-        </div>
-      `,
+    const subject = `[Contact BYS] ${sujet} — ${nom}`;
+    const { html, text } = renderEmail({
+      sujet: subject,
+      badge: { ton: "info", libelle: "Formulaire de contact" },
+      titre: "Nouveau message de contact",
+      sousTitre: safeSujet,
+      corpsHtml: `${emailDetails([
+        ["Nom", safeNom],
+        ["Email", `<a href="mailto:${safeEmail}">${safeEmail}</a>`],
+        ["Sujet", safeSujet],
+      ])}
+${emailEncadre("info", "Message", `<p style="margin:0">${safeMessage}</p>`)}
+<p>Répondez directement à cet email pour écrire à ${safeNom}.</p>`,
     });
+
+    await sendMail({ from: FROM, to: TO, replyTo: email, subject, html, text });
 
     return NextResponse.json({ ok: true });
   } catch (err) {

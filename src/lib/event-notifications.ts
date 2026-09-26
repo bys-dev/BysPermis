@@ -5,6 +5,7 @@ import {
   sendEleveCancellationEmail,
   sendEleveEventEmail,
 } from "@/lib/email";
+import { emailDetails, emailEncadre } from "@/lib/email-layout";
 
 const APP_URL = process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://byspermis.fr";
 
@@ -582,22 +583,20 @@ export async function notifyOwnersNewPartnerLead(lead: {
   );
 
   const e = escapeHtml;
-  const row = (label: string, value: string) =>
-    `<tr><td style="padding:6px 16px 6px 0;font-weight:bold;color:#374151;vertical-align:top;white-space:nowrap">${label}</td><td style="padding:6px 0;color:#111827">${value}</td></tr>`;
   const agrement = lead.agrementNumber
     ? `${e(lead.agrementNumber)}${lead.agrementDepartement ? ` (dép. ${e(lead.agrementDepartement)})` : ""}`
-    : "<em style='color:#9ca3af'>non renseigné</em>";
+    : "<em style='color:#9ca3af;font-weight:normal'>non renseigné</em>";
   const bodyHtml = `<p>Un centre souhaite rejoindre la plateforme. Vous pouvez accepter la demande (le compte propriétaire est créé automatiquement et ses accès lui sont envoyés) ou la refuser avec un motif.</p>
-    <table style="border-collapse:collapse;width:100%;margin:16px 0">
-      ${row("Centre", e(lead.centreNom))}
-      ${row("N° d'agrément", agrement)}
-      ${row("Contact", e(lead.contactNom))}
-      ${row("Email", `<a href="mailto:${e(lead.contactEmail)}">${e(lead.contactEmail)}</a>`)}
-      ${row("Téléphone", e(lead.telephone))}
-      ${row("Ville / dép.", e(lead.ville))}
-      ${lead.volumeMensuel ? row("Volume estimé", e(lead.volumeMensuel)) : ""}
-    </table>
-    ${lead.message ? `<div style="background:#f9fafb;border-left:4px solid #3b82f6;padding:12px 16px;border-radius:4px;line-height:1.6">${e(lead.message).replace(/\n/g, "<br/>")}</div>` : ""}`;
+    ${emailDetails([
+      ["Centre", e(lead.centreNom)],
+      ["N° d'agrément", agrement],
+      ["Contact", e(lead.contactNom)],
+      ["Email", `<a href="mailto:${e(lead.contactEmail)}">${e(lead.contactEmail)}</a>`],
+      ["Téléphone", `<a href="tel:${e(lead.telephone.replace(/\s/g, ""))}">${e(lead.telephone)}</a>`],
+      ["Ville / dép.", e(lead.ville)],
+      lead.volumeMensuel ? ["Volume estimé", e(lead.volumeMensuel)] : null,
+    ])}
+    ${lead.message ? emailEncadre("info", "Message du centre", `<p style="margin:0">${e(lead.message).replace(/\n/g, "<br/>")}</p>`) : ""}`;
 
   const results = await Promise.allSettled(
     recipients.emails.map((to) =>
@@ -628,10 +627,7 @@ export async function sendPartnerLeadRefusedEmail(params: {
     title: "Votre demande de partenariat",
     bodyHtml: `<p>Bonjour,</p>
       <p>Merci de l'intérêt que vous portez à BYS Permis. Après étude, nous ne pouvons pas donner suite à la demande de partenariat de <strong>${escapeHtml(params.centreNom)}</strong> pour le moment.</p>
-      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:16px 20px;margin:20px 0">
-        <p style="margin:0 0 8px;font-weight:bold;color:#991B1B;font-size:14px">Motif :</p>
-        <p style="margin:0;color:#7F1D1D;font-size:13px">${escapeHtml(params.motif).replace(/\n/g, "<br/>")}</p>
-      </div>
+      ${emailEncadre("danger", "Motif", `<p style="margin:0">${escapeHtml(params.motif).replace(/\n/g, "<br/>")}</p>`)}
       <p>Si votre situation évolue (par exemple l'obtention ou le renouvellement de votre agrément préfectoral), vous pouvez déposer une nouvelle demande.</p>`,
     ctaUrl: `${APP_URL}/devenir-partenaire`,
     ctaLabel: "Déposer une nouvelle demande",
